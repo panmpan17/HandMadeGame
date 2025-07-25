@@ -8,6 +8,9 @@ FRAMEWORK = -framework Cocoa -framework OpenGL -framework IOKit -framework CoreV
 compile:
 	$(CXX) $(SRCS) -o $(OUTPUT_NAME) $(INCLUDES) $(LIBS) $(FRAMEWORK) -Wl,-rpath,@loader_path/lib
 
+quick: compile
+	./$(OUTPUT_NAME)
+
 mac: compile
 
 	mkdir -p $(OUTPUT_NAME).app/Contents/MacOS
