@@ -1,27 +1,65 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
+#include <print>
+
+
+#define IS_DEBUG_VERSION 1
+#ifdef IS_DEBUG_VERSION
+#define DEBUG_PRINT(msg, ...) std::println(msg, __VA_ARGS__)
+#else
+#define DEBUG_PRINT(msg, ...) do {} while (0)
+#endif
+
+
+class Window {
+public:
+    Window() {
+        if (!glfwInit()) {
+            DEBUG_PRINT("Failed to initialize GLFW");
+            return;
+        }
+
+        m_pWindow = glfwCreateWindow(800, 600, "My GLFW Window", NULL, NULL);
+        if (!m_pWindow) {
+            DEBUG_PRINT("Failed to create GLFW window");
+            glfwTerminate();
+            return;
+        }
+    }
+
+    ~Window() {
+        if (m_pWindow) {
+            glfwDestroyWindow(m_pWindow);
+        }
+        glfwTerminate();
+    }
+
+    bool isValid() const {
+        return m_pWindow != nullptr;
+    }
+
+    void start() {
+        glfwMakeContextCurrent(m_pWindow);
+
+        while (!glfwWindowShouldClose(m_pWindow)) {
+            glfwSwapBuffers(m_pWindow);
+            glfwPollEvents();
+        }
+
+        glfwTerminate();
+    }
+
+private:
+    GLFWwindow* m_pWindow = nullptr;
+};
 
 int main() {
-    if (!glfwInit()) {
-        std::cerr << "Failed to initialize GLFW" << std::endl;
-        return -1;
+    Window window;
+    if (!window.isValid()) {
+        return -1; // Initialization failed
     }
 
-    GLFWwindow* window = glfwCreateWindow(800, 600, "My GLFW Window", NULL, NULL);
-    if (!window) {
-        std::cerr << "Failed to create GLFW window" << std::endl;
-        glfwTerminate();
-        return -1;
-    }
-
-    glfwMakeContextCurrent(window);
-
-    while (!glfwWindowShouldClose(window)) {
-        glfwSwapBuffers(window);
-        glfwPollEvents();
-    }
-
-    glfwTerminate();
+    window.start();
     return 0;
 }
 
