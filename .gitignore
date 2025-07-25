@@ -1,0 +1,4 @@
+glfw-build/
+glfw-3.4/
+lib/*.dylib
+* APP
