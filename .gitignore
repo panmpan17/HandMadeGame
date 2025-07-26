@@ -3,3 +3,5 @@ glfw-3.4/
 lib/*.dylib
 * APP
 *.app
+output/
+.DS_Store
