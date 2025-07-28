@@ -12,4 +12,6 @@ public:
 
 private:
     GLFWwindow* m_pWindow = nullptr;
+
+    void configureAndCreateWindow();
 };
