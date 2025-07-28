@@ -7,6 +7,7 @@
 #include <functional>
 
 #include "window.h"
+#include "camera.h"
 #include "debug_macro.h"
 
 typedef struct Vertex
@@ -56,6 +57,11 @@ Window::Window()
 
 Window::~Window()
 {
+    if (m_pCamera)
+    {
+        delete m_pCamera;
+        m_pCamera = nullptr;
+    }
     if (m_pWindow)
     {
         glfwDestroyWindow(m_pWindow);
@@ -83,7 +89,15 @@ void Window::configureAndCreateWindow()
 
 void Window::start()
 {
+    m_pCamera = new Camera();
+    m_pCamera->setRatio(m_nWidth / (float) m_nHeight);
+
     glfwSetKeyCallback(m_pWindow, &Window::onKeyCallback);
+    glfwSetCursorEnterCallback(m_pWindow, &Window::onCursorEnterCallback);
+    glfwSetCursorPosCallback(m_pWindow, &Window::onCursorPosCallback);
+    glfwSetMouseButtonCallback(m_pWindow, &Window::onMouseButtonCallback);
+
+    // glfwSetWindowOpacity(m_pWindow, 0.5f); // Fun
 
     glfwMakeContextCurrent(m_pWindow);
     gladLoadGL(glfwGetProcAddress);
@@ -147,14 +161,12 @@ void Window::mainLoop()
 
 void Window::drawFrame()
 {
-    mat4x4 m, p, mvp;
-    mat4x4_identity(m);
-    mat4x4_rotate_Z(m, m, (float) glfwGetTime());
-    mat4x4_ortho(p, -m_fRatio, m_fRatio, -1.f, 1.f, 1.f, -1.f);
-    mat4x4_mul(mvp, p, m);
+    mat4x4 mvp;
+    // m_pCamera->setRotation(0.1f, 0.1f, 0.1f); // Rotate the camera slightly each frame
+    m_pCamera->getViewMatrix(mvp);
 
     glUseProgram(m_nProgram);
-    glUniformMatrix4fv(m_nMvpLocation, 1, GL_FALSE, (const GLfloat*) &mvp);
+    glUniformMatrix4fv(m_nMvpLocation, 1, GL_FALSE, (const GLfloat*) mvp);
     glBindVertexArray(m_nVertexArray);
     glDrawArrays(GL_TRIANGLES, 0, 3);
 }
@@ -162,4 +174,26 @@ void Window::drawFrame()
 void Window::onKeyCallback(GLFWwindow* pWindow, int nKey, int nScanNode, int nAction, int nMods)
 {
     // DEBUG_PRINT_EX("Key pressed: {}, Scancode: {}, Action: {}, Mods: {}", nKey, nScanNode, nAction, nMods);
+}
+
+void Window::onCursorEnterCallback(GLFWwindow* pWindow, int bEntered)
+{
+    // if (bEntered)
+    // {
+    //     DEBUG_PRINT("Cursor entered the window");
+    // }
+    // else
+    // {
+    //     DEBUG_PRINT("Cursor left the window");
+    // }
+}
+
+void Window::onCursorPosCallback(GLFWwindow* pWindow, double fPosX, double fPosY)
+{
+    // DEBUG_PRINT_EX("Cursor position: ({}, {})", fPosX, fPosY);
+}
+
+void Window::onMouseButtonCallback(GLFWwindow* pWindow, int nButton, int nAction, int nMods)
+{
+    DEBUG_PRINT_EX("Mouse button: {}, Action: {}, Mods: {}", nButton, nAction, nMods);
 }
