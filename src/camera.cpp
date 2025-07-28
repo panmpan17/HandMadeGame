@@ -14,7 +14,8 @@ void Camera::getViewMatrix(mat4x4& oOutViewMatrix)
     mat4x4 m, p;
 
     mat4x4_identity(m);
-    // mat4x4_rotate_Z(m, m, (float) glfwGetTime());
+    mat4x4_translate(m, m_position[0], m_position[1], m_position[2]);
+    mat4x4_rotate_Z(m, m, (float) m_rotation[2]); // Rotate around Z-axis
 
     const float LEFT_CLIPPING_PLANE = -m_fRatio;
     const float RIGHT_CLIPPING_PLANE = m_fRatio;

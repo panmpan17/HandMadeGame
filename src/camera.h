@@ -9,11 +9,21 @@ public:
     inline void setRatio(float fRatio) {
         m_fRatio = fRatio;
     }
+    inline void setPosition(float fX, float fY) {
+        m_position[0] = fX;
+        m_position[1] = fY;
+    }
     inline void setPosition(float fX, float fY, float fZ) {
         m_position[0] = fX;
         m_position[1] = fY;
         m_position[2] = fZ;
     }
+    inline void move(float fX, float fY, float fZ) {
+        m_position[0] += fX;
+        m_position[1] += fY;
+        m_position[2] += fZ;
+    }
+
     inline void setRotation(float fX, float fY, float fZ) {
         m_rotation[0] = fX;
         m_rotation[1] = fY;

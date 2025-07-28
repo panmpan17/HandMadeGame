@@ -8,6 +8,7 @@
 
 #include "window.h"
 #include "camera.h"
+#include "shader.h"
 #include "debug_macro.h"
 
 typedef struct Vertex
@@ -23,29 +24,12 @@ static const Vertex vertices[3] =
     { {   0.f,  0.6f }, { 0.f, 0.f, 1.f } }
 };
 
-static const char* vertex_shader_text =
-"#version 330\n"
-"uniform mat4 MVP;\n"
-"in vec3 vCol;\n"
-"in vec2 vPos;\n"
-"out vec3 color;\n"
-"void main()\n"
-"{\n"
-"    gl_Position = MVP * vec4(vPos, 0.0, 1.0);\n"
-"    color = vCol;\n"
-"}\n";
- 
-static const char* fragment_shader_text =
-"#version 330\n"
-"in vec3 color;\n"
-"out vec4 fragment;\n"
-"void main()\n"
-"{\n"
-"    fragment = vec4(color, 1.0);\n"
-"}\n";
+Window* Window::ins = nullptr;
 
 Window::Window()
 {
+    ins = this;
+
     if (!glfwInit())
     {
         DEBUG_PRINT("Failed to initialize GLFW");
@@ -114,22 +98,12 @@ void Window::setupGLVertex()
     glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-    const GLuint vertex_shader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertex_shader, 1, &vertex_shader_text, NULL);
-    glCompileShader(vertex_shader);
+    m_pBaseShader = new Shader();
 
-    const GLuint fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragment_shader, 1, &fragment_shader_text, NULL);
-    glCompileShader(fragment_shader);
-
-    m_nProgram = glCreateProgram();
-    glAttachShader(m_nProgram, vertex_shader);
-    glAttachShader(m_nProgram, fragment_shader);
-    glLinkProgram(m_nProgram);
-
-    m_nMvpLocation = glGetUniformLocation(m_nProgram, "MVP");
-    const GLint vpos_location = glGetAttribLocation(m_nProgram, "vPos");
-    const GLint vcol_location = glGetAttribLocation(m_nProgram, "vCol");
+    GLint nProgram = m_pBaseShader->getProgram();
+    m_nMvpLocation = glGetUniformLocation(nProgram, "MVP");
+    const GLint vpos_location = glGetAttribLocation(nProgram, "vPos");
+    const GLint vcol_location = glGetAttribLocation(nProgram, "vCol");
 
     glGenVertexArrays(1, &m_nVertexArray);
     glBindVertexArray(m_nVertexArray);
@@ -143,6 +117,8 @@ void Window::setupGLVertex()
 
 void Window::mainLoop()
 {
+    m_fLastDrawTime = glfwGetTime();
+
     // glfwGetFramebufferSize(m_pWindow, &width, &height);
     m_fRatio = m_nWidth / (float) m_nHeight;
     while (!glfwWindowShouldClose(m_pWindow))
@@ -161,11 +137,19 @@ void Window::mainLoop()
 
 void Window::drawFrame()
 {
+    m_fCurrentDrawTime = glfwGetTime();
+    m_fDeltaTime = m_fCurrentDrawTime - m_fLastDrawTime;
+    m_fLastDrawTime = m_fCurrentDrawTime;
+
     mat4x4 mvp;
-    // m_pCamera->setRotation(0.1f, 0.1f, 0.1f); // Rotate the camera slightly each frame
+
+    // Michael TODO: translate mouse position to camera position
+    // m_pCamera->setPosition(m_fTempMouseX, m_fTempMouseY);
+    // m_pCamera->move(3 * m_fDeltaTime, 0, 0); // Move the camera back a bit
+    // m_pCamera->rotate(0, 0, 1.f * m_fDeltaTime); // Rotate the camera slightly each frame
     m_pCamera->getViewMatrix(mvp);
 
-    glUseProgram(m_nProgram);
+    glUseProgram(m_pBaseShader->getProgram());
     glUniformMatrix4fv(m_nMvpLocation, 1, GL_FALSE, (const GLfloat*) mvp);
     glBindVertexArray(m_nVertexArray);
     glDrawArrays(GL_TRIANGLES, 0, 3);
@@ -190,10 +174,12 @@ void Window::onCursorEnterCallback(GLFWwindow* pWindow, int bEntered)
 
 void Window::onCursorPosCallback(GLFWwindow* pWindow, double fPosX, double fPosY)
 {
-    // DEBUG_PRINT_EX("Cursor position: ({}, {})", fPosX, fPosY);
+    ins->m_fTempMouseX = static_cast<float>(fPosX);
+    ins->m_fTempMouseY = static_cast<float>(fPosY);
+    // DEBUG_PRINT_EX("Cursor position: ({}, {})\r", fPosX, fPosY);
 }
 
 void Window::onMouseButtonCallback(GLFWwindow* pWindow, int nButton, int nAction, int nMods)
 {
-    DEBUG_PRINT_EX("Mouse button: {}, Action: {}, Mods: {}", nButton, nAction, nMods);
+    // DEBUG_PRINT_EX("Mouse button: {}, Action: {}, Mods: {}", nButton, nAction, nMods);
 }
