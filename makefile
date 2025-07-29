@@ -6,10 +6,13 @@ INCLUDES = -I./include
 LIBS = -L./lib -lglfw.3
 FRAMEWORK = -framework Cocoa -framework OpenGL -framework IOKit -framework CoreVideo 
 
+RELEASE_BUILD_FLAG = -DDEBUG_FLAG=0
+DEBUG_BUILD_FLAG = -DDEBUG_FLAG=1
+
 compile:
 	@echo "Compiling $(OUTPUT_NAME) to $(OUTPUT_FOLDER)"
 	@mkdir -p $(OUTPUT_FOLDER)
-	$(CXX) $(SRCS) -o $(OUTPUT_FOLDER)/$(OUTPUT_NAME) $(INCLUDES) $(LIBS) $(FRAMEWORK) -Wl,-rpath,@loader_path/lib -std=c++23
+	$(CXX) $(SRCS) -o $(OUTPUT_FOLDER)/$(OUTPUT_NAME) $(INCLUDES) $(LIBS) $(FRAMEWORK) -Wl,-rpath,@loader_path/lib -std=c++23 $(RELEASE_BUILD_FLAG)
 
 quick: compile
 	cp -r ./lib $(OUTPUT_FOLDER)/lib

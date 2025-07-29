@@ -4,6 +4,15 @@
 #include <fstream>
 // #include <vector>
 
+class path;
+
+class FileUtils
+{
+public:
+    static std::string getExecutablePath();
+    static std::string getExecutableDirectory();
+};
+
 class FileReader {
 public:
     FileReader(const std::string& path);

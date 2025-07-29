@@ -2,10 +2,14 @@
 
 #include <print>
 
-#define IS_DEBUG_VERSION 1
+#ifndef DEBUG_FLAG
+#define DEBUG_FLAG 1
+#endif
+
+#define IS_DEBUG_VERSION (DEBUG_FLAG == 1)
 
 
-#ifdef IS_DEBUG_VERSION
+#if IS_DEBUG_VERSION
 
 #define LOG(msg) std::print(msg)
 #define LOG_EX(msg, ...) std::print(msg, __VA_ARGS__)
