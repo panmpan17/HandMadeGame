@@ -1,3 +1,4 @@
+#pragma once
 
 class GLFWwindow;
 class Camera;
@@ -28,6 +29,7 @@ private:
     Shader* m_pBaseShader = nullptr;
 
     int m_nWidth = 800, m_nHeight = 600;
+    int m_nActualWidth = 800, m_nActualHeight = 600;
     float m_fRatio = 1.0f;
 
     double m_fCurrentDrawTime = 0.0;

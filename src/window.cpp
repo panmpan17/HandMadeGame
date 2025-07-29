@@ -32,7 +32,7 @@ Window::Window()
 
     if (!glfwInit())
     {
-        DEBUG_PRINT("Failed to initialize GLFW");
+        LOGLN("Failed to initialize GLFW");
         return;
     }
 
@@ -65,7 +65,7 @@ void Window::configureAndCreateWindow()
     m_pWindow = glfwCreateWindow(m_nWidth, m_nHeight, "My GLFW Window", NULL, NULL);
     if (!m_pWindow)
     {
-        DEBUG_PRINT("Failed to create GLFW window");
+        LOGLN("Failed to create GLFW window");
         glfwTerminate();
         return;
     }
@@ -74,7 +74,6 @@ void Window::configureAndCreateWindow()
 void Window::start()
 {
     m_pCamera = new Camera();
-    m_pCamera->setRatio(m_nWidth / (float) m_nHeight);
 
     glfwSetKeyCallback(m_pWindow, &Window::onKeyCallback);
     glfwSetCursorEnterCallback(m_pWindow, &Window::onCursorEnterCallback);
@@ -98,7 +97,7 @@ void Window::setupGLVertex()
     glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-    m_pBaseShader = new Shader();
+    m_pBaseShader = new Shader("shaders/test.vert", "shaders/test.frag");
 
     GLint nProgram = m_pBaseShader->getProgram();
     m_nMvpLocation = glGetUniformLocation(nProgram, "MVP");
@@ -119,11 +118,15 @@ void Window::mainLoop()
 {
     m_fLastDrawTime = glfwGetTime();
 
-    // glfwGetFramebufferSize(m_pWindow, &width, &height);
-    m_fRatio = m_nWidth / (float) m_nHeight;
     while (!glfwWindowShouldClose(m_pWindow))
     {
-        glViewport(0, 0, m_nWidth, m_nHeight);
+        // Because mac's retina display has a different pixel ratio (and moving to different monitors)
+        // need to adjust the viewport to match the actual framebuffer size.
+        glfwGetFramebufferSize(m_pWindow, &m_nActualWidth, &m_nActualHeight);
+        m_fRatio = m_nActualWidth / (float) m_nActualHeight;
+        m_pCamera->setRatio(m_fRatio);
+
+        glViewport(0, 0, m_nActualWidth, m_nActualHeight);
         glClear(GL_COLOR_BUFFER_BIT);
 
         drawFrame();
@@ -157,18 +160,18 @@ void Window::drawFrame()
 
 void Window::onKeyCallback(GLFWwindow* pWindow, int nKey, int nScanNode, int nAction, int nMods)
 {
-    // DEBUG_PRINT_EX("Key pressed: {}, Scancode: {}, Action: {}, Mods: {}", nKey, nScanNode, nAction, nMods);
+    // LOGLN_EX("Key pressed: {}, Scancode: {}, Action: {}, Mods: {}", nKey, nScanNode, nAction, nMods);
 }
 
 void Window::onCursorEnterCallback(GLFWwindow* pWindow, int bEntered)
 {
     // if (bEntered)
     // {
-    //     DEBUG_PRINT("Cursor entered the window");
+    //     LOGLN("Cursor entered the window");
     // }
     // else
     // {
-    //     DEBUG_PRINT("Cursor left the window");
+    //     LOGLN("Cursor left the window");
     // }
 }
 
@@ -176,10 +179,10 @@ void Window::onCursorPosCallback(GLFWwindow* pWindow, double fPosX, double fPosY
 {
     ins->m_fTempMouseX = static_cast<float>(fPosX);
     ins->m_fTempMouseY = static_cast<float>(fPosY);
-    // DEBUG_PRINT_EX("Cursor position: ({}, {})\r", fPosX, fPosY);
+    // LOGLN_EX("Cursor position: ({}, {})\r", fPosX, fPosY);
 }
 
 void Window::onMouseButtonCallback(GLFWwindow* pWindow, int nButton, int nAction, int nMods)
 {
-    // DEBUG_PRINT_EX("Mouse button: {}, Action: {}, Mods: {}", nButton, nAction, nMods);
+    // LOGLN_EX("Mouse button: {}, Action: {}, Mods: {}", nButton, nAction, nMods);
 }

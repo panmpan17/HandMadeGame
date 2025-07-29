@@ -1,10 +1,13 @@
+#pragma once
+
+#include <string>
 
 typedef unsigned int GLuint;
 
 class Shader
 {
 public:
-    // Shader(const char* vertex_shader_text, const char* fragment_shader_text);
+    Shader(const std::string& strVertexShaderPath, const std::string& strFragmentShaderPath);
     Shader();
     ~Shader();
 

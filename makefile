@@ -1,5 +1,5 @@
 CXX = g++
-SRCS = src/main.cpp src/window.cpp src/glad.c src/camera.cpp src/shader.cpp
+SRCS = src/main.cpp src/window.cpp src/glad.c src/camera.cpp src/shader.cpp src/file_utils.cpp
 OUTPUT_FOLDER = output
 OUTPUT_NAME = "My GLFW App"
 INCLUDES = -I./include
@@ -12,6 +12,8 @@ compile:
 	$(CXX) $(SRCS) -o $(OUTPUT_FOLDER)/$(OUTPUT_NAME) $(INCLUDES) $(LIBS) $(FRAMEWORK) -Wl,-rpath,@loader_path/lib -std=c++23
 
 quick: compile
+	cp -r ./lib $(OUTPUT_FOLDER)/lib
+	cp -r ./shaders $(OUTPUT_FOLDER)/shaders
 	./$(OUTPUT_FOLDER)/$(OUTPUT_NAME)
 
 mac: compile
@@ -20,6 +22,7 @@ mac: compile
 
 	cp $(OUTPUT_FOLDER)/$(OUTPUT_NAME) $(OUTPUT_FOLDER)/$(OUTPUT_NAME).app/Contents/MacOS/$(OUTPUT_NAME)
 	cp -r ./lib $(OUTPUT_FOLDER)/$(OUTPUT_NAME).app/Contents/MacOS/
+	cp -r ./shaders $(OUTPUT_FOLDER)/$(OUTPUT_NAME).app/Contents/MacOS/
 
 	mkdir -p $(OUTPUT_FOLDER)/$(OUTPUT_NAME).app/Contents/Resources
 	cp MacAppPack/icon-windowed.icns $(OUTPUT_FOLDER)/$(OUTPUT_NAME).app/Contents/Resources/

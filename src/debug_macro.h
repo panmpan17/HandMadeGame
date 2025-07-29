@@ -1,3 +1,5 @@
+#pragma once
+
 #include <print>
 
 #define IS_DEBUG_VERSION 1
@@ -5,12 +7,18 @@
 
 #ifdef IS_DEBUG_VERSION
 
-#define DEBUG_PRINT(msg) std::println(msg)
-#define DEBUG_PRINT_EX(msg, ...) std::println(msg, __VA_ARGS__)
+#define LOG(msg) std::print(msg)
+#define LOG_EX(msg, ...) std::print(msg, __VA_ARGS__)
+
+#define LOGLN(msg) std::println(msg)
+#define LOGLN_EX(msg, ...) std::println(msg, __VA_ARGS__)
 
 #else
 
-#define DEBUG_PRINT(msg) do {} while (0)
-#define DEBUG_PRINT_EX(msg, ...) do {} while (0)
+#define LOG(msg) do {} while (0)
+#define LOG_EX(msg, ...) do {} while (0)
+
+#define LOGLN(msg) do {} while (0)
+#define LOGLN_EX(msg, ...) do {} while (0)
 
 #endif
