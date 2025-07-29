@@ -10,15 +10,9 @@
 #include "camera.h"
 #include "shader.h"
 #include "quad.h"
+#include "triangle.h"
 #include "debug_macro.h"
 
- 
-static const VertexWColor vertices[3] =
-{
-    { { -0.6f, -0.4f }, { 1.f, 0.f, 0.f } },
-    { {  0.6f, -0.4f }, { 0.f, 1.f, 0.f } },
-    { {   0.f,  0.6f }, { 0.f, 0.f, 1.f } }
-};
 
 Window* Window::ins = nullptr;
 
@@ -84,6 +78,8 @@ void Window::start()
     
     setupGLVertex();
     setupShaders();
+    // The order of execute is important here, but not sure why
+    m_pTriangle->setShader(m_pBaseShader);
 
     if (m_pQuad)
     {
@@ -95,10 +91,8 @@ void Window::start()
 
 void Window::setupGLVertex()
 {
-    GLuint vertex_buffer;
-    glGenBuffers(1, &vertex_buffer);
-    glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    m_pTriangle = new Triangle();
+    m_pTriangle->registerBuffer();
 
     vec3 color = {1.f, 0.f, 0.f}; // Red color for the quad
     m_pQuad = new Quad(0, 0, 0.5f, 0.5f * (m_nWidth / (float)m_nHeight), color);
@@ -139,14 +133,15 @@ void Window::drawFrame()
     m_fDeltaTime = m_fCurrentDrawTime - m_fLastDrawTime;
     m_fLastDrawTime = m_fCurrentDrawTime;
 
-    mat4x4 mvp;
-
     // Michael TODO: translate mouse position to camera position
     // m_pCamera->setPosition(m_fTempMouseX, m_fTempMouseY);
     // m_pCamera->move(3 * m_fDeltaTime, 0, 0); // Move the camera back a bit
     // m_pCamera->rotate(0, 0, 1.f * m_fDeltaTime); // Rotate the camera slightly each frame
-    m_pCamera->getViewMatrix(mvp);
 
+    m_pTriangle->draw();
+    
+    mat4x4 mvp;
+    m_pCamera->getViewMatrix(mvp);
     glUseProgram(m_pBaseShader->getProgram());
     glUniformMatrix4fv(m_pBaseShader->getMvpLocation(), 1, GL_FALSE, (const GLfloat*) mvp);
     glBindVertexArray(m_pBaseShader->getVertexArray());
@@ -157,6 +152,8 @@ void Window::drawFrame()
         m_pQuad->draw();
     }
 }
+
+#pragma mark - Input Callbacks
 
 void Window::onKeyCallback(GLFWwindow* pWindow, int nKey, int nScanNode, int nAction, int nMods)
 {

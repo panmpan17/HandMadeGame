@@ -5,6 +5,7 @@ class Camera;
 class TestShader;
 class ImageShader;
 class Quad;
+class Triangle;
 
 typedef unsigned int GLuint;
 
@@ -44,6 +45,8 @@ private:
     Quad* m_pQuad2 = nullptr;
 
     float m_fTempMouseX = 0.0f, m_fTempMouseY = 0.0f;
+
+    Triangle* m_pTriangle = nullptr;
 
     void configureAndCreateWindow();
     void setupGLVertex();

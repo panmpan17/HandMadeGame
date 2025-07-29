@@ -1,8 +1,11 @@
 #include "camera.h"
 // #include <GLFW/glfw3.h>
 
+Camera* Camera::main = nullptr;
+
 Camera::Camera()
 {
+    main = this;
 }
 
 Camera::~Camera()

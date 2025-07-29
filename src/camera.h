@@ -5,6 +5,8 @@
 
 class Camera {
 public:
+    static Camera* main;
+
     Camera();
     ~Camera();
 

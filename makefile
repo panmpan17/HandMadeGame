@@ -1,5 +1,5 @@
 CXX = g++
-SRCS = src/main.cpp src/window.cpp src/glad.c src/camera.cpp src/shader.cpp src/file_utils.cpp src/quad.cpp
+SRCS = src/main.cpp src/window.cpp src/glad.c src/camera.cpp src/shader.cpp src/file_utils.cpp src/quad.cpp src/triangle.cpp
 OUTPUT_FOLDER = output
 OUTPUT_NAME = "My GLFW App"
 INCLUDES = -I./include
@@ -12,7 +12,7 @@ DEBUG_BUILD_FLAG = -DDEBUG_FLAG=1
 compile:
 	@echo "Compiling $(OUTPUT_NAME) to $(OUTPUT_FOLDER)"
 	@mkdir -p $(OUTPUT_FOLDER)
-	$(CXX) $(SRCS) -o $(OUTPUT_FOLDER)/$(OUTPUT_NAME) $(INCLUDES) $(LIBS) $(FRAMEWORK) -Wl,-rpath,@loader_path/lib -std=c++23 $(RELEASE_BUILD_FLAG)
+	$(CXX) $(SRCS) -o $(OUTPUT_FOLDER)/$(OUTPUT_NAME) $(INCLUDES) $(LIBS) $(FRAMEWORK) -Wl,-rpath,@loader_path/lib -std=c++23 $(DEBUG_BUILD_FLAG)
 
 quick: compile
 	cp -r ./lib $(OUTPUT_FOLDER)
