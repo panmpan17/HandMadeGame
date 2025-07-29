@@ -53,3 +53,20 @@ Shader::~Shader()
         glDeleteShader(m_nProgram);
     }
 }
+
+TestShader::TestShader()
+    : Shader("shaders/test.vert", "shaders/test.frag")
+{
+    m_nMvpLocation = glGetUniformLocation(m_nProgram, "MVP");
+    const GLint vpos_location = glGetAttribLocation(m_nProgram, "vPos");
+    const GLint vcol_location = glGetAttribLocation(m_nProgram, "vCol");
+
+    glGenVertexArrays(1, &m_nVertexArray);
+    glBindVertexArray(m_nVertexArray);
+    glEnableVertexAttribArray(vpos_location);
+    glVertexAttribPointer(vpos_location, 2, GL_FLOAT, GL_FALSE,
+                          sizeof(Vertex), (void*) offsetof(Vertex, pos));
+    glEnableVertexAttribArray(vcol_location);
+    glVertexAttribPointer(vcol_location, 3, GL_FLOAT, GL_FALSE,
+                          sizeof(Vertex), (void*) offsetof(Vertex, col));
+}

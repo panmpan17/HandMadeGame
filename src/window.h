@@ -2,7 +2,7 @@
 
 class GLFWwindow;
 class Camera;
-class Shader;
+class TestShader;
 
 typedef unsigned int GLuint;
 
@@ -25,8 +25,7 @@ public:
 private:
     GLFWwindow* m_pWindow = nullptr;
 
-    GLuint m_nMvpLocation, m_nVertexArray;
-    Shader* m_pBaseShader = nullptr;
+    TestShader* m_pBaseShader = nullptr;
 
     int m_nWidth = 800, m_nHeight = 600;
     int m_nActualWidth = 800, m_nActualHeight = 600;
@@ -42,6 +41,7 @@ private:
 
     void configureAndCreateWindow();
     void setupGLVertex();
+    void setupShaders();
     void mainLoop();
     void drawFrame();
 };

@@ -11,11 +11,6 @@
 #include "shader.h"
 #include "debug_macro.h"
 
-typedef struct Vertex
-{
-    vec2 pos;
-    vec3 col;
-} Vertex;
  
 static const Vertex vertices[3] =
 {
@@ -87,6 +82,8 @@ void Window::start()
     glfwSwapInterval(1); // Enable vsync
     
     setupGLVertex();
+    setupShaders();
+
     mainLoop();
 }
 
@@ -96,22 +93,11 @@ void Window::setupGLVertex()
     glGenBuffers(1, &vertex_buffer);
     glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+}
 
-    m_pBaseShader = new Shader("shaders/test.vert", "shaders/test.frag");
-
-    GLint nProgram = m_pBaseShader->getProgram();
-    m_nMvpLocation = glGetUniformLocation(nProgram, "MVP");
-    const GLint vpos_location = glGetAttribLocation(nProgram, "vPos");
-    const GLint vcol_location = glGetAttribLocation(nProgram, "vCol");
-
-    glGenVertexArrays(1, &m_nVertexArray);
-    glBindVertexArray(m_nVertexArray);
-    glEnableVertexAttribArray(vpos_location);
-    glVertexAttribPointer(vpos_location, 2, GL_FLOAT, GL_FALSE,
-                          sizeof(Vertex), (void*) offsetof(Vertex, pos));
-    glEnableVertexAttribArray(vcol_location);
-    glVertexAttribPointer(vcol_location, 3, GL_FLOAT, GL_FALSE,
-                          sizeof(Vertex), (void*) offsetof(Vertex, col));
+void Window::setupShaders()
+{
+    m_pBaseShader = new TestShader();
 }
 
 void Window::mainLoop()
@@ -153,8 +139,8 @@ void Window::drawFrame()
     m_pCamera->getViewMatrix(mvp);
 
     glUseProgram(m_pBaseShader->getProgram());
-    glUniformMatrix4fv(m_nMvpLocation, 1, GL_FALSE, (const GLfloat*) mvp);
-    glBindVertexArray(m_nVertexArray);
+    glUniformMatrix4fv(m_pBaseShader->getMvpLocation(), 1, GL_FALSE, (const GLfloat*) mvp);
+    glBindVertexArray(m_pBaseShader->getVertexArray());
     glDrawArrays(GL_TRIANGLES, 0, 3);
 }
 
