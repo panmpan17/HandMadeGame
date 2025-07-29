@@ -3,6 +3,8 @@
 class GLFWwindow;
 class Camera;
 class TestShader;
+class ImageShader;
+class Quad;
 
 typedef unsigned int GLuint;
 
@@ -26,6 +28,7 @@ private:
     GLFWwindow* m_pWindow = nullptr;
 
     TestShader* m_pBaseShader = nullptr;
+    ImageShader* m_pImageShader = nullptr;
 
     int m_nWidth = 800, m_nHeight = 600;
     int m_nActualWidth = 800, m_nActualHeight = 600;
@@ -36,6 +39,9 @@ private:
     float m_fDeltaTime = 0.0;
 
     Camera* m_pCamera = nullptr;
+
+    Quad* m_pQuad = nullptr;
+    Quad* m_pQuad2 = nullptr;
 
     float m_fTempMouseX = 0.0f, m_fTempMouseY = 0.0f;
 

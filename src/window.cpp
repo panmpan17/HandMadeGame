@@ -9,10 +9,11 @@
 #include "window.h"
 #include "camera.h"
 #include "shader.h"
+#include "quad.h"
 #include "debug_macro.h"
 
  
-static const Vertex vertices[3] =
+static const VertexWColor vertices[3] =
 {
     { { -0.6f, -0.4f }, { 1.f, 0.f, 0.f } },
     { {  0.6f, -0.4f }, { 0.f, 1.f, 0.f } },
@@ -84,6 +85,11 @@ void Window::start()
     setupGLVertex();
     setupShaders();
 
+    if (m_pQuad)
+    {
+        m_pQuad->setShaderProgram(m_pBaseShader);
+    }
+
     mainLoop();
 }
 
@@ -93,6 +99,9 @@ void Window::setupGLVertex()
     glGenBuffers(1, &vertex_buffer);
     glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    vec3 color = {1.f, 0.f, 0.f}; // Red color for the quad
+    m_pQuad = new Quad(0, 0, 0.5f, 0.5f * (m_nWidth / (float)m_nHeight), color);
 }
 
 void Window::setupShaders()
@@ -142,6 +151,11 @@ void Window::drawFrame()
     glUniformMatrix4fv(m_pBaseShader->getMvpLocation(), 1, GL_FALSE, (const GLfloat*) mvp);
     glBindVertexArray(m_pBaseShader->getVertexArray());
     glDrawArrays(GL_TRIANGLES, 0, 3);
+
+    if (m_pQuad)
+    {
+        m_pQuad->draw();
+    }
 }
 
 void Window::onKeyCallback(GLFWwindow* pWindow, int nKey, int nScanNode, int nAction, int nMods)

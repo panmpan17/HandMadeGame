@@ -5,10 +5,15 @@
 
 typedef unsigned int GLuint;
 
-typedef struct Vertex
+typedef struct VertexWColor
 {
     vec2 pos;
     vec3 col;
+} VertexWColor;
+
+typedef struct Vertex
+{
+    vec2 pos;
 } Vertex;
 
 class Shader
@@ -35,4 +40,19 @@ public:
 
 private:
     GLuint m_nMvpLocation, m_nVertexArray;
+};
+
+
+class ImageShader : public Shader
+{
+public:
+    ImageShader();
+
+    inline GLuint getMvpLocation() const { return m_nMvpLocation; }
+    inline GLuint getTextureLocation() const { return m_nTextureLocation; }
+    inline GLuint getVertexArray() const { return m_nVertexArray; }
+    inline GLuint getColorLocation() const { return m_nColorLocation; }
+
+private:
+    GLuint m_nMvpLocation, m_nColorLocation, m_nTextureLocation, m_nVertexArray;
 };

@@ -65,8 +65,26 @@ TestShader::TestShader()
     glBindVertexArray(m_nVertexArray);
     glEnableVertexAttribArray(vpos_location);
     glVertexAttribPointer(vpos_location, 2, GL_FLOAT, GL_FALSE,
-                          sizeof(Vertex), (void*) offsetof(Vertex, pos));
+                          sizeof(VertexWColor), (void*) offsetof(VertexWColor, pos));
     glEnableVertexAttribArray(vcol_location);
     glVertexAttribPointer(vcol_location, 3, GL_FLOAT, GL_FALSE,
-                          sizeof(Vertex), (void*) offsetof(Vertex, col));
+                          sizeof(VertexWColor), (void*) offsetof(VertexWColor, col));
+}
+
+
+ImageShader::ImageShader()
+    : Shader("shaders/image.vert", "shaders/image.frag")
+{
+    m_nMvpLocation = glGetUniformLocation(m_nProgram, "MVP");
+    m_nColorLocation = glGetUniformLocation(m_nProgram, "color");
+
+    // m_nTextureLocation = glGetUniformLocation(m_nProgram, "texture");
+    const GLint vpos_location = glGetAttribLocation(m_nProgram, "vPos");
+    // const GLint vtex_location = glGetAttribLocation(m_nProgram, "vTex");
+
+    glGenVertexArrays(1, &m_nVertexArray);
+    glBindVertexArray(m_nVertexArray);
+    glEnableVertexAttribArray(vpos_location);
+    glVertexAttribPointer(vpos_location, 2, GL_FLOAT, GL_FALSE,
+                            sizeof(Vertex), (void*) offsetof(Vertex, pos));
 }

@@ -1,5 +1,5 @@
 CXX = g++
-SRCS = src/main.cpp src/window.cpp src/glad.c src/camera.cpp src/shader.cpp src/file_utils.cpp
+SRCS = src/main.cpp src/window.cpp src/glad.c src/camera.cpp src/shader.cpp src/file_utils.cpp src/quad.cpp
 OUTPUT_FOLDER = output
 OUTPUT_NAME = "My GLFW App"
 INCLUDES = -I./include
@@ -15,8 +15,8 @@ compile:
 	$(CXX) $(SRCS) -o $(OUTPUT_FOLDER)/$(OUTPUT_NAME) $(INCLUDES) $(LIBS) $(FRAMEWORK) -Wl,-rpath,@loader_path/lib -std=c++23 $(RELEASE_BUILD_FLAG)
 
 quick: compile
-	cp -r ./lib $(OUTPUT_FOLDER)/lib
-	cp -r ./shaders $(OUTPUT_FOLDER)/shaders
+	cp -r ./lib $(OUTPUT_FOLDER)
+	cp -r ./shaders $(OUTPUT_FOLDER)
 	./$(OUTPUT_FOLDER)/$(OUTPUT_NAME)
 
 mac: compile
