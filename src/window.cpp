@@ -67,6 +67,11 @@ Window::~Window()
         delete[] m_pDrawables;
         m_pDrawables = nullptr;
     }
+    if (m_pImage)
+    {
+        delete m_pImage;
+        m_pImage = nullptr;
+    }
     glfwTerminate();
 }
 
@@ -103,6 +108,13 @@ void Window::start()
     gladLoadGL(glfwGetProcAddress);
     glfwSwapInterval(1); // Enable vsync
     
+    m_pImage = new Image("assets/images/test.png");
+    if (m_pImage->isCPULoaded())
+    {
+        m_pImage->loadTextureToGL();
+        m_pImage->freeCPUData();
+    }
+
     setupShaders();
     setupGLVertex();
 
@@ -122,11 +134,13 @@ void Window::setupGLVertex()
     //  * (m_nWidth / (float)m_nHeight) only needed if not matrix translated
     m_pDrawables[1] = new Quad(0, 0, 0.5f, 0.5f, red);
     m_pDrawables[1]->setShader(m_pImageShader);
+    static_cast<Quad*>(m_pDrawables[1])->setImage(m_pImage);
     m_pDrawables[1]->registerBuffer();
 
     vec4 color = {0.5f, 0.5f, 1.f, 1.f}; // Blue color for the second quad
     m_pDrawables[2] = new Quad(0.5f, 0.5f, 0.3f, 0.3f, color);
     m_pDrawables[2]->setShader(m_pImageShader);
+    static_cast<Quad*>(m_pDrawables[2])->setImage(m_pImage);
     m_pDrawables[2]->registerBuffer();
 }
 

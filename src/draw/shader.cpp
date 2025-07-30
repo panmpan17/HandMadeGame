@@ -72,4 +72,8 @@ ImageShader::ImageShader()
     m_nVPosLocation = glGetAttribLocation(m_nProgram, "vPos");
     m_nVUVLocation = glGetAttribLocation(m_nProgram, "vUV");
     m_nTextureLocation = glGetUniformLocation(m_nProgram, "u_tex0");
+
+    glUseProgram(m_nProgram);
+    glUniform1i(m_nTextureLocation, 0); // Texture unit 0
+    glUseProgram(0);
 }

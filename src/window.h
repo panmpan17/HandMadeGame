@@ -7,6 +7,7 @@ class ImageShader;
 class Quad;
 class Triangle;
 class IDrawable;
+class Image;
 
 typedef unsigned int GLuint;
 
@@ -44,6 +45,9 @@ private:
 
     IDrawable** m_pDrawables = nullptr;
     int m_nDrawableCount = 0;
+
+    // TODO: optimization, load it some where centralized
+    Image* m_pImage = nullptr;
 
     void configureAndCreateWindow();
     void setupGLVertex();

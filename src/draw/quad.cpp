@@ -3,9 +3,10 @@
 // #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
-
 #include "quad.h"
+#include "../image.h"
 #include "../camera.h"
+#include "../debug_macro.h"
 
 Quad::Quad(float fX, float fY, float fWidth, float fHeight, vec4 color)
 {
@@ -56,7 +57,17 @@ void Quad::draw()
     glUseProgram(m_pShader->getProgram());
     glUniformMatrix4fv(m_pShader->getMvpLocation(), 1, GL_FALSE, (const GLfloat*) mvp);
     glUniform4f(m_pShader->getColorLocation(), m_color[0], m_color[1], m_color[2], 1);
+
+    glUniform1i(m_pShader->getTextureLocation(), 0); // Texture unit 0
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, m_pImage ? m_pImage->getTextureID() : 0);
+    LOGLN_EX("Quad::draw() - Using texture location: {}", m_pShader->getTextureLocation());
+
     glBindVertexArray(m_nVertexArray);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4); // Draw the quad using triangle strip
+
+    glBindTexture(GL_TEXTURE_2D, 0); // Unbind the texture
+    glBindVertexArray(0); // Unbind the vertex array
     glUseProgram(0);
 }

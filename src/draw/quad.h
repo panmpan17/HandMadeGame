@@ -8,6 +8,8 @@
 
 typedef unsigned int GLuint;
 
+class Image;
+
 class Quad : public IDrawable
 {
 public:
@@ -23,6 +25,7 @@ public:
     }
 
     inline void setShader(Shader* pShader) override { m_pShader = static_cast<ImageShader*>(pShader); }
+    inline void setImage(Image* pImage) { m_pImage = pImage; }
 
 private:
     vec3 m_position = {0.f, 0.f, 0.f};
@@ -33,4 +36,5 @@ private:
     vec4 m_color = {1.f, 1.f, 1.f, 1.f};
 
     ImageShader* m_pShader = nullptr;
+    Image* m_pImage = nullptr; // Optional, if the quad uses an image texture
 };
