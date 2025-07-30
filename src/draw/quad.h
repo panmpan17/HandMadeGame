@@ -11,7 +11,7 @@ typedef unsigned int GLuint;
 class Quad : public IDrawable
 {
 public:
-    Quad(float fX, float fY, float fWidth, float fHeight, vec3 color);
+    Quad(float fX, float fY, float fWidth, float fHeight, vec4 color);
     ~Quad();
 
     void registerBuffer() override;
@@ -22,14 +22,15 @@ public:
         m_position[1] = fY;
     }
 
-    inline void setShader(Shader* pShader) override { m_pShader = static_cast<TestShader*>(pShader); }
+    inline void setShader(Shader* pShader) override { m_pShader = static_cast<ImageShader*>(pShader); }
 
 private:
     vec3 m_position = {0.f, 0.f, 0.f};
 
     GLuint m_nVertexBuffer, m_nVertexArray;
 
-    VertexWColor m_arrVertices[4];
+    VertexWUV m_arrVertices[4];
+    vec4 m_color = {1.f, 1.f, 1.f, 1.f};
 
-    TestShader* m_pShader = nullptr;
+    ImageShader* m_pShader = nullptr;
 };

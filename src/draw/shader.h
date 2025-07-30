@@ -39,10 +39,11 @@ public:
     ImageShader();
 
     inline GLuint getMvpLocation() const { return m_nMvpLocation; }
-    inline GLuint getTextureLocation() const { return m_nTextureLocation; }
-    inline GLuint getVertexArray() const { return m_nVertexArray; }
     inline GLuint getColorLocation() const { return m_nColorLocation; }
+    inline GLuint getVPosLocation() const { return m_nVPosLocation; }
+    inline GLuint getVUVLocation() const { return m_nVUVLocation; }
+    inline GLuint getTextureLocation() const { return m_nTextureLocation; }
 
 private:
-    GLuint m_nMvpLocation, m_nColorLocation, m_nTextureLocation, m_nVertexArray;
+    GLuint m_nMvpLocation, m_nColorLocation, m_nVPosLocation, m_nVUVLocation, m_nTextureLocation;
 };

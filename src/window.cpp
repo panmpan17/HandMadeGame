@@ -3,6 +3,9 @@
 // #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
+
 #include <linmath.h>
 #include <functional>
 
@@ -13,6 +16,7 @@
 #include "draw/triangle.h"
 #include "debug_macro.h"
 #include "input_handle.h"
+#include "image.h"
 
 
 Window* Window::ins = nullptr;
@@ -53,9 +57,12 @@ Window::~Window()
     }
     if (m_pDrawables)
     {
-        for (int i = 0; m_pDrawables[i]; ++i)
+        for (int i = 0; i < m_nDrawableCount; ++i)
         {
-            delete m_pDrawables[i];
+            if (m_pDrawables[i])
+            {
+                delete m_pDrawables[i];
+            }
         }
         delete[] m_pDrawables;
         m_pDrawables = nullptr;
@@ -111,20 +118,22 @@ void Window::setupGLVertex()
     m_pDrawables[0]->setShader(m_pBaseShader);
     m_pDrawables[0]->registerBuffer();
 
-    vec3 color = {1.f, 0.f, 0.f}; // Red color for the quad
+    vec4 red = {1.f, 0.f, 0.f, 1.f}; // Red color for the quad
     //  * (m_nWidth / (float)m_nHeight) only needed if not matrix translated
-    m_pDrawables[1] = new Quad(0, 0, 0.5f, 0.5f, color);
-    m_pDrawables[1]->setShader(m_pBaseShader);
+    m_pDrawables[1] = new Quad(0, 0, 0.5f, 0.5f, red);
+    m_pDrawables[1]->setShader(m_pImageShader);
     m_pDrawables[1]->registerBuffer();
 
+    vec4 color = {0.5f, 0.5f, 1.f, 1.f}; // Blue color for the second quad
     m_pDrawables[2] = new Quad(0.5f, 0.5f, 0.3f, 0.3f, color);
-    m_pDrawables[2]->setShader(m_pBaseShader);
+    m_pDrawables[2]->setShader(m_pImageShader);
     m_pDrawables[2]->registerBuffer();
 }
 
 void Window::setupShaders()
 {
     m_pBaseShader = new TestShader();
+    m_pImageShader = new ImageShader();
 }
 
 void Window::mainLoop()

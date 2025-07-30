@@ -56,7 +56,7 @@ Shader::~Shader()
 }
 
 TestShader::TestShader()
-    : Shader("shaders/test.vert", "shaders/test.frag")
+    : Shader("assets/shaders/test.vert", "assets/shaders/test.frag")
 {
     m_nMvpLocation = glGetUniformLocation(m_nProgram, "MVP");
     m_nVPosLocation = glGetAttribLocation(m_nProgram, "vPos");
@@ -65,18 +65,11 @@ TestShader::TestShader()
 
 
 ImageShader::ImageShader()
-    : Shader("shaders/image.vert", "shaders/image.frag")
+    : Shader("assets/shaders/image.vert", "assets/shaders/image.frag")
 {
     m_nMvpLocation = glGetUniformLocation(m_nProgram, "MVP");
-    m_nColorLocation = glGetUniformLocation(m_nProgram, "color");
-
-    // m_nTextureLocation = glGetUniformLocation(m_nProgram, "texture");
-    const GLint vpos_location = glGetAttribLocation(m_nProgram, "vPos");
-    // const GLint vtex_location = glGetAttribLocation(m_nProgram, "vTex");
-
-    glGenVertexArrays(1, &m_nVertexArray);
-    glBindVertexArray(m_nVertexArray);
-    glEnableVertexAttribArray(vpos_location);
-    glVertexAttribPointer(vpos_location, 2, GL_FLOAT, GL_FALSE,
-                            sizeof(Vertex), (void*) offsetof(Vertex, pos));
+    m_nColorLocation = glGetUniformLocation(m_nProgram, "imageColor");
+    m_nVPosLocation = glGetAttribLocation(m_nProgram, "vPos");
+    m_nVUVLocation = glGetAttribLocation(m_nProgram, "vUV");
+    m_nTextureLocation = glGetUniformLocation(m_nProgram, "u_tex0");
 }

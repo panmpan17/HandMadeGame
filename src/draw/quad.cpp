@@ -7,14 +7,16 @@
 #include "quad.h"
 #include "../camera.h"
 
-Quad::Quad(float fX, float fY, float fWidth, float fHeight, vec3 color)
+Quad::Quad(float fX, float fY, float fWidth, float fHeight, vec4 color)
 {
     float fStartX = fX - fWidth / 2.0f;
     float fStartY = fY - fHeight / 2.0f;
-    m_arrVertices[0] = { { fStartX, fStartY }, *color }; // Bottom left
-    m_arrVertices[1] = { { fStartX + fWidth, fStartY }, *color }; // Bottom right
-    m_arrVertices[2] = { { fStartX, fStartY + fHeight }, *color }; // Top right
-    m_arrVertices[3] = { { fStartX + fWidth, fStartY + fHeight }, *color }; // Top left
+    m_arrVertices[0] = { { fStartX, fStartY }, { 0.0f, 0.0f } }; // Bottom left
+    m_arrVertices[1] = { { fStartX + fWidth, fStartY }, { 1.0f, 0.0f } }; // Bottom right
+    m_arrVertices[2] = { { fStartX, fStartY + fHeight }, { 0.0f, 1.0f } }; // Top right
+    m_arrVertices[3] = { { fStartX + fWidth, fStartY + fHeight }, { 1.0f, 1.0f } }; // Top left
+
+    vec4_dup(m_color, color);
 }
 
 Quad::~Quad()
@@ -32,9 +34,9 @@ void Quad::registerBuffer()
     glGenVertexArrays(1, &m_nVertexArray);
     glBindVertexArray(m_nVertexArray);
     glEnableVertexAttribArray(m_pShader->getVPosLocation());
-    glVertexAttribPointer(m_pShader->getVPosLocation(), 2, GL_FLOAT, GL_FALSE, sizeof(VertexWColor), (void*)offsetof(VertexWColor, pos));
-    glEnableVertexAttribArray(m_pShader->getVColLocation());
-    glVertexAttribPointer(m_pShader->getVColLocation(), 3, GL_FLOAT, GL_FALSE, sizeof(VertexWColor), (void*)offsetof(VertexWColor, col));
+    glVertexAttribPointer(m_pShader->getVPosLocation(), 2, GL_FLOAT, GL_FALSE, sizeof(VertexWUV), (void*)offsetof(VertexWUV, pos));
+    glEnableVertexAttribArray(m_pShader->getVUVLocation());
+    glVertexAttribPointer(m_pShader->getVUVLocation(), 2, GL_FLOAT, GL_FALSE, sizeof(VertexWUV), (void*)offsetof(VertexWUV, uv));
 
     // Unbind
     glBindVertexArray(0);
@@ -53,6 +55,7 @@ void Quad::draw()
 
     glUseProgram(m_pShader->getProgram());
     glUniformMatrix4fv(m_pShader->getMvpLocation(), 1, GL_FALSE, (const GLfloat*) mvp);
+    glUniform4f(m_pShader->getColorLocation(), m_color[0], m_color[1], m_color[2], 1);
     glBindVertexArray(m_nVertexArray);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4); // Draw the quad using triangle strip
     glUseProgram(0);
