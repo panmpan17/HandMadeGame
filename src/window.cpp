@@ -8,9 +8,9 @@
 
 #include "window.h"
 #include "camera.h"
-#include "shader.h"
-#include "quad.h"
-#include "triangle.h"
+#include "draw/shader.h"
+#include "draw/quad.h"
+#include "draw/triangle.h"
 #include "debug_macro.h"
 
 
@@ -83,7 +83,7 @@ void Window::start()
 
     if (m_pQuad)
     {
-        m_pQuad->setShaderProgram(m_pBaseShader);
+        m_pQuad->setShader(m_pBaseShader);
     }
 
     mainLoop();

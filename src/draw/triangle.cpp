@@ -3,9 +3,9 @@
 
 #include "triangle.h"
 #include "shader.h"
-#include "camera.h"
+#include "../camera.h"
 
-#include "debug_macro.h"
+#include "../debug_macro.h"
 
 
 Triangle::Triangle()

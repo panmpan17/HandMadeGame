@@ -15,7 +15,7 @@ Quad::Quad(float fX, float fY, float fWidth, float fHeight, vec3 color)
     m_arrVertices[2] = { { fStartX, fStartY + fHeight }, *color }; // Top right
     m_arrVertices[3] = { { fStartX + fWidth, fStartY + fHeight }, *color }; // Top left
 
-    setupVertexBuffer();
+    registerBuffer();
 }
 
 Quad::~Quad()
@@ -24,7 +24,7 @@ Quad::~Quad()
     glDeleteVertexArrays(1, &m_vertexArray);
 }
 
-void Quad::setupVertexBuffer()
+void Quad::registerBuffer()
 {
     glGenBuffers(1, &m_vertexBuffer);
     glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
@@ -33,8 +33,6 @@ void Quad::setupVertexBuffer()
 
 void Quad::draw()
 {
-    setupVertexBuffer();
-
     mat4x4 mvp;
     mat4x4_identity(mvp);
 

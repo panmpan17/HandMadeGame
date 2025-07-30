@@ -1,8 +1,9 @@
 #include <glad/gl.h>
 #include <GLFW/glfw3.h>
 
+#include "vertex.h"
 #include "shader.h"
-#include "file_utils.h"
+#include "../file_utils.h"
 // #include "debug_macro.h"
 
 Shader::Shader(const std::string& strVertexShaderPath, const std::string& strFragmentShaderPath)

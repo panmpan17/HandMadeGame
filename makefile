@@ -1,5 +1,5 @@
 CXX = g++
-SRCS = src/main.cpp src/window.cpp src/glad.c src/camera.cpp src/shader.cpp src/file_utils.cpp src/quad.cpp src/triangle.cpp
+SRCS = src/main.cpp src/window.cpp include/glad/glad.c src/camera.cpp src/draw/shader.cpp src/file_utils.cpp src/draw/quad.cpp src/draw/triangle.cpp
 OUTPUT_FOLDER = output
 OUTPUT_NAME = "My GLFW App"
 INCLUDES = -I./include

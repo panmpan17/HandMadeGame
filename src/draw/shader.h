@@ -1,20 +1,9 @@
 #pragma once
 
 #include <string>
-#include <linmath.h>
 
 typedef unsigned int GLuint;
 
-typedef struct VertexWColor
-{
-    vec2 pos;
-    vec3 col;
-} VertexWColor;
-
-typedef struct Vertex
-{
-    vec2 pos;
-} Vertex;
 
 class Shader
 {

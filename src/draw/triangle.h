@@ -1,13 +1,8 @@
 #pragma once
 
+#include "vertex.h"
 #include "shader.h"
-
-
-class IDrawable
-{
-public:
-    virtual void draw() = 0;
-};
+#include "drawable_interface.h"
 
 
 class Triangle : public IDrawable
@@ -16,10 +11,10 @@ public:
     Triangle();
     ~Triangle();
 
-    void registerBuffer();
+    void registerBuffer() override;
     void draw() override;
 
-    void setShader(TestShader* shader) { m_pShader = shader; }
+    inline void setShader(Shader* pShader) override { m_pShader = static_cast<TestShader*>(pShader); }
 
 private:
     TestShader* m_pShader = nullptr;
