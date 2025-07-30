@@ -12,6 +12,7 @@
 #include "draw/quad.h"
 #include "draw/triangle.h"
 #include "debug_macro.h"
+#include "input_handle.h"
 
 
 Window* Window::ins = nullptr;
@@ -65,10 +66,10 @@ void Window::start()
 {
     m_pCamera = new Camera();
 
-    glfwSetKeyCallback(m_pWindow, &Window::onKeyCallback);
-    glfwSetCursorEnterCallback(m_pWindow, &Window::onCursorEnterCallback);
-    glfwSetCursorPosCallback(m_pWindow, &Window::onCursorPosCallback);
-    glfwSetMouseButtonCallback(m_pWindow, &Window::onMouseButtonCallback);
+    glfwSetKeyCallback(m_pWindow, &InputManager::onKeyCallback);
+    glfwSetCursorEnterCallback(m_pWindow, &InputManager::onMouseEnterCallback);
+    glfwSetCursorPosCallback(m_pWindow, &InputManager::onMousePosCallback);
+    glfwSetMouseButtonCallback(m_pWindow, &InputManager::onMouseButtonCallback);
 
     // glfwSetWindowOpacity(m_pWindow, 0.5f); // Fun
 
@@ -79,7 +80,7 @@ void Window::start()
     setupGLVertex();
     setupShaders();
     // The order of execute is important here, but not sure why
-    m_pTriangle->setShader(m_pBaseShader);
+    // m_pTriangle->setShader(m_pBaseShader);
 
     if (m_pQuad)
     {
@@ -91,11 +92,12 @@ void Window::start()
 
 void Window::setupGLVertex()
 {
-    m_pTriangle = new Triangle();
-    m_pTriangle->registerBuffer();
+    // m_pTriangle = new Triangle();
+    // m_pTriangle->registerBuffer();
 
     vec3 color = {1.f, 0.f, 0.f}; // Red color for the quad
-    m_pQuad = new Quad(0, 0, 0.5f, 0.5f * (m_nWidth / (float)m_nHeight), color);
+    //  * (m_nWidth / (float)m_nHeight) only needed if not matrix translated
+    m_pQuad = new Quad(0, 0, 0.5f, 0.5f, color);
 }
 
 void Window::setupShaders()
@@ -138,48 +140,14 @@ void Window::drawFrame()
     // m_pCamera->move(3 * m_fDeltaTime, 0, 0); // Move the camera back a bit
     // m_pCamera->rotate(0, 0, 1.f * m_fDeltaTime); // Rotate the camera slightly each frame
 
-    m_pTriangle->draw();
-    
-    mat4x4 mvp;
-    m_pCamera->getViewMatrix(mvp);
-    glUseProgram(m_pBaseShader->getProgram());
-    glUniformMatrix4fv(m_pBaseShader->getMvpLocation(), 1, GL_FALSE, (const GLfloat*) mvp);
-    glBindVertexArray(m_pBaseShader->getVertexArray());
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+    // m_pTriangle->draw();
 
     if (m_pQuad)
     {
+        float fGlX, fGlY;
+        InputManager::getMousePositionInGL(fGlX, fGlY);
+        m_pQuad->setPosition(fGlX, fGlY);
+        LOG_EX("Quad position set to: ({}, {})\r", fGlX, fGlY);
         m_pQuad->draw();
     }
-}
-
-#pragma mark - Input Callbacks
-
-void Window::onKeyCallback(GLFWwindow* pWindow, int nKey, int nScanNode, int nAction, int nMods)
-{
-    // LOGLN_EX("Key pressed: {}, Scancode: {}, Action: {}, Mods: {}", nKey, nScanNode, nAction, nMods);
-}
-
-void Window::onCursorEnterCallback(GLFWwindow* pWindow, int bEntered)
-{
-    // if (bEntered)
-    // {
-    //     LOGLN("Cursor entered the window");
-    // }
-    // else
-    // {
-    //     LOGLN("Cursor left the window");
-    // }
-}
-
-void Window::onCursorPosCallback(GLFWwindow* pWindow, double fPosX, double fPosY)
-{
-    ins->m_fTempMouseX = static_cast<float>(fPosX);
-    ins->m_fTempMouseY = static_cast<float>(fPosY);
-    // LOGLN_EX("Cursor position: ({}, {})\r", fPosX, fPosY);
-}
-
-void Window::onMouseButtonCallback(GLFWwindow* pWindow, int nButton, int nAction, int nMods)
-{
-    // LOGLN_EX("Mouse button: {}, Action: {}, Mods: {}", nButton, nAction, nMods);
 }

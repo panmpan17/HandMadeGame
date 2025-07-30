@@ -1,5 +1,7 @@
 #pragma once
 
+#include <linmath.h>
+
 #include "vertex.h"
 #include "shader.h"
 #include "drawable_interface.h"
@@ -15,9 +17,16 @@ public:
     void registerBuffer() override;
     void draw() override;
 
+    inline void setPosition(float fX, float fY) {
+        m_position[0] = fX;
+        m_position[1] = fY;
+    }
+
     inline void setShader(Shader* pShader) override { m_pShader = static_cast<TestShader*>(pShader); }
 
 private:
+    vec3 m_position = {0.f, 0.f, 0.f};
+
     GLuint m_vertexBuffer;
     GLuint m_vertexArray;
 

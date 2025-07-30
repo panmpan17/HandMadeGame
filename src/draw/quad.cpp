@@ -5,6 +5,7 @@
 
 
 #include "quad.h"
+#include "../camera.h"
 
 Quad::Quad(float fX, float fY, float fWidth, float fHeight, vec3 color)
 {
@@ -33,8 +34,13 @@ void Quad::registerBuffer()
 
 void Quad::draw()
 {
-    mat4x4 mvp;
-    mat4x4_identity(mvp);
+    mat4x4 mvp, local, cameraViewMatrix;
+
+    mat4x4_identity(local);
+    mat4x4_translate(local, m_position[0], m_position[1], m_position[2]);
+
+    Camera::main->getViewMatrix(cameraViewMatrix);
+    mat4x4_mul(mvp, cameraViewMatrix, local);
 
     glUseProgram(m_pShader->getProgram());
     glUniformMatrix4fv(m_pShader->getMvpLocation(), 1, GL_FALSE, (const GLfloat*) mvp);

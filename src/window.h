@@ -12,6 +12,11 @@ typedef unsigned int GLuint;
 class Window {
 public:
     static Window* ins;
+    static float getWindowRatio() { return ins->m_fRatio; }
+    static void getWindowSize(int& width, int& height) {
+        width = ins->m_nWidth;
+        height = ins->m_nHeight;
+    }
 
     Window();
     ~Window();
@@ -19,11 +24,6 @@ public:
     bool isValid() const { return m_pWindow != nullptr; }
 
     void start();
-
-    static void onKeyCallback(GLFWwindow* pWindow, int nKey, int nScanNode, int nAction, int nMods);
-    static void onCursorEnterCallback(GLFWwindow* pWindow, int bEntered);
-    static void onCursorPosCallback(GLFWwindow* pWindow, double fPosX, double fPosY);
-    static void onMouseButtonCallback(GLFWwindow* pWindow, int nButton, int nAction, int nMods);
 
 private:
     GLFWwindow* m_pWindow = nullptr;
@@ -43,8 +43,6 @@ private:
 
     Quad* m_pQuad = nullptr;
     Quad* m_pQuad2 = nullptr;
-
-    float m_fTempMouseX = 0.0f, m_fTempMouseY = 0.0f;
 
     Triangle* m_pTriangle = nullptr;
 
