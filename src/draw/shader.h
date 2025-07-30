@@ -25,10 +25,11 @@ public:
     TestShader();
 
     inline GLuint getMvpLocation() const { return m_nMvpLocation; }
-    inline GLuint getVertexArray() const { return m_nVertexArray; }
+    inline GLuint getVPosLocation() const { return m_nVPosLocation; }
+    inline GLuint getVColLocation() const { return m_nVColLocation; }
 
 private:
-    GLuint m_nMvpLocation, m_nVertexArray;
+    GLuint m_nMvpLocation, m_nVPosLocation, m_nVColLocation;
 };
 
 

@@ -21,10 +21,20 @@ Triangle::~Triangle()
 
 void Triangle::registerBuffer()
 {
-    GLuint vertex_buffer;
-    glGenBuffers(1, &vertex_buffer);
-    glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
+    glGenBuffers(1, &m_nVertexBuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, m_nVertexBuffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    glGenVertexArrays(1, &m_nVertexArray);
+    glBindVertexArray(m_nVertexArray);
+    glEnableVertexAttribArray(m_pShader->getVPosLocation());
+    glVertexAttribPointer(m_pShader->getVPosLocation(), 2, GL_FLOAT, GL_FALSE, sizeof(VertexWColor), (void*)offsetof(VertexWColor, pos));
+    glEnableVertexAttribArray(m_pShader->getVColLocation());
+    glVertexAttribPointer(m_pShader->getVColLocation(), 3, GL_FLOAT, GL_FALSE, sizeof(VertexWColor), (void*)offsetof(VertexWColor, col));
+
+    // Unbind
+    glBindVertexArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 void Triangle::draw()
@@ -36,6 +46,7 @@ void Triangle::draw()
     
     glUseProgram(m_pShader->getProgram());
     glUniformMatrix4fv(m_pShader->getMvpLocation(), 1, GL_FALSE, (const GLfloat*) mvp);
-    glBindVertexArray(m_pShader->getVertexArray());
+    glBindVertexArray(m_nVertexArray);
     glDrawArrays(GL_TRIANGLES, 0, 3);
+    glUseProgram(0);
 }

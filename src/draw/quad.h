@@ -27,8 +27,7 @@ public:
 private:
     vec3 m_position = {0.f, 0.f, 0.f};
 
-    GLuint m_vertexBuffer;
-    GLuint m_vertexArray;
+    GLuint m_nVertexBuffer, m_nVertexArray;
 
     VertexWColor m_arrVertices[4];
 

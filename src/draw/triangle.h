@@ -4,6 +4,7 @@
 #include "shader.h"
 #include "drawable_interface.h"
 
+typedef unsigned int GLuint;
 
 class Triangle : public IDrawable
 {
@@ -19,4 +20,6 @@ public:
 private:
     TestShader* m_pShader = nullptr;
     VertexWColor vertices[3];
+
+    GLuint m_nVertexBuffer, m_nVertexArray;
 };

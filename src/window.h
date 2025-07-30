@@ -6,6 +6,7 @@ class TestShader;
 class ImageShader;
 class Quad;
 class Triangle;
+class IDrawable;
 
 typedef unsigned int GLuint;
 
@@ -31,7 +32,7 @@ private:
     TestShader* m_pBaseShader = nullptr;
     ImageShader* m_pImageShader = nullptr;
 
-    int m_nWidth = 800, m_nHeight = 600;
+    int m_nWidth = 80, m_nHeight = 60;
     int m_nActualWidth = 800, m_nActualHeight = 600;
     float m_fRatio = 1.0f;
 
@@ -41,10 +42,8 @@ private:
 
     Camera* m_pCamera = nullptr;
 
-    Quad* m_pQuad = nullptr;
-    Quad* m_pQuad2 = nullptr;
-
-    Triangle* m_pTriangle = nullptr;
+    IDrawable** m_pDrawables = nullptr;
+    int m_nDrawableCount = 0;
 
     void configureAndCreateWindow();
     void setupGLVertex();

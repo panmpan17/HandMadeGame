@@ -41,6 +41,25 @@ Window::~Window()
     {
         glfwDestroyWindow(m_pWindow);
     }
+    if (m_pBaseShader)
+    {
+        delete m_pBaseShader;
+        m_pBaseShader = nullptr;
+    }
+    if (m_pImageShader)
+    {
+        delete m_pImageShader;
+        m_pImageShader = nullptr;
+    }
+    if (m_pDrawables)
+    {
+        for (int i = 0; m_pDrawables[i]; ++i)
+        {
+            delete m_pDrawables[i];
+        }
+        delete[] m_pDrawables;
+        m_pDrawables = nullptr;
+    }
     glfwTerminate();
 }
 
@@ -77,27 +96,30 @@ void Window::start()
     gladLoadGL(glfwGetProcAddress);
     glfwSwapInterval(1); // Enable vsync
     
-    setupGLVertex();
     setupShaders();
-    // The order of execute is important here, but not sure why
-    // m_pTriangle->setShader(m_pBaseShader);
-
-    if (m_pQuad)
-    {
-        m_pQuad->setShader(m_pBaseShader);
-    }
+    setupGLVertex();
 
     mainLoop();
 }
 
 void Window::setupGLVertex()
 {
-    // m_pTriangle = new Triangle();
-    // m_pTriangle->registerBuffer();
+    m_nDrawableCount = 3;
+    m_pDrawables = new IDrawable*[m_nDrawableCount];
+
+    m_pDrawables[0] = new Triangle();
+    m_pDrawables[0]->setShader(m_pBaseShader);
+    m_pDrawables[0]->registerBuffer();
 
     vec3 color = {1.f, 0.f, 0.f}; // Red color for the quad
     //  * (m_nWidth / (float)m_nHeight) only needed if not matrix translated
-    m_pQuad = new Quad(0, 0, 0.5f, 0.5f, color);
+    m_pDrawables[1] = new Quad(0, 0, 0.5f, 0.5f, color);
+    m_pDrawables[1]->setShader(m_pBaseShader);
+    m_pDrawables[1]->registerBuffer();
+
+    m_pDrawables[2] = new Quad(0.5f, 0.5f, 0.3f, 0.3f, color);
+    m_pDrawables[2]->setShader(m_pBaseShader);
+    m_pDrawables[2]->registerBuffer();
 }
 
 void Window::setupShaders()
@@ -140,14 +162,8 @@ void Window::drawFrame()
     // m_pCamera->move(3 * m_fDeltaTime, 0, 0); // Move the camera back a bit
     // m_pCamera->rotate(0, 0, 1.f * m_fDeltaTime); // Rotate the camera slightly each frame
 
-    // m_pTriangle->draw();
-
-    if (m_pQuad)
+    for (int i = 0; i < m_nDrawableCount; ++i)
     {
-        float fGlX, fGlY;
-        InputManager::getMousePositionInGL(fGlX, fGlY);
-        m_pQuad->setPosition(fGlX, fGlY);
-        LOG_EX("Quad position set to: ({}, {})\r", fGlX, fGlY);
-        m_pQuad->draw();
+        m_pDrawables[i]->draw();
     }
 }

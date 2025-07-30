@@ -59,17 +59,8 @@ TestShader::TestShader()
     : Shader("shaders/test.vert", "shaders/test.frag")
 {
     m_nMvpLocation = glGetUniformLocation(m_nProgram, "MVP");
-    const GLint vpos_location = glGetAttribLocation(m_nProgram, "vPos");
-    const GLint vcol_location = glGetAttribLocation(m_nProgram, "vCol");
-
-    glGenVertexArrays(1, &m_nVertexArray);
-    glBindVertexArray(m_nVertexArray);
-    glEnableVertexAttribArray(vpos_location);
-    glVertexAttribPointer(vpos_location, 2, GL_FLOAT, GL_FALSE,
-                          sizeof(VertexWColor), (void*) offsetof(VertexWColor, pos));
-    glEnableVertexAttribArray(vcol_location);
-    glVertexAttribPointer(vcol_location, 3, GL_FLOAT, GL_FALSE,
-                          sizeof(VertexWColor), (void*) offsetof(VertexWColor, col));
+    m_nVPosLocation = glGetAttribLocation(m_nProgram, "vPos");
+    m_nVColLocation = glGetAttribLocation(m_nProgram, "vCol");
 }
 
 
