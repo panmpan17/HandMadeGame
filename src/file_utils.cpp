@@ -49,8 +49,6 @@ std::string FileUtils::getExecutableDirectory()
     return path.parent_path().string();
 }
 
-#define PARENT_PATH_OBJ(strPath) std::filesystem::path(strPath).parent_path()
-
 
 FileReader::FileReader(const std::string& path)
 {

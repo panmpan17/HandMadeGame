@@ -4,13 +4,21 @@
 #include <glad/gl.h>
 #include <GLFW/glfw3.h>
 
+#include "file_utils.h"
 #include "debug_macro.h"
 
 Image::Image(const std::string& strPath)
 {
     stbi_set_flip_vertically_on_load(true);
 
-    m_pData = stbi_load(strPath.c_str(), &m_nWidth, &m_nHeight, &m_nChannels, 0);
+    std::string fullPath = strPath;
+    if (*strPath.begin() != '/')
+    {
+        std::string executablePath = FileUtils::getExecutablePath();
+        fullPath = PARENT_PATH_OBJ(executablePath).append(strPath).string();
+    }
+
+    m_pData = stbi_load(fullPath.c_str(), &m_nWidth, &m_nHeight, &m_nChannels, 0);
 }
 
 Image::~Image()
