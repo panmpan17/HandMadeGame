@@ -8,7 +8,9 @@ typedef unsigned int GLuint;
 class Shader
 {
 public:
-    Shader(const std::string& strVertexShaderPath, const std::string& strFragmentShaderPath);
+    static void checkShaderCompilResult(const std::string& strShaderPath, GLuint nShader);
+
+    Shader(const std::string &strVertexShaderPath, const std::string &strFragmentShaderPath);
     Shader();
     ~Shader();
 

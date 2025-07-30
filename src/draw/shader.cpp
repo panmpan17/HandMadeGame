@@ -1,10 +1,29 @@
 #include <glad/gl.h>
 #include <GLFW/glfw3.h>
+#include <vector>
 
 #include "vertex.h"
 #include "shader.h"
 #include "../file_utils.h"
 #include "../debug_macro.h"
+
+
+void Shader::checkShaderCompilResult(const std::string& strShaderPath, GLuint nShader)
+{
+    GLint isCompiled = 0;
+    glGetShaderiv(nShader, GL_COMPILE_STATUS, &isCompiled);
+    if (isCompiled == GL_FALSE)
+    {
+        GLint maxLength = 0;
+        glGetShaderiv(nShader, GL_INFO_LOG_LENGTH, &maxLength);
+
+        // The maxLength includes the NULL character
+        std::vector<GLchar> errorLog(maxLength);
+        glGetShaderInfoLog(nShader, maxLength, &maxLength, &errorLog[0]);
+        LOGERRLN_EX("Shader '{}' compilation failed: {}", strShaderPath, std::string(errorLog.data()));
+    }
+}
+
 
 Shader::Shader(const std::string& strVertexShaderPath, const std::string& strFragmentShaderPath)
 {
@@ -24,6 +43,10 @@ Shader::Shader(const std::string& strVertexShaderPath, const std::string& strFra
         const char* vertex_shader_source = vertex_shader_text.c_str();
         glShaderSource(vertex_shader, 1, &vertex_shader_source, NULL);
         glCompileShader(vertex_shader);
+        
+#if IS_DEBUG_VERSION
+        checkShaderCompilResult(strVertexShaderPath, vertex_shader);
+#endif
     }
 
     {
@@ -39,6 +62,10 @@ Shader::Shader(const std::string& strVertexShaderPath, const std::string& strFra
         const char* fragment_shader_source = fragment_shader_text.c_str();
         glShaderSource(fragment_shader, 1, &fragment_shader_source, NULL);
         glCompileShader(fragment_shader);
+
+#if IS_DEBUG_VERSION
+        checkShaderCompilResult(strFragmentShaderPath, fragment_shader);
+#endif
     }
 
     m_nProgram = glCreateProgram();

@@ -8,6 +8,8 @@
 
 Image::Image(const std::string& strPath)
 {
+    stbi_set_flip_vertically_on_load(true);
+
     m_pData = stbi_load(strPath.c_str(), &m_nWidth, &m_nHeight, &m_nChannels, 0);
 }
 

@@ -12,6 +12,6 @@ in vec2 uv;
 void main()
 {
     // vec2 diffToCenter = (gl_FragCoord.xy - ripperCenter.xy) / u_resolution.xy;
-    vec4 textColor = texture2D(u_tex0, uv);
+    vec4 textColor = texture(u_tex0, uv);
     fragment = textColor * imageColor;
 }

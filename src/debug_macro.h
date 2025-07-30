@@ -1,6 +1,8 @@
 #pragma once
 
 #include <print>
+#include <format>
+#include <iostream>
 
 #ifndef DEBUG_FLAG
 #define DEBUG_FLAG 1
@@ -17,6 +19,11 @@
 #define LOGLN(msg) std::println(msg)
 #define LOGLN_EX(msg, ...) std::println(msg, __VA_ARGS__)
 
+#define LOGERR(msg) std::println("\033[91m{}\033[0m", msg)
+#define LOGERR_EX(msg, ...) std::cout << "\033[91m" << std::format(msg, __VA_ARGS__) << "\033[0m";
+
+#define LOGERRLN(msg) std::println("\033[91m{}\033[0m", msg)
+#define LOGERRLN_EX(msg, ...) std::cout << "\033[91m" << std::format(msg, __VA_ARGS__) << "\033[0m" << std::endl;
 
 #define ASSERT(condition, msg) \
     do { \
@@ -44,5 +51,11 @@
 #define LOGLN_EX(msg, ...) do {} while (0)
 
 #define ASSERT(condition, msg) do {} while (0)
+
+#define LOGERR(msg) do {} while (0)
+#define LOGERR_EX(msg, ...) do {} while (0)
+
+#define LOGERRLN(msg) do {} while (0)
+#define LOGERRLN_EX(msg, ...) do {} while (0)
 
 #endif
