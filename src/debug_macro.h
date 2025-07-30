@@ -26,6 +26,15 @@
         } \
     } while (0)
 
+// A macro to make it easy to use
+// #define GL_CHECK() \
+//     do { \
+//         GLenum error;\
+//         while ((error = glGetError()) != GL_NO_ERROR) {\
+//             std::println("OpenGL Error: {} at {}:{}", error, __FILE__, __LINE__);\
+//         }\
+//     } while (0)
+
 #else
 
 #define LOG(msg) do {} while (0)

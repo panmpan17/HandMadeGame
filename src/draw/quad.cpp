@@ -62,7 +62,7 @@ void Quad::draw()
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_pImage ? m_pImage->getTextureID() : 0);
-    LOGLN_EX("Quad::draw() - Using texture location: {}", m_pShader->getTextureLocation());
+    // LOGLN_EX("Quad::draw() - Using texture location: {}", m_pShader->getTextureLocation());
 
     glBindVertexArray(m_nVertexArray);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4); // Draw the quad using triangle strip

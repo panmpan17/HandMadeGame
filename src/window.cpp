@@ -75,6 +75,14 @@ Window::~Window()
     glfwTerminate();
 }
 
+void APIENTRY glDebugOutput(GLenum source, GLenum type, unsigned int id, GLenum severity, GLsizei length, const char* message, const void* userParam)
+{
+    // ignore non-significant error/warnings
+    if (id == 131169 || id == 131185 || id == 131218 || id == 131204) return;
+
+    std::println("Debug message ({}) at {}:{}: {}", id, __FILE__, __LINE__, message);
+}
+
 void Window::configureAndCreateWindow()
 {
     // Configure GL version
@@ -84,6 +92,10 @@ void Window::configureAndCreateWindow()
 
     glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
+#if IS_DEBUG_VERSION
+    glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
+#endif
+
     m_pWindow = glfwCreateWindow(m_nWidth, m_nHeight, "My GLFW Window", NULL, NULL);
     if (!m_pWindow)
     {
@@ -91,6 +103,16 @@ void Window::configureAndCreateWindow()
         glfwTerminate();
         return;
     }
+
+    // GLint flags;
+    // glGetIntegerv(GL_CONTEXT_FLAGS, &flags);
+    // if (flags & GL_CONTEXT_FLAG_DEBUG_BIT)
+    // {
+    //     glEnable(GL_DEBUG_OUTPUT);
+    //     glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+    //     glDebugMessageCallback(glDebugOutput, nullptr);
+    //     glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
+    // }
 }
 
 void Window::start()
