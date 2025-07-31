@@ -12,8 +12,8 @@ typedef unsigned int GLuint;
 class Window {
 public:
     static Window* ins;
-    static float getWindowRatio() { return ins->m_fRatio; }
-    static void getWindowSize(int& width, int& height) {
+    inline static float getWindowRatio() { return ins->m_fRatio; }
+    inline static void getWindowSize(int& width, int& height) {
         width = ins->m_nWidth;
         height = ins->m_nHeight;
     }
@@ -21,9 +21,11 @@ public:
     Window();
     ~Window();
 
-    bool isValid() const { return m_pWindow != nullptr; }
+    inline bool isValid() const { return m_pWindow != nullptr; }
 
     void start();
+
+    void addNode(Node* pNode);
 
 private:
     GLFWwindow* m_pWindow = nullptr;
@@ -31,7 +33,7 @@ private:
     TestShader* m_pBaseShader = nullptr;
     ImageShader* m_pImageShader = nullptr;
 
-    int m_nWidth = 800, m_nHeight = 600;
+    int m_nWidth = 80, m_nHeight = 60;
     int m_nActualWidth = 800, m_nActualHeight = 600;
     float m_fRatio = 1.0f;
 
@@ -42,8 +44,8 @@ private:
     Camera* m_pCamera = nullptr;
 
     // TODO: make this extensible
-    Node** m_pNodes = nullptr;
-    int m_nNodeCount = 0;
+    int m_nNodeCount = 10;
+    Node* m_pNodes[10] = { nullptr };
 
     // TODO: optimization, load it some where centralized
     Image* m_pImage = nullptr;

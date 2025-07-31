@@ -19,3 +19,15 @@ public:
 protected:
     Node* m_pNode = nullptr;
 };
+
+
+class IUpdatable : public Component
+{
+public:
+    virtual ~IUpdatable() = default;
+
+    virtual bool isIDrawable() override { return false; }
+    virtual bool isIUpdatable() override { return true; }
+
+    virtual void update(float deltaTime) = 0;
+};

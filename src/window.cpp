@@ -18,6 +18,7 @@
 #include "input_handle.h"
 #include "image.h"
 #include "node.h"
+#include "rotate.h"
 
 
 Window* Window::ins = nullptr;
@@ -56,18 +57,13 @@ Window::~Window()
         delete m_pImageShader;
         m_pImageShader = nullptr;
     }
-    if (m_pNodes)
-    {
-        for (int i = 0; i < m_nNodeCount; ++i)
-        {
-            if (m_pNodes[i])
-            {
-                delete m_pNodes[i];
-            }
-        }
-        delete[] m_pNodes;
-        m_pNodes = nullptr;
-    }
+    // for (int i = 0; i < m_nNodeCount; ++i)
+    // {
+    //     if (m_pNodes[i])
+    //     {
+    //         delete m_pNodes[i];
+    //     }
+    // }
     if (m_pImage)
     {
         delete m_pImage;
@@ -146,39 +142,61 @@ void Window::start()
 
 void Window::setupGLVertex()
 {
-    m_nNodeCount = 3;
-    m_pNodes = new Node*[m_nNodeCount];
-
     // Triangle
-    m_pNodes[0] = new Node();
-    m_pNodes[0]->setPosition(-0.5f, 0.f, 0.f);
-    m_pNodes[0]->setRotation(0.f);
+    auto pNode1 = new Node(-0.5f, 0.f, 0.f, 0.f);
+
     auto pTriangle = new Triangle();
     pTriangle->setShader(m_pBaseShader);
     pTriangle->registerBuffer();
-    m_pNodes[0]->setComponent(pTriangle);
+    pNode1->addComponent(pTriangle);
+
+    pNode1->addComponent(new Rotate(-1.0f));
+
+    addNode(pNode1);
 
     // Quads 1
-    m_pNodes[1] = new Node();
-    m_pNodes[1]->setPosition(0.5f, 0.5f, 0.f);
-    m_pNodes[1]->setRotation(0.f);
+    auto pNode2 = new Node(0.5f, 0.5f, 0.f, 0.f);
+
     vec4 red = {1.f, 0.f, 0.f, 1.f}; // Red color for the quad
     auto pQuad = new Quad(0, 0, 0.5f, 0.5f, red);
     pQuad->setShader(m_pImageShader);
     static_cast<Quad*>(pQuad)->setImage(m_pImage);
     pQuad->registerBuffer();
-    m_pNodes[1]->setComponent(pQuad);
+    pNode2->addComponent(pQuad);
+
+    pNode2->addComponent(new Rotate(1.0f));
+
+    addNode(pNode2);
 
     // Quads 2
-    m_pNodes[2] = new Node();
-    m_pNodes[2]->setPosition(0.5f, -0.5f, 0.f);
-    m_pNodes[2]->setRotation(0.f);
+    auto pNode3 = new Node(0.5f, -0.5f, 0.f, 0.f);
+
     vec4 color = {0.5f, 0.5f, 1.f, 1.f}; // Blue color for the second quad
     auto pQuad2 = new Quad(0, 0, 0.3f, 0.3f, color);
     pQuad2->setShader(m_pImageShader);
     static_cast<Quad*>(pQuad2)->setImage(m_pImage);
     pQuad2->registerBuffer();
-    m_pNodes[2]->setComponent(pQuad2);
+    pNode3->addComponent(pQuad2);
+
+    addNode(pNode3);
+}
+
+void Window::addNode(Node* pNode)
+{
+    if (pNode == nullptr) return;
+
+    // Find an empty slot in the node array
+    for (int i = 0; i < m_nNodeCount; ++i)
+    {
+        if (m_pNodes[i] == nullptr)
+        {
+            m_pNodes[i] = pNode;
+            return;
+        }
+    }
+
+    // TODO: Handle case where no empty slot is found, e.g., resize the array or log an error
+    LOGERRLN("No empty slot found to add the node");
 }
 
 void Window::setupShaders()
@@ -224,6 +242,10 @@ void Window::drawFrame()
 
     for (int i = 0; i < m_nNodeCount; ++i)
     {
-        m_pNodes[i]->draw();
+        if (m_pNodes[i])
+        {
+            m_pNodes[i]->update(m_fDeltaTime);
+            m_pNodes[i]->draw();
+        }
     }
 }
