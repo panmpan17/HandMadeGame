@@ -19,6 +19,11 @@ Image::Image(const std::string& strPath)
     }
 
     m_pData = stbi_load(fullPath.c_str(), &m_nWidth, &m_nHeight, &m_nChannels, 0);
+
+    if (!m_pData)
+    {
+        LOGERR_EX("Failed to load image: {}", fullPath);
+    }
 }
 
 Image::~Image()

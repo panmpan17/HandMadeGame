@@ -4,6 +4,7 @@
 #include "triangle.h"
 #include "shader.h"
 #include "../camera.h"
+#include "../node.h"
 
 #include "../debug_macro.h"
 
@@ -39,11 +40,19 @@ void Triangle::registerBuffer()
 
 void Triangle::draw()
 {
-    mat4x4 mvp;
-    Camera::main->getViewMatrix(mvp);
-
     ASSERT(m_pShader, "Shader must be set before drawing the triangle");
-    
+
+    mat4x4 mvp, local, cameraViewMatrix;
+    mat4x4_identity(local);
+
+    const vec3& position = m_pNode->getPosition();
+    mat4x4_translate(local, position[0], position[1], position[2]);
+
+    mat4x4_rotate_Z(local, local, m_pNode->getRotation());
+
+    Camera::main->getViewMatrix(cameraViewMatrix);
+    mat4x4_mul(mvp, cameraViewMatrix, local);
+
     glUseProgram(m_pShader->getProgram());
     glUniformMatrix4fv(m_pShader->getMvpLocation(), 1, GL_FALSE, (const GLfloat*) mvp);
     glBindVertexArray(m_nVertexArray);

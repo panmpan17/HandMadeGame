@@ -4,10 +4,8 @@ class GLFWwindow;
 class Camera;
 class TestShader;
 class ImageShader;
-class Quad;
-class Triangle;
-class IDrawable;
 class Image;
+class Node;
 
 typedef unsigned int GLuint;
 
@@ -43,8 +41,9 @@ private:
 
     Camera* m_pCamera = nullptr;
 
-    IDrawable** m_pDrawables = nullptr;
-    int m_nDrawableCount = 0;
+    // TODO: make this extensible
+    Node** m_pNodes = nullptr;
+    int m_nNodeCount = 0;
 
     // TODO: optimization, load it some where centralized
     Image* m_pImage = nullptr;

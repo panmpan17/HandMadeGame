@@ -17,6 +17,7 @@
 #include "debug_macro.h"
 #include "input_handle.h"
 #include "image.h"
+#include "node.h"
 
 
 Window* Window::ins = nullptr;
@@ -55,17 +56,17 @@ Window::~Window()
         delete m_pImageShader;
         m_pImageShader = nullptr;
     }
-    if (m_pDrawables)
+    if (m_pNodes)
     {
-        for (int i = 0; i < m_nDrawableCount; ++i)
+        for (int i = 0; i < m_nNodeCount; ++i)
         {
-            if (m_pDrawables[i])
+            if (m_pNodes[i])
             {
-                delete m_pDrawables[i];
+                delete m_pNodes[i];
             }
         }
-        delete[] m_pDrawables;
-        m_pDrawables = nullptr;
+        delete[] m_pNodes;
+        m_pNodes = nullptr;
     }
     if (m_pImage)
     {
@@ -145,25 +146,39 @@ void Window::start()
 
 void Window::setupGLVertex()
 {
-    m_nDrawableCount = 3;
-    m_pDrawables = new IDrawable*[m_nDrawableCount];
+    m_nNodeCount = 3;
+    m_pNodes = new Node*[m_nNodeCount];
 
-    m_pDrawables[0] = new Triangle();
-    m_pDrawables[0]->setShader(m_pBaseShader);
-    m_pDrawables[0]->registerBuffer();
+    // Triangle
+    m_pNodes[0] = new Node();
+    m_pNodes[0]->setPosition(-0.5f, 0.f, 0.f);
+    m_pNodes[0]->setRotation(0.f);
+    auto pTriangle = new Triangle();
+    pTriangle->setShader(m_pBaseShader);
+    pTriangle->registerBuffer();
+    m_pNodes[0]->setComponent(pTriangle);
 
+    // Quads 1
+    m_pNodes[1] = new Node();
+    m_pNodes[1]->setPosition(0.5f, 0.5f, 0.f);
+    m_pNodes[1]->setRotation(0.f);
     vec4 red = {1.f, 0.f, 0.f, 1.f}; // Red color for the quad
-    //  * (m_nWidth / (float)m_nHeight) only needed if not matrix translated
-    m_pDrawables[1] = new Quad(0, 0, 0.5f, 0.5f, red);
-    m_pDrawables[1]->setShader(m_pImageShader);
-    static_cast<Quad*>(m_pDrawables[1])->setImage(m_pImage);
-    m_pDrawables[1]->registerBuffer();
+    auto pQuad = new Quad(0, 0, 0.5f, 0.5f, red);
+    pQuad->setShader(m_pImageShader);
+    static_cast<Quad*>(pQuad)->setImage(m_pImage);
+    pQuad->registerBuffer();
+    m_pNodes[1]->setComponent(pQuad);
 
+    // Quads 2
+    m_pNodes[2] = new Node();
+    m_pNodes[2]->setPosition(0.5f, -0.5f, 0.f);
+    m_pNodes[2]->setRotation(0.f);
     vec4 color = {0.5f, 0.5f, 1.f, 1.f}; // Blue color for the second quad
-    m_pDrawables[2] = new Quad(0.5f, 0.5f, 0.3f, 0.3f, color);
-    m_pDrawables[2]->setShader(m_pImageShader);
-    static_cast<Quad*>(m_pDrawables[2])->setImage(m_pImage);
-    m_pDrawables[2]->registerBuffer();
+    auto pQuad2 = new Quad(0, 0, 0.3f, 0.3f, color);
+    pQuad2->setShader(m_pImageShader);
+    static_cast<Quad*>(pQuad2)->setImage(m_pImage);
+    pQuad2->registerBuffer();
+    m_pNodes[2]->setComponent(pQuad2);
 }
 
 void Window::setupShaders()
@@ -207,8 +222,8 @@ void Window::drawFrame()
     // m_pCamera->move(3 * m_fDeltaTime, 0, 0); // Move the camera back a bit
     // m_pCamera->rotate(0, 0, 1.f * m_fDeltaTime); // Rotate the camera slightly each frame
 
-    for (int i = 0; i < m_nDrawableCount; ++i)
+    for (int i = 0; i < m_nNodeCount; ++i)
     {
-        m_pDrawables[i]->draw();
+        m_pNodes[i]->draw();
     }
 }

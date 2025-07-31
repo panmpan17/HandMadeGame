@@ -7,6 +7,7 @@
 #include "../image.h"
 #include "../camera.h"
 #include "../debug_macro.h"
+#include "../node.h"
 
 Quad::Quad(float fX, float fY, float fWidth, float fHeight, vec4 color)
 {
@@ -46,10 +47,16 @@ void Quad::registerBuffer()
 
 void Quad::draw()
 {
+    ASSERT(m_pShader, "Shader must be set before drawing the quad");
+
     mat4x4 mvp, local, cameraViewMatrix;
 
     mat4x4_identity(local);
-    mat4x4_translate(local, m_position[0], m_position[1], m_position[2]);
+
+    const vec3& position = m_pNode->getPosition();
+    mat4x4_translate(local, position[0], position[1], position[2]);
+
+    mat4x4_rotate_Z(local, local, m_pNode->getRotation());
 
     Camera::main->getViewMatrix(cameraViewMatrix);
     mat4x4_mul(mvp, cameraViewMatrix, local);

@@ -19,17 +19,10 @@ public:
     void registerBuffer() override;
     void draw() override;
 
-    inline void setPosition(float fX, float fY) {
-        m_position[0] = fX;
-        m_position[1] = fY;
-    }
-
     inline void setShader(Shader* pShader) override { m_pShader = static_cast<ImageShader*>(pShader); }
     inline void setImage(Image* pImage) { m_pImage = pImage; }
 
 private:
-    vec3 m_position = {0.f, 0.f, 0.f};
-
     GLuint m_nVertexBuffer, m_nVertexArray;
 
     VertexWUV m_arrVertices[4];
