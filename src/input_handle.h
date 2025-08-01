@@ -26,17 +26,3 @@ private:
     static bool sm_bMouseEntered;
     static float sm_fMouseX, sm_fMouseY;
 };
-
-
-class WorldVector
-{
-public:
-    float x, y, z;
-
-    WorldVector() : x(0), y(0), z(0) {}
-    WorldVector(float value) : x(value), y(value), z(value) {}
-    WorldVector(float x, float y) : x(x), y(y), z(0) {}
-    WorldVector(float x, float y, float z) : x(x), y(y), z(z) {}
-
-
-};

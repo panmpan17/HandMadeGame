@@ -2,6 +2,9 @@
 
 int main() {
     Window window;
+    window.setResizable(true);
+    window.configureAndCreateWindow();
+
     if (!window.isValid())
     {
         return -1; // Initialization failed

@@ -12,17 +12,20 @@ typedef unsigned int GLuint;
 class Window {
 public:
     static Window* ins;
-    inline static float getWindowRatio() { return ins->m_fRatio; }
-    inline static void getWindowSize(int& width, int& height) {
-        width = ins->m_nWidth;
-        height = ins->m_nHeight;
-    }
 
     Window();
     ~Window();
 
     inline bool isValid() const { return m_pWindow != nullptr; }
 
+    inline void setResizable(bool resizable) { m_bResizable = resizable; }
+    inline float getWindowRatio() { return ins->m_fRatio; }
+    inline void getWindowSize(int& width, int& height) {
+        width = ins->m_nWidth;
+        height = ins->m_nHeight;
+    }
+
+    void configureAndCreateWindow();
     void start();
 
     void addNode(Node* pNode);
@@ -50,7 +53,8 @@ private:
     // TODO: optimization, load it some where centralized
     Image* m_pImage = nullptr;
 
-    void configureAndCreateWindow();
+    bool m_bResizable = false;
+
     void setupGLVertex();
     void setupShaders();
     void mainLoop();

@@ -5,3 +5,4 @@ glfw-3.4/
 *.app
 output/
 .DS_Store
+build/

@@ -9,7 +9,7 @@ float InputManager::sm_fMouseY = 0.0f;
 void InputManager::windowPositionToGLPosition(float windowX, float windowY, float& glX, float& glY)
 {
     int width, height;
-    Window::getWindowSize(width, height);
+    Window::ins->getWindowSize(width, height);
 
     // Convert window coordinates to OpenGL coordinates
     glX = (windowX / width) * 2.0f - 1.0f; // Normalize to [-1, 1]
@@ -19,7 +19,7 @@ void InputManager::windowPositionToGLPosition(float windowX, float windowY, floa
 void InputManager::GLPositionToWindowPosition(float glX, float glY, float& windowX, float& windowY)
 {
     int width, height;
-    Window::getWindowSize(width, height);
+    Window::ins->getWindowSize(width, height);
 
     // Convert OpenGL coordinates back to window coordinates
     windowX = (glX + 1.0f) / 2.0f * width; // Normalize to [0, width]

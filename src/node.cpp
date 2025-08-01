@@ -1,5 +1,5 @@
 #include "node.h"
-#include "component.h"
+#include "components/component.h"
 #include "draw/drawable_interface.h"
 
 

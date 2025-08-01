@@ -18,7 +18,8 @@
 #include "input_handle.h"
 #include "image.h"
 #include "node.h"
-#include "rotate.h"
+#include "components/rotate.h"
+#include "components/follow_mouse.h"
 
 
 Window* Window::ins = nullptr;
@@ -32,8 +33,6 @@ Window::Window()
         LOGLN("Failed to initialize GLFW");
         return;
     }
-
-    configureAndCreateWindow();
 }
 
 Window::~Window()
@@ -87,7 +86,7 @@ void Window::configureAndCreateWindow()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+    glfwWindowHint(GLFW_RESIZABLE, m_bResizable ? GLFW_TRUE : GLFW_FALSE);
 
 #if IS_DEBUG_VERSION
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
