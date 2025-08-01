@@ -1,6 +1,6 @@
 glfw-build/
 glfw-3.4/
-lib/*.dylib
+*.dylib
 * APP
 *.app
 output/
