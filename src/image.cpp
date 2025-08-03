@@ -7,6 +7,21 @@
 #include "file_utils.h"
 #include "debug_macro.h"
 
+#ifndef __has_include
+  static_assert(false, "__has_include not supported");
+#else
+#  if __cplusplus >= 201703L && __has_include(<filesystem>)
+#    include <filesystem>
+     namespace fs = std::filesystem;
+#  elif __has_include(<experimental/filesystem>)
+#    include <experimental/filesystem>
+     namespace fs = std::experimental::filesystem;
+#  elif __has_include(<boost/filesystem.hpp>)
+#    include <boost/filesystem.hpp>
+     namespace fs = boost::filesystem;
+#  endif
+#endif
+
 Image::Image(const std::string& strPath)
 {
     stbi_set_flip_vertically_on_load(true);
@@ -15,7 +30,7 @@ Image::Image(const std::string& strPath)
     if (*strPath.begin() != '/')
     {
         std::string executablePath = FileUtils::getExecutablePath();
-        fullPath = PARENT_PATH_OBJ(executablePath).append(strPath).string();
+        fullPath = fs::path(executablePath).parent_path().append(strPath).string();
     }
 
     m_pData = stbi_load(fullPath.c_str(), &m_nWidth, &m_nHeight, &m_nChannels, 0);

@@ -19,9 +19,9 @@ MAC_RPATH = -Wl,-rpath,@loader_path/lib
 
 
 # --- Windows Configuration ---
-WIN_CXX = x86_64-w64-mingw32-g++
+WIN_CXX = g++
 
-WIN_LIBS = -L./lib/windows/ -lglfw3dll
+WIN_LIBS = -L./lib/ -lglfw3 -lstdc++exp -lopengl32 -lgdi32
 WIN_RPATH = -Wl,-rpath,@loader_path/lib
 WIN_OUTPUT_NAME = $(OUTPUT_NAME).exe
 
@@ -55,13 +55,15 @@ mac-build: mac-compile
 	open -R $(OUTPUT_FOLDER)/$(OUTPUT_NAME).app
 
 window-compile:
-	@echo "Not implemented for Windows yet"
+	@echo "Compiling $(OUTPUT_NAME) to $(OUTPUT_FOLDER) for Window"
+	@mkdir -p $(OUTPUT_FOLDER)
+	$(WIN_CXX) $(SRCS) $(CPP_STD) -o $(OUTPUT_FOLDER)/$(OUTPUT_NAME) $(INCLUDES) $(COMMON_LIBS) $(DEBUG_BUILD_FLAG) $(WIN_LIBS)
 
 window-quick: window-compile
 	@echo "Not implemented for Windows yet"
 
 window-build: window-compile
-	@echo "Not implemented for Windows yet"
+	cp -r ./assets $(OUTPUT_FOLDER)
 
 compile-all: mac-compile window-compile
 

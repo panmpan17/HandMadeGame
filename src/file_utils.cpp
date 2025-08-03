@@ -9,6 +9,23 @@
 #include <unistd.h>
 #elif IS_PLATFORM_WINDOWS
 #include <windows.h>
+#include <stdexcept>
+#endif
+
+
+#ifndef __has_include
+  static_assert(false, "__has_include not supported");
+#else
+#  if __cplusplus >= 201703L && __has_include(<filesystem>)
+#    include <filesystem>
+     namespace fs = std::filesystem;
+#  elif __has_include(<experimental/filesystem>)
+#    include <experimental/filesystem>
+     namespace fs = std::experimental::filesystem;
+#  elif __has_include(<boost/filesystem.hpp>)
+#    include <boost/filesystem.hpp>
+     namespace fs = boost::filesystem;
+#  endif
 #endif
 
 
@@ -56,10 +73,10 @@ FileReader::FileReader(const std::string& path)
     if (*path.begin() != '/')
     {
         std::string executablePath = FileUtils::getExecutablePath();
-        fullPath = PARENT_PATH_OBJ(executablePath).append(path).string();
+        fullPath = fs::path(executablePath).parent_path().append(path).string();
     }
 
-    if (std::filesystem::exists(fullPath))
+    if (fs::exists(fullPath))
     {
         file.open(fullPath);
     }

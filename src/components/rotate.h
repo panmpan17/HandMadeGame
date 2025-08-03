@@ -1,7 +1,7 @@
 #pragma once
 
 #include "component.h"
-#include "node.h"
+#include "../node.h"
 
 
 class Rotate : public IUpdatable

@@ -3,6 +3,7 @@
 #include "camera.h"
 #include <linmath.h>
 #include <string>
+#include <stdexcept>
 
 
 Vector2 WorldVectorSytem::screenToWorld(float screenX, float screenY)

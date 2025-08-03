@@ -4,7 +4,6 @@
 #include <fstream>
 // #include <vector>
 
-#define PARENT_PATH_OBJ(strPath) std::filesystem::path(strPath).parent_path()
 
 class path;
 
