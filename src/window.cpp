@@ -20,6 +20,7 @@
 #include "node.h"
 #include "components/rotate.h"
 #include "components/follow_mouse.h"
+#include "components/movement.h"
 
 
 Window* Window::ins = nullptr;
@@ -68,6 +69,9 @@ Window::~Window()
         delete m_pImage;
         m_pImage = nullptr;
     }
+
+    InputManager::Cleanup();
+
     glfwTerminate();
 }
 
@@ -113,6 +117,8 @@ void Window::configureAndCreateWindow()
 
 void Window::start()
 {
+    InputManager::Initialize();
+
     m_pCamera = new Camera();
 
     glfwSetKeyCallback(m_pWindow, &InputManager::onKeyCallback);
@@ -150,6 +156,8 @@ void Window::setupGLVertex()
     pNode1->addComponent(pTriangle);
 
     pNode1->addComponent(new Rotate(-1.0f));
+
+    pNode1->addComponent(new Movement(1.0f)); // Add movement component with speed 1.0f
 
     addNode(pNode1);
 

@@ -1,9 +1,17 @@
 #include "input_handle.h"
 #include "window.h"
+#include "debug_macro.h"
+
+
+#define GLFW_RELEASE 0
+#define GLFW_PRESS 1
+#define GLFW_REPEAT 2
+
 
 bool InputManager::sm_bMouseEntered = false;
 float InputManager::sm_fMouseX = 0.0f;
 float InputManager::sm_fMouseY = 0.0f;
+InputManager* InputManager::ins = nullptr;
 
 
 void InputManager::windowPositionToGLPosition(float windowX, float windowY, float& glX, float& glY)
@@ -45,5 +53,48 @@ void InputManager::onMouseButtonCallback(GLFWwindow* pWindow, int nButton, int n
 
 void InputManager::onKeyCallback(GLFWwindow* pWindow, int nKey, int nScanNode, int nAction, int nMods)
 {
-    // LOGLN_EX("Key pressed: {}, Scancode: {}, Action: {}, Mods: {}", nKey, nScanNode, nAction, nMods);
+    if (!ins)
+    {
+        LOGERRLN("InputManager instance is not initialized.");
+        return;
+    }
+
+    switch (nAction)
+    {
+        case GLFW_PRESS:
+            if (nKey >= 0 && nKey < 256)
+            {
+                ins->m_bKeyPressed[nKey] = true;
+                ins->m_KeyPressEvent[nKey].invoke(true);
+            }
+            break;
+        case GLFW_RELEASE:
+            if (nKey >= 0 && nKey < 256)
+            {
+                ins->m_bKeyPressed[nKey] = false;
+                ins->m_KeyPressEvent[nKey].invoke(false);
+            }
+            break;
+        case GLFW_REPEAT:
+            break;
+        default:
+            break;
+    }
+}
+
+void InputManager::Initialize()
+{
+    if (ins == nullptr)
+    {
+        ins = new InputManager();
+    }
+}
+
+InputManager::InputManager()
+{
+    // Initialize key states to false
+    for (int i = 0; i < 256; ++i)
+    {
+        m_bKeyPressed[i] = false;
+    }
 }

@@ -1,5 +1,5 @@
 # --- General Configuration ---
-SRCS = src/*.cpp src/draw/*.cpp include/glad/glad.c
+SRCS = src/*.cpp src/draw/*.cpp src/components/*.cpp include/glad/glad.c
 OUTPUT_FOLDER = output
 OUTPUT_NAME = "My GLFW App"
 
@@ -57,7 +57,7 @@ mac-build: mac-compile
 window-compile:
 	@echo "Compiling $(OUTPUT_NAME) to $(OUTPUT_FOLDER) for Window"
 	@mkdir -p $(OUTPUT_FOLDER)
-	$(WIN_CXX) $(SRCS) $(CPP_STD) -o $(OUTPUT_FOLDER)/$(OUTPUT_NAME) $(INCLUDES) $(COMMON_LIBS) $(DEBUG_BUILD_FLAG) $(WIN_LIBS)
+	$(WIN_CXX) $(SRCS) $(CPP_STD) -o $(OUTPUT_FOLDER)/$(OUTPUT_NAME) $(INCLUDES) $(COMMON_LIBS) $(DEBUG_BUILD_FLAG) $(WIN_LIBS) -mwindows
 
 window-quick: window-compile
 	@echo "Not implemented for Windows yet"
