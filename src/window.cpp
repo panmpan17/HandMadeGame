@@ -21,6 +21,7 @@
 #include "components/rotate.h"
 #include "components/follow_mouse.h"
 #include "components/movement.h"
+#include "components/simple_particle_system.h"
 
 
 Window* Window::ins = nullptr;
@@ -186,6 +187,13 @@ void Window::setupGLVertex()
     pNode3->addComponent(pQuad2);
 
     addNode(pNode3);
+
+    // Particle System
+    auto pNode4 = new Node(0, 0, 0, 0);
+    auto particle = new SimpleParticleSystem(20);
+    particle->setShader(new ParticleShader());
+    pNode4->addComponent(particle);
+    addNode(pNode4);
 }
 
 void Window::addNode(Node* pNode)

@@ -105,3 +105,11 @@ ImageShader::ImageShader()
     glUniform1i(m_nTextureLocation, 0); // Texture unit 0
     glUseProgram(0);
 }
+
+ParticleShader::ParticleShader()
+    : Shader("assets/shaders/particle.vert", "assets/shaders/particle.frag")
+{
+    m_nMvpLocation = glGetUniformLocation(m_nProgram, "MVP");
+    m_nColorLocation = glGetUniformLocation(m_nProgram, "particleColor");
+    m_nVPosLocation = glGetAttribLocation(m_nProgram, "vPos");
+}

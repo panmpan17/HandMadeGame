@@ -8,9 +8,9 @@ void Node::update(float deltaTime)
     // Update logic for the node, if any
     for (int i = 0; i < m_nComponentCount; ++i)
     {
-        if (m_pComponents[i] && m_pComponents[i]->isIUpdatable())
+        if (m_pComponents[i] && m_pComponents[i]->isUpdatable())
         {
-            static_cast<IUpdatable*>(m_pComponents[i])->update(deltaTime);
+            m_pComponents[i]->update(deltaTime);
         }
     }
 }
