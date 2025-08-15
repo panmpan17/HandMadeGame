@@ -192,6 +192,7 @@ void Window::setupGLVertex()
     auto pNode4 = new Node(0, 0, 0, 0);
     auto particle = new SimpleParticleSystem(20);
     particle->setShader(new ParticleShader());
+    particle->registerBuffer();
     pNode4->addComponent(particle);
     addNode(pNode4);
 }

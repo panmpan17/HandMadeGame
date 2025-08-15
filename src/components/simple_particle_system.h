@@ -20,11 +20,12 @@ class SimpleParticleSystem : public IDrawable
 public:
     SimpleParticleSystem(int nParticleCount)
     {
+        m_nParticleCount = nParticleCount;
         m_arrParticles = new Particle[nParticleCount];
 
         std::random_device rd;
         std::mt19937 gen(rd());
-        std::uniform_real_distribution<float> positionDist(-5.0f, 5.0f);
+        std::uniform_real_distribution<float> positionDist(-0.5f, 0.5f);
         std::uniform_real_distribution<float> colorDist(0.0f, 1.0f);
 
         for (int i = 0; i < nParticleCount; ++i)
@@ -55,6 +56,8 @@ public:
 
 private:
     Particle* m_arrParticles = nullptr;
+
+    int m_nParticleCount = 0;
 
     GLuint m_nVertexBuffer = 0;
     GLuint m_nVertexArray = 0;
