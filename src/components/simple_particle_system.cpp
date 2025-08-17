@@ -7,14 +7,69 @@
 #include "../node.h"
 #include "../camera.h"
 
+static std::random_device rd;
+static std::mt19937 gen(rd());
+std::uniform_real_distribution<float> randomRange0To1(0.0f, 1.0f);
+
+
+float randomFloat()
+{
+    return randomRange0To1(gen);
+}
+
+float randomFloat(float fMin, float fMax)
+{
+    float fValue = randomRange0To1(gen);
+    fValue = fValue * (fMax - fMin) + fMin;
+    return fValue;
+}
+
+int randomInt(int nMin, int nMax)
+{
+    std::uniform_int_distribution<int> randomRange(nMin, nMax);
+    return randomRange(gen);
+}
+
+void printMatx4x4(mat4x4 mat)
+{
+    for (int i = 0; i < 4; ++i)
+    {
+        for (int j = 0; j < 4; ++j)
+        {
+            std::cout << mat[i][j] << " ";
+        }
+        std::cout << std::endl;
+    }
+}
+
+SimpleParticleSystem::SimpleParticleSystem(int nParticleCount)
+{
+    m_nParticleCount = nParticleCount;
+    m_arrParticles = new Particle[nParticleCount];
+
+    for (int i = 0; i < nParticleCount; ++i)
+    {
+        m_arrParticles[i].position[0] = randomFloat(-0.8f, 0.8f); // Initialize position
+        m_arrParticles[i].position[1] = randomFloat(-0.8f, 0.8f);
+
+        m_arrParticles[i].color[0] = randomFloat(); // Initialize color to white
+        m_arrParticles[i].color[1] = randomFloat();
+        m_arrParticles[i].color[2] = randomFloat();
+        m_arrParticles[i].color[3] = 1.0f; // Alpha
+
+        m_arrParticles[i].rotation = randomFloat(0.0f, 2.0f * M_PI); // Random rotation
+        m_arrParticles[i].scale = randomFloat(0.2f, 0.4f); // Random scale
+        m_arrParticles[i].rotationSpeed = randomFloat(0.1f, 1.0f); // Random rotation speed
+    }
+}
 
 void SimpleParticleSystem::registerBuffer()
 {
     Vertex arrQuadVerticies[4];
-    arrQuadVerticies[0] = { { -0.2f, -0.2f } };
-    arrQuadVerticies[1] = { { 0.2f, -0.2f } };
-    arrQuadVerticies[2] = { { -0.2f, 0.2f } };
-    arrQuadVerticies[3] = { { 0.2f, 0.2f } };
+    arrQuadVerticies[0] = { { -0.1f, -0.1f } };
+    arrQuadVerticies[1] = { { 0.1f, -0.1f } };
+    arrQuadVerticies[2] = { { -0.1f, 0.1f } };
+    arrQuadVerticies[3] = { { 0.1f, 0.1f } };
 
     glGenBuffers(1, &m_nVertexBuffer);
     glBindBuffer(GL_ARRAY_BUFFER, m_nVertexBuffer);
@@ -42,15 +97,21 @@ void SimpleParticleSystem::draw()
 
     for (int i = 0; i < m_nParticleCount; ++i)
     {
-        mat4x4 mvp, local, cameraViewMatrix;
+        mat4x4 mvp, local, translate, cameraViewMatrix;
 
         mat4x4_identity(local);
 
-        const vec3& position = m_pNode->getPosition();
-        mat4x4_translate(local, position[0] + m_arrParticles[i].position[0], position[1] + m_arrParticles[i].position[1], position[2]);
+        // Transform the local matrix
+        mat4x4_scale_aniso(local, local, m_arrParticles[i].scale, m_arrParticles[i].scale, m_arrParticles[i].scale);
 
-        // mat4x4_rotate_Z(local, local, m_pNode->getRotation());
+        const vec2& particlePosition = m_arrParticles[i].position;
+        mat4x4 location;
+        mat4x4_translate(location, particlePosition[0], particlePosition[1], 0.0f);
+        mat4x4_mul(local, local, location);
 
+        mat4x4_rotate_Z(local, local, m_arrParticles[i].rotation);
+        
+        // Apply to Camera matrix
         Camera::main->getViewMatrix(cameraViewMatrix);
         mat4x4_mul(mvp, cameraViewMatrix, local);
 
@@ -78,5 +139,9 @@ void SimpleParticleSystem::draw()
 
 void SimpleParticleSystem::update(float deltaTime)
 {
-
+    for (int i = 0; i < m_nParticleCount; ++i)
+    {
+        // Update particle position, rotation, etc.
+        m_arrParticles[i].rotation += deltaTime * m_arrParticles[i].rotationSpeed; // Example rotation update
+    }
 }
