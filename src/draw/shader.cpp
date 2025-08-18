@@ -113,3 +113,11 @@ ParticleShader::ParticleShader()
     m_nColorLocation = glGetUniformLocation(m_nProgram, "particleColor");
     m_nVPosLocation = glGetAttribLocation(m_nProgram, "vPos");
 }
+
+ParticleInstanceShader::ParticleInstanceShader()
+    : Shader("assets/shaders/particle_instance.vert", "assets/shaders/particle_instance.frag")
+{
+    m_nMvpLocation = glGetUniformLocation(m_nProgram, "MVP");
+    // m_nColorLocation = glGetUniformLocation(m_nProgram, "particleColor");
+    // m_nVPosLocation = glGetAttribLocation(m_nProgram, "vPos");
+}

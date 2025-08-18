@@ -14,7 +14,6 @@
 #include "draw/shader.h"
 #include "draw/quad.h"
 #include "draw/triangle.h"
-#include "debug_macro.h"
 #include "input_handle.h"
 #include "image.h"
 #include "node.h"
@@ -22,6 +21,7 @@
 #include "components/follow_mouse.h"
 #include "components/movement.h"
 #include "components/simple_particle_system.h"
+#include "components/particle_system.h"
 
 
 Window* Window::ins = nullptr;
@@ -195,6 +195,13 @@ void Window::setupGLVertex()
     particle->registerBuffer();
     pNode4->addComponent(particle);
     addNode(pNode4);
+
+    auto pNode5 = new Node(0, 0, 0, 0);
+    auto particle2 = new ParticleSystem(20);
+    particle2->setShader(new ParticleInstanceShader());
+    particle2->registerBuffer();
+    pNode5->addComponent(particle2);
+    addNode(pNode5);
 }
 
 void Window::addNode(Node* pNode)
@@ -256,6 +263,8 @@ void Window::drawFrame()
     // m_pCamera->move(3 * m_fDeltaTime, 0, 0); // Move the camera back a bit
     // m_pCamera->rotate(0, 0, 1.f * m_fDeltaTime); // Rotate the camera slightly each frame
 
+    m_nDrawCallCount = 0;
+
     for (int i = 0; i < m_nNodeCount; ++i)
     {
         if (m_pNodes[i])
@@ -264,4 +273,11 @@ void Window::drawFrame()
             m_pNodes[i]->draw();
         }
     }
+
+    LOG_EX("Draw call count: {}\r", m_nDrawCallCount);
+}
+
+void Window::increaseDrawCallCount()
+{
+    ++m_nDrawCallCount;
 }

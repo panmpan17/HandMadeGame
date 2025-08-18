@@ -6,6 +6,7 @@
 #include "../debug_macro.h"
 #include "../node.h"
 #include "../camera.h"
+#include "../window.h"
 
 static std::random_device rd;
 static std::mt19937 gen(rd());
@@ -91,9 +92,8 @@ void SimpleParticleSystem::draw()
 {
     ASSERT(m_pShader, "Shader must be set before drawing the quad");
 
-    // std::println("SimpleParticleSystem::draw() - Drawing particles");
-
     glBindVertexArray(m_nVertexArray);
+    glUseProgram(m_pShader->getProgram());
 
     for (int i = 0; i < m_nParticleCount; ++i)
     {
@@ -115,8 +115,6 @@ void SimpleParticleSystem::draw()
         Camera::main->getViewMatrix(cameraViewMatrix);
         mat4x4_mul(mvp, cameraViewMatrix, local);
 
-        glUseProgram(m_pShader->getProgram());
-
         ParticleShader* pParticleShader = static_cast<ParticleShader*>(m_pShader);
         glUniformMatrix4fv(pParticleShader->getMvpLocation(), 1, GL_FALSE, (const GLfloat*) mvp);
 
@@ -130,6 +128,7 @@ void SimpleParticleSystem::draw()
         // LOGLN_EX("Quad::draw() - Using texture location: {}", m_pShader->getTextureLocation());
 
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4); // Draw the quad using triangle strip
+        INCREASE_DRAW_CALL_COUNT();
     }
 
     // glBindTexture(GL_TEXTURE_2D, 0); // Unbind the texture

@@ -8,6 +8,7 @@
 #include "../camera.h"
 #include "../debug_macro.h"
 #include "../node.h"
+#include "../window.h"
 
 Quad::Quad(float fX, float fY, float fWidth, float fHeight, vec4 color)
 {
@@ -73,6 +74,7 @@ void Quad::draw()
 
     glBindVertexArray(m_nVertexArray);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4); // Draw the quad using triangle strip
+    INCREASE_DRAW_CALL_COUNT();
 
     glBindTexture(GL_TEXTURE_2D, 0); // Unbind the texture
     glBindVertexArray(0); // Unbind the vertex array

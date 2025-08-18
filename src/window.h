@@ -1,5 +1,7 @@
 #pragma once
 
+#include "debug_macro.h"
+
 class GLFWwindow;
 class Camera;
 class TestShader;
@@ -30,6 +32,8 @@ public:
 
     void addNode(Node* pNode);
 
+    void increaseDrawCallCount();
+
 private:
     GLFWwindow* m_pWindow = nullptr;
 
@@ -54,9 +58,16 @@ private:
     Image* m_pImage = nullptr;
 
     bool m_bResizable = false;
+    int m_nDrawCallCount = 0;
 
     void setupGLVertex();
     void setupShaders();
     void mainLoop();
     void drawFrame();
 };
+
+#if IS_DEBUG_VERSION
+#define INCREASE_DRAW_CALL_COUNT() Window::ins->increaseDrawCallCount()
+#else
+#define INCREASE_DRAW_CALL_COUNT() do {} while (0)
+#endif

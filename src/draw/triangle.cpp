@@ -5,6 +5,7 @@
 #include "shader.h"
 #include "../camera.h"
 #include "../node.h"
+#include "../window.h"
 
 #include "../debug_macro.h"
 
@@ -57,5 +58,6 @@ void Triangle::draw()
     glUniformMatrix4fv(m_pShader->getMvpLocation(), 1, GL_FALSE, (const GLfloat*) mvp);
     glBindVertexArray(m_nVertexArray);
     glDrawArrays(GL_TRIANGLES, 0, 3);
+    INCREASE_DRAW_CALL_COUNT();
     glUseProgram(0);
 }

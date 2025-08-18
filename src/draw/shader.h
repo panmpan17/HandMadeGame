@@ -65,3 +65,20 @@ public:
 private:
     GLuint m_nMvpLocation, m_nColorLocation, m_nVPosLocation;
 };
+
+
+
+class ParticleInstanceShader : public Shader
+{
+public:
+    ParticleInstanceShader();
+
+    inline GLuint getMvpLocation() const { return m_nMvpLocation; }
+    inline GLuint getColorLocation() const { return m_nColorLocation; }
+    inline GLuint getVPosLocation() const { return m_nVPosLocation; }
+    // inline GLuint getVUVLocation() const { return m_nVUVLocation; }
+    // inline GLuint getTextureLocation() const { return m_nTextureLocation; }
+
+private:
+    GLuint m_nMvpLocation, m_nColorLocation, m_nVPosLocation;
+};
