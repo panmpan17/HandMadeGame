@@ -189,15 +189,15 @@ void Window::setupGLVertex()
     addNode(pNode3);
 
     // Particle System
-    auto pNode4 = new Node(0, 0, 0, 0);
-    auto particle = new SimpleParticleSystem(20);
-    particle->setShader(new ParticleShader());
-    particle->registerBuffer();
-    pNode4->addComponent(particle);
-    addNode(pNode4);
+    // auto pNode4 = new Node(0, 0, 0, 0);
+    // auto particle = new SimpleParticleSystem(10000);
+    // particle->setShader(new ParticleShader());
+    // particle->registerBuffer();
+    // pNode4->addComponent(particle);
+    // addNode(pNode4);
 
     auto pNode5 = new Node(0, 0, 0, 0);
-    auto particle2 = new ParticleSystem(20);
+    auto particle2 = new ParticleSystem(10000);
     particle2->setShader(new ParticleInstanceShader());
     particle2->registerBuffer();
     pNode5->addComponent(particle2);
@@ -274,7 +274,7 @@ void Window::drawFrame()
         }
     }
 
-    LOG_EX("Draw call count: {}\r", m_nDrawCallCount);
+    LOG_EX("Draw call count: {}, Fps: {}\r", m_nDrawCallCount, 1.0f / m_fDeltaTime);
 }
 
 void Window::increaseDrawCallCount()

@@ -5,11 +5,15 @@ uniform mat4 MVP;
 layout (location = 0) in vec2 quadPos;
 layout (location = 1) in vec2 instancePos;
 layout (location = 2) in vec4 instanceColor;
+layout (location = 3) in float rotation;
+layout (location = 4) in float scale;
 
 out vec4 fragmentColor;
 
 void main()
 {
-    gl_Position = MVP * vec4(quadPos + instancePos, 0.0, 1.0);
+    mat2 rotationMatrix = mat2(cos(rotation), -sin(rotation), sin(rotation), cos(rotation));
+    vec2 scaledPos = quadPos * scale;
+    gl_Position = MVP * vec4((rotationMatrix * scaledPos) + instancePos, 0.0, 1.0);
     fragmentColor = instanceColor;
 }

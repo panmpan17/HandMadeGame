@@ -71,7 +71,7 @@ void ParticleSystem::registerBuffer()
     // Instance data
     glGenBuffers(1, &m_nInstanceBuffer);
     glBindBuffer(GL_ARRAY_BUFFER, m_nInstanceBuffer);
-    glBufferData(GL_ARRAY_BUFFER, m_nParticleCount * sizeof(ParticleGPUInstance), m_arrParticlesGPU, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, m_nParticleCount * sizeof(ParticleGPUInstance), m_arrParticlesGPU, GL_DYNAMIC_DRAW);
 
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(ParticleGPUInstance), (void*)offsetof(ParticleGPUInstance, position));
@@ -80,6 +80,14 @@ void ParticleSystem::registerBuffer()
     glEnableVertexAttribArray(2);
     glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(ParticleGPUInstance), (void*)offsetof(ParticleGPUInstance, color));
     glVertexAttribDivisor(2, 1);
+
+    glEnableVertexAttribArray(3);
+    glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleGPUInstance), (void*)offsetof(ParticleGPUInstance, rotation));
+    glVertexAttribDivisor(3, 1);
+
+    glEnableVertexAttribArray(4);
+    glVertexAttribPointer(4, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleGPUInstance), (void*)offsetof(ParticleGPUInstance, scale));
+    glVertexAttribDivisor(4, 1);
 
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -98,9 +106,13 @@ void ParticleSystem::draw()
     ParticleShader* pParticleShader = static_cast<ParticleShader*>(m_pShader);
     glUniformMatrix4fv(pParticleShader->getMvpLocation(), 1, GL_FALSE, (const GLfloat*) cameraViewMatrix);
 
+    glBindBuffer(GL_ARRAY_BUFFER, m_nInstanceBuffer);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, m_nParticleCount * sizeof(ParticleGPUInstance), m_arrParticlesGPU);
+
     glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, m_nParticleCount);
     INCREASE_DRAW_CALL_COUNT();
 
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0); // Unbind the vertex array
     glUseProgram(0);
 }
