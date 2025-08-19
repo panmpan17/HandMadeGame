@@ -93,6 +93,8 @@ void Window::configureAndCreateWindow()
 
     glfwWindowHint(GLFW_RESIZABLE, m_bResizable ? GLFW_TRUE : GLFW_FALSE);
 
+    glfwSwapInterval(1);
+
 #if IS_DEBUG_VERSION
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
 #endif
@@ -197,7 +199,7 @@ void Window::setupGLVertex()
     // addNode(pNode4);
 
     auto pNode5 = new Node(0, 0, 0, 0);
-    auto particle2 = new ParticleSystem(10000);
+    auto particle2 = new ParticleSystem(100);
     particle2->setShader(new ParticleInstanceShader());
     particle2->registerBuffer();
     pNode5->addComponent(particle2);

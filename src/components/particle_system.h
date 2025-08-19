@@ -19,7 +19,9 @@ struct ParticleCPUInstance
 {
     float rotationSpeed;
     // vec2 velocity;
-    // float life;
+    float lifetime;
+
+    bool isAlive() const { return lifetime > 0; }
 };
 
 
@@ -43,7 +45,9 @@ private:
     ParticleGPUInstance* m_arrParticlesGPU = nullptr;
     ParticleCPUInstance* m_arrParticlesCPU = nullptr;
 
-    int m_nParticleCount = 0;
+    int m_nAllParticleCount = 0;
+    int m_nAliveParticleCount = 0;
+    int m_nLastAliveParticleIndex = 0;
 
     GLuint m_nVertexBuffer = 0;
     GLuint m_nVertexArray = 0;
@@ -52,4 +56,6 @@ private:
     Shader* m_pShader = nullptr;
 
     bool m_bSimulateInLocal = false;
+
+    void sortAliveParticleInFront();
 };

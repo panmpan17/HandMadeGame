@@ -17,25 +17,40 @@ int randomInt(int nMin, int nMax);
 
 ParticleSystem::ParticleSystem(int nParticleCount)
 {
-    m_nParticleCount = nParticleCount;
+    m_nAllParticleCount = nParticleCount;
     m_arrParticlesGPU = new ParticleGPUInstance[nParticleCount];
     m_arrParticlesCPU = new ParticleCPUInstance[nParticleCount];
 
+    m_nAliveParticleCount = 0;
     for (int i = 0; i < nParticleCount; ++i)
     {
         m_arrParticlesGPU[i].position[0] = randomFloat(-0.8f, 0.8f); // Initialize position
         m_arrParticlesGPU[i].position[1] = randomFloat(-0.8f, 0.8f);
 
-        m_arrParticlesGPU[i].color[0] = randomFloat(); // Initialize color to white
-        m_arrParticlesGPU[i].color[1] = randomFloat();
-        m_arrParticlesGPU[i].color[2] = randomFloat();
-        m_arrParticlesGPU[i].color[3] = 1.0f; // Alpha
+        // m_arrParticlesGPU[i].color[0] = randomFloat(); // Initialize color to white
+        // m_arrParticlesGPU[i].color[1] = randomFloat();
+        // m_arrParticlesGPU[i].color[2] = randomFloat();
+        // m_arrParticlesGPU[i].color[3] = 1.0f; // Alpha
 
         m_arrParticlesGPU[i].rotation = randomFloat(0.0f, 2.0f * M_PI); // Random rotation
         m_arrParticlesGPU[i].scale = randomFloat(0.2f, 0.4f); // Random scale
 
         m_arrParticlesCPU[i].rotationSpeed = randomFloat(0.1f, 1.0f); // Random rotation speed
+
+        m_arrParticlesCPU[i].lifetime = randomFloat(-1, 10); // Random lifetime
+
+        if (m_arrParticlesCPU[i].isAlive())
+        {
+            vec4_dup(m_arrParticlesGPU[i].color, vec4 { 1, 1, 1, 1.f });
+            ++m_nAliveParticleCount;
+        }
+        else
+        {
+            vec4_dup(m_arrParticlesGPU[i].color, vec4 { .5f, .5f, .5f, 1.f });
+        }
     }
+
+    sortAliveParticleInFront();
 }
 
 ParticleSystem::~ParticleSystem()
@@ -71,7 +86,7 @@ void ParticleSystem::registerBuffer()
     // Instance data
     glGenBuffers(1, &m_nInstanceBuffer);
     glBindBuffer(GL_ARRAY_BUFFER, m_nInstanceBuffer);
-    glBufferData(GL_ARRAY_BUFFER, m_nParticleCount * sizeof(ParticleGPUInstance), m_arrParticlesGPU, GL_DYNAMIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, m_nAllParticleCount * sizeof(ParticleGPUInstance), m_arrParticlesGPU, GL_DYNAMIC_DRAW);
 
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(ParticleGPUInstance), (void*)offsetof(ParticleGPUInstance, position));
@@ -107,9 +122,9 @@ void ParticleSystem::draw()
     glUniformMatrix4fv(pParticleShader->getMvpLocation(), 1, GL_FALSE, (const GLfloat*) cameraViewMatrix);
 
     glBindBuffer(GL_ARRAY_BUFFER, m_nInstanceBuffer);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, m_nParticleCount * sizeof(ParticleGPUInstance), m_arrParticlesGPU);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, m_nAliveParticleCount * sizeof(ParticleGPUInstance), m_arrParticlesGPU);
 
-    glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, m_nParticleCount);
+    glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, m_nAliveParticleCount);
     INCREASE_DRAW_CALL_COUNT();
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -119,9 +134,51 @@ void ParticleSystem::draw()
 
 void ParticleSystem::update(float deltaTime)
 {
-    for (int i = 0; i < m_nParticleCount; ++i)
+    for (int i = 0; i < m_nAllParticleCount; ++i)
     {
-        // Update particle position, rotation, etc.
-        m_arrParticlesGPU[i].rotation += deltaTime * m_arrParticlesCPU[i].rotationSpeed; // Example rotation update
+        if (m_arrParticlesCPU[i].isAlive())
+        {
+            m_arrParticlesCPU[i].lifetime -= deltaTime;
+
+            if (!m_arrParticlesCPU[i].isAlive())
+            {
+                std::swap(m_arrParticlesCPU[i], m_arrParticlesCPU[m_nLastAliveParticleIndex]);
+                std::swap(m_arrParticlesGPU[i], m_arrParticlesGPU[m_nLastAliveParticleIndex]);
+                --m_nLastAliveParticleIndex;
+                --m_nAliveParticleCount;
+                --i;
+                continue;
+            }
+            
+            m_arrParticlesGPU[i].rotation += deltaTime * m_arrParticlesCPU[i].rotationSpeed; // Example rotation update
+        }
+    }
+}
+
+
+void ParticleSystem::sortAliveParticleInFront()
+{
+    for (int i = 0; i < m_nAllParticleCount; i++)
+    {
+        for (int e = i + 1; e < m_nAllParticleCount; e++)
+        {
+            if (!m_arrParticlesCPU[i].isAlive() && m_arrParticlesCPU[e].isAlive())
+            {
+                std::swap(m_arrParticlesCPU[i], m_arrParticlesCPU[e]);
+                std::swap(m_arrParticlesGPU[i], m_arrParticlesGPU[e]);
+            }
+        }
+    }
+
+    for (int i = 0; i < m_nAllParticleCount; i++)
+    {
+        if (m_arrParticlesCPU[i].isAlive())
+        {
+            m_nLastAliveParticleIndex = i;
+        }
+        else
+        {
+            break;
+        }
     }
 }
