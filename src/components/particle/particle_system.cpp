@@ -13,6 +13,12 @@ float randomFloat();
 float randomFloat(float fMin, float fMax);
 int randomInt(int nMin, int nMax);
 
+#define SWAP_PARTICLE_POSITION(i, j) \
+    do { \
+        std::swap(m_arrParticlesGPU[i], m_arrParticlesGPU[j]); \
+        std::swap(m_arrParticlesCPU[i], m_arrParticlesCPU[j]); \
+    } while (0)
+
 
 ParticleSystem::ParticleSystem(int nParticleCount)
 {
@@ -21,35 +27,17 @@ ParticleSystem::ParticleSystem(int nParticleCount)
     m_arrParticlesCPU = new ParticleCPUInstance[nParticleCount];
 
     m_nAliveParticleCount = 0;
+    m_nLastAliveParticleIndex = -1;
+
     for (int i = 0; i < nParticleCount; ++i)
     {
-        m_arrParticlesGPU[i].position[0] = randomFloat(-0.8f, 0.8f); // Initialize position
-        m_arrParticlesGPU[i].position[1] = randomFloat(-0.8f, 0.8f);
-
-        // m_arrParticlesGPU[i].color[0] = randomFloat(); // Initialize color to white
-        // m_arrParticlesGPU[i].color[1] = randomFloat();
-        // m_arrParticlesGPU[i].color[2] = randomFloat();
-        // m_arrParticlesGPU[i].color[3] = 1.0f; // Alpha
-
-        m_arrParticlesGPU[i].rotation = randomFloat(0.0f, 2.0f * M_PI); // Random rotation
-        m_arrParticlesGPU[i].scale = randomFloat(0.2f, 0.4f); // Random scale
-
-        m_arrParticlesCPU[i].rotationSpeed = randomFloat(0.1f, 1.0f); // Random rotation speed
-
-        m_arrParticlesCPU[i].lifetime = randomFloat(-1, 10); // Random lifetime
-
-        if (m_arrParticlesCPU[i].isAlive())
-        {
-            vec4_dup(m_arrParticlesGPU[i].color, vec4 { 1, 1, 1, 1.f });
-            ++m_nAliveParticleCount;
-        }
-        else
-        {
-            vec4_dup(m_arrParticlesGPU[i].color, vec4 { .5f, .5f, .5f, 1.f });
-        }
+        m_arrParticlesCPU[i].m_fLifetime = 0;
     }
 
-    sortAliveParticleInFront();
+    for (int i = 0; i < 4; ++i)
+    {
+        m_arrParticleModules[i] = nullptr;
+    }
 }
 
 ParticleSystem::~ParticleSystem()
@@ -88,19 +76,19 @@ void ParticleSystem::registerBuffer()
     glBufferData(GL_ARRAY_BUFFER, m_nAllParticleCount * sizeof(ParticleGPUInstance), m_arrParticlesGPU, GL_DYNAMIC_DRAW);
 
     glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(ParticleGPUInstance), (void*)offsetof(ParticleGPUInstance, position));
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(ParticleGPUInstance), (void*)offsetof(ParticleGPUInstance, m_vecPosition));
     glVertexAttribDivisor(1, 1);
 
     glEnableVertexAttribArray(2);
-    glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(ParticleGPUInstance), (void*)offsetof(ParticleGPUInstance, color));
+    glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(ParticleGPUInstance), (void*)offsetof(ParticleGPUInstance, m_vecColor));
     glVertexAttribDivisor(2, 1);
 
     glEnableVertexAttribArray(3);
-    glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleGPUInstance), (void*)offsetof(ParticleGPUInstance, rotation));
+    glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleGPUInstance), (void*)offsetof(ParticleGPUInstance, m_fRotation));
     glVertexAttribDivisor(3, 1);
 
     glEnableVertexAttribArray(4);
-    glVertexAttribPointer(4, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleGPUInstance), (void*)offsetof(ParticleGPUInstance, scale));
+    glVertexAttribPointer(4, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleGPUInstance), (void*)offsetof(ParticleGPUInstance, m_fScale));
     glVertexAttribDivisor(4, 1);
 
     glBindVertexArray(0);
@@ -110,6 +98,8 @@ void ParticleSystem::registerBuffer()
 void ParticleSystem::draw()
 {
     ASSERT(m_pShader, "Shader must be set before drawing the quad");
+
+    if (m_nAliveParticleCount <= 0) return;
 
     glBindVertexArray(m_nVertexArray);
     glUseProgram(m_pShader->getProgram());
@@ -131,29 +121,59 @@ void ParticleSystem::draw()
     glUseProgram(0);
 }
 
-void ParticleSystem::update(float deltaTime)
+void ParticleSystem::update(float fDeltaTime)
 {
+    // spawnNewParticle();
+    for (IParticleModule*& pModule : m_arrParticleModules)
+    {
+        if (pModule)
+        {
+            pModule->update(*this, fDeltaTime);
+        }
+    }
+
     for (int i = 0; i < m_nAllParticleCount; ++i)
     {
         if (m_arrParticlesCPU[i].isAlive())
         {
-            m_arrParticlesCPU[i].lifetime -= deltaTime;
+            m_arrParticlesCPU[i].m_fLifetime -= fDeltaTime;
 
             if (!m_arrParticlesCPU[i].isAlive())
             {
-                std::swap(m_arrParticlesCPU[i], m_arrParticlesCPU[m_nLastAliveParticleIndex]);
-                std::swap(m_arrParticlesGPU[i], m_arrParticlesGPU[m_nLastAliveParticleIndex]);
+                SWAP_PARTICLE_POSITION(i, m_nLastAliveParticleIndex);
                 --m_nLastAliveParticleIndex;
                 --m_nAliveParticleCount;
                 --i;
                 continue;
             }
             
-            m_arrParticlesGPU[i].rotation += deltaTime * m_arrParticlesCPU[i].rotationSpeed; // Example rotation update
+            m_arrParticlesGPU[i].m_fRotation += fDeltaTime * m_arrParticlesCPU[i].m_fRotationSpeed; // Example m_fRotation update
         }
     }
 }
 
+int ParticleSystem::spawnNewParticle(int nStartIndex/* = 0*/)
+{
+    for (int i = nStartIndex; i < m_nAllParticleCount; ++i)
+    {
+        if (!m_arrParticlesCPU[i].isAlive())
+        {
+            m_arrParticlesCPU[i].m_fLifetime = randomFloat(1.0f, 3.0f); // Random lifetime
+            m_arrParticlesCPU[i].m_fRotationSpeed = randomFloat(0.1f, 1.0f); // Random m_fRotation speed
+
+            m_arrParticlesGPU[i].m_vecPosition[0] = randomFloat(-0.8f, 0.8f);
+            m_arrParticlesGPU[i].m_vecPosition[1] = randomFloat(-0.8f, 0.8f);
+            vec4_dup(m_arrParticlesGPU[i].m_vecColor, vec4 { 1.f, 1.f, 1.f, 1.f });
+            m_arrParticlesGPU[i].m_fRotation = randomFloat(0.0f, 2.0f * M_PI);
+            m_arrParticlesGPU[i].m_fScale = randomFloat(0.2f, 0.4f);
+
+            ++m_nAliveParticleCount;
+            return ++m_nLastAliveParticleIndex;
+        }
+    }
+
+    return -1;
+}
 
 void ParticleSystem::sortAliveParticleInFront()
 {
@@ -163,8 +183,7 @@ void ParticleSystem::sortAliveParticleInFront()
         {
             if (!m_arrParticlesCPU[i].isAlive() && m_arrParticlesCPU[e].isAlive())
             {
-                std::swap(m_arrParticlesCPU[i], m_arrParticlesCPU[e]);
-                std::swap(m_arrParticlesGPU[i], m_arrParticlesGPU[e]);
+                SWAP_PARTICLE_POSITION(i, e);
             }
         }
     }

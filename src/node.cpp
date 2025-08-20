@@ -1,6 +1,8 @@
 #include "node.h"
 #include "components/component.h"
 #include "draw/drawable_interface.h"
+#include <iostream>
+#include "debug_macro.h"
 
 
 void Node::update(float deltaTime)
@@ -10,7 +12,19 @@ void Node::update(float deltaTime)
     {
         if (m_pComponents[i] && m_pComponents[i]->isUpdatable())
         {
-            m_pComponents[i]->update(deltaTime);
+            try
+            {
+                m_pComponents[i]->update(deltaTime);
+            }
+            catch (const std::runtime_error& e) {
+                LOGERRLN_EX("Runtime error in component update: {}", e.what());
+            }
+            catch (const std::exception& e) {
+                LOGERRLN_EX("Standard exception in component update: {}", e.what());
+            }
+            catch (...) {
+                LOGERRLN("Unknown exception in component update");
+            }
         }
     }
 }
@@ -22,7 +36,19 @@ void Node::draw()
     {
         if (m_pComponents[i] && m_pComponents[i]->isIDrawable())
         {
-            static_cast<IDrawable*>(m_pComponents[i])->draw();
+            try
+            {
+                static_cast<IDrawable*>(m_pComponents[i])->draw();
+            }
+            catch (const std::runtime_error& e) {
+                LOGERRLN_EX("Runtime error in component draw: {}", e.what());
+            }
+            catch (const std::exception& e) {
+                LOGERRLN_EX("Standard exception in component draw: {}", e.what());
+            }
+            catch (...) {
+                LOGERRLN("Unknown exception in component draw");
+            }
         }
     }
 }

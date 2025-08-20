@@ -8,19 +8,27 @@ typedef unsigned int GLuint;
 
 struct ParticleGPUInstance
 {
-    vec2 position;
-    vec4 color;
-    float rotation;
-    float scale;
+    vec2 m_vecPosition;
+    vec4 m_vecColor;
+    float m_fRotation;
+    float m_fScale;
 };
 
 struct ParticleCPUInstance
 {
-    float rotationSpeed;
+    float m_fRotationSpeed;
     // vec2 velocity;
-    float lifetime;
+    float m_fLifetime;
 
-    bool isAlive() const { return lifetime > 0; }
+    bool isAlive() const { return m_fLifetime > 0; }
+};
+
+
+class ParticleSystem;
+class IParticleModule
+{
+public:
+    virtual void update(ParticleSystem& particleSystem, float deltaTime) = 0;
 };
 
 
@@ -38,7 +46,14 @@ public:
     void draw() override;
     void setShader(Shader* pShader) override { m_pShader = pShader; }
 
-    void update(float deltaTime) override;
+    void update(float fDeltaTime) override;
+
+    /// @brief Spawns a new particle
+    /// @param nStartIndex The index to start searching for a free particle
+    /// @return The index of the newly spawned particle, or -1 if none available
+    int spawnNewParticle(int nStartIndex = 0);
+
+    void addParticleModule(IParticleModule* pModule) { for (int i = 0; i < 4; ++i) { if (m_arrParticleModules[i] == nullptr) { m_arrParticleModules[i] = pModule; break; } } }
 
 private:
     ParticleGPUInstance* m_arrParticlesGPU = nullptr;
@@ -55,6 +70,8 @@ private:
     Shader* m_pShader = nullptr;
 
     bool m_bSimulateInLocal = false;
+
+    IParticleModule* m_arrParticleModules[4];
 
     void sortAliveParticleInFront();
 };

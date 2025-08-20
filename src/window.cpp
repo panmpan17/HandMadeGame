@@ -22,6 +22,7 @@
 #include "components/movement.h"
 #include "components/particle/simple_particle_system.h"
 #include "components/particle/particle_system.h"
+#include "components/particle/particle_spawn.h"
 
 
 Window* Window::ins = nullptr;
@@ -202,6 +203,8 @@ void Window::setupGLVertex()
     auto particle2 = new ParticleSystem(100);
     particle2->setShader(new ParticleInstanceShader());
     particle2->registerBuffer();
+    // particle2->addParticleModule(new ParticleIntervalSpawn(10));
+    particle2->addParticleModule(new ParticleBurstSpawn(1.0f, 20));
     pNode5->addComponent(particle2);
     addNode(pNode5);
 }
