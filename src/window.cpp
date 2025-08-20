@@ -20,8 +20,8 @@
 #include "components/rotate.h"
 #include "components/follow_mouse.h"
 #include "components/movement.h"
-#include "components/simple_particle_system.h"
-#include "components/particle_system.h"
+#include "components/particle/simple_particle_system.h"
+#include "components/particle/particle_system.h"
 
 
 Window* Window::ins = nullptr;

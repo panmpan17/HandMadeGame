@@ -1,12 +1,13 @@
 #include "simple_particle_system.h"
 
 #include <glad/gl.h>
-#include "../draw/shader.h"
-#include "../draw/vertex.h"
-#include "../debug_macro.h"
-#include "../node.h"
-#include "../camera.h"
-#include "../window.h"
+#include <random>
+#include "../../draw/shader.h"
+#include "../../draw/vertex.h"
+#include "../../debug_macro.h"
+#include "../../node.h"
+#include "../../camera.h"
+#include "../../window.h"
 
 static std::random_device rd;
 static std::mt19937 gen(rd());

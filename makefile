@@ -1,5 +1,5 @@
 # --- General Configuration ---
-SRCS = src/*.cpp src/draw/*.cpp src/components/*.cpp include/glad/glad.c
+SRCS = src/*.cpp src/**/*.cpp src/**/**/*.cpp include/glad/glad.c
 OUTPUT_FOLDER = output
 OUTPUT_NAME = "My GLFW App"
 

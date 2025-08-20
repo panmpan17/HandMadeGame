@@ -1,13 +1,12 @@
 #include "particle_system.h"
-#include "simple_particle_system.h"
 
 #include <glad/gl.h>
-#include "../draw/shader.h"
-#include "../draw/vertex.h"
-#include "../debug_macro.h"
-#include "../node.h"
-#include "../camera.h"
-#include "../window.h"
+#include "../../draw/shader.h"
+#include "../../draw/vertex.h"
+#include "../../debug_macro.h"
+#include "../../node.h"
+#include "../../camera.h"
+#include "../../window.h"
 
 
 float randomFloat();

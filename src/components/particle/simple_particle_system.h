@@ -1,9 +1,8 @@
 #pragma once
 
-#include "component.h"
-#include "../draw/drawable_interface.h"
+// #include "../component.h"
+#include "../../draw/drawable_interface.h"
 #include <linmath.h>
-#include <random>
 
 typedef unsigned int GLuint;
 
