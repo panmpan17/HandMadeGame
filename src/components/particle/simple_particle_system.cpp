@@ -8,29 +8,8 @@
 #include "../../node.h"
 #include "../../camera.h"
 #include "../../window.h"
+#include "../../random.h"
 
-static std::random_device rd;
-static std::mt19937 gen(rd());
-std::uniform_real_distribution<float> randomRange0To1(0.0f, 1.0f);
-
-
-float randomFloat()
-{
-    return randomRange0To1(gen);
-}
-
-float randomFloat(float fMin, float fMax)
-{
-    float fValue = randomRange0To1(gen);
-    fValue = fValue * (fMax - fMin) + fMin;
-    return fValue;
-}
-
-int randomInt(int nMin, int nMax)
-{
-    std::uniform_int_distribution<int> randomRange(nMin, nMax);
-    return randomRange(gen);
-}
 
 void printMatx4x4(mat4x4 mat)
 {

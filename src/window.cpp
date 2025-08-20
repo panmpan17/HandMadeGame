@@ -203,7 +203,8 @@ void Window::setupGLVertex()
     auto particle2 = new ParticleSystem(100);
     particle2->setShader(new ParticleInstanceShader());
     particle2->registerBuffer();
-    // particle2->addParticleModule(new ParticleIntervalSpawn(10));
+    particle2->setParticleStartColor({ 1.f, 0.f, 0.f, 1.f }, { 0.f, 1.f, 0.f, 1.f });
+    particle2->addParticleModule(new ParticleIntervalSpawn(10));
     particle2->addParticleModule(new ParticleBurstSpawn(1.0f, 20));
     pNode5->addComponent(particle2);
     addNode(pNode5);

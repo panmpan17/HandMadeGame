@@ -55,19 +55,39 @@ public:
 
     void addParticleModule(IParticleModule* pModule) { for (int i = 0; i < 4; ++i) { if (m_arrParticleModules[i] == nullptr) { m_arrParticleModules[i] = pModule; break; } } }
 
+    void setParticleLifetime(float fMin, float fMax) { m_fLifetimeMin = fMin; m_fLifetimeMax = fMax; }
+    void setParticleStartRotation(float fMin, float fMax) { m_fStartRotationMin = fMin; m_fStartRotationMax = fMax; }
+    void setParticleStartRotationSpeed(float fMin, float fMax) { m_fStartRotationSpeedMin = fMin; m_fStartRotationSpeedMax = fMax; }
+    void setParticleStartScale(float fMin, float fMax) { m_fStartScaleMin = fMin; m_fStartScaleMax = fMax; }
+    void setParticleStartColor(const vec4& colorMin, const vec4& colorMax) { vec4_dup(m_vecStartColorMin, colorMin); vec4_dup(m_vecStartColorMax, colorMax); }
+
 private:
     ParticleGPUInstance* m_arrParticlesGPU = nullptr;
     ParticleCPUInstance* m_arrParticlesCPU = nullptr;
-
-    int m_nAllParticleCount = 0;
-    int m_nAliveParticleCount = 0;
-    int m_nLastAliveParticleIndex = 0;
 
     GLuint m_nVertexBuffer = 0;
     GLuint m_nVertexArray = 0;
     GLuint m_nInstanceBuffer = 0;
 
     Shader* m_pShader = nullptr;
+
+    int m_nAllParticleCount = 0;
+    int m_nAliveParticleCount = 0;
+    int m_nLastAliveParticleIndex = 0;
+
+    float m_fLifetimeMin = 1.0f;
+    float m_fLifetimeMax = 3.0f;
+
+    float m_fStartRotationMin = 0.0f;
+    float m_fStartRotationMax = 0.0f;
+    float m_fStartRotationSpeedMin = 0.0f;
+    float m_fStartRotationSpeedMax = 0.0f;
+
+    float m_fStartScaleMin = 0.2f;
+    float m_fStartScaleMax = 0.4f;
+
+    vec4 m_vecStartColorMin = { 0.9f, 0.9f, 0.9f, 1.f };
+    vec4 m_vecStartColorMax = { 1.f, 1.f, 1.f, 1.f };
 
     bool m_bSimulateInLocal = false;
 

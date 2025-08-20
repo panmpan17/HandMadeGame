@@ -7,14 +7,12 @@
 #include "../../node.h"
 #include "../../camera.h"
 #include "../../window.h"
+#include "../../random.h"
 
-
-float randomFloat();
-float randomFloat(float fMin, float fMax);
-int randomInt(int nMin, int nMax);
 
 #define SWAP_PARTICLE_POSITION(i, j) \
     do { \
+        if (i == j) break; \
         std::swap(m_arrParticlesGPU[i], m_arrParticlesGPU[j]); \
         std::swap(m_arrParticlesCPU[i], m_arrParticlesCPU[j]); \
     } while (0)
@@ -123,7 +121,6 @@ void ParticleSystem::draw()
 
 void ParticleSystem::update(float fDeltaTime)
 {
-    // spawnNewParticle();
     for (IParticleModule*& pModule : m_arrParticleModules)
     {
         if (pModule)
@@ -158,14 +155,15 @@ int ParticleSystem::spawnNewParticle(int nStartIndex/* = 0*/)
     {
         if (!m_arrParticlesCPU[i].isAlive())
         {
-            m_arrParticlesCPU[i].m_fLifetime = randomFloat(1.0f, 3.0f); // Random lifetime
-            m_arrParticlesCPU[i].m_fRotationSpeed = randomFloat(0.1f, 1.0f); // Random m_fRotation speed
+            m_arrParticlesCPU[i].m_fLifetime = randomFloat(m_fLifetimeMin, m_fLifetimeMax); // Random lifetime
+            m_arrParticlesCPU[i].m_fRotationSpeed = randomFloat(m_fStartRotationSpeedMin, m_fStartRotationSpeedMax); // Random m_fRotation speed
 
+            // TODO: use a virtual class like ParticleSpawnShape to control the spawn position and align rotation?
             m_arrParticlesGPU[i].m_vecPosition[0] = randomFloat(-0.8f, 0.8f);
             m_arrParticlesGPU[i].m_vecPosition[1] = randomFloat(-0.8f, 0.8f);
-            vec4_dup(m_arrParticlesGPU[i].m_vecColor, vec4 { 1.f, 1.f, 1.f, 1.f });
-            m_arrParticlesGPU[i].m_fRotation = randomFloat(0.0f, 2.0f * M_PI);
-            m_arrParticlesGPU[i].m_fScale = randomFloat(0.2f, 0.4f);
+            randomBetweenVec4(m_arrParticlesGPU[i].m_vecColor, m_vecStartColorMin, m_vecStartColorMax);
+            m_arrParticlesGPU[i].m_fRotation = randomFloat(m_fStartRotationMin, m_fStartRotationMax);
+            m_arrParticlesGPU[i].m_fScale = randomFloat(m_fStartScaleMin, m_fStartScaleMax);
 
             ++m_nAliveParticleCount;
             return ++m_nLastAliveParticleIndex;
