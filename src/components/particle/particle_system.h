@@ -17,7 +17,7 @@ struct ParticleGPUInstance
 struct ParticleCPUInstance
 {
     float m_fRotationSpeed;
-    // vec2 velocity;
+    vec2 m_vecVelocity;
     float m_fLifetime;
 
     bool isAlive() const { return m_fLifetime > 0; }
@@ -105,9 +105,13 @@ private:
     vec4 m_vecStartColorMin = { 0.9f, 0.9f, 0.9f, 1.f };
     vec4 m_vecStartColorMax = { 1.f, 1.f, 1.f, 1.f };
 
+    float m_fStartVelocityMin = 0.3f;
+    float m_fStartVelocityMax = 0.5f;
+
     bool m_bSimulateInLocal = false;
 
     IParticleModule* m_arrParticleModules[4];
 
+    void updateParticle(int& nIndex, float fDeltaTime);
     void sortAliveParticleInFront();
 };

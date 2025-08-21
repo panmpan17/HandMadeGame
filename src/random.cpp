@@ -47,3 +47,19 @@ void randomBetweenVec4(vec4& vResult, const vec4& vMin, const vec4& vMax)
     vResult[2] = randomFloat(vMin[2], vMax[2]);
     vResult[3] = randomFloat(vMin[3], vMax[3]);
 }
+
+void randomOnUnitCircle(vec2& vResult)
+{
+    float angle = randomFloat(0.0f, 2.0f * M_PI);
+    vResult[0] = cos(angle);
+    vResult[1] = sin(angle);
+}
+
+void randomOnUnitSphere(vec3& vResult)
+{
+    float theta = randomFloat(0.0f, 2.0f * M_PI);
+    float phi = randomFloat(0.0f, M_PI);
+    vResult[0] = sin(phi) * cos(theta);
+    vResult[1] = sin(phi) * sin(theta);
+    vResult[2] = cos(phi);
+}

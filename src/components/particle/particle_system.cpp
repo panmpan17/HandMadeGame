@@ -139,22 +139,29 @@ void ParticleSystem::update(float fDeltaTime)
 
     for (int i = 0; i < m_nAllParticleCount; ++i)
     {
-        if (m_arrParticlesCPU[i].isAlive())
-        {
-            m_arrParticlesCPU[i].m_fLifetime -= fDeltaTime;
-
-            if (!m_arrParticlesCPU[i].isAlive())
-            {
-                SWAP_PARTICLE_POSITION(i, m_nLastAliveParticleIndex);
-                --m_nLastAliveParticleIndex;
-                --m_nAliveParticleCount;
-                --i;
-                continue;
-            }
-            
-            m_arrParticlesGPU[i].m_fRotation += fDeltaTime * m_arrParticlesCPU[i].m_fRotationSpeed; // Example m_fRotation update
-        }
+        updateParticle(i, fDeltaTime);
     }
+}
+
+void ParticleSystem::updateParticle(int& nIndex, float fDeltaTime)
+{
+    if (!m_arrParticlesCPU[nIndex].isAlive()) return;
+
+    m_arrParticlesCPU[nIndex].m_fLifetime -= fDeltaTime;
+
+    if (!m_arrParticlesCPU[nIndex].isAlive())
+    {
+        SWAP_PARTICLE_POSITION(nIndex, m_nLastAliveParticleIndex);
+        --m_nLastAliveParticleIndex;
+        --m_nAliveParticleCount;
+        --nIndex;
+        return;
+    }
+
+    m_arrParticlesGPU[nIndex].m_fRotation += fDeltaTime * m_arrParticlesCPU[nIndex].m_fRotationSpeed;
+
+    m_arrParticlesGPU[nIndex].m_vecPosition[0] += m_arrParticlesCPU[nIndex].m_vecVelocity[0] * fDeltaTime;
+    m_arrParticlesGPU[nIndex].m_vecPosition[1] += m_arrParticlesCPU[nIndex].m_vecVelocity[1] * fDeltaTime;
 }
 
 void ParticleSystem::spawnNewParticles(int nSpawnCount/* = 1*/)
@@ -187,6 +194,12 @@ void ParticleSystem::spawnNewParticles(int nSpawnCount/* = 1*/)
                     m_arrParticlesGPU[i].m_vecPosition[1] = randomFloat(-m_fSpawnShapeHeight, m_fSpawnShapeHeight) + nodePosition[1];
                     break;
             }
+
+            float fStartVelocity = randomFloat(m_fStartVelocityMin, m_fStartVelocityMax);
+            randomOnUnitCircle(m_arrParticlesCPU[i].m_vecVelocity);
+            m_arrParticlesCPU[i].m_vecVelocity[0] *= fStartVelocity;
+            m_arrParticlesCPU[i].m_vecVelocity[1] *= fStartVelocity;
+            // m_arrParticlesGPU[i]
 
             randomBetweenVec4(m_arrParticlesGPU[i].m_vecColor, m_vecStartColorMin, m_vecStartColorMax);
             m_arrParticlesGPU[i].m_fRotation = randomFloat(m_fStartRotationMin, m_fStartRotationMax);
