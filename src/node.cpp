@@ -5,6 +5,18 @@
 #include "debug_macro.h"
 
 
+Node::~Node()
+{
+    for (int i = 0; i < m_nComponentCount; ++i)
+    {
+        if (m_pComponents[i])
+        {
+            delete m_pComponents[i];
+        }
+    }
+}
+
+
 void Node::update(float deltaTime)
 {
     // Update logic for the node, if any

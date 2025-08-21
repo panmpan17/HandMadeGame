@@ -17,6 +17,8 @@ public:
         m_position[2] = fZ;
     }
 
+    ~Node();
+
     inline void setPosition(float fX, float fY) {
         m_position[0] = fX;
         m_position[1] = fY;

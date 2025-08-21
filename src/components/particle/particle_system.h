@@ -28,7 +28,17 @@ class ParticleSystem;
 class IParticleModule
 {
 public:
+    virtual ~IParticleModule() = default;
+
     virtual void update(ParticleSystem& particleSystem, float deltaTime) = 0;
+};
+
+
+enum class eParticleSpawnShape : int
+{
+    DOT,
+    CIRCLE,
+    BOX,
 };
 
 
@@ -48,10 +58,9 @@ public:
 
     void update(float fDeltaTime) override;
 
-    /// @brief Spawns a new particle
-    /// @param nStartIndex The index to start searching for a free particle
-    /// @return The index of the newly spawned particle, or -1 if none available
-    int spawnNewParticle(int nStartIndex = 0);
+    /// @brief Spawns new particles
+    /// @param nSpawnCount The number of particles to spawn
+    void spawnNewParticles(int nSpawnCount = 0);
 
     void addParticleModule(IParticleModule* pModule) { for (int i = 0; i < 4; ++i) { if (m_arrParticleModules[i] == nullptr) { m_arrParticleModules[i] = pModule; break; } } }
 
@@ -60,6 +69,9 @@ public:
     void setParticleStartRotationSpeed(float fMin, float fMax) { m_fStartRotationSpeedMin = fMin; m_fStartRotationSpeedMax = fMax; }
     void setParticleStartScale(float fMin, float fMax) { m_fStartScaleMin = fMin; m_fStartScaleMax = fMax; }
     void setParticleStartColor(const vec4& colorMin, const vec4& colorMax) { vec4_dup(m_vecStartColorMin, colorMin); vec4_dup(m_vecStartColorMax, colorMax); }
+
+    void setSpawnShape(eParticleSpawnShape shape) { m_eSpawnShape = shape; }
+    void setSpawnShapeDimensions(float width, float height) { m_fSpawnShapeWidth = width; m_fSpawnShapeHeight = height; }
 
 private:
     ParticleGPUInstance* m_arrParticlesGPU = nullptr;
@@ -74,6 +86,10 @@ private:
     int m_nAllParticleCount = 0;
     int m_nAliveParticleCount = 0;
     int m_nLastAliveParticleIndex = 0;
+
+    eParticleSpawnShape m_eSpawnShape = eParticleSpawnShape::DOT;
+    float m_fSpawnShapeWidth = 0.1f;
+    float m_fSpawnShapeHeight = 0.1f;
 
     float m_fLifetimeMin = 1.0f;
     float m_fLifetimeMax = 3.0f;

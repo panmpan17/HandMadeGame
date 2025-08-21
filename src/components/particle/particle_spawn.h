@@ -14,7 +14,7 @@ public:
         m_fSpawnTimer += fDeltaTime;
         if (m_fSpawnTimer >= m_fSpawnInterval)
         {
-            rParticleSystem.spawnNewParticle();
+            rParticleSystem.spawnNewParticles(1);
             m_fSpawnTimer = 0.0f;
         }
     }
@@ -35,11 +35,7 @@ public:
 
         if (m_fBurstTimer >= m_fBurstInterval)
         {
-            int nStartIndex = 0;
-            for (int i = 0; i < m_nBurstCount; ++i)
-            {
-                nStartIndex = rParticleSystem.spawnNewParticle(nStartIndex) + 1;
-            }
+            rParticleSystem.spawnNewParticles(m_nBurstCount);
             m_fBurstTimer = 0.0f;
         }
     }

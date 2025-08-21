@@ -43,6 +43,14 @@ ParticleSystem::~ParticleSystem()
     delete[] m_arrParticlesGPU;
     delete[] m_arrParticlesCPU;
 
+    for (IParticleModule*& pModule : m_arrParticleModules)
+    {
+        if (pModule)
+        {
+            delete pModule;
+        }
+    }
+
     glDeleteBuffers(1, &m_nInstanceBuffer);
     glDeleteVertexArrays(1, &m_nVertexArray);
     glDeleteBuffers(1, &m_nVertexBuffer);
@@ -149,28 +157,45 @@ void ParticleSystem::update(float fDeltaTime)
     }
 }
 
-int ParticleSystem::spawnNewParticle(int nStartIndex/* = 0*/)
+void ParticleSystem::spawnNewParticles(int nSpawnCount/* = 1*/)
 {
-    for (int i = nStartIndex; i < m_nAllParticleCount; ++i)
+    for (int i = m_nLastAliveParticleIndex + 1, spawned = 0; i < m_nAllParticleCount && spawned < nSpawnCount; ++i, ++spawned)
     {
         if (!m_arrParticlesCPU[i].isAlive())
         {
             m_arrParticlesCPU[i].m_fLifetime = randomFloat(m_fLifetimeMin, m_fLifetimeMax); // Random lifetime
             m_arrParticlesCPU[i].m_fRotationSpeed = randomFloat(m_fStartRotationSpeedMin, m_fStartRotationSpeedMax); // Random m_fRotation speed
 
-            // TODO: use a virtual class like ParticleSpawnShape to control the spawn position and align rotation?
-            m_arrParticlesGPU[i].m_vecPosition[0] = randomFloat(-0.8f, 0.8f);
-            m_arrParticlesGPU[i].m_vecPosition[1] = randomFloat(-0.8f, 0.8f);
+            const vec3& nodePosition = getNode()->getPosition();
+            switch (m_eSpawnShape)
+            {
+                case eParticleSpawnShape::DOT:
+                    vec2_dup(m_arrParticlesGPU[i].m_vecPosition, nodePosition);
+                    break;
+
+                case eParticleSpawnShape::CIRCLE:
+                    {
+                        float fAngle = randomFloat(0.0f, 2.0f * M_PI);
+                        float fRadius = randomFloat(0.0f, m_fSpawnShapeWidth);
+                        m_arrParticlesGPU[i].m_vecPosition[0] = cos(fAngle) * fRadius + nodePosition[0];
+                        m_arrParticlesGPU[i].m_vecPosition[1] = sin(fAngle) * fRadius + nodePosition[1];
+                    }
+                    break;
+
+                case eParticleSpawnShape::BOX:
+                    m_arrParticlesGPU[i].m_vecPosition[0] = randomFloat(-m_fSpawnShapeWidth, m_fSpawnShapeWidth) + nodePosition[0];
+                    m_arrParticlesGPU[i].m_vecPosition[1] = randomFloat(-m_fSpawnShapeHeight, m_fSpawnShapeHeight) + nodePosition[1];
+                    break;
+            }
+
             randomBetweenVec4(m_arrParticlesGPU[i].m_vecColor, m_vecStartColorMin, m_vecStartColorMax);
             m_arrParticlesGPU[i].m_fRotation = randomFloat(m_fStartRotationMin, m_fStartRotationMax);
             m_arrParticlesGPU[i].m_fScale = randomFloat(m_fStartScaleMin, m_fStartScaleMax);
 
             ++m_nAliveParticleCount;
-            return ++m_nLastAliveParticleIndex;
+            ++m_nLastAliveParticleIndex;
         }
     }
-
-    return -1;
 }
 
 void ParticleSystem::sortAliveParticleInFront()

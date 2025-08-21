@@ -205,9 +205,35 @@ void Window::setupGLVertex()
     particle2->registerBuffer();
     particle2->setParticleStartColor({ 1.f, 0.f, 0.f, 1.f }, { 0.f, 1.f, 0.f, 1.f });
     particle2->addParticleModule(new ParticleIntervalSpawn(10));
-    particle2->addParticleModule(new ParticleBurstSpawn(1.0f, 20));
+    // particle2->addParticleModule(new ParticleBurstSpawn(1.0f, 20));
     pNode5->addComponent(particle2);
     addNode(pNode5);
+
+
+    auto pNode6 = new Node(0.5f, 0, 0, 0);
+    auto particle3 = new ParticleSystem(100);
+    particle3->setShader(new ParticleInstanceShader());
+    particle3->registerBuffer();
+    particle3->setParticleStartColor({ 0.f, 0.f, 1.f, 1.f }, { 0.f, 1.f, 0.f, 1.f });
+    particle3->setSpawnShape(eParticleSpawnShape::BOX);
+    particle3->setSpawnShapeDimensions(0.2f, 0.5f);
+    // particle3->addParticleModule(new ParticleIntervalSpawn(10));
+    particle3->addParticleModule(new ParticleBurstSpawn(1.0f, 20));
+    pNode6->addComponent(particle3);
+    addNode(pNode6);
+
+
+    auto pNode7 = new Node(-0.5f, 0, 0, 0);
+    auto particle4 = new ParticleSystem(100);
+    particle4->setShader(new ParticleInstanceShader());
+    particle4->registerBuffer();
+    particle4->setSpawnShape(eParticleSpawnShape::CIRCLE);
+    particle4->setSpawnShapeDimensions(0.4f, 0.4f);
+    particle4->setParticleStartColor({ 1.f, 0.f, 0.f, 1.f }, { 0.f, 0.f, 1.f, 1.f });
+    particle4->addParticleModule(new ParticleIntervalSpawn(10));
+    particle4->addParticleModule(new ParticleBurstSpawn(1.0f, 20));
+    pNode7->addComponent(particle4);
+    addNode(pNode7);
 }
 
 void Window::addNode(Node* pNode)
