@@ -62,3 +62,39 @@ void Movement::getMovementDirection(short& x, short& y)
     x = m_bMovementKeyPressed.test(3) - m_bMovementKeyPressed.test(2);
     y = m_bMovementKeyPressed.test(0) - m_bMovementKeyPressed.test(1);
 }
+
+float lerp(float fStart, float fEnd, float fT)
+{
+    return fStart + (fEnd - fStart) * fT;
+}
+
+void TwoPointsMovement::update(float fDeltaTime)
+{
+    // Update the position based on the direction and speed
+    auto pNode = getNode();
+    if (!pNode) return;
+
+    if (m_bIsMovingForward)
+    {
+        m_fTimer += fDeltaTime;
+    }
+    else
+    {
+        m_fTimer -= fDeltaTime;
+    }
+
+    if (m_fTimer >= m_fDuration) {
+        m_fTimer = m_fDuration;
+        m_bIsMovingForward = !m_bIsMovingForward;
+    }
+    if (m_fTimer <= 0) {
+        m_fTimer = 0;
+        m_bIsMovingForward = !m_bIsMovingForward;
+    }
+
+    float fProgress = m_fTimer / m_fDuration;
+    float fX = lerp(m_vecStart[0], m_vecEnd[0], fProgress);
+    float fY = lerp(m_vecStart[1], m_vecEnd[1], fProgress);
+
+    pNode->setPosition(fX, fY);
+}

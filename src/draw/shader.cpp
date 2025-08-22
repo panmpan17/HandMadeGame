@@ -118,6 +118,8 @@ ParticleInstanceShader::ParticleInstanceShader()
     : Shader("assets/shaders/particle_instance.vert", "assets/shaders/particle_instance.frag")
 {
     m_nMvpLocation = glGetUniformLocation(m_nProgram, "MVP");
+    m_nNodeTransformLocation = glGetUniformLocation(m_nProgram, "NodeTransform");
+    m_nUseNodeTransformLocation = glGetUniformLocation(m_nProgram, "UseNodeTransform");
     // m_nColorLocation = glGetUniformLocation(m_nProgram, "particleColor");
     // m_nVPosLocation = glGetAttribLocation(m_nProgram, "vPos");
 }

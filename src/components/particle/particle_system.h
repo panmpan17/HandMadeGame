@@ -3,6 +3,7 @@
 // #include "../component.h"
 #include "../../draw/drawable_interface.h"
 #include <linmath.h>
+#include <functional>
 
 typedef unsigned int GLuint;
 
@@ -41,11 +42,13 @@ enum class eParticleSpawnShape : int
     BOX,
 };
 
+typedef std::function<void(vec2&)> ParticleStartVelocityDirectionOverride;
+
 
 class ParticleSystem : public IDrawable
 {
 public:
-    ParticleSystem(int nParticleCount);
+    ParticleSystem(int nParticleCount, bool bSimulateInLocal = false);
 
     ~ParticleSystem() override;
 
@@ -54,7 +57,7 @@ public:
     
     void registerBuffer() override;
     void draw() override;
-    void setShader(Shader* pShader) override { m_pShader = pShader; }
+    void setShader(Shader* pShader) override;
 
     void update(float fDeltaTime) override;
 
@@ -69,9 +72,14 @@ public:
     void setParticleStartRotationSpeed(float fMin, float fMax) { m_fStartRotationSpeedMin = fMin; m_fStartRotationSpeedMax = fMax; }
     void setParticleStartScale(float fMin, float fMax) { m_fStartScaleMin = fMin; m_fStartScaleMax = fMax; }
     void setParticleStartColor(const vec4& colorMin, const vec4& colorMax) { vec4_dup(m_vecStartColorMin, colorMin); vec4_dup(m_vecStartColorMax, colorMax); }
+    void setParticleStartVelocity(float fMin, float fMax) { m_fStartVelocityMin = fMin; m_fStartVelocityMax = fMax; }
+    void setParticleStartVelocityDirectionOverride(ParticleStartVelocityDirectionOverride func) { m_funcStartVelocityDirectionOverride = func; }
 
     void setSpawnShape(eParticleSpawnShape shape) { m_eSpawnShape = shape; }
     void setSpawnShapeDimensions(float width, float height) { m_fSpawnShapeWidth = width; m_fSpawnShapeHeight = height; }
+
+    void setGravity(const vec2& gravity) { vec2_dup(m_fGravity, gravity); }
+    void setGravity(float fX, float fY) { m_fGravity[0] = fX; m_fGravity[1] = fY; }
 
 private:
     ParticleGPUInstance* m_arrParticlesGPU = nullptr;
@@ -107,6 +115,9 @@ private:
 
     float m_fStartVelocityMin = 0.3f;
     float m_fStartVelocityMax = 0.5f;
+    ParticleStartVelocityDirectionOverride m_funcStartVelocityDirectionOverride = nullptr;
+
+    vec2 m_fGravity = { 0.0f, -0.981f };
 
     bool m_bSimulateInLocal = false;
 

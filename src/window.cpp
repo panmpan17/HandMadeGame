@@ -23,6 +23,7 @@
 #include "components/particle/simple_particle_system.h"
 #include "components/particle/particle_system.h"
 #include "components/particle/particle_spawn.h"
+#include "random.h"
 
 
 Window* Window::ins = nullptr;
@@ -200,13 +201,22 @@ void Window::setupGLVertex()
     // addNode(pNode4);
 
     auto pNode5 = new Node(0, 0, 0, 0);
-    auto particle2 = new ParticleSystem(100);
+    auto particle2 = new ParticleSystem(100, true);
     particle2->setShader(new ParticleInstanceShader());
     particle2->registerBuffer();
     particle2->setParticleStartColor({ 1.f, 0.f, 0.f, 1.f }, { 0.f, 1.f, 0.f, 1.f });
     particle2->addParticleModule(new ParticleIntervalSpawn(10));
+    particle2->setParticleLifetime(4, 6);
+    particle2->setParticleStartVelocity(1, 1);
+    particle2->setGravity({ 0, -0.6f });
+    particle2->setParticleStartVelocityDirectionOverride([](vec2& velocity) {
+        velocity[0] = randomFloat(-0.2f, 0.2f); // Override X direction
+        velocity[1] = 1.f; // Override Y direction
+    });
+
     // particle2->addParticleModule(new ParticleBurstSpawn(1.0f, 20));
     pNode5->addComponent(particle2);
+    pNode5->addComponent(new TwoPointsMovement({ -0.5f, 0.f }, { 0.5f, 0.f }, 2.0f));
     addNode(pNode5);
 
 

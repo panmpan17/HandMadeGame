@@ -74,11 +74,11 @@ public:
     ParticleInstanceShader();
 
     inline GLuint getMvpLocation() const { return m_nMvpLocation; }
-    inline GLuint getColorLocation() const { return m_nColorLocation; }
-    inline GLuint getVPosLocation() const { return m_nVPosLocation; }
+    inline GLuint getNodeTransformLocation() const { return m_nNodeTransformLocation; }
+    inline GLuint getUseNodeTransformLocation() const { return m_nUseNodeTransformLocation; }
     // inline GLuint getVUVLocation() const { return m_nVUVLocation; }
     // inline GLuint getTextureLocation() const { return m_nTextureLocation; }
 
 private:
-    GLuint m_nMvpLocation, m_nColorLocation, m_nVPosLocation;
+    GLuint m_nMvpLocation, m_nNodeTransformLocation, m_nUseNodeTransformLocation;
 };

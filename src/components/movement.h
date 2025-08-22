@@ -1,6 +1,7 @@
 #pragma once
 
 #include <bitset>
+#include <functional>
 #include "component.h"
 #include "../node.h"
 
@@ -25,3 +26,32 @@ private:
     void getMovementDirection(short& x, short& y);
 };
 
+
+class TwoPointsMovement : public Component
+{
+public:
+    TwoPointsMovement(const vec2& vecStart, const vec2& vecEnd, float duration)
+        : m_fDuration(duration)
+    {
+        vec2_dup(m_vecStart, vecStart);
+        vec2_dup(m_vecEnd, vecEnd);
+    }
+
+    virtual ~TwoPointsMovement() {}
+
+    virtual bool isIDrawable() const override { return false; }
+    virtual bool isUpdatable() const override { return true; }
+
+    virtual void update(float fDeltaTime) override;
+
+    virtual void draw() override {}
+
+private:
+    vec2 m_vecStart;
+    vec2 m_vecEnd;
+    float m_fDuration;
+    float m_fTimer = 0;
+
+    // TODO: make this flexible
+    bool m_bIsMovingForward = false;
+};

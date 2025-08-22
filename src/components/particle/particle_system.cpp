@@ -18,7 +18,7 @@
     } while (0)
 
 
-ParticleSystem::ParticleSystem(int nParticleCount)
+ParticleSystem::ParticleSystem(int nParticleCount, bool bSimulateInLocal/* = false */)
 {
     m_nAllParticleCount = nParticleCount;
     m_arrParticlesGPU = new ParticleGPUInstance[nParticleCount];
@@ -36,6 +36,8 @@ ParticleSystem::ParticleSystem(int nParticleCount)
     {
         m_arrParticleModules[i] = nullptr;
     }
+
+    m_bSimulateInLocal = bSimulateInLocal;
 }
 
 ParticleSystem::~ParticleSystem()
@@ -101,6 +103,16 @@ void ParticleSystem::registerBuffer()
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
+void ParticleSystem::setShader(Shader* pShader)
+{
+    m_pShader = pShader;
+
+    ParticleInstanceShader* pParticleShader = static_cast<ParticleInstanceShader*>(m_pShader);
+    glUseProgram(pParticleShader->getProgram());
+
+    glUniform1i(pParticleShader->getUseNodeTransformLocation(), m_bSimulateInLocal ? 1 : 0);
+}
+
 void ParticleSystem::draw()
 {
     ASSERT(m_pShader, "Shader must be set before drawing the quad");
@@ -113,8 +125,19 @@ void ParticleSystem::draw()
     mat4x4 cameraViewMatrix;
     Camera::main->getViewMatrix(cameraViewMatrix);
 
-    ParticleShader* pParticleShader = static_cast<ParticleShader*>(m_pShader);
+    ParticleInstanceShader* pParticleShader = static_cast<ParticleInstanceShader*>(m_pShader);
     glUniformMatrix4fv(pParticleShader->getMvpLocation(), 1, GL_FALSE, (const GLfloat*) cameraViewMatrix);
+
+    if (m_bSimulateInLocal)
+    {
+        mat4x4 nodeTransform;
+
+        mat4x4_identity(nodeTransform);
+        const vec3& nodePosition = getNode()->getPosition();
+        mat4x4_translate(nodeTransform, nodePosition[0], nodePosition[1], nodePosition[2]);
+
+        glUniformMatrix4fv(pParticleShader->getNodeTransformLocation(), 1, GL_FALSE, (const GLfloat*) nodeTransform);
+    }
 
     glBindBuffer(GL_ARRAY_BUFFER, m_nInstanceBuffer);
     glBufferSubData(GL_ARRAY_BUFFER, 0, m_nAliveParticleCount * sizeof(ParticleGPUInstance), m_arrParticlesGPU);
@@ -160,6 +183,9 @@ void ParticleSystem::updateParticle(int& nIndex, float fDeltaTime)
 
     m_arrParticlesGPU[nIndex].m_fRotation += fDeltaTime * m_arrParticlesCPU[nIndex].m_fRotationSpeed;
 
+    m_arrParticlesCPU[nIndex].m_vecVelocity[0] += m_fGravity[0] * fDeltaTime;
+    m_arrParticlesCPU[nIndex].m_vecVelocity[1] += m_fGravity[1] * fDeltaTime;
+
     m_arrParticlesGPU[nIndex].m_vecPosition[0] += m_arrParticlesCPU[nIndex].m_vecVelocity[0] * fDeltaTime;
     m_arrParticlesGPU[nIndex].m_vecPosition[1] += m_arrParticlesCPU[nIndex].m_vecVelocity[1] * fDeltaTime;
 }
@@ -173,30 +199,51 @@ void ParticleSystem::spawnNewParticles(int nSpawnCount/* = 1*/)
             m_arrParticlesCPU[i].m_fLifetime = randomFloat(m_fLifetimeMin, m_fLifetimeMax); // Random lifetime
             m_arrParticlesCPU[i].m_fRotationSpeed = randomFloat(m_fStartRotationSpeedMin, m_fStartRotationSpeedMax); // Random m_fRotation speed
 
-            const vec3& nodePosition = getNode()->getPosition();
+            float vecBasePositionX, vecBasePositionY;
+            if (m_bSimulateInLocal)
+            {
+                vecBasePositionX = 0;
+                vecBasePositionY = 0;
+            }
+            else
+            {
+                const vec3& vecBasePosition = getNode()->getPosition();
+                vecBasePositionX = vecBasePosition[0];
+                vecBasePositionY = vecBasePosition[1];
+            }
+
             switch (m_eSpawnShape)
             {
                 case eParticleSpawnShape::DOT:
-                    vec2_dup(m_arrParticlesGPU[i].m_vecPosition, nodePosition);
+                    m_arrParticlesGPU[i].m_vecPosition[0] = vecBasePositionX;
+                    m_arrParticlesGPU[i].m_vecPosition[1] = vecBasePositionY;
                     break;
 
                 case eParticleSpawnShape::CIRCLE:
                     {
                         float fAngle = randomFloat(0.0f, 2.0f * M_PI);
                         float fRadius = randomFloat(0.0f, m_fSpawnShapeWidth);
-                        m_arrParticlesGPU[i].m_vecPosition[0] = cos(fAngle) * fRadius + nodePosition[0];
-                        m_arrParticlesGPU[i].m_vecPosition[1] = sin(fAngle) * fRadius + nodePosition[1];
+                        m_arrParticlesGPU[i].m_vecPosition[0] = cos(fAngle) * fRadius + vecBasePositionX;
+                        m_arrParticlesGPU[i].m_vecPosition[1] = sin(fAngle) * fRadius + vecBasePositionY;
                     }
                     break;
 
                 case eParticleSpawnShape::BOX:
-                    m_arrParticlesGPU[i].m_vecPosition[0] = randomFloat(-m_fSpawnShapeWidth, m_fSpawnShapeWidth) + nodePosition[0];
-                    m_arrParticlesGPU[i].m_vecPosition[1] = randomFloat(-m_fSpawnShapeHeight, m_fSpawnShapeHeight) + nodePosition[1];
+                    m_arrParticlesGPU[i].m_vecPosition[0] = randomFloat(-m_fSpawnShapeWidth, m_fSpawnShapeWidth) + vecBasePositionX;
+                    m_arrParticlesGPU[i].m_vecPosition[1] = randomFloat(-m_fSpawnShapeHeight, m_fSpawnShapeHeight) + vecBasePositionY;
                     break;
             }
 
             float fStartVelocity = randomFloat(m_fStartVelocityMin, m_fStartVelocityMax);
-            randomOnUnitCircle(m_arrParticlesCPU[i].m_vecVelocity);
+            if (m_funcStartVelocityDirectionOverride)
+            {
+                m_funcStartVelocityDirectionOverride(m_arrParticlesCPU[i].m_vecVelocity);
+            }
+            else
+            {
+                randomOnUnitCircle(m_arrParticlesCPU[i].m_vecVelocity);
+            }
+
             m_arrParticlesCPU[i].m_vecVelocity[0] *= fStartVelocity;
             m_arrParticlesCPU[i].m_vecVelocity[1] *= fStartVelocity;
             // m_arrParticlesGPU[i]
