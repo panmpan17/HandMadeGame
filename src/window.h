@@ -54,9 +54,6 @@ private:
     int m_nNodeCount = 10;
     Node* m_pNodes[10] = { nullptr };
 
-    // TODO: optimization, load it some where centralized
-    Image* m_pImage = nullptr;
-
     bool m_bResizable = false;
     int m_nDrawCallCount = 0;
 

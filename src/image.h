@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <unordered_map>
 
 typedef unsigned int GLuint;
 
@@ -8,6 +9,7 @@ class Image
 {
 public:
     Image(const std::string& strPath);
+    Image(const std::string_view& strPath);
     ~Image();
 
     inline int getWidth() const { return m_nWidth; }
@@ -27,4 +29,25 @@ private:
     int m_nChannels;
     unsigned char* m_pData;
     GLuint m_nTextureID = 0; // Texture ID for OpenGL texture binding
+};
+
+
+class ImageLoader
+{
+public:
+    inline static ImageLoader* getInstance() { return ins; }
+
+    static void Initialize();
+    static void Cleanup();
+
+    void registerImage(const std::string_view& strName, const std::string_view& strPath);
+    Image* getImage(const std::string_view& strName);
+
+private:
+    ImageLoader();
+    ~ImageLoader();
+
+    static ImageLoader* ins;
+
+    std::unordered_map<std::string_view, Image*> m_mapLoadedImages;
 };

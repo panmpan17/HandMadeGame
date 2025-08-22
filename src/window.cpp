@@ -67,13 +67,9 @@ Window::~Window()
     //         delete m_pNodes[i];
     //     }
     // }
-    if (m_pImage)
-    {
-        delete m_pImage;
-        m_pImage = nullptr;
-    }
 
     InputManager::Cleanup();
+    ImageLoader::Cleanup();
 
     glfwTerminate();
 }
@@ -123,6 +119,7 @@ void Window::configureAndCreateWindow()
 void Window::start()
 {
     InputManager::Initialize();
+    ImageLoader::Initialize();
 
     m_pCamera = new Camera();
 
@@ -137,12 +134,8 @@ void Window::start()
     gladLoadGL(glfwGetProcAddress);
     glfwSwapInterval(1); // Enable vsync
     
-    m_pImage = new Image("assets/images/test.png");
-    if (m_pImage->isCPULoaded())
-    {
-        m_pImage->loadTextureToGL();
-        m_pImage->freeCPUData();
-    }
+    ImageLoader::getInstance()->registerImage("test", "assets/images/test.png");
+    ImageLoader::getInstance()->registerImage("dust", "assets/images/dust_1.png");
 
     setupShaders();
     setupGLVertex();
@@ -152,6 +145,9 @@ void Window::start()
 
 void Window::setupGLVertex()
 {
+    Image* pTestImage = ImageLoader::getInstance()->getImage("test");
+    Image* pDustImage = ImageLoader::getInstance()->getImage("dust");
+
     // Triangle
     auto pNode1 = new Node(-0.5f, 0.f, 0.f, 0.f);
 
@@ -172,7 +168,7 @@ void Window::setupGLVertex()
     vec4 red = {1.f, 0.f, 0.f, 1.f}; // Red color for the quad
     auto pQuad = new Quad(0, 0, 0.5f, 0.5f, red);
     pQuad->setShader(m_pImageShader);
-    static_cast<Quad*>(pQuad)->setImage(m_pImage);
+    static_cast<Quad*>(pQuad)->setImage(pTestImage);
     pQuad->registerBuffer();
     pNode2->addComponent(pQuad);
 
@@ -186,7 +182,7 @@ void Window::setupGLVertex()
     vec4 color = {0.5f, 0.5f, 1.f, 1.f}; // Blue color for the second quad
     auto pQuad2 = new Quad(0, 0, 0.3f, 0.3f, color);
     pQuad2->setShader(m_pImageShader);
-    static_cast<Quad*>(pQuad2)->setImage(m_pImage);
+    static_cast<Quad*>(pQuad2)->setImage(pDustImage);
     pQuad2->registerBuffer();
     pNode3->addComponent(pQuad2);
 

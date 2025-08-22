@@ -26,19 +26,51 @@ Image::Image(const std::string& strPath)
 {
     stbi_set_flip_vertically_on_load(true);
 
-    std::string fullPath = strPath;
     if (*strPath.begin() != '/')
     {
-        std::string executablePath = FileUtils::getExecutablePath();
-        fullPath = fs::path(executablePath).parent_path().append(strPath).string();
+        std::string strExecutablePath = FileUtils::getExecutablePath();
+        std::string strFullPath = fs::path(strExecutablePath).parent_path().append(strPath).string();
+
+        m_pData = stbi_load(strFullPath.c_str(), &m_nWidth, &m_nHeight, &m_nChannels, 0);
+        if (!m_pData)
+        {
+            LOGERR_EX("Failed to load image: {}", strFullPath);
+        }
     }
-
-    m_pData = stbi_load(fullPath.c_str(), &m_nWidth, &m_nHeight, &m_nChannels, 0);
-
-    if (!m_pData)
+    else
     {
-        LOGERR_EX("Failed to load image: {}", fullPath);
+        m_pData = stbi_load(strPath.c_str(), &m_nWidth, &m_nHeight, &m_nChannels, 0);
+        if (!m_pData)
+        {
+            LOGERR_EX("Failed to load image: {}", strPath);
+        }
     }
+}
+
+Image::Image(const std::string_view& strPath)
+{
+    stbi_set_flip_vertically_on_load(true);
+
+    if (*strPath.begin() != '/')
+    {
+        std::string strExecutablePath = FileUtils::getExecutablePath();
+        std::string strFullPath = fs::path(strExecutablePath).parent_path().append(strPath).string();
+
+        m_pData = stbi_load(strFullPath.c_str(), &m_nWidth, &m_nHeight, &m_nChannels, 0);
+        if (!m_pData)
+        {
+            LOGERR_EX("Failed to load image: {}", strFullPath);
+        }
+    }
+    else
+    {
+        m_pData = stbi_load(strPath.data(), &m_nWidth, &m_nHeight, &m_nChannels, 0);
+        if (!m_pData)
+        {
+            LOGERR_EX("Failed to load image: {}", strPath);
+        }
+    }
+
 }
 
 Image::~Image()
@@ -80,4 +112,64 @@ void Image::freeCPUData()
         stbi_image_free(m_pData);
         m_pData = nullptr;
     }
+}
+
+
+ImageLoader* ImageLoader::ins = nullptr;
+
+void ImageLoader::Initialize()
+{
+    if (!ins)
+    {
+        ins = new ImageLoader();
+    }
+}
+
+void ImageLoader::Cleanup()
+{
+    if (ins)
+    {
+        delete ins;
+        ins = nullptr;
+    }
+}
+
+
+ImageLoader::ImageLoader()
+{
+
+}
+
+ImageLoader::~ImageLoader()
+{
+    for (auto& pair : m_mapLoadedImages)
+    {
+        delete pair.second; // Free the Image object
+    }
+    m_mapLoadedImages.clear();
+}
+
+void ImageLoader::registerImage(const std::string_view& strName, const std::string_view& strPath)
+{
+    auto iterFind = m_mapLoadedImages.find(strName);
+    if (iterFind == m_mapLoadedImages.end())
+    {
+        auto pImage = new Image(strPath);
+        if (pImage->isCPULoaded())
+        {
+            pImage->loadTextureToGL();
+            pImage->freeCPUData();
+        }
+        m_mapLoadedImages[strName] = pImage;
+    }
+}
+
+Image* ImageLoader::getImage(const std::string_view& strName)
+{
+    auto iterFind = m_mapLoadedImages.find(strName);
+    if (iterFind != m_mapLoadedImages.end())
+    {
+        return iterFind->second;
+    }
+    return nullptr;
 }
