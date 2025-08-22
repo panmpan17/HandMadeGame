@@ -140,6 +140,9 @@ void Window::start()
     setupShaders();
     setupGLVertex();
 
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
     mainLoop();
 }
 
@@ -148,19 +151,31 @@ void Window::setupGLVertex()
     Image* pTestImage = ImageLoader::getInstance()->getImage("test");
     Image* pDustImage = ImageLoader::getInstance()->getImage("dust");
 
-    // Triangle
-    auto pNode1 = new Node(-0.5f, 0.f, 0.f, 0.f);
+    { // Triangle
+        auto pNode = new Node(-0.5f, 0.f, 0.f, 0.f);
 
-    auto pTriangle = new Triangle();
-    pTriangle->setShader(m_pBaseShader);
-    pTriangle->registerBuffer();
-    pNode1->addComponent(pTriangle);
+        auto pTriangle = new Triangle();
+        pTriangle->setShader(m_pBaseShader);
+        pTriangle->registerBuffer();
+        pNode->addComponent(pTriangle);
 
-    pNode1->addComponent(new Rotate(-1.0f));
+        pNode->addComponent(new Rotate(-1.0f));
 
-    pNode1->addComponent(new Movement(1.0f)); // Add movement component with speed 1.0f
+        pNode->addComponent(new Movement(1.0f)); // Add movement component with speed 1.0f
 
-    addNode(pNode1);
+        addNode(pNode);
+    }
+
+    {
+        auto pNode = new Node(-0.4f, 0.f, 0.f, 0.f);
+
+        auto pTriangle = new Triangle();
+        pTriangle->setShader(m_pBaseShader);
+        pTriangle->registerBuffer();
+        pNode->addComponent(pTriangle);
+
+        addNode(pNode);
+    }
 
     // Quads 1
     auto pNode2 = new Node(0.5f, 0.5f, 0.f, 0.f);
@@ -177,7 +192,7 @@ void Window::setupGLVertex()
     addNode(pNode2);
 
     // Quads 2
-    auto pNode3 = new Node(0.5f, -0.5f, 0.f, 0.f);
+    auto pNode3 = new Node(0.5f, 0.5f, 0.f, 0.f);
 
     vec4 color = {0.5f, 0.5f, 1.f, 1.f}; // Blue color for the second quad
     auto pQuad2 = new Quad(0, 0, 0.3f, 0.3f, color);
@@ -198,6 +213,7 @@ void Window::setupGLVertex()
 
     auto pNode5 = new Node(0, 0, 0, 0);
     auto particle2 = new ParticleSystem(100, true);
+    particle2->setImage(pDustImage);
     particle2->setShader(new ParticleInstanceShader());
     particle2->registerBuffer();
     particle2->setParticleStartColor({ 1.f, 0.f, 0.f, 1.f }, { 0.f, 1.f, 0.f, 1.f });

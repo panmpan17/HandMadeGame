@@ -5,12 +5,14 @@ uniform mat4 NodeTransform;
 uniform bool UseNodeTransform;
 
 layout (location = 0) in vec2 quadPos;
-layout (location = 1) in vec2 instancePos;
-layout (location = 2) in vec4 instanceColor;
-layout (location = 3) in float rotation;
-layout (location = 4) in float scale;
+layout (location = 1) in vec2 quadTexCoord;
+layout (location = 2) in vec2 instancePos;
+layout (location = 3) in vec4 instanceColor;
+layout (location = 4) in float rotation;
+layout (location = 5) in float scale;
 
 out vec4 fragmentColor;
+out vec2 uv;
 
 void main()
 {
@@ -27,4 +29,5 @@ void main()
     }
 
     fragmentColor = instanceColor;
+    uv = quadTexCoord;
 }

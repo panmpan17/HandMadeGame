@@ -8,6 +8,7 @@
 #include "../../camera.h"
 #include "../../window.h"
 #include "../../random.h"
+#include "../../image.h"
 
 
 #define SWAP_PARTICLE_POSITION(i, j) \
@@ -61,11 +62,11 @@ ParticleSystem::~ParticleSystem()
 void ParticleSystem::registerBuffer()
 {
     // Four corner vertex datas
-    Vertex arrQuadVerticies[4];
-    arrQuadVerticies[0] = { { -0.1f, -0.1f } };
-    arrQuadVerticies[1] = { { 0.1f, -0.1f } };
-    arrQuadVerticies[2] = { { -0.1f, 0.1f } };
-    arrQuadVerticies[3] = { { 0.1f, 0.1f } };
+    VertexWUV arrQuadVerticies[4];
+    arrQuadVerticies[0] = { { -0.1f, -0.1f }, { 0.f, 0.f } };
+    arrQuadVerticies[1] = { { 0.1f, -0.1f }, { 1.f, 0.f } };
+    arrQuadVerticies[2] = { { -0.1f, 0.1f }, { 0.f, 1.f } };
+    arrQuadVerticies[3] = { { 0.1f, 0.1f }, { 1.f, 1.f } };
 
     glGenBuffers(1, &m_nVertexBuffer);
     glBindBuffer(GL_ARRAY_BUFFER, m_nVertexBuffer);
@@ -75,7 +76,9 @@ void ParticleSystem::registerBuffer()
     glBindVertexArray(m_nVertexArray);
 
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, pos));
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(VertexWUV), (void*)offsetof(VertexWUV, pos));
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(VertexWUV), (void*)offsetof(VertexWUV, uv));
 
 
     // Instance data
@@ -83,21 +86,21 @@ void ParticleSystem::registerBuffer()
     glBindBuffer(GL_ARRAY_BUFFER, m_nInstanceBuffer);
     glBufferData(GL_ARRAY_BUFFER, m_nAllParticleCount * sizeof(ParticleGPUInstance), m_arrParticlesGPU, GL_DYNAMIC_DRAW);
 
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(ParticleGPUInstance), (void*)offsetof(ParticleGPUInstance, m_vecPosition));
-    glVertexAttribDivisor(1, 1);
-
     glEnableVertexAttribArray(2);
-    glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(ParticleGPUInstance), (void*)offsetof(ParticleGPUInstance, m_vecColor));
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(ParticleGPUInstance), (void*)offsetof(ParticleGPUInstance, m_vecPosition));
     glVertexAttribDivisor(2, 1);
 
     glEnableVertexAttribArray(3);
-    glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleGPUInstance), (void*)offsetof(ParticleGPUInstance, m_fRotation));
+    glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(ParticleGPUInstance), (void*)offsetof(ParticleGPUInstance, m_vecColor));
     glVertexAttribDivisor(3, 1);
 
     glEnableVertexAttribArray(4);
-    glVertexAttribPointer(4, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleGPUInstance), (void*)offsetof(ParticleGPUInstance, m_fScale));
+    glVertexAttribPointer(4, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleGPUInstance), (void*)offsetof(ParticleGPUInstance, m_fRotation));
     glVertexAttribDivisor(4, 1);
+
+    glEnableVertexAttribArray(5);
+    glVertexAttribPointer(5, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleGPUInstance), (void*)offsetof(ParticleGPUInstance, m_fScale));
+    glVertexAttribDivisor(5, 1);
 
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -111,6 +114,8 @@ void ParticleSystem::setShader(Shader* pShader)
     glUseProgram(pParticleShader->getProgram());
 
     glUniform1i(pParticleShader->getUseNodeTransformLocation(), m_bSimulateInLocal ? 1 : 0);
+
+    glUniform1i(pParticleShader->getUseTextureLocation(), m_pImage ? 1 : 0);
 }
 
 void ParticleSystem::draw()
@@ -127,6 +132,9 @@ void ParticleSystem::draw()
 
     ParticleInstanceShader* pParticleShader = static_cast<ParticleInstanceShader*>(m_pShader);
     glUniformMatrix4fv(pParticleShader->getMvpLocation(), 1, GL_FALSE, (const GLfloat*) cameraViewMatrix);
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, m_pImage ? m_pImage->getTextureID() : 0);
 
     if (m_bSimulateInLocal)
     {
@@ -145,6 +153,7 @@ void ParticleSystem::draw()
     glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, m_nAliveParticleCount);
     INCREASE_DRAW_CALL_COUNT();
 
+    glBindTexture(GL_TEXTURE_2D, 0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0); // Unbind the vertex array
     glUseProgram(0);

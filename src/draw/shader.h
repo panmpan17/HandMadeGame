@@ -76,9 +76,10 @@ public:
     inline GLuint getMvpLocation() const { return m_nMvpLocation; }
     inline GLuint getNodeTransformLocation() const { return m_nNodeTransformLocation; }
     inline GLuint getUseNodeTransformLocation() const { return m_nUseNodeTransformLocation; }
+    inline GLuint getUseTextureLocation() const { return m_nUseTextureLocation; }
     // inline GLuint getVUVLocation() const { return m_nVUVLocation; }
-    // inline GLuint getTextureLocation() const { return m_nTextureLocation; }
+    inline GLuint getTextureLocation() const { return m_nTextureLocation; }
 
 private:
-    GLuint m_nMvpLocation, m_nNodeTransformLocation, m_nUseNodeTransformLocation;
+    GLuint m_nMvpLocation, m_nNodeTransformLocation, m_nUseNodeTransformLocation, m_nUseTextureLocation, m_nTextureLocation;
 };

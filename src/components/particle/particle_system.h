@@ -6,6 +6,7 @@
 #include <functional>
 
 typedef unsigned int GLuint;
+class Image;
 
 struct ParticleGPUInstance
 {
@@ -81,6 +82,8 @@ public:
     void setGravity(const vec2& gravity) { vec2_dup(m_fGravity, gravity); }
     void setGravity(float fX, float fY) { m_fGravity[0] = fX; m_fGravity[1] = fY; }
 
+    void setImage(Image* pImage) { m_pImage = pImage; }
+
 private:
     ParticleGPUInstance* m_arrParticlesGPU = nullptr;
     ParticleCPUInstance* m_arrParticlesCPU = nullptr;
@@ -120,6 +123,8 @@ private:
     vec2 m_fGravity = { 0.0f, -0.981f };
 
     bool m_bSimulateInLocal = false;
+
+    Image* m_pImage = nullptr;
 
     IParticleModule* m_arrParticleModules[4];
 
