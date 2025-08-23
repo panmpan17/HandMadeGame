@@ -11,6 +11,22 @@
             "cStandard": "c17",
             "cppStandard": "c++23",
             "intelliSenseMode": "macos-clang-arm64"
+        },
+        {
+            "name": "Win",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "${workspaceFolder}/include"
+            ],
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE"
+            ],
+            "compilerPath": "C:/Program Files/LLVM/bin/clang.exe",
+            "cStandard": "c23",
+            "cppStandard": "c++23",
+            "intelliSenseMode": "windows-clang-x64"
         }
     ],
     "version": 4

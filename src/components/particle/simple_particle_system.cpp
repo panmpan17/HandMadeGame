@@ -9,6 +9,7 @@
 #include "../../camera.h"
 #include "../../window.h"
 #include "../../random.h"
+#include "../../platform.h"
 
 
 void printMatx4x4(mat4x4 mat)

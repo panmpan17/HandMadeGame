@@ -9,6 +9,7 @@
 #include "../../window.h"
 #include "../../random.h"
 #include "../../image.h"
+#include "../../platform.h"
 
 
 #define SWAP_PARTICLE_POSITION(i, j) \

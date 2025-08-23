@@ -63,10 +63,12 @@ void Movement::getMovementDirection(short& x, short& y)
     y = m_bMovementKeyPressed.test(0) - m_bMovementKeyPressed.test(1);
 }
 
+#if defined(__APPLE__) || defined(__MACH__)
 float lerp(float fStart, float fEnd, float fT)
 {
     return fStart + (fEnd - fStart) * fT;
 }
+#endif
 
 void TwoPointsMovement::update(float fDeltaTime)
 {

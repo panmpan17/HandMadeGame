@@ -1,5 +1,7 @@
 #include "random.h"
 #include <random>
+#include "platform.h"
+
 
 
 static std::random_device rd;
