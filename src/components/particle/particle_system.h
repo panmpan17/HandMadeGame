@@ -21,6 +21,8 @@ struct ParticleCPUInstance
     float m_fRotationSpeed;
     vec2 m_vecVelocity;
     float m_fLifetime;
+    float m_fMaxLifetime;
+    float m_fBaseScale;
 
     bool isAlive() const { return m_fLifetime > 0; }
 };
@@ -35,6 +37,14 @@ public:
     virtual void update(ParticleSystem& particleSystem, float deltaTime) = 0;
 
     virtual void onActiveTimeReset() {}
+};
+
+class IParticleIndividualModule
+{
+public:
+    virtual ~IParticleIndividualModule() = default;
+
+    virtual void update(ParticleSystem& particleSystem, ParticleGPUInstance* pParticleGpu, ParticleCPUInstance* pParticleCpu, float deltaTime) = 0;
 };
 
 
@@ -69,6 +79,7 @@ public:
     void spawnNewParticles(int nSpawnCount = 0);
 
     void addParticleModule(IParticleModule* pModule) { for (int i = 0; i < 4; ++i) { if (m_arrParticleModules[i] == nullptr) { m_arrParticleModules[i] = pModule; break; } } }
+    void addParticleIndividualModule(IParticleIndividualModule* pModule) { for (int i = 0; i < 4; ++i) { if (m_arrParticleIndividualModules[i] == nullptr) { m_arrParticleIndividualModules[i] = pModule; break; } } }
 
     void setParticleLifetime(float fMin, float fMax) { m_fLifetimeMin = fMin; m_fLifetimeMax = fMax; }
     void setParticleStartRotation(float fMin, float fMax) { m_fStartRotationMin = fMin; m_fStartRotationMax = fMax; }
@@ -150,6 +161,7 @@ private:
 
 
     IParticleModule* m_arrParticleModules[4];
+    IParticleIndividualModule* m_arrParticleIndividualModules[4];
 
     void updateParticle(int& nIndex, float fDeltaTime);
     void sortAliveParticleInFront();

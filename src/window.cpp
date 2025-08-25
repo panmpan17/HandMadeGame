@@ -23,6 +23,7 @@
 #include "components/particle/simple_particle_system.h"
 #include "components/particle/particle_system.h"
 #include "components/particle/particle_spawn.h"
+#include "components/particle/particle_lifetime_change.h"
 #include "random.h"
 
 
@@ -212,13 +213,14 @@ void Window::setupGLVertex()
     // addNode(pNode4);
 
     auto pNode5 = new Node(0, 0, 0, 0);
-    auto particle2 = new ParticleSystem(100, true);
+    auto particle2 = new ParticleSystem(100, false);
     particle2->setImage(pDustImage);
     particle2->setShader(new ParticleInstanceShader());
     particle2->registerBuffer();
     particle2->setParticleStartColor({ 1.f, 0.f, 0.f, 1.f }, { 0.f, 1.f, 0.f, 1.f });
     particle2->setIsLooping(false);
     particle2->addParticleModule(new ParticleIntervalSpawn(10));
+    particle2->addParticleIndividualModule(new ScaleThroughParticleLifetime(0.1f, 1.f));
     particle2->setParticleLifetime(4, 6);
     particle2->setParticleStartVelocity(1, 1);
     particle2->setGravity({ 0, -0.6f });

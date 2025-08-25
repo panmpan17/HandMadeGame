@@ -39,6 +39,11 @@ ParticleSystem::ParticleSystem(int nParticleCount, bool bSimulateInLocal/* = fal
         m_arrParticleModules[i] = nullptr;
     }
 
+    for (int i = 0; i < 4; ++i)
+    {
+        m_arrParticleIndividualModules[i] = nullptr;
+    }
+
     m_bSimulateInLocal = bSimulateInLocal;
 }
 
@@ -48,6 +53,14 @@ ParticleSystem::~ParticleSystem()
     delete[] m_arrParticlesCPU;
 
     for (IParticleModule*& pModule : m_arrParticleModules)
+    {
+        if (pModule)
+        {
+            delete pModule;
+        }
+    }
+
+    for (IParticleIndividualModule*& pModule : m_arrParticleIndividualModules)
     {
         if (pModule)
         {
@@ -218,6 +231,14 @@ void ParticleSystem::updateParticle(int& nIndex, float fDeltaTime)
 
     m_arrParticlesGPU[nIndex].m_vecPosition[0] += m_arrParticlesCPU[nIndex].m_vecVelocity[0] * fDeltaTime;
     m_arrParticlesGPU[nIndex].m_vecPosition[1] += m_arrParticlesCPU[nIndex].m_vecVelocity[1] * fDeltaTime;
+
+    for (IParticleIndividualModule*& pModule : m_arrParticleIndividualModules)
+    {
+        if (pModule)
+        {
+            pModule->update(*this, &m_arrParticlesGPU[nIndex], &m_arrParticlesCPU[nIndex], fDeltaTime);
+        }
+    }
 }
 
 void ParticleSystem::spawnNewParticles(int nSpawnCount/* = 1*/)
@@ -232,6 +253,7 @@ void ParticleSystem::spawnNewParticles(int nSpawnCount/* = 1*/)
         if (!m_arrParticlesCPU[i].isAlive())
         {
             m_arrParticlesCPU[i].m_fLifetime = randomFloat(m_fLifetimeMin, m_fLifetimeMax); // Random lifetime
+            m_arrParticlesCPU[i].m_fMaxLifetime = m_arrParticlesCPU[i].m_fLifetime;
             m_arrParticlesCPU[i].m_fRotationSpeed = randomFloat(m_fStartRotationSpeedMin, m_fStartRotationSpeedMax); // Random m_fRotation speed
 
             float vecBasePositionX, vecBasePositionY;
@@ -286,6 +308,7 @@ void ParticleSystem::spawnNewParticles(int nSpawnCount/* = 1*/)
             randomBetweenVec4(m_arrParticlesGPU[i].m_vecColor, m_vecStartColorMin, m_vecStartColorMax);
             m_arrParticlesGPU[i].m_fRotation = randomFloat(m_fStartRotationMin, m_fStartRotationMax);
             m_arrParticlesGPU[i].m_fScale = randomFloat(m_fStartScaleMin, m_fStartScaleMax);
+            m_arrParticlesCPU[i].m_fBaseScale = m_arrParticlesGPU[i].m_fScale;
 
             ++m_nAliveParticleCount;
             ++m_nLastAliveParticleIndex;
