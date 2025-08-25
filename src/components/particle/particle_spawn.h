@@ -11,6 +11,11 @@ public:
 
     void update(ParticleSystem& rParticleSystem, float fDeltaTime) override
     {
+        if (!rParticleSystem.getIsEmitting())
+        {
+            return;
+        }
+
         m_fSpawnTimer += fDeltaTime;
         if (m_fSpawnTimer >= m_fSpawnInterval)
         {
@@ -27,21 +32,29 @@ private:
 class ParticleBurstSpawn : public IParticleModule
 {
 public:
-    ParticleBurstSpawn(float fBurstInterval, int nBurstCount) : m_fBurstInterval(fBurstInterval), m_nBurstCount(nBurstCount) {}
+    ParticleBurstSpawn(float fBurstAt, int nBurstCount) : m_fBurstAt(fBurstAt), m_nBurstCount(nBurstCount) {}
 
     void update(ParticleSystem& rParticleSystem, float fDeltaTime) override
     {
-        m_fBurstTimer += fDeltaTime;
+        if (!rParticleSystem.getIsEmitting() || m_bHasBursted)
+        {
+            return;
+        }
 
-        if (m_fBurstTimer >= m_fBurstInterval)
+        if (rParticleSystem.getActiveTimer() >= m_fBurstAt)
         {
             rParticleSystem.spawnNewParticles(m_nBurstCount);
-            m_fBurstTimer = 0.0f;
+            m_bHasBursted = true;
         }
     }
 
+    void onActiveTimeReset() override
+    {
+        m_bHasBursted = false;
+    }
+
 private:
-    float m_fBurstInterval = 0.1f; // Time between bursts
-    float m_fBurstTimer = 0.0f;
+    float m_fBurstAt = 0.1f; // Activated time
+    bool m_bHasBursted = false;
     int m_nBurstCount;
 };

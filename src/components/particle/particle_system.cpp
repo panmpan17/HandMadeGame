@@ -162,6 +162,26 @@ void ParticleSystem::draw()
 
 void ParticleSystem::update(float fDeltaTime)
 {
+    m_fActiveTimer += fDeltaTime;
+    if (m_fActiveTimer >= m_fActiveTime)
+    {
+        if (m_bIsLooping)
+        {
+            m_fActiveTimer = 0.0f;
+            for (IParticleModule*& pModule : m_arrParticleModules)
+            {
+                if (pModule)
+                {
+                    pModule->onActiveTimeReset();
+                }
+            }
+        }
+        else
+        {
+            m_bIsEmitting = false;
+        }
+    }
+
     for (IParticleModule*& pModule : m_arrParticleModules)
     {
         if (pModule)
@@ -202,6 +222,11 @@ void ParticleSystem::updateParticle(int& nIndex, float fDeltaTime)
 
 void ParticleSystem::spawnNewParticles(int nSpawnCount/* = 1*/)
 {
+    if (!m_bIsEmitting)
+    {
+        return;
+    }
+
     for (int i = m_nLastAliveParticleIndex + 1, spawned = 0; i < m_nAllParticleCount && spawned < nSpawnCount; ++i, ++spawned)
     {
         if (!m_arrParticlesCPU[i].isAlive())

@@ -33,6 +33,8 @@ public:
     virtual ~IParticleModule() = default;
 
     virtual void update(ParticleSystem& particleSystem, float deltaTime) = 0;
+
+    virtual void onActiveTimeReset() {}
 };
 
 
@@ -74,15 +76,30 @@ public:
     void setParticleStartScale(float fMin, float fMax) { m_fStartScaleMin = fMin; m_fStartScaleMax = fMax; }
     void setParticleStartColor(const vec4& colorMin, const vec4& colorMax) { vec4_dup(m_vecStartColorMin, colorMin); vec4_dup(m_vecStartColorMax, colorMax); }
     void setParticleStartVelocity(float fMin, float fMax) { m_fStartVelocityMin = fMin; m_fStartVelocityMax = fMax; }
-    void setParticleStartVelocityDirectionOverride(ParticleStartVelocityDirectionOverride func) { m_funcStartVelocityDirectionOverride = func; }
+    void setParticleStartVelocityDirectionOverride(ParticleStartVelocityDirectionOverride funcOverride) { m_funcStartVelocityDirectionOverride = funcOverride; }
 
-    void setSpawnShape(eParticleSpawnShape shape) { m_eSpawnShape = shape; }
-    void setSpawnShapeDimensions(float width, float height) { m_fSpawnShapeWidth = width; m_fSpawnShapeHeight = height; }
+    void setSpawnShape(eParticleSpawnShape eShape) { m_eSpawnShape = eShape; }
+    void setSpawnShapeDimensions(float fWidth, float fHeight) { m_fSpawnShapeWidth = fWidth; m_fSpawnShapeHeight = fHeight; }
 
-    void setGravity(const vec2& gravity) { vec2_dup(m_fGravity, gravity); }
+    void setGravity(const vec2& vecGravity) { vec2_dup(m_fGravity, vecGravity); }
     void setGravity(float fX, float fY) { m_fGravity[0] = fX; m_fGravity[1] = fY; }
 
     void setImage(Image* pImage) { m_pImage = pImage; }
+
+    void play(bool bResetActiveTimer = true)
+    {
+        m_bIsEmitting = true;
+        if (bResetActiveTimer)
+        {
+            m_fActiveTimer = 0.0f;
+        }
+    }
+    bool getIsEmitting() const { return m_bIsEmitting; }
+
+    void setActiveTime(float fTime) { m_fActiveTime = fTime; }
+    float getActiveTimer() const { return m_fActiveTimer; }
+
+    void setIsLooping(bool bLooping) { m_bIsLooping = bLooping; }
 
 private:
     ParticleGPUInstance* m_arrParticlesGPU = nullptr;
@@ -125,6 +142,12 @@ private:
     bool m_bSimulateInLocal = false;
 
     Image* m_pImage = nullptr;
+
+    bool m_bIsEmitting = true;
+    bool m_bIsLooping = true;
+    float m_fActiveTime = 5.0f;
+    float m_fActiveTimer = 0.0f;
+
 
     IParticleModule* m_arrParticleModules[4];
 

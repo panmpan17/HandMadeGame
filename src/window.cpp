@@ -217,6 +217,7 @@ void Window::setupGLVertex()
     particle2->setShader(new ParticleInstanceShader());
     particle2->registerBuffer();
     particle2->setParticleStartColor({ 1.f, 0.f, 0.f, 1.f }, { 0.f, 1.f, 0.f, 1.f });
+    particle2->setIsLooping(false);
     particle2->addParticleModule(new ParticleIntervalSpawn(10));
     particle2->setParticleLifetime(4, 6);
     particle2->setParticleStartVelocity(1, 1);
@@ -253,7 +254,7 @@ void Window::setupGLVertex()
     particle4->setSpawnShapeDimensions(0.4f, 0.4f);
     particle4->setParticleStartColor({ 1.f, 0.f, 0.f, 1.f }, { 0.f, 0.f, 1.f, 1.f });
     particle4->addParticleModule(new ParticleIntervalSpawn(10));
-    particle4->addParticleModule(new ParticleBurstSpawn(1.0f, 20));
+    particle4->addParticleModule(new ParticleBurstSpawn(0.0f, 20));
     pNode7->addComponent(particle4);
     addNode(pNode7);
 }
