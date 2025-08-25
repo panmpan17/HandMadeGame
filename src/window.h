@@ -1,6 +1,7 @@
 #pragma once
 
 #include "debug_macro.h"
+#include "expandable_array.h"
 
 class GLFWwindow;
 class Camera;
@@ -50,9 +51,7 @@ private:
 
     Camera* m_pCamera = nullptr;
 
-    // TODO: make this extensible
-    int m_nNodeCount = 10;
-    Node* m_pNodes[10] = { nullptr };
+    PointerExtendableArray<Node*> m_oNodeArray = PointerExtendableArray<Node*>(10);
 
     bool m_bResizable = false;
     int m_nDrawCallCount = 0;

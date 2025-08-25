@@ -264,19 +264,7 @@ void Window::setupGLVertex()
 void Window::addNode(Node* pNode)
 {
     if (pNode == nullptr) return;
-
-    // Find an empty slot in the node array
-    for (int i = 0; i < m_nNodeCount; ++i)
-    {
-        if (m_pNodes[i] == nullptr)
-        {
-            m_pNodes[i] = pNode;
-            return;
-        }
-    }
-
-    // TODO: Handle case where no empty slot is found, e.g., resize the array or log an error
-    LOGERRLN("No empty slot found to add the node");
+    m_oNodeArray.addElement(pNode);
 }
 
 void Window::setupShaders()
@@ -322,12 +310,14 @@ void Window::drawFrame()
 
     m_nDrawCallCount = 0;
 
-    for (int i = 0; i < m_nNodeCount; ++i)
+    int nSize = m_oNodeArray.getSize();
+    for (int i = 0; i < nSize; ++i)
     {
-        if (m_pNodes[i])
+        Node* pNode = m_oNodeArray.getElement(i);
+        if (pNode)
         {
-            m_pNodes[i]->update(m_fDeltaTime);
-            m_pNodes[i]->draw();
+            pNode->update(m_fDeltaTime);
+            pNode->draw();
         }
     }
 
