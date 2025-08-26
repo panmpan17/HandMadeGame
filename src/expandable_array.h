@@ -20,19 +20,19 @@ private:
 
 
 template<typename T>
-class PointerExtendableArray
+class PointerExpandableArray
 {
 public:
     static_assert(std::is_pointer<T>::value, "Template parameter must be a pointer type");
 
-    PointerExtendableArray(int nInitialSize)
+    PointerExpandableArray(int nInitialSize)
     {
         m_nSize = nInitialSize;
         m_pArray = static_cast<T*>(malloc(sizeof(T) * m_nSize));
         std::memset(m_pArray, 0, sizeof(T) * nInitialSize);
     }
 
-    ~PointerExtendableArray()
+    ~PointerExpandableArray()
     {
         for (int i = 0; i < m_nSize; ++i)
         {
@@ -41,8 +41,8 @@ public:
         free(m_pArray);
     }
 
-    PointerExtendableArray(const PointerExtendableArray&) = delete;
-    PointerExtendableArray& operator=(const PointerExtendableArray&) = delete;
+    PointerExpandableArray(const PointerExpandableArray&) = delete;
+    PointerExpandableArray& operator=(const PointerExpandableArray&) = delete;
 
     T getElement(int index) const
     {

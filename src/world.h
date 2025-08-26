@@ -21,5 +21,5 @@ private:
     TestShader* m_pBaseShader = nullptr;
     ImageShader* m_pImageShader = nullptr;
 
-    PointerExtendableArray<Node*> m_oNodeArray = PointerExtendableArray<Node*>(10);
+    PointerExpandableArray<Node*> m_oNodeArray = PointerExpandableArray<Node*>(10);
 };

@@ -7,26 +7,22 @@
 
 Node::~Node()
 {
-    for (int i = 0; i < m_nComponentCount; ++i)
-    {
-        if (m_pComponents[i])
-        {
-            delete m_pComponents[i];
-        }
-    }
+    // NOTE: m_oComponentArray should auto destruct and call the destructors of all components.
 }
 
 
 void Node::update(float deltaTime)
 {
     // Update logic for the node, if any
-    for (int i = 0; i < m_nComponentCount; ++i)
+    int nSize = m_oComponentArray.getSize();
+    for (int i = 0; i < nSize; ++i)
     {
-        if (m_pComponents[i] && m_pComponents[i]->isUpdatable())
+        Component* pComponent = m_oComponentArray.getElement(i);
+        if (pComponent && pComponent->isUpdatable())
         {
             try
             {
-                m_pComponents[i]->update(deltaTime);
+                pComponent->update(deltaTime);
             }
             catch (const std::runtime_error& e) {
                 LOGERRLN_EX("Runtime error in component update: {}", e.what());
@@ -44,13 +40,15 @@ void Node::update(float deltaTime)
 void Node::draw()
 {
     // Draw logic for the node, if any
-    for (int i = 0; i < m_nComponentCount; ++i)
+    int nSize = m_oComponentArray.getSize();
+    for (int i = 0; i < nSize; ++i)
     {
-        if (m_pComponents[i] && m_pComponents[i]->isIDrawable())
+        Component* pComponent = m_oComponentArray.getElement(i);
+        if (pComponent && pComponent->isIDrawable())
         {
             try
             {
-                static_cast<IDrawable*>(m_pComponents[i])->draw();
+                static_cast<IDrawable*>(pComponent)->draw();
             }
             catch (const std::runtime_error& e) {
                 LOGERRLN_EX("Runtime error in component draw: {}", e.what());
@@ -68,17 +66,6 @@ void Node::draw()
 void Node::addComponent(Component* pComponent)
 {
     if (pComponent == nullptr) return;
-
-    // Find an empty slot in the component array
-    for (int i = 0; i < m_nComponentCount; ++i)
-    {
-        if (m_pComponents[i] == nullptr)
-        {
-            m_pComponents[i] = pComponent;
-            pComponent->setNode(this);
-            return;
-        }
-    }
-
-    // TODO: Handle case where no empty slot is found, e.g., resize the array or log an error
+    m_oComponentArray.addElement(pComponent);
+    pComponent->setNode(this);
 }

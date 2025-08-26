@@ -120,6 +120,7 @@ void WorldScene::init()
     // particle2->addParticleModule(new ParticleBurstSpawn(1.0f, 20));
     pNode5->addComponent(particle2);
     pNode5->addComponent(new TwoPointsMovement({ -0.5f, 0.f }, { 0.5f, 0.f }, 2.0f));
+    pNode5->setActive(false);
     addNode(pNode5);
 
 
@@ -133,6 +134,7 @@ void WorldScene::init()
     // particle3->addParticleModule(new ParticleIntervalSpawn(10));
     particle3->addParticleModule(new ParticleBurstSpawn(1.0f, 20));
     pNode6->addComponent(particle3);
+    pNode6->setActive(false);
     addNode(pNode6);
 
 
@@ -146,7 +148,21 @@ void WorldScene::init()
     particle4->addParticleModule(new ParticleIntervalSpawn(10));
     particle4->addParticleModule(new ParticleBurstSpawn(0.0f, 20));
     pNode7->addComponent(particle4);
+    pNode7->setActive(false);
     addNode(pNode7);
+
+    {
+        Image* pCharacter = ImageLoader::getInstance()->getImage("character");
+
+        auto pPlayer = new Node(0.f, 0.f, 0.f, 0.f);
+        vec4 colorWhite = {1.f, 1.f, 1.f, 1.f}; // White color for the quad
+        auto pSprite = new Quad(0, 0, 0.5f, 0.5f, colorWhite);
+        pSprite->setShader(m_pImageShader);
+        static_cast<Quad*>(pSprite)->setImage(pCharacter);
+        pSprite->registerBuffer();
+        pPlayer->addComponent(pSprite);
+        addNode(pPlayer);
+    }
 }
 
 void WorldScene::update(float fDeltatime)
@@ -155,7 +171,7 @@ void WorldScene::update(float fDeltatime)
     for (int i = 0; i < nSize; ++i)
     {
         Node* pNode = m_oNodeArray.getElement(i);
-        if (pNode)
+        if (pNode && pNode->isActive())
         {
             pNode->update(fDeltatime);
         }
@@ -168,7 +184,7 @@ void WorldScene::render()
     for (int i = 0; i < nSize; ++i)
     {
         Node* pNode = m_oNodeArray.getElement(i);
-        if (pNode)
+        if (pNode && pNode->isActive())
         {
             pNode->draw();
         }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <linmath.h>
+#include "expandable_array.h"
 
 
 class Component;
@@ -52,11 +53,13 @@ public:
     void update(float deltaTime);
     void draw();
 
+    void setActive(bool isActive) { m_bIsActive = isActive; }
+    bool isActive() const { return m_bIsActive; }
+
 private:
     vec3 m_position = {0.f, 0.f, 0.f};
     float m_fRotation = 0;
+    bool m_bIsActive = true;
 
-    // Component* m_pComponent = nullptr;
-    int m_nComponentCount = 10;
-    Component* m_pComponents[10] = { nullptr };
+    PointerExpandableArray<Component*> m_oComponentArray = PointerExpandableArray<Component*>(5);
 };
