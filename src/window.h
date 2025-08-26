@@ -1,14 +1,10 @@
 #pragma once
 
 #include "debug_macro.h"
-#include "expandable_array.h"
 
 class GLFWwindow;
 class Camera;
-class TestShader;
-class ImageShader;
-class Image;
-class Node;
+class WorldScene;
 
 typedef unsigned int GLuint;
 
@@ -31,15 +27,10 @@ public:
     void configureAndCreateWindow();
     void start();
 
-    void addNode(Node* pNode);
-
     void increaseDrawCallCount();
 
 private:
     GLFWwindow* m_pWindow = nullptr;
-
-    TestShader* m_pBaseShader = nullptr;
-    ImageShader* m_pImageShader = nullptr;
 
     int m_nWidth = 80, m_nHeight = 60;
     int m_nActualWidth = 800, m_nActualHeight = 600;
@@ -51,13 +42,11 @@ private:
 
     Camera* m_pCamera = nullptr;
 
-    PointerExtendableArray<Node*> m_oNodeArray = PointerExtendableArray<Node*>(10);
+    WorldScene* m_pWorldScene = nullptr;
 
     bool m_bResizable = false;
     int m_nDrawCallCount = 0;
 
-    void setupGLVertex();
-    void setupShaders();
     void mainLoop();
     void drawFrame();
 };
