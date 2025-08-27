@@ -54,14 +54,15 @@ public:
 
     /// @brief Adds a new element to the array. This will assume ownership of the element.
     /// @param element The element to add.
-    void addElement(T element)
+    /// @return The index at which the element was added.
+    int addElement(T element)
     {
         for (int i = 0; i < m_nSize; ++i)
         {
             if (m_pArray[i] == nullptr)
             {
                 m_pArray[i] = element;
-                return;
+                return i;
             }
         }
 
@@ -73,6 +74,8 @@ public:
             throw MemoryAllocateException("Failed to expand array for new element.");
         }
         m_pArray[nIndex] = element; // Add to the first new slot
+
+        return nIndex;
     }
 
     /// @brief Returns and removes the last non-null element, does not shrink capacity.

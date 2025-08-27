@@ -7,6 +7,7 @@
 #include "components/rotate.h"
 #include "components/movement.h"
 #include "components/sprite_animation.h"
+#include "components/character2d.h"
 #include "components/particle/simple_particle_system.h"
 #include "components/particle/particle_system.h"
 #include "components/particle/particle_spawn.h"
@@ -161,12 +162,13 @@ void WorldScene::init()
         pSprite->registerBuffer();
         pPlayer->addComponent(pSprite);
 
-        auto nIndex = new ushort[] {15, 8, 9, 10, 11, 4, 5, 6, 7, 0, 1};
-        auto pWalkAnimation = new SpriteAnimationInfo(nIndex, 11, 0.06f);
-        pPlayer->addComponent(new SpriteAnimation(pSprite, pWalkAnimation));
-        addNode(pPlayer);
+        auto pSpriteAnimation = new SpriteAnimation(pSprite);
+        pPlayer->addComponent(pSpriteAnimation);
 
-        delete[] nIndex;
+        auto pCharacter2d = new Character2d(pSpriteAnimation);
+        pPlayer->addComponent(pCharacter2d);
+
+        addNode(pPlayer);
     }
 }
 
