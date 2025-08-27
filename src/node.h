@@ -2,12 +2,14 @@
 
 #include <linmath.h>
 #include "expandable_array.h"
+#include "serializer.h"
 
 
 class Component;
+class DataSerializer;
+class DataDeserializer;
 
-
-class Node
+class Node : public ISerializable
 {
 public:
     Node() {}
@@ -55,6 +57,18 @@ public:
 
     void setActive(bool isActive) { m_bIsActive = isActive; }
     bool isActive() const { return m_bIsActive; }
+
+    void serializedTo(DataSerializer& serializer) const override;
+    void deserializeField(const std::string_view& strFieldName, const std::string_view& strFieldValue) override;
+
+    friend std::ostream& operator<<(std::ostream& os, const Node& node)
+    {
+        os << "Node(pos=" <<  node.m_position[0] << "," <<  node.m_position[1] << "," <<  node.m_position[2] << "; "
+           << "rotation=" << node.m_fRotation << "; "
+           << "active=" << node.m_bIsActive
+           << " )";
+        return os;
+    }
 
 private:
     vec3 m_position = {0.f, 0.f, 0.f};
