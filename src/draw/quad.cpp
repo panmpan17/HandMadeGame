@@ -97,19 +97,32 @@ Sprite::Sprite(Image* pImage, int nPixelPerUnit/* = 100*/)
     m_pImage = pImage;
     m_fWidth = pImage->getWidth() * (1.f / nPixelPerUnit);
     m_fHeight = pImage->getHeight() * (1.f / nPixelPerUnit);
+    m_vecUVOOffset[0] = 0;
+    m_vecUVOOffset[1] = 0;
 }
 
-Sprite::Sprite(Image* pImage, int nSpriteSheetXCount, int nSpriteSheetYCount, int nPixelPerUnit/* = 100*/)
+Sprite::Sprite(Image* pImage, int nSpriteSheetXCount, int nSpriteSheetYCount, int nSpriteIndex/* = 0 */, int nPixelPerUnit/* = 100*/)
 {
     m_pImage = pImage;
     m_fWidth = (pImage->getWidth() / (float)nSpriteSheetXCount) * (1.f / nPixelPerUnit);
     m_fHeight = (pImage->getHeight() / (float)nSpriteSheetYCount) * (1.f / nPixelPerUnit);
     m_nSpriteSheetXCount = nSpriteSheetXCount;
     m_nSpriteSheetYCount = nSpriteSheetYCount;
+
+    setSpriteIndex(nSpriteIndex);
 }
 
 Sprite::~Sprite()
 {
+}
+
+void Sprite::setSpriteIndex(int nIndex)
+{
+    m_nSpriteIndex = nIndex % (m_nSpriteSheetXCount * m_nSpriteSheetYCount);
+    int xIndex = m_nSpriteIndex % m_nSpriteSheetXCount;
+    int yIndex = m_nSpriteIndex / m_nSpriteSheetXCount;
+    m_vecUVOOffset[0] = xIndex / (float)m_nSpriteSheetXCount;
+    m_vecUVOOffset[1] = yIndex / (float)m_nSpriteSheetYCount;
 }
 
 void Sprite::draw()
@@ -122,6 +135,5 @@ void Sprite::predrawSetShaderUniforms()
     glUniform1i(m_pShader->getSpriteSheetXCountLocation(), m_nSpriteSheetXCount);
     glUniform1i(m_pShader->getSpriteSheetYCountLocation(), m_nSpriteSheetYCount);
 
-    // TODO: change the uv offset
-    glUniform2f(m_pShader->getUVOffsetLocation(), 0.0f, 0.0f);
+    glUniform2f(m_pShader->getUVOffsetLocation(), m_vecUVOOffset[0], m_vecUVOOffset[1]);
 }

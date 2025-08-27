@@ -40,14 +40,18 @@ class Sprite : public Quad
 {
 public:
     Sprite(Image* pImage, int nPixelPerUnit = 100);
-    Sprite(Image* pImage, int nSpriteSheetXCount, int nSpriteSheetYCount, int nPixelPerUnit = 100);
+    Sprite(Image* pImage, int nSpriteSheetXCount, int nSpriteSheetYCount, int nSpriteIndex = 0, int nPixelPerUnit = 100);
     ~Sprite();
 
     void draw() override;
+
+    void setSpriteIndex(int nIndex);
+    int getSpriteIndex() const { return m_nSpriteIndex; }
 
 protected:
     void predrawSetShaderUniforms() override;
     int m_nSpriteSheetXCount = 1;
     int m_nSpriteSheetYCount = 1;
     int m_nSpriteIndex = 0;
+    vec2 m_vecUVOOffset;
 };

@@ -6,6 +6,7 @@
 #include "draw/triangle.h"
 #include "components/rotate.h"
 #include "components/movement.h"
+#include "components/sprite_animation.h"
 #include "components/particle/simple_particle_system.h"
 #include "components/particle/particle_system.h"
 #include "components/particle/particle_spawn.h"
@@ -159,7 +160,13 @@ void WorldScene::init()
         pSprite->setShader(m_pImageShader);
         pSprite->registerBuffer();
         pPlayer->addComponent(pSprite);
+
+        auto nIndex = new ushort[] {15, 8, 9, 10, 11, 4, 5, 6, 7, 0, 1};
+        auto pWalkAnimation = new SpriteAnimationInfo(nIndex, 11, 0.06f);
+        pPlayer->addComponent(new SpriteAnimation(pSprite, pWalkAnimation));
         addNode(pPlayer);
+
+        delete[] nIndex;
     }
 }
 
