@@ -100,6 +100,9 @@ ImageShader::ImageShader()
     m_nVPosLocation = glGetAttribLocation(m_nProgram, "vPos");
     m_nVUVLocation = glGetAttribLocation(m_nProgram, "vUV");
     m_nTextureLocation = glGetUniformLocation(m_nProgram, "u_tex0");
+    m_nSpriteSheetXCountLocation = glGetUniformLocation(m_nProgram, "spriteSheetXCount");
+    m_nSpriteSheetYCountLocation = glGetUniformLocation(m_nProgram, "spriteSheetYCount");
+    m_nUVOffsetLocation = glGetUniformLocation(m_nProgram, "uvOffset");
 
     glUseProgram(m_nProgram);
     glUniform1i(m_nTextureLocation, 0); // Texture unit 0

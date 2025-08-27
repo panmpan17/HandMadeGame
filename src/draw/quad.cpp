@@ -10,15 +10,8 @@
 #include "../node.h"
 #include "../window.h"
 
-Quad::Quad(float fX, float fY, float fWidth, float fHeight, vec4 color)
+Quad::Quad(float fWidth, float fHeight, vec4 color) : m_fWidth(fWidth), m_fHeight(fHeight)
 {
-    float fStartX = fX - fWidth / 2.0f;
-    float fStartY = fY - fHeight / 2.0f;
-    m_arrVertices[0] = { { fStartX, fStartY }, { 0.0f, 0.0f } }; // Bottom left
-    m_arrVertices[1] = { { fStartX + fWidth, fStartY }, { 1.0f, 0.0f } }; // Bottom right
-    m_arrVertices[2] = { { fStartX, fStartY + fHeight }, { 0.0f, 1.0f } }; // Top right
-    m_arrVertices[3] = { { fStartX + fWidth, fStartY + fHeight }, { 1.0f, 1.0f } }; // Top left
-
     vec4_dup(m_color, color);
 }
 
@@ -32,7 +25,15 @@ void Quad::registerBuffer()
 {
     glGenBuffers(1, &m_nVertexBuffer);
     glBindBuffer(GL_ARRAY_BUFFER, m_nVertexBuffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(m_arrVertices), m_arrVertices, GL_STATIC_DRAW);
+
+    float fStartX = -m_fWidth / 2.0f;
+    float fStartY = -m_fHeight / 2.0f;
+    VertexWUV arrVertices[4];
+    arrVertices[0] = { { fStartX, fStartY }, { 0.0f, 0.0f } }; // Bottom left
+    arrVertices[1] = { { fStartX + m_fWidth, fStartY }, { 1.0f, 0.0f } }; // Bottom right
+    arrVertices[2] = { { fStartX, fStartY + m_fHeight }, { 0.0f, 1.0f } }; // Top right
+    arrVertices[3] = { { fStartX + m_fWidth, fStartY + m_fHeight }, { 1.0f, 1.0f } }; // Top left
+    glBufferData(GL_ARRAY_BUFFER, sizeof(arrVertices), arrVertices, GL_STATIC_DRAW);
 
     glGenVertexArrays(1, &m_nVertexArray);
     glBindVertexArray(m_nVertexArray);
@@ -65,6 +66,7 @@ void Quad::draw()
     glUseProgram(m_pShader->getProgram());
     glUniformMatrix4fv(m_pShader->getMvpLocation(), 1, GL_FALSE, (const GLfloat*) mvp);
     glUniform4f(m_pShader->getColorLocation(), m_color[0], m_color[1], m_color[2], 1);
+    predrawSetShaderUniforms();
 
     glUniform1i(m_pShader->getTextureLocation(), 0); // Texture unit 0
 
@@ -79,4 +81,47 @@ void Quad::draw()
     glBindTexture(GL_TEXTURE_2D, 0); // Unbind the texture
     glBindVertexArray(0); // Unbind the vertex array
     glUseProgram(0);
+}
+
+void Quad::predrawSetShaderUniforms()
+{
+    glUniform1i(m_pShader->getSpriteSheetXCountLocation(), 1);
+    glUniform1i(m_pShader->getSpriteSheetYCountLocation(), 1);
+    glUniform2f(m_pShader->getUVOffsetLocation(), 0.0f, 0.0f);
+}
+
+
+Sprite::Sprite(Image* pImage, int nPixelPerUnit/* = 100*/)
+    // : Quad(0.5f, 0.5f, {1.f, 1.f, 1.f, 1.f})
+{
+    m_pImage = pImage;
+    m_fWidth = pImage->getWidth() * (1.f / nPixelPerUnit);
+    m_fHeight = pImage->getHeight() * (1.f / nPixelPerUnit);
+}
+
+Sprite::Sprite(Image* pImage, int nSpriteSheetXCount, int nSpriteSheetYCount, int nPixelPerUnit/* = 100*/)
+{
+    m_pImage = pImage;
+    m_fWidth = (pImage->getWidth() / (float)nSpriteSheetXCount) * (1.f / nPixelPerUnit);
+    m_fHeight = (pImage->getHeight() / (float)nSpriteSheetYCount) * (1.f / nPixelPerUnit);
+    m_nSpriteSheetXCount = nSpriteSheetXCount;
+    m_nSpriteSheetYCount = nSpriteSheetYCount;
+}
+
+Sprite::~Sprite()
+{
+}
+
+void Sprite::draw()
+{
+    Quad::draw();
+}
+
+void Sprite::predrawSetShaderUniforms()
+{
+    glUniform1i(m_pShader->getSpriteSheetXCountLocation(), m_nSpriteSheetXCount);
+    glUniform1i(m_pShader->getSpriteSheetYCountLocation(), m_nSpriteSheetYCount);
+
+    // TODO: change the uv offset
+    glUniform2f(m_pShader->getUVOffsetLocation(), 0.0f, 0.0f);
 }

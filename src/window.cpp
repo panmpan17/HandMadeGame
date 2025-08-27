@@ -114,6 +114,7 @@ void Window::start()
     
     ImageLoader::getInstance()->registerImage("test", "assets/images/test.png");
     ImageLoader::getInstance()->registerImage("dust", "assets/images/dust_1.png");
+    ImageLoader::getInstance()->registerImage("character", "assets/images/character_animation.png");
 
     // setupShaders();
 

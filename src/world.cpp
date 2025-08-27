@@ -70,7 +70,7 @@ void WorldScene::init()
     auto pNode2 = new Node(0.5f, 0.5f, 0.f, 0.f);
 
     vec4 red = {1.f, 0.f, 0.f, 1.f}; // Red color for the quad
-    auto pQuad = new Quad(0, 0, 0.5f, 0.5f, red);
+    auto pQuad = new Quad(0.5f, 0.5f, red);
     pQuad->setShader(m_pImageShader);
     static_cast<Quad*>(pQuad)->setImage(pTestImage);
     pQuad->registerBuffer();
@@ -84,7 +84,7 @@ void WorldScene::init()
     auto pNode3 = new Node(0.5f, 0.5f, 0.f, 0.f);
 
     vec4 color = {0.5f, 0.5f, 1.f, 1.f}; // Blue color for the second quad
-    auto pQuad2 = new Quad(0, 0, 0.3f, 0.3f, color);
+    auto pQuad2 = new Quad(0.3f, 0.3f, color);
     pQuad2->setShader(m_pImageShader);
     static_cast<Quad*>(pQuad2)->setImage(pDustImage);
     pQuad2->registerBuffer();
@@ -155,10 +155,8 @@ void WorldScene::init()
         Image* pCharacter = ImageLoader::getInstance()->getImage("character");
 
         auto pPlayer = new Node(0.f, 0.f, 0.f, 0.f);
-        vec4 colorWhite = {1.f, 1.f, 1.f, 1.f}; // White color for the quad
-        auto pSprite = new Quad(0, 0, 0.5f, 0.5f, colorWhite);
+        auto pSprite = new Sprite(pCharacter, 4, 4);
         pSprite->setShader(m_pImageShader);
-        static_cast<Quad*>(pSprite)->setImage(pCharacter);
         pSprite->registerBuffer();
         pPlayer->addComponent(pSprite);
         addNode(pPlayer);

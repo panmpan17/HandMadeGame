@@ -46,8 +46,13 @@ public:
     inline GLuint getVUVLocation() const { return m_nVUVLocation; }
     inline GLuint getTextureLocation() const { return m_nTextureLocation; }
 
+    inline GLuint getSpriteSheetXCountLocation() const { return m_nSpriteSheetXCountLocation; }
+    inline GLuint getSpriteSheetYCountLocation() const { return m_nSpriteSheetYCountLocation; }
+    inline GLuint getUVOffsetLocation() const { return m_nUVOffsetLocation; }
+
 private:
     GLuint m_nMvpLocation, m_nColorLocation, m_nVPosLocation, m_nVUVLocation, m_nTextureLocation;
+    GLuint m_nSpriteSheetXCountLocation, m_nSpriteSheetYCountLocation, m_nUVOffsetLocation;
 };
 
 
