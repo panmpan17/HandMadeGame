@@ -1,5 +1,15 @@
 #include "serializer.h"
 #include "node.h"
+#include "iserializable.h"
+
+DataSerializer& DataSerializer::operator<<(const ISerializable* pObject)
+{
+    if (pObject)
+    {
+        pObject->serializedTo(*this);
+    }
+    return *this;
+}
 
 
 void DataDeserializer::read()

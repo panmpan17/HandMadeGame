@@ -3,6 +3,7 @@
 #include "draw/drawable_interface.h"
 #include <iostream>
 #include "debug_macro.h"
+#include "serializer.h"
 
 
 Node::~Node()
@@ -16,6 +17,16 @@ void Node::serializedTo(DataSerializer& serializer) const
     serializer.ADD_ATTRIBUTES(m_position);
     serializer.ADD_ATTRIBUTES(m_fRotation);
     serializer.ADD_ATTRIBUTES(m_bIsActive);
+
+    for (int i = 0; i < m_oComponentArray.getSize(); ++i)
+    {
+        Component* pComponent = m_oComponentArray.getElement(i);
+        if (pComponent)
+        {
+            serializer << pComponent;
+        }
+    }
+
     serializer.endClassHeader();
 }
 

@@ -1,5 +1,6 @@
 #include "movement.h"
 #include "../input_handle.h"
+#include "../serializer.h"
 
 
 Movement::Movement(float fMoveSpeed)
@@ -62,6 +63,12 @@ void Movement::getMovementDirection(short& x, short& y)
     x = m_bMovementKeyPressed.test(3) - m_bMovementKeyPressed.test(2);
     y = m_bMovementKeyPressed.test(0) - m_bMovementKeyPressed.test(1);
 }
+
+void Movement::serializeToWrapper(DataSerializer& serializer) const
+{
+    serializer.ADD_ATTRIBUTES(m_fMoveSpeed);
+}
+
 
 #if defined(__APPLE__) || defined(__MACH__)
 float lerp(float fStart, float fEnd, float fT)

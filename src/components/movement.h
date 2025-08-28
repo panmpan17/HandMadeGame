@@ -9,7 +9,7 @@
 class Movement : public Component
 {
 public:
-    Movement(float fMoveSpeed);
+    Movement(float fMoveSpeed = 0);
     virtual ~Movement();
 
     virtual bool isIDrawable() const override { return false; }
@@ -19,11 +19,13 @@ public:
 
     virtual void draw() override {}
 
-private:
+protected:
     float m_fMoveSpeed = 0.0f;
     std::bitset<4> m_bMovementKeyPressed = 0;
 
     void getMovementDirection(short& x, short& y);
+
+    virtual void serializeToWrapper(DataSerializer& serializer) const override;
 };
 
 
@@ -46,7 +48,7 @@ public:
 
     virtual void draw() override {}
 
-private:
+protected:
     vec2 m_vecStart;
     vec2 m_vecEnd;
     float m_fDuration;

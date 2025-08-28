@@ -19,7 +19,6 @@ public:
 
 private:
     TestShader* m_pShader = nullptr;
-    VertexWColor vertices[3];
 
     GLuint m_nVertexBuffer, m_nVertexArray;
 };

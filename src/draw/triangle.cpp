@@ -12,9 +12,6 @@
 
 Triangle::Triangle()
 {
-    vertices[0] = { { -0.6f, -0.4f }, { 1.f, 0.f, 0.f } };
-    vertices[1] = { {  0.6f, -0.4f }, { 0.f, 1.f, 0.f } };
-    vertices[2] = { {   0.f,  0.6f }, { 0.f, 0.f, 1.f } };
 }
 
 Triangle::~Triangle()
@@ -25,7 +22,12 @@ void Triangle::registerBuffer()
 {
     glGenBuffers(1, &m_nVertexBuffer);
     glBindBuffer(GL_ARRAY_BUFFER, m_nVertexBuffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    VertexWColor arrVertices[3];
+    arrVertices[0] = { { -0.6f, -0.4f }, { 1.f, 0.f, 0.f } };
+    arrVertices[1] = { {  0.6f, -0.4f }, { 0.f, 1.f, 0.f } };
+    arrVertices[2] = { {   0.f,  0.6f }, { 0.f, 0.f, 1.f } };
+    glBufferData(GL_ARRAY_BUFFER, sizeof(arrVertices), arrVertices, GL_STATIC_DRAW);
 
     glGenVertexArrays(1, &m_nVertexArray);
     glBindVertexArray(m_nVertexArray);

@@ -14,19 +14,7 @@
         return; \
     }
 
-
-class DataSerializer;
-
-class ISerializable
-{
-public:
-    ISerializable() = default;
-    virtual ~ISerializable() = default;
-
-    virtual void serializedTo(DataSerializer& serializer) const = 0;
-    virtual void deserializeField(const std::string_view& strFieldName, const std::string_view& strFieldValue) = 0;
-};
-
+class ISerializable;
 
 class DataSerializer
 {
@@ -81,6 +69,15 @@ public:
     {
         CHECK_FILE_IS_OPEN;
         m_oOutputFile << strAttributeNames << ": " << bValue << "\n";
+    }
+
+    DataSerializer& operator<<(const ISerializable* pObject);
+
+    void finish()
+    {
+        if (m_oOutputFile.is_open()) {
+            m_oOutputFile.close();
+        }
     }
 
 private:

@@ -13,6 +13,7 @@
 #include "components/particle/particle_spawn.h"
 #include "components/particle/particle_lifetime_change.h"
 #include "random.h"
+#include "serializer.h"
 
 
 WorldScene::WorldScene()
@@ -36,6 +37,9 @@ WorldScene::~WorldScene()
 
 void WorldScene::init()
 {   
+    // TODO: remove this
+    DataSerializer oSerializer("world.txt");
+
     m_pBaseShader = new TestShader();
     m_pImageShader = new ImageShader();
 
@@ -55,6 +59,8 @@ void WorldScene::init()
         pNode->addComponent(new Movement(1.0f)); // Add movement component with speed 1.0f
 
         addNode(pNode);
+
+        oSerializer << pNode;
     }
 
     {
@@ -66,6 +72,8 @@ void WorldScene::init()
         pNode->addComponent(pTriangle);
 
         addNode(pNode);
+
+        oSerializer << pNode;
     }
 
     // Quads 1
@@ -82,6 +90,8 @@ void WorldScene::init()
 
     addNode(pNode2);
 
+    oSerializer << pNode2;
+
     // Quads 2
     auto pNode3 = new Node(0.5f, 0.5f, 0.f, 0.f);
 
@@ -93,6 +103,8 @@ void WorldScene::init()
     pNode3->addComponent(pQuad2);
 
     addNode(pNode3);
+
+    oSerializer << pNode3;
 
     // Particle System
     // auto pNode4 = new Node(0, 0, 0, 0);
@@ -124,6 +136,7 @@ void WorldScene::init()
     pNode5->addComponent(new TwoPointsMovement({ -0.5f, 0.f }, { 0.5f, 0.f }, 2.0f));
     pNode5->setActive(false);
     addNode(pNode5);
+    oSerializer << pNode5;
 
 
     auto pNode6 = new Node(0.5f, 0, 0, 0);
@@ -139,6 +152,8 @@ void WorldScene::init()
     pNode6->setActive(false);
     addNode(pNode6);
 
+    oSerializer << pNode6;
+
 
     auto pNode7 = new Node(-0.5f, 0, 0, 0);
     auto particle4 = new ParticleSystem(100);
@@ -152,6 +167,8 @@ void WorldScene::init()
     pNode7->addComponent(particle4);
     pNode7->setActive(false);
     addNode(pNode7);
+
+    oSerializer << pNode7;
 
     {
         Image* pCharacter = ImageLoader::getInstance()->getImage("character");
@@ -169,7 +186,11 @@ void WorldScene::init()
         pPlayer->addComponent(pCharacter2d);
 
         addNode(pPlayer);
+
+        oSerializer << pPlayer;
     }
+
+    oSerializer.finish();
 }
 
 void WorldScene::update(float fDeltatime)

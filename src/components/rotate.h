@@ -2,6 +2,7 @@
 
 #include "component.h"
 #include "../node.h"
+#include "../serializer.h"
 
 
 class Rotate : public Component
@@ -24,7 +25,12 @@ public:
 
     virtual void draw() override {}
 
-private:
+protected:
     float m_fRotationSpeed = 0.0f; // Speed of rotation in degrees per second
+
+    virtual void serializeToWrapper(DataSerializer& serializer) const override
+    {
+        serializer.ADD_ATTRIBUTES(m_fRotationSpeed);
+    }
 };
 
