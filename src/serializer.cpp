@@ -5,6 +5,7 @@
 #include "draw/quad.h"
 #include "components/rotate.h"
 #include "components/movement.h"
+#include "components/particle/particle_system.h"
 
 
 DataSerializer& DataSerializer::operator<<(const ISerializable* pObject)
@@ -50,6 +51,10 @@ void DataDeserializer::read()
             else if (memcmp(strClassName, "4Quad", 5) == 0)
             {
                 m_pCurrentDeserializingObject = new Quad();
+            }
+            else if (memcmp(strClassName, "14ParticleSystem", 16) == 0)
+            {
+                m_pCurrentDeserializingObject = new ParticleSystem();
             }
 
             m_bIsClassStarted = m_pCurrentDeserializingObject != nullptr;

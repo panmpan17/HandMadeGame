@@ -18,7 +18,8 @@
 
 WorldScene::WorldScene()
 {
-
+    m_pBaseShader = new TestShader();
+    m_pImageShader = new ImageShader();
 }
 
 WorldScene::~WorldScene()
@@ -39,9 +40,6 @@ void WorldScene::init()
 {
     // TODO: remove this
     DataSerializer oSerializer("world.txt");
-
-    m_pBaseShader = new TestShader();
-    m_pImageShader = new ImageShader();
 
     Image* pTestImage = ImageLoader::getInstance()->getImage("test");
     Image* pDustImage = ImageLoader::getInstance()->getImage("dust");
@@ -223,9 +221,16 @@ void WorldScene::readFromFiles(const std::string_view& strFilePath)
         else if (Quad* pQuad = dynamic_cast<Quad*>(pObject))
         {
             pQuad->setShader(m_pImageShader);
-            pQuad->setImage(pTestImage);
             pQuad->registerBuffer();
             pCurrentNode->addComponent(pQuad);
+        }
+        else if (ParticleSystem* pParticleSystem = dynamic_cast<ParticleSystem*>(pObject))
+        {
+            pParticleSystem->setShader(new ParticleInstanceShader());
+            pParticleSystem->registerBuffer();
+            pParticleSystem->addParticleModule(new ParticleIntervalSpawn(10));
+            pParticleSystem->addParticleModule(new ParticleBurstSpawn(0.0f, 20));
+            pCurrentNode->addComponent(pParticleSystem);
         }
         else if (Component* pRotate = dynamic_cast<Component*>(pObject))
         {

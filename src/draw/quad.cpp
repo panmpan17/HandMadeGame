@@ -98,14 +98,27 @@ void Quad::serializeToWrapper(DataSerializer& serializer) const
     serializer.ADD_ATTRIBUTES(m_fHeight);
     serializer.ADD_ATTRIBUTES(m_color);
 
+    if (m_pImage)
+    {
+        serializer.ADD_ATTRIBUTES_VALUE(m_pImage, m_pImage->getPath());
+    }
+
     // TODO: add a link to image
 }
 
 void Quad::deserializeField(const std::string_view& strFieldName, const std::string_view& strFieldValue)
 {
+    std::cout << "Deserializing Quad: " << strFieldName << " = " << strFieldValue << std::endl;
+
     DESERIALIZE_FIELD(m_fWidth);
     DESERIALIZE_FIELD(m_fHeight);
     DESERIALIZE_FIELD(m_color);
+
+    IF_DESERIALIZE_FIELD_CHECK(m_pImage)
+    {
+        m_pImage = ImageLoader::getInstance()->getImageByPath(strFieldValue);
+        std::cout << "Deserializing Quad: " << strFieldName << " = " << strFieldValue << ", " << m_pImage << std::endl;
+    }
 }
 
 

@@ -61,7 +61,7 @@ typedef std::function<void(vec2&)> ParticleStartVelocityDirectionOverride;
 class ParticleSystem : public IDrawable
 {
 public:
-    ParticleSystem(int nParticleCount, bool bSimulateInLocal = false);
+    ParticleSystem(int nParticleCount = 100, bool bSimulateInLocal = false);
 
     ~ParticleSystem() override;
 
@@ -111,6 +111,8 @@ public:
     float getActiveTimer() const { return m_fActiveTimer; }
 
     void setIsLooping(bool bLooping) { m_bIsLooping = bLooping; }
+
+    virtual void deserializeField(const std::string_view& strFieldName, const std::string_view& strFieldValue) override;
 
 private:
     ParticleGPUInstance* m_arrParticlesGPU = nullptr;

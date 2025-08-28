@@ -362,3 +362,28 @@ void ParticleSystem::serializeToWrapper(DataSerializer& serializer) const
     serializer.ADD_ATTRIBUTES(m_fStartVelocityMin);
     serializer.ADD_ATTRIBUTES(m_fStartVelocityMax);
 }
+
+void ParticleSystem::deserializeField(const std::string_view& strFieldName, const std::string_view& strFieldValue)
+{
+    DESERIALIZE_FIELD(m_nAllParticleCount);
+
+    IF_DESERIALIZE_FIELD_CHECK(m_eSpawnShape)
+    {
+        m_eSpawnShape = static_cast<eParticleSpawnShape>(std::atoi(strFieldValue.data()));
+    }
+
+    DESERIALIZE_FIELD(m_fSpawnShapeWidth);
+    DESERIALIZE_FIELD(m_fSpawnShapeHeight);
+    DESERIALIZE_FIELD(m_fLifetimeMin);
+    DESERIALIZE_FIELD(m_fLifetimeMax);
+    DESERIALIZE_FIELD(m_fStartRotationMin);
+    DESERIALIZE_FIELD(m_fStartRotationMax);
+    DESERIALIZE_FIELD(m_fStartRotationSpeedMin);
+    DESERIALIZE_FIELD(m_fStartRotationSpeedMax);
+    DESERIALIZE_FIELD(m_fStartScaleMin);
+    DESERIALIZE_FIELD(m_fStartScaleMax);
+    DESERIALIZE_FIELD(m_vecStartColorMin);
+    DESERIALIZE_FIELD(m_vecStartColorMax);
+    DESERIALIZE_FIELD(m_fStartVelocityMin);
+    DESERIALIZE_FIELD(m_fStartVelocityMax);
+}

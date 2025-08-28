@@ -15,6 +15,8 @@
         DataDeserializer::deserializeField(fileName, strFieldValue); \
         return; \
     }
+#define IF_DESERIALIZE_FIELD_CHECK(fileName) \
+    if (memcmp(strFieldName.data(), #fileName, sizeof(#fileName) - 1) == 0)
 
 class ISerializable;
 
@@ -76,6 +78,11 @@ public:
     {
         CHECK_FILE_IS_OPEN;
         m_oOutputFile << strAttributeNames << ": " << bValue << "\n";
+    }
+    void addAttributes(const std::string_view& strAttributeNames, const std::string_view& strValue)
+    {
+        CHECK_FILE_IS_OPEN;
+        m_oOutputFile << strAttributeNames << ": " << strValue << "\n";
     }
 
     DataSerializer& operator<<(const ISerializable* pObject);
