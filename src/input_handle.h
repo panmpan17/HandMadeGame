@@ -4,7 +4,7 @@
 #include <functional>
 
 
-class GLFWwindow;
+typedef struct GLFWwindow GLFWwindow;
 
 
 enum class KeyCode : int

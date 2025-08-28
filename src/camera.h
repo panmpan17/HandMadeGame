@@ -45,5 +45,4 @@ private:
     float m_fRatio = 1.0f;
     vec3 m_position = {0.f, 0.f, 0.f};
     vec3 m_rotation = {0.f, 0.f, 0.f};
-    mat4x4 m_projectionMatrix = {0};
 };

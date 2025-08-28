@@ -10,7 +10,7 @@
 struct SpriteAnimationInfo
 {
     SpriteAnimationInfo(ushort nSpriteIndexArray[], int nArraySize, float fAnimateInterval)
-        : m_fAnimateInterval(fAnimateInterval), m_nSpriteIndexArraySize(nArraySize)
+        : m_nSpriteIndexArraySize(nArraySize), m_fAnimateInterval(fAnimateInterval)
     {
         m_nSpriteIndexArray = new ushort[nArraySize];
         memcpy(m_nSpriteIndexArray, nSpriteIndexArray, sizeof(ushort) * nArraySize);

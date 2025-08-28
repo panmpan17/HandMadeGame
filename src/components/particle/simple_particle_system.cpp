@@ -78,7 +78,7 @@ void SimpleParticleSystem::draw()
 
     for (int i = 0; i < m_nParticleCount; ++i)
     {
-        mat4x4 mvp, local, translate, cameraViewMatrix;
+        mat4x4 mvp, local, cameraViewMatrix;
 
         mat4x4_identity(local);
 

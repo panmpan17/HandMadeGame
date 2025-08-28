@@ -16,6 +16,6 @@ public:
     virtual void registerBuffer() = 0;
     virtual void setShader(Shader* pShader) = 0;
 
-    virtual void update(float deltaTime) override {}
+    virtual void update(float _) override {}
 };
 

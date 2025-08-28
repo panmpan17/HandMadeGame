@@ -46,7 +46,6 @@ public:
 private:
     SpriteAnimation* m_pAnimation;
 
-    bool m_bIsWalking = false;
     int m_nIdleAnimationIndex;
     int m_nWalkAnimationIndex;
 };

@@ -2,7 +2,7 @@
 
 #include "debug_macro.h"
 
-class GLFWwindow;
+typedef struct GLFWwindow GLFWwindow;
 class Camera;
 class WorldScene;
 

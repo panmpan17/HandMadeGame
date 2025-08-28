@@ -8,6 +8,7 @@
 
 Vector2 WorldVectorSytem::screenToWorld(float screenX, float screenY)
 {
+    /*
     int windowWidth, windowHeight;
     m_pWindow->getWindowSize(windowWidth, windowHeight);
 
@@ -24,6 +25,7 @@ Vector2 WorldVectorSytem::screenToWorld(float screenX, float screenY)
     // Create a 4D vector in NDC space
     // For 2D, we assume the Z position is at the origin of NDC [-1, 1], so Z=0
     vec4 ndcVector = {ndcX, ndcY, 0.0f, 1.0f};
+    */
 
     // 2. Get the combined inverse matrix (Inverse(Projection * View))
 //     mat4x4 pvMatrix;
