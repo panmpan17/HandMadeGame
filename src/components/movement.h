@@ -32,6 +32,14 @@ protected:
 class TwoPointsMovement : public Component
 {
 public:
+    TwoPointsMovement()
+    {
+        m_vecStart[0] = 0;
+        m_vecStart[1] = 0;
+        m_vecEnd[0] = 0;
+        m_vecEnd[1] = 0;
+        m_fDuration = 1.0f;
+    }
     TwoPointsMovement(const vec2& vecStart, const vec2& vecEnd, float duration)
         : m_fDuration(duration)
     {
@@ -56,4 +64,6 @@ protected:
 
     // TODO: make this flexible
     bool m_bIsMovingForward = false;
+
+    virtual void serializeToWrapper(DataSerializer& serializer) const override;
 };

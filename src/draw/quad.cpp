@@ -9,6 +9,8 @@
 #include "../debug_macro.h"
 #include "../node.h"
 #include "../window.h"
+#include "../serializer.h"
+
 
 Quad::Quad(float fWidth, float fHeight, vec4 color) : m_fWidth(fWidth), m_fHeight(fHeight)
 {
@@ -89,6 +91,16 @@ void Quad::predrawSetShaderUniforms()
     glUniform1i(m_pShader->getSpriteSheetYCountLocation(), 1);
     glUniform2f(m_pShader->getUVOffsetLocation(), 0.0f, 0.0f);
 }
+
+void Quad::serializeToWrapper(DataSerializer& serializer) const
+{
+    serializer.ADD_ATTRIBUTES(m_fWidth);
+    serializer.ADD_ATTRIBUTES(m_fHeight);
+    serializer.ADD_ATTRIBUTES(m_color);
+
+    // TODO: add a link to image
+}
+
 
 
 Sprite::Sprite(Image* pImage, int nPixelPerUnit/* = 100*/)

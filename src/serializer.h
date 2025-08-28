@@ -4,10 +4,12 @@
 #include <linmath.h>
 #include <fstream>
 #include <iostream>
+#include <vector>
 
 
 #define CHECK_FILE_IS_OPEN if (!m_oOutputFile.is_open()) { std::cerr << "Error: File not open\n"; return; }
 #define ADD_ATTRIBUTES(fieldName) addAttributes(#fieldName, fieldName)
+#define ADD_ATTRIBUTES_VALUE(fieldName, value) addAttributes(#fieldName, value)
 #define DESERIALIZE_FIELD(fileName) \
     if (memcmp(strFieldName.data(), #fileName, sizeof(#fileName) - 1) == 0) { \
         DataDeserializer::deserializeField(fileName, strFieldValue); \
@@ -65,6 +67,11 @@ public:
         CHECK_FILE_IS_OPEN;
         m_oOutputFile << strAttributeNames << ": " << vecValue[0] << ", " << vecValue[1] << ", " << vecValue[2] << "\n";
     }
+    void addAttributes(const std::string_view& strAttributeNames, const vec4& vecValue)
+    {
+        CHECK_FILE_IS_OPEN;
+        m_oOutputFile << strAttributeNames << ": " << vecValue[0] << ", " << vecValue[1] << ", " << vecValue[2] << ", " << vecValue[3] << "\n";
+    }
     void addAttributes(const std::string_view& strAttributeNames, bool bValue)
     {
         CHECK_FILE_IS_OPEN;
@@ -108,18 +115,28 @@ public:
         outBool = std::string(strFieldValue) == "1";
     }
 
-    DataDeserializer(const std::string& filename)
+    DataDeserializer(const std::string_view& strFilename)
     {
-        m_oInputFile.open(filename, std::ios::in);
+        m_oInputFile.open(strFilename, std::ios::in);
     }
+
+    ~DataDeserializer()
+    {
+        if (m_oInputFile.is_open()) {
+            m_oInputFile.close();
+        }
+    }
+
+
+    const std::vector<ISerializable*>& getDeserializedObjects() const { return m_vecDeserializedObjects; }
 
     void read();
 
-private:
+protected:
     std::ifstream m_oInputFile;
     bool m_bIsClassStarted = false;
     std::string_view m_strClassName;
-    // std::vector<std::pair<std::string, std::string>> m_vecFieldInfo;
 
     ISerializable* m_pCurrentDeserializingObject = nullptr;
+    std::vector<ISerializable*> m_vecDeserializedObjects;
 };

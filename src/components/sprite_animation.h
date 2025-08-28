@@ -86,7 +86,7 @@ public:
 
     virtual void draw() override {}
 
-private:
+protected:
     Sprite* m_pSprite;
     PointerExpandableArray<SpriteAnimationInfo*> m_pAnimationInfoArray = PointerExpandableArray<SpriteAnimationInfo*>(5);
     SpriteAnimationInfo* m_pAnimationInfo = nullptr;
@@ -94,5 +94,7 @@ private:
     int m_nCurrentFrame = 0;
 
     float m_fIntervalTimer = 0;
+
+    virtual void serializeToWrapper(DataSerializer& serializer) const override;
 };
 

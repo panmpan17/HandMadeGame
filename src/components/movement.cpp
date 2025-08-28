@@ -107,3 +107,10 @@ void TwoPointsMovement::update(float fDeltaTime)
 
     pNode->setPosition(fX, fY);
 }
+
+void TwoPointsMovement::serializeToWrapper(DataSerializer& serializer) const
+{
+    serializer.ADD_ATTRIBUTES(m_vecStart);
+    serializer.ADD_ATTRIBUTES(m_vecEnd);
+    serializer.ADD_ATTRIBUTES(m_fDuration);
+}

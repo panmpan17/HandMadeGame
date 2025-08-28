@@ -36,7 +36,7 @@ WorldScene::~WorldScene()
 }
 
 void WorldScene::init()
-{   
+{
     // TODO: remove this
     DataSerializer oSerializer("world.txt");
 
@@ -191,6 +191,34 @@ void WorldScene::init()
     }
 
     oSerializer.finish();
+}
+
+void WorldScene::readFromFiles(const std::string_view& strFilePath)
+{
+    DataDeserializer deserializer(strFilePath);
+    deserializer.read();
+
+    std::vector<ISerializable*> deserializedObjects = deserializer.getDeserializedObjects();
+
+    m_pBaseShader = new TestShader();
+
+    int nSize = deserializedObjects.size();
+    Node* pCurrentNode = nullptr;
+    for (int i = 0; i < nSize; ++i)
+    {
+        ISerializable* pObject = deserializedObjects[i];
+        if (Node* pNode = dynamic_cast<Node*>(pObject))
+        {
+            pCurrentNode = pNode;
+            addNode(pNode);
+        }
+        else if (Triangle* pTriangle = dynamic_cast<Triangle*>(pObject))
+        {
+            pTriangle->setShader(m_pBaseShader);
+            pTriangle->registerBuffer();
+            pCurrentNode->addComponent(pTriangle);
+        }
+    }
 }
 
 void WorldScene::update(float fDeltatime)

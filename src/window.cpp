@@ -119,7 +119,8 @@ void Window::start()
     // setupShaders();
 
     m_pWorldScene = new WorldScene();
-    m_pWorldScene->init();
+    m_pWorldScene->readFromFiles("assets/level.txt");
+    // m_pWorldScene->init();
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

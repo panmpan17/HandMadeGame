@@ -10,6 +10,7 @@
 #include "../../random.h"
 #include "../../image.h"
 #include "../../platform.h"
+#include "../../serializer.h"
 
 
 #define SWAP_PARTICLE_POSITION(i, j) \
@@ -340,4 +341,24 @@ void ParticleSystem::sortAliveParticleInFront()
             break;
         }
     }
+}
+
+void ParticleSystem::serializeToWrapper(DataSerializer& serializer) const
+{
+    serializer.ADD_ATTRIBUTES(m_nAllParticleCount);
+    serializer.ADD_ATTRIBUTES_VALUE(m_eSpawnShape, static_cast<int>(m_eSpawnShape));
+    serializer.ADD_ATTRIBUTES(m_fSpawnShapeWidth);
+    serializer.ADD_ATTRIBUTES(m_fSpawnShapeHeight);
+    serializer.ADD_ATTRIBUTES(m_fLifetimeMin);
+    serializer.ADD_ATTRIBUTES(m_fLifetimeMax);
+    serializer.ADD_ATTRIBUTES(m_fStartRotationMin);
+    serializer.ADD_ATTRIBUTES(m_fStartRotationMax);
+    serializer.ADD_ATTRIBUTES(m_fStartRotationSpeedMin);
+    serializer.ADD_ATTRIBUTES(m_fStartRotationSpeedMax);
+    serializer.ADD_ATTRIBUTES(m_fStartScaleMin);
+    serializer.ADD_ATTRIBUTES(m_fStartScaleMax);
+    serializer.ADD_ATTRIBUTES(m_vecStartColorMin);
+    serializer.ADD_ATTRIBUTES(m_vecStartColorMax);
+    serializer.ADD_ATTRIBUTES(m_fStartVelocityMin);
+    serializer.ADD_ATTRIBUTES(m_fStartVelocityMax);
 }

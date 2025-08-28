@@ -165,4 +165,6 @@ private:
 
     void updateParticle(int& nIndex, float fDeltaTime);
     void sortAliveParticleInFront();
+
+    void serializeToWrapper(DataSerializer& serializer) const override;
 };

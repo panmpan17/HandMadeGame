@@ -17,6 +17,8 @@ public:
 
     void addNode(Node* pNode);
 
+    void readFromFiles(const std::string_view& strFilePath);
+
 private:
     TestShader* m_pBaseShader = nullptr;
     ImageShader* m_pImageShader = nullptr;

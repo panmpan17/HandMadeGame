@@ -17,6 +17,7 @@ void Node::serializedTo(DataSerializer& serializer) const
     serializer.ADD_ATTRIBUTES(m_position);
     serializer.ADD_ATTRIBUTES(m_fRotation);
     serializer.ADD_ATTRIBUTES(m_bIsActive);
+    serializer.endClassHeader();
 
     for (int i = 0; i < m_oComponentArray.getSize(); ++i)
     {
@@ -26,8 +27,6 @@ void Node::serializedTo(DataSerializer& serializer) const
             serializer << pComponent;
         }
     }
-
-    serializer.endClassHeader();
 }
 
 void Node::deserializeField(const std::string_view& strFieldName, const std::string_view& strFieldValue)

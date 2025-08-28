@@ -34,6 +34,8 @@ protected:
 
     ImageShader* m_pShader = nullptr;
     Image* m_pImage = nullptr; // Optional, if the quad uses an image texture
+
+    virtual void serializeToWrapper(DataSerializer& serializer) const override;
 };
 
 class Sprite : public Quad
