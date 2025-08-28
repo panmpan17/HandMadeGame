@@ -101,6 +101,12 @@ void Quad::serializeToWrapper(DataSerializer& serializer) const
     // TODO: add a link to image
 }
 
+void Quad::deserializeField(const std::string_view& strFieldName, const std::string_view& strFieldValue)
+{
+    DESERIALIZE_FIELD(m_fWidth);
+    DESERIALIZE_FIELD(m_fHeight);
+    DESERIALIZE_FIELD(m_color);
+}
 
 
 Sprite::Sprite(Image* pImage, int nPixelPerUnit/* = 100*/)

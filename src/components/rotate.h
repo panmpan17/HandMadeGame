@@ -8,7 +8,7 @@
 class Rotate : public Component
 {
 public:
-    Rotate(float rotationSpeed) : m_fRotationSpeed(rotationSpeed) {}
+    Rotate(float rotationSpeed = 0) : m_fRotationSpeed(rotationSpeed) {}
 
     virtual bool isIDrawable() const override { return false; }
     virtual bool isUpdatable() const override { return true; }
@@ -24,6 +24,8 @@ public:
     }
 
     virtual void draw() override {}
+
+    virtual void deserializeField(const std::string_view& strFieldName, const std::string_view& strFieldValue) override;
 
 protected:
     float m_fRotationSpeed = 0.0f; // Speed of rotation in degrees per second

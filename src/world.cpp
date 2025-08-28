@@ -201,6 +201,8 @@ void WorldScene::readFromFiles(const std::string_view& strFilePath)
     std::vector<ISerializable*> deserializedObjects = deserializer.getDeserializedObjects();
 
     m_pBaseShader = new TestShader();
+    m_pImageShader = new ImageShader();
+    Image* pTestImage = ImageLoader::getInstance()->getImage("test");
 
     int nSize = deserializedObjects.size();
     Node* pCurrentNode = nullptr;
@@ -217,6 +219,22 @@ void WorldScene::readFromFiles(const std::string_view& strFilePath)
             pTriangle->setShader(m_pBaseShader);
             pTriangle->registerBuffer();
             pCurrentNode->addComponent(pTriangle);
+        }
+        else if (Quad* pQuad = dynamic_cast<Quad*>(pObject))
+        {
+            pQuad->setShader(m_pImageShader);
+            pQuad->setImage(pTestImage);
+            pQuad->registerBuffer();
+            pCurrentNode->addComponent(pQuad);
+        }
+        else if (Component* pRotate = dynamic_cast<Component*>(pObject))
+        {
+            pCurrentNode->addComponent(pRotate);
+        }
+        else
+        {
+            // Unknown object type, handle accordingly
+            delete pObject; // Prevent memory leak
         }
     }
 }

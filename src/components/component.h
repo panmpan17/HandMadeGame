@@ -22,7 +22,7 @@ public:
     virtual void update(float deltaTime) = 0;
 
     void serializedTo(DataSerializer& serializer) const override;
-    void deserializeField(const std::string_view& strFieldName, const std::string_view& strFieldValue) override;
+    virtual void deserializeField(const std::string_view& strFieldName, const std::string_view& strFieldValue) override;
 
 protected:
     Node* m_pNode = nullptr;

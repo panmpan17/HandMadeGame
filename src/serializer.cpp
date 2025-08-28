@@ -2,6 +2,10 @@
 #include "node.h"
 #include "iserializable.h"
 #include "draw/triangle.h"
+#include "draw/quad.h"
+#include "components/rotate.h"
+#include "components/movement.h"
+
 
 DataSerializer& DataSerializer::operator<<(const ISerializable* pObject)
 {
@@ -25,16 +29,30 @@ void DataDeserializer::read()
         const char strBack = line.back();
         if (memcmp(&strBack, "{", 1) == 0) {
             m_strClassName = line.substr(0, line.size() - 2);
-            m_bIsClassStarted = true;
 
-            if (memcmp(m_strClassName.data(), "Node", 4) == 0)
+            const char* strClassName = m_strClassName.data();
+            if (memcmp(strClassName, "Node", 4) == 0)
             {
                 m_pCurrentDeserializingObject = new Node();
             }
-            if (memcmp(m_strClassName.data(), "8Triangle", 8) == 0)
+            else if (memcmp(strClassName, "8Triangle", 9) == 0)
             {
                 m_pCurrentDeserializingObject = new Triangle();
             }
+            else if (memcmp(strClassName, "6Rotate", 7) == 0)
+            {
+                m_pCurrentDeserializingObject = new Rotate();
+            }
+            else if (memcmp(strClassName, "8Movement", 9) == 0)
+            {
+                m_pCurrentDeserializingObject = new Movement();
+            }
+            else if (memcmp(strClassName, "4Quad", 5) == 0)
+            {
+                m_pCurrentDeserializingObject = new Quad();
+            }
+
+            m_bIsClassStarted = m_pCurrentDeserializingObject != nullptr;
 
             std::cout << "Class " << m_strClassName <<  " start" << "\n";
         }
@@ -50,7 +68,7 @@ void DataDeserializer::read()
                 m_bIsClassStarted = false;                
             }
         }
-        else if (m_bIsClassStarted) {
+        else if (m_bIsClassStarted && m_pCurrentDeserializingObject) {
             size_t pos = line.find(":");
             if (pos != std::string::npos) {
                 std::cout << "Deserializing field " << line.substr(0, pos) << " with value " << line.substr(pos + 2) << "\n";

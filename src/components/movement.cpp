@@ -69,6 +69,11 @@ void Movement::serializeToWrapper(DataSerializer& serializer) const
     serializer.ADD_ATTRIBUTES(m_fMoveSpeed);
 }
 
+void Movement::deserializeField(const std::string_view& strFieldName, const std::string_view& strFieldValue)
+{
+    DESERIALIZE_FIELD(m_fMoveSpeed);
+}
+
 
 #if defined(__APPLE__) || defined(__MACH__)
 float lerp(float fStart, float fEnd, float fT)

@@ -102,6 +102,10 @@ public:
     {
         sscanf(strFieldValue.data(), "%f, %f, %f", &outVec[0], &outVec[1], &outVec[2]);
     }
+    static void deserializeField(vec4& outVec, const std::string_view& strFieldValue)
+    {
+        sscanf(strFieldValue.data(), "%f, %f, %f, %f", &outVec[0], &outVec[1], &outVec[2], &outVec[3]);
+    }
     static void deserializeField(int& outInt, const std::string_view& strFieldValue)
     {
         outInt = std::stoi(strFieldValue.data());

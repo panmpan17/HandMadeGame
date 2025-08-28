@@ -1,0 +1,5 @@
+Node {
+m_position: 3, 2, 3
+m_fRotation: 45
+m_bIsActive: 1
+}

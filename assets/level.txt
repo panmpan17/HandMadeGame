@@ -5,3 +5,29 @@ m_bIsActive: 1
 }
 8Triangle {
 }
+6Rotate {
+m_fRotationSpeed: -1
+}
+8Movement {
+m_fMoveSpeed: 1
+}
+Node {
+m_position: -0.4, 0, 0
+m_fRotation: 0
+m_bIsActive: 1
+}
+8Triangle {
+}
+Node {
+m_position: 0.5, 0.5, 0
+m_fRotation: 0
+m_bIsActive: 1
+}
+4Quad {
+m_fWidth: 0.5
+m_fHeight: 0.5
+m_color: 1, 0, 0, 1
+}
+6Rotate {
+m_fRotationSpeed: 1
+}

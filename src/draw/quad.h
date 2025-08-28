@@ -13,6 +13,7 @@ class Image;
 class Quad : public IDrawable
 {
 public:
+    Quad() {}
     Quad(float fWidth, float fHeight, vec4 color);
     ~Quad();
 
@@ -22,9 +23,9 @@ public:
     inline void setShader(Shader* pShader) override { m_pShader = static_cast<ImageShader*>(pShader); }
     inline void setImage(Image* pImage) { m_pImage = pImage; }
 
-protected:
-    Quad() {};
+    virtual void deserializeField(const std::string_view& strFieldName, const std::string_view& strFieldValue) override;
 
+protected:
     virtual void predrawSetShaderUniforms();
 
     GLuint m_nVertexBuffer, m_nVertexArray;
