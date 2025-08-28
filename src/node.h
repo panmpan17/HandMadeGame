@@ -3,6 +3,7 @@
 #include <linmath.h>
 #include "expandable_array.h"
 #include "serializer.h"
+#include "components/component.h"
 
 
 class Component;

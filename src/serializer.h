@@ -8,6 +8,11 @@
 
 #define CHECK_FILE_IS_OPEN if (!m_oOutputFile.is_open()) { std::cerr << "Error: File not open\n"; return; }
 #define ADD_ATTRIBUTES(fieldName) addAttributes(#fieldName, fieldName)
+#define DESERIALIZE_FIELD(fileName) \
+    if (memcmp(strFieldName.data(), #fileName, sizeof(#fileName) - 1) == 0) { \
+        DataDeserializer::deserializeField(fileName, strFieldValue); \
+        return; \
+    }
 
 
 class DataSerializer;
@@ -85,6 +90,27 @@ private:
 class DataDeserializer
 {
 public:
+    static void deserializeField(vec2& outVec, const std::string_view& strFieldValue)
+    {
+        sscanf(strFieldValue.data(), "%f, %f", &outVec[0], &outVec[1]);
+    }
+    static void deserializeField(vec3& outVec, const std::string_view& strFieldValue)
+    {
+        sscanf(strFieldValue.data(), "%f, %f, %f", &outVec[0], &outVec[1], &outVec[2]);
+    }
+    static void deserializeField(int& outInt, const std::string_view& strFieldValue)
+    {
+        outInt = std::stoi(strFieldValue.data());
+    }
+    static void deserializeField(float& outFloat, const std::string_view& strFieldValue)
+    {
+        outFloat = std::stof(strFieldValue.data());
+    }
+    static void deserializeField(bool& outBool, const std::string_view& strFieldValue)
+    {
+        outBool = std::string(strFieldValue) == "1";
+    }
+
     DataDeserializer(const std::string& filename)
     {
         m_oInputFile.open(filename, std::ios::in);

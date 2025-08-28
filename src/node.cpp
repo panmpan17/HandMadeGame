@@ -21,21 +21,9 @@ void Node::serializedTo(DataSerializer& serializer) const
 
 void Node::deserializeField(const std::string_view& strFieldName, const std::string_view& strFieldValue)
 {
-    if (strFieldName == "m_position")
-    {
-        sscanf(strFieldValue.data(), "%f, %f, %f", &m_position[0], &m_position[1], &m_position[2]);
-        std::cout << "Deserialized m_position: " << m_position[0] << ", " << m_position[1] << ", " << m_position[2] << "\n";
-    }
-    else if (strFieldName == "m_fRotation")
-    {
-        m_fRotation = std::stof(std::string(strFieldValue));
-        std::cout << "Deserialized m_fRotation: " << m_fRotation << "\n";
-    }
-    else if (strFieldName == "m_bIsActive")
-    {
-        m_bIsActive = std::string(strFieldValue) == "1";
-        std::cout << "Deserialized m_bIsActive: " << m_bIsActive << "\n";
-    }
+    DESERIALIZE_FIELD(m_position);
+    DESERIALIZE_FIELD(m_fRotation);
+    DESERIALIZE_FIELD(m_bIsActive);
 }
 
 void Node::update(float deltaTime)
