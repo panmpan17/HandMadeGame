@@ -1,3 +1,9 @@
+# --- Colors
+GREEN := \033[0;32m
+RED := \033[0;31m
+YELLOW := \033[0;33m
+RESET := \033[0m
+
 # --- General Configuration ---
 SRC_DIR := src
 BUILD_DIR := build
@@ -12,7 +18,7 @@ OBJS := $(patsubst %.c,$(BUILD_DIR)/%.o,$(OBJS))
 INCLUDES := -I./include
 CPP_STD := -std=c++23
 WARNING_FLAG :=  -Wall -Wextra -O2
-CXXFLAGS := $(CPP_STD) $(WARNING_FLAG)
+CXXFLAGS := $(CPP_STD) -MMD -MP
 RELEASE_BUILD_FLAG := -DDEBUG_FLAG=0
 DEBUG_BUILD_FLAG := -DDEBUG_FLAG=1
 
@@ -32,29 +38,30 @@ WIN_OUTPUT_NAME := $(OUTPUT_NAME).exe
 $(OUTPUT_FOLDER)/$(OUTPUT_NAME): $(OBJS)
 	@echo "Linking $(OUTPUT_NAME)..."
 	@mkdir -p $(OUTPUT_FOLDER)
-	$(MAC_CXX) $(OBJS) -o $@ $(MAC_FRAMEWORK) $(MAC_RPATH) $(MAC_LIBS)
+	@$(MAC_CXX) $(OBJS) -o $@ $(MAC_FRAMEWORK) $(MAC_RPATH) $(MAC_LIBS)
 
 # Compile each .cpp/.c into .o
 $(BUILD_DIR)/%.o: %.cpp
 	@echo "Compiling $<"
 	@mkdir -p $(dir $@)
-	$(MAC_CXX) $(CXXFLAGS) $(DEBUG_BUILD_FLAG) $(INCLUDES) -c $< -o $@
+	@$(MAC_CXX) $(CXXFLAGS) $(DEBUG_BUILD_FLAG) $(INCLUDES) -c $< -o $@
 
 $(BUILD_DIR)/%.o: %.c
 	@echo "Compiling $<"
 	@mkdir -p $(dir $@)
-	$(MAC_CXX) $(CXXFLAGS) $(DEBUG_BUILD_FLAG) $(INCLUDES) -c $< -o $@
+	@$(MAC_CXX) $(CXXFLAGS) $(DEBUG_BUILD_FLAG) $(INCLUDES) -c $< -o $@
 
 
 # --- Mac Targets ---
 mac-compile: $(OUTPUT_FOLDER)/$(OUTPUT_NAME)
-	@echo "Build done -> $(OUTPUT_FOLDER)/$(OUTPUT_NAME)"
+	@echo "$(GREEN)Build done -> $(OUTPUT_FOLDER)/$(OUTPUT_NAME)$(RESET)"
 
 mac-quick: mac-compile
-	mkdir -p $(OUTPUT_FOLDER)/lib
-	cp ./lib/mac/*.dylib $(OUTPUT_FOLDER)/lib
-	cp -r ./assets $(OUTPUT_FOLDER)
-	./$(OUTPUT_FOLDER)/$(OUTPUT_NAME)
+	@echo "$(YELLOW)Running $(OUTPUT_NAME)...$(RESET)"
+	@mkdir -p $(OUTPUT_FOLDER)/lib
+	@cp ./lib/mac/*.dylib $(OUTPUT_FOLDER)/lib
+	@cp -r ./assets $(OUTPUT_FOLDER)
+	@./$(OUTPUT_FOLDER)/$(OUTPUT_NAME)
 
 mac-build: mac-compile
 
@@ -94,5 +101,8 @@ build-all: mac-build window-build
 # --- Others ---
 clean:
 	rm -rf $(OUTPUT_FOLDER) $(BUILD_DIR)
+	@echo "$(GREEN)Cleaned up build files$(RESET)"
 
 .PHONY: mac-compile mac-quick mac-build window-compile window-quick window-build compile-all quick-all build-all clean
+
+-include $(OBJS:.o=.d)
