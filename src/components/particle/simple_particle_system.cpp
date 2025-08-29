@@ -78,7 +78,7 @@ void SimpleParticleSystem::draw()
 
     for (int i = 0; i < m_nParticleCount; ++i)
     {
-        mat4x4 mvp, local, cameraViewMatrix;
+        mat4x4 mvp, local;
 
         mat4x4_identity(local);
 
@@ -93,7 +93,7 @@ void SimpleParticleSystem::draw()
         mat4x4_rotate_Z(local, local, m_arrParticles[i].rotation);
         
         // Apply to Camera matrix
-        Camera::main->getViewMatrix(cameraViewMatrix);
+        const mat4x4& cameraViewMatrix = Camera::main->getViewProjectionMatrix();
         mat4x4_mul(mvp, cameraViewMatrix, local);
 
         ParticleShader* pParticleShader = static_cast<ParticleShader*>(m_pShader);

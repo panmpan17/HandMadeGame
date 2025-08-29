@@ -142,8 +142,7 @@ void ParticleSystem::draw()
     glBindVertexArray(m_nVertexArray);
     glUseProgram(m_pShader->getProgram());
 
-    mat4x4 cameraViewMatrix;
-    Camera::main->getViewMatrix(cameraViewMatrix);
+    const mat4x4& cameraViewMatrix = Camera::main->getViewProjectionMatrix();
 
     ParticleInstanceShader* pParticleShader = static_cast<ParticleInstanceShader*>(m_pShader);
     glUniformMatrix4fv(pParticleShader->getMvpLocation(), 1, GL_FALSE, (const GLfloat*) cameraViewMatrix);

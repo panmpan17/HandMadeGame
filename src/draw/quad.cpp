@@ -53,7 +53,7 @@ void Quad::draw()
 {
     ASSERT(m_pShader, "Shader must be set before drawing the quad");
 
-    mat4x4 mvp, local, cameraViewMatrix;
+    mat4x4 mvp, local;
 
     mat4x4_identity(local);
 
@@ -62,7 +62,7 @@ void Quad::draw()
 
     mat4x4_rotate_Z(local, local, m_pNode->getRotation());
 
-    Camera::main->getViewMatrix(cameraViewMatrix);
+    const mat4x4& cameraViewMatrix = Camera::main->getViewProjectionMatrix();
     mat4x4_mul(mvp, cameraViewMatrix, local);
 
     glUseProgram(m_pShader->getProgram());

@@ -137,8 +137,12 @@ void Window::mainLoop()
         // Because mac's retina display has a different pixel ratio (and moving to different monitors)
         // need to adjust the viewport to match the actual framebuffer size.
         glfwGetFramebufferSize(m_pWindow, &m_nActualWidth, &m_nActualHeight);
-        m_fRatio = m_nActualWidth / (float) m_nActualHeight;
-        m_pCamera->setRatio(m_fRatio);
+        float fNewRatio = m_nActualWidth / (float) m_nActualHeight;
+        if (m_fRatio != fNewRatio)
+        {
+            m_fRatio = fNewRatio;
+            m_pCamera->setRatio(m_fRatio);
+        }
 
         glViewport(0, 0, m_nActualWidth, m_nActualHeight);
         glClear(GL_COLOR_BUFFER_BIT);

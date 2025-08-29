@@ -29,7 +29,7 @@ Vector2 WorldVectorSytem::screenToWorld(float screenX, float screenY)
 
     // 2. Get the combined inverse matrix (Inverse(Projection * View))
 //     mat4x4 pvMatrix;
-//     mat4x4_mul(pvMatrix, m_pCamera->getProjectionMatrix(), m_pCamera->getViewMatrix());
+//     mat4x4_mul(pvMatrix, m_pCamera->getProjectionMatrix(), m_pCamera->getViewProjectionMatrix());
 
 //     mat4x4 inversePVMatrix;
 //     mat4x4_invert(inversePVMatrix, pvMatrix);

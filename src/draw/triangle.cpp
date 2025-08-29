@@ -45,7 +45,7 @@ void Triangle::draw()
 {
     ASSERT(m_pShader, "Shader must be set before drawing the triangle");
 
-    mat4x4 mvp, local, cameraViewMatrix;
+    mat4x4 mvp, local;
     mat4x4_identity(local);
 
     const vec3& position = m_pNode->getPosition();
@@ -53,7 +53,7 @@ void Triangle::draw()
 
     mat4x4_rotate_Z(local, local, m_pNode->getRotation());
 
-    Camera::main->getViewMatrix(cameraViewMatrix);
+    const mat4x4& cameraViewMatrix = Camera::main->getViewProjectionMatrix();
     mat4x4_mul(mvp, cameraViewMatrix, local);
 
     glUseProgram(m_pShader->getProgram());
