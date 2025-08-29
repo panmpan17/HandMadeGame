@@ -9,7 +9,7 @@
 #include "../debug_macro.h"
 
 
-void Shader::checkShaderCompilResult(const std::string& strShaderPath, GLuint nShader)
+void Shader::checkShaderCompilResult(const std::string_view& strShaderPath, GLuint nShader)
 {
     GLint isCompiled = 0;
     glGetShaderiv(nShader, GL_COMPILE_STATUS, &isCompiled);
@@ -26,8 +26,11 @@ void Shader::checkShaderCompilResult(const std::string& strShaderPath, GLuint nS
 }
 
 
-Shader::Shader(const std::string& strVertexShaderPath, const std::string& strFragmentShaderPath)
+Shader::Shader(int nId, const std::string& strShaderName, const std::string &strVertexShaderPath, const std::string &strFragmentShaderPath)
 {
+    m_nId = nId;
+    m_strName = strShaderName;
+
     GLuint vertex_shader;
     GLuint fragment_shader;
 
@@ -83,17 +86,19 @@ Shader::~Shader()
     }
 }
 
-TestShader::TestShader()
-    : Shader("assets/shaders/test.vert", "assets/shaders/test.frag")
+GLuint Shader::getUniformLocation(const std::string& name) const
 {
-    m_nMvpLocation = glGetUniformLocation(m_nProgram, "MVP");
-    m_nVPosLocation = glGetAttribLocation(m_nProgram, "vPos");
-    m_nVColLocation = glGetAttribLocation(m_nProgram, "vCol");
+    return glGetUniformLocation(m_nProgram, name.c_str());
+}
+
+GLuint Shader::getAttributeLocation(const std::string& name) const
+{
+    return glGetAttribLocation(m_nProgram, name.c_str());
 }
 
 
 ImageShader::ImageShader()
-    : Shader("assets/shaders/image.vert", "assets/shaders/image.frag")
+    : Shader(1, "image", "assets/shaders/image.vert", "assets/shaders/image.frag")
 {
     m_nMvpLocation = glGetUniformLocation(m_nProgram, "MVP");
     m_nColorLocation = glGetUniformLocation(m_nProgram, "imageColor");
@@ -110,7 +115,7 @@ ImageShader::ImageShader()
 }
 
 ParticleShader::ParticleShader()
-    : Shader("assets/shaders/particle.vert", "assets/shaders/particle.frag")
+    : Shader(2, "particle", "assets/shaders/particle.vert", "assets/shaders/particle.frag")
 {
     m_nMvpLocation = glGetUniformLocation(m_nProgram, "MVP");
     m_nColorLocation = glGetUniformLocation(m_nProgram, "particleColor");
@@ -118,7 +123,7 @@ ParticleShader::ParticleShader()
 }
 
 ParticleInstanceShader::ParticleInstanceShader()
-    : Shader("assets/shaders/particle_instance.vert", "assets/shaders/particle_instance.frag")
+    : Shader(3, "particle_instance", "assets/shaders/particle_instance.vert", "assets/shaders/particle_instance.frag")
 {
     m_nMvpLocation = glGetUniformLocation(m_nProgram, "MVP");
     m_nNodeTransformLocation = glGetUniformLocation(m_nProgram, "NodeTransform");

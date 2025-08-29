@@ -4,6 +4,7 @@
 #include "draw/shader.h"
 #include "draw/quad.h"
 #include "draw/triangle.h"
+#include "draw/shader_loader.h"
 #include "components/rotate.h"
 #include "components/movement.h"
 #include "components/sprite_animation.h"
@@ -18,28 +19,18 @@
 
 WorldScene::WorldScene()
 {
-    m_pBaseShader = new TestShader();
-    m_pImageShader = new ImageShader();
 }
 
 WorldScene::~WorldScene()
 {
-    if (m_pBaseShader)
-    {
-        delete m_pBaseShader;
-        m_pBaseShader = nullptr;
-    }
-    if (m_pImageShader)
-    {
-        delete m_pImageShader;
-        m_pImageShader = nullptr;
-    }
 }
 
 void WorldScene::init()
 {
     // TODO: remove this
     DataSerializer oSerializer("world.txt");
+
+    Shader* pShader = ShaderLoader::getInstance()->getShader("test");
 
     Image* pTestImage = ImageLoader::getInstance()->getImage("test");
     Image* pDustImage = ImageLoader::getInstance()->getImage("dust");
@@ -48,7 +39,7 @@ void WorldScene::init()
         auto pNode = new Node(-0.5f, 0.f, 0.f, 0.f);
 
         auto pTriangle = new Triangle();
-        pTriangle->setShader(m_pBaseShader);
+        pTriangle->setShader(pShader);
         pTriangle->registerBuffer();
         pNode->addComponent(pTriangle);
 
@@ -65,7 +56,7 @@ void WorldScene::init()
         auto pNode = new Node(-0.4f, 0.f, 0.f, 0.f);
 
         auto pTriangle = new Triangle();
-        pTriangle->setShader(m_pBaseShader);
+        pTriangle->setShader(pShader);
         pTriangle->registerBuffer();
         pNode->addComponent(pTriangle);
 
@@ -75,6 +66,7 @@ void WorldScene::init()
     }
 
     // Quads 1
+    /*
     auto pNode2 = new Node(0.5f, 0.5f, 0.f, 0.f);
 
     vec4 red = {1.f, 0.f, 0.f, 1.f}; // Red color for the quad
@@ -189,6 +181,7 @@ void WorldScene::init()
     }
 
     oSerializer.finish();
+    */
 }
 
 void WorldScene::readFromFiles(const std::string_view& strFilePath)
@@ -198,8 +191,9 @@ void WorldScene::readFromFiles(const std::string_view& strFilePath)
 
     std::vector<ISerializable*> deserializedObjects = deserializer.getDeserializedObjects();
 
-    m_pBaseShader = new TestShader();
-    m_pImageShader = new ImageShader();
+    Shader* pTestShader = ShaderLoader::getInstance()->getShader("test");
+
+    auto m_pImageShader = new ImageShader();
     Image* pTestImage = ImageLoader::getInstance()->getImage("test");
 
     int nSize = deserializedObjects.size();
@@ -214,7 +208,7 @@ void WorldScene::readFromFiles(const std::string_view& strFilePath)
         }
         else if (Triangle* pTriangle = dynamic_cast<Triangle*>(pObject))
         {
-            pTriangle->setShader(m_pBaseShader);
+            pTriangle->setShader(pTestShader);
             pTriangle->registerBuffer();
             pCurrentNode->addComponent(pTriangle);
         }

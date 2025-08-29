@@ -13,6 +13,7 @@
 #include "camera.h"
 #include "input_handle.h"
 #include "image.h"
+#include "draw/shader_loader.h"
 #include "world.h"
 
 
@@ -98,7 +99,6 @@ void Window::start()
 {
     InputManager::Initialize();
     ImageLoader::Initialize();
-
     m_pCamera = new Camera();
 
     glfwSetKeyCallback(m_pWindow, &InputManager::onKeyCallback);
@@ -111,16 +111,16 @@ void Window::start()
     glfwMakeContextCurrent(m_pWindow);
     gladLoadGL(glfwGetProcAddress);
     glfwSwapInterval(1); // Enable vsync
+
+    ShaderLoader::Initialize();
     
     ImageLoader::getInstance()->registerImage("test", "assets/images/test.png");
     ImageLoader::getInstance()->registerImage("dust", "assets/images/dust_1.png");
     ImageLoader::getInstance()->registerImage("character", "assets/images/character_animation.png");
 
-    // setupShaders();
-
     m_pWorldScene = new WorldScene();
-    m_pWorldScene->readFromFiles("assets/level.txt");
-    // m_pWorldScene->init();
+    // m_pWorldScene->readFromFiles("assets/level.txt");
+    m_pWorldScene->init();
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

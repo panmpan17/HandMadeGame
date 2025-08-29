@@ -29,12 +29,15 @@ void Triangle::registerBuffer()
     arrVertices[2] = { {   0.f,  0.6f }, { 0.f, 0.f, 1.f } };
     glBufferData(GL_ARRAY_BUFFER, sizeof(arrVertices), arrVertices, GL_STATIC_DRAW);
 
+    GLuint vPosLocation =  m_pShader->getAttributeLocation("vPos");
+    GLuint vColLocation =  m_pShader->getAttributeLocation("vCol");
+
     glGenVertexArrays(1, &m_nVertexArray);
     glBindVertexArray(m_nVertexArray);
-    glEnableVertexAttribArray(m_pShader->getVPosLocation());
-    glVertexAttribPointer(m_pShader->getVPosLocation(), 2, GL_FLOAT, GL_FALSE, sizeof(VertexWColor), (void*)offsetof(VertexWColor, pos));
-    glEnableVertexAttribArray(m_pShader->getVColLocation());
-    glVertexAttribPointer(m_pShader->getVColLocation(), 3, GL_FLOAT, GL_FALSE, sizeof(VertexWColor), (void*)offsetof(VertexWColor, col));
+    glEnableVertexAttribArray(vPosLocation);
+    glVertexAttribPointer(vPosLocation, 2, GL_FLOAT, GL_FALSE, sizeof(VertexWColor), (void*)offsetof(VertexWColor, pos));
+    glEnableVertexAttribArray(vColLocation);
+    glVertexAttribPointer(vColLocation, 3, GL_FLOAT, GL_FALSE, sizeof(VertexWColor), (void*)offsetof(VertexWColor, col));
 
     // Unbind
     glBindVertexArray(0);
@@ -57,7 +60,7 @@ void Triangle::draw()
     mat4x4_mul(mvp, cameraViewMatrix, local);
 
     glUseProgram(m_pShader->getProgram());
-    glUniformMatrix4fv(m_pShader->getMvpLocation(), 1, GL_FALSE, (const GLfloat*) mvp);
+    glUniformMatrix4fv(m_nMVPUniform, 1, GL_FALSE, (const GLfloat*) mvp);
     glBindVertexArray(m_nVertexArray);
     glDrawArrays(GL_TRIANGLES, 0, 3);
     INCREASE_DRAW_CALL_COUNT();

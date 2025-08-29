@@ -16,13 +16,16 @@ public:
 
 class FileReader {
 public:
-    FileReader(const std::string& path);
+    FileReader(const std::string& strPath);
+    FileReader(const std::string_view& strPath);
     ~FileReader();
 
     bool isOpen() const;
     std::string readAll();
     // std::vector<std::string> readLines();
     void close();
+
+    bool readLine(std::string& outStrLine);
 
 private:
     std::ifstream file;

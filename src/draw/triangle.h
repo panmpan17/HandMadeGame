@@ -15,10 +15,10 @@ public:
     void registerBuffer() override;
     void draw() override;
 
-    inline void setShader(Shader* pShader) override { m_pShader = static_cast<TestShader*>(pShader); }
+    inline void setShader(Shader* pShader) override { m_pShader = pShader; m_nMVPUniform = m_pShader->getUniformLocation("MVP"); }
 
 private:
-    TestShader* m_pShader = nullptr;
+    Shader* m_pShader = nullptr;
 
-    GLuint m_nVertexBuffer, m_nVertexArray;
+    GLuint m_nVertexBuffer, m_nVertexArray, m_nMVPUniform;
 };

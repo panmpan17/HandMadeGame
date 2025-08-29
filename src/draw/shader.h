@@ -8,30 +8,25 @@ typedef unsigned int GLuint;
 class Shader
 {
 public:
-    static void checkShaderCompilResult(const std::string& strShaderPath, GLuint nShader);
+    static void checkShaderCompilResult(const std::string_view& strVertexShaderPath, GLuint nShader);
 
-    Shader(const std::string &strVertexShaderPath, const std::string &strFragmentShaderPath);
+    // Shader(const std::string_view& strShaderName, const std::string_view &strVertexShaderPath, const std::string_view &strFragmentShaderPath);
+    Shader(int nId, const std::string& strShaderName, const std::string &strVertexShaderPath, const std::string &strFragmentShaderPath);
     Shader();
     ~Shader();
 
+    inline const std::string& getName() const { return m_strName; }
+
     inline GLuint getProgram() const { return m_nProgram; }
+
+    GLuint getUniformLocation(const std::string& name) const;
+    GLuint getAttributeLocation(const std::string& name) const;
 
 protected:
     GLuint m_nProgram;
-};
 
-
-class TestShader : public Shader
-{
-public:
-    TestShader();
-
-    inline GLuint getMvpLocation() const { return m_nMvpLocation; }
-    inline GLuint getVPosLocation() const { return m_nVPosLocation; }
-    inline GLuint getVColLocation() const { return m_nVColLocation; }
-
-private:
-    GLuint m_nMvpLocation, m_nVPosLocation, m_nVColLocation;
+    int m_nId;
+    std::string m_strName;
 };
 
 

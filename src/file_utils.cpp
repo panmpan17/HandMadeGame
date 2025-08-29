@@ -67,22 +67,61 @@ std::string FileUtils::getExecutableDirectory()
 }
 
 
-FileReader::FileReader(const std::string& path)
+FileReader::FileReader(const std::string& strPath)
 {
-    std::string fullPath = path;
-    if (*path.begin() != '/')
+    if (*strPath.begin() != '/')
     {
         std::string executablePath = FileUtils::getExecutablePath();
-        fullPath = fs::path(executablePath).parent_path().append(path).string();
-    }
+        std::string strFullPath = fs::path(executablePath).parent_path().append(strPath).string();
 
-    if (fs::exists(fullPath))
-    {
-        file.open(fullPath);
+        if (fs::exists(strFullPath))
+        {
+            file.open(strFullPath);
+        }
+        else
+        {
+            throw std::runtime_error("File does not exist: " + strFullPath);
+        }
     }
     else
     {
-        throw std::runtime_error("File does not exist: " + fullPath);
+        if (fs::exists(strPath))
+        {
+            file.open(strPath);
+        }
+        else
+        {
+            throw std::runtime_error("File does not exist: " + strPath);
+        }
+    }
+}
+
+FileReader::FileReader(const std::string_view& strPath)
+{
+    if (*strPath.begin() != '/')
+    {
+        std::string executablePath = FileUtils::getExecutablePath();
+        std::string strFullPath = fs::path(executablePath).parent_path().append(strPath).string();
+
+        if (fs::exists(strFullPath))
+        {
+            file.open(strFullPath);
+        }
+        else
+        {
+            throw std::runtime_error("File does not exist: " + strFullPath);
+        }
+    }
+    else
+    {
+        if (fs::exists(strPath))
+        {
+            file.open(strPath);
+        }
+        else
+        {
+            throw std::runtime_error("File does not exist: " + std::string(strPath));
+        }
     }
 }
 
@@ -106,6 +145,17 @@ std::string FileReader::readAll()
     std::ostringstream ss;
     ss << file.rdbuf();
     return ss.str();
+}
+
+bool FileReader::readLine(std::string& outStrLine)
+{
+    if (!file.is_open()) return false;
+
+    if (std::getline(file, outStrLine))
+    {
+        return true;
+    }
+    return false;
 }
 
 // std::vector<std::string> FileReader::readLines()
