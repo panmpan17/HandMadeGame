@@ -15,7 +15,7 @@ public:
     void registerBuffer() override;
     void draw() override;
 
-    inline void setShader(Shader* pShader) override { m_pShader = pShader; m_nMVPUniform = m_pShader->getUniformLocation("MVP"); }
+    inline void setShader(Shader* pShader) override { m_pShader = pShader; m_nMVPUniform = m_pShader->getUniformLocation("u_MVP"); }
 
 private:
     Shader* m_pShader = nullptr;

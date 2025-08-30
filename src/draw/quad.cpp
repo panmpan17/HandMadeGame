@@ -10,6 +10,7 @@
 #include "../node.h"
 #include "../window.h"
 #include "../serializer.h"
+#include "shader.h"
 
 
 Quad::Quad(float fWidth, float fHeight, vec4 color) : m_fWidth(fWidth), m_fHeight(fHeight)
@@ -21,6 +22,19 @@ Quad::~Quad()
 {
     glDeleteBuffers(1, &m_nVertexBuffer);
     glDeleteVertexArrays(1, &m_nVertexArray);
+}
+
+void Quad::setShader(Shader* pShader)
+{
+    m_pShader = pShader;
+
+    m_nSpriteXCountUniform = m_pShader->getUniformLocation("u_spriteSheetXCount");
+    m_nSpriteYCountUniform = m_pShader->getUniformLocation("u_spriteSheetYCount");
+    m_nUVOffsetUniform = m_pShader->getUniformLocation("u_uvOffset");
+
+    m_nMVPUniform = m_pShader->getUniformLocation("u_MVP");
+    m_nColorUniform = m_pShader->getUniformLocation("u_imageColor");
+    m_nTextureUniform = m_pShader->getUniformLocation("u_tex0");
 }
 
 void Quad::registerBuffer()
@@ -37,12 +51,15 @@ void Quad::registerBuffer()
     arrVertices[3] = { { fStartX + m_fWidth, fStartY + m_fHeight }, { 1.0f, 1.0f } }; // Top left
     glBufferData(GL_ARRAY_BUFFER, sizeof(arrVertices), arrVertices, GL_STATIC_DRAW);
 
+    GLuint nVPosAttr = m_pShader->getAttributeLocation("a_vPos");
+    GLuint nVUVAttr = m_pShader->getAttributeLocation("a_vUV");
+
     glGenVertexArrays(1, &m_nVertexArray);
     glBindVertexArray(m_nVertexArray);
-    glEnableVertexAttribArray(m_pShader->getVPosLocation());
-    glVertexAttribPointer(m_pShader->getVPosLocation(), 2, GL_FLOAT, GL_FALSE, sizeof(VertexWUV), (void*)offsetof(VertexWUV, pos));
-    glEnableVertexAttribArray(m_pShader->getVUVLocation());
-    glVertexAttribPointer(m_pShader->getVUVLocation(), 2, GL_FLOAT, GL_FALSE, sizeof(VertexWUV), (void*)offsetof(VertexWUV, uv));
+    glEnableVertexAttribArray(nVPosAttr);
+    glVertexAttribPointer(nVPosAttr, 2, GL_FLOAT, GL_FALSE, sizeof(VertexWUV), (void*)offsetof(VertexWUV, pos));
+    glEnableVertexAttribArray(nVUVAttr);
+    glVertexAttribPointer(nVUVAttr, 2, GL_FLOAT, GL_FALSE, sizeof(VertexWUV), (void*)offsetof(VertexWUV, uv));
 
     // Unbind
     glBindVertexArray(0);
@@ -66,11 +83,11 @@ void Quad::draw()
     mat4x4_mul(mvp, cameraViewMatrix, local);
 
     glUseProgram(m_pShader->getProgram());
-    glUniformMatrix4fv(m_pShader->getMvpLocation(), 1, GL_FALSE, (const GLfloat*) mvp);
-    glUniform4f(m_pShader->getColorLocation(), m_color[0], m_color[1], m_color[2], 1);
+    glUniformMatrix4fv(m_nMVPUniform, 1, GL_FALSE, (const GLfloat*) mvp);
+    glUniform4f(m_nColorUniform, m_color[0], m_color[1], m_color[2], 1);
     predrawSetShaderUniforms();
 
-    glUniform1i(m_pShader->getTextureLocation(), 0); // Texture unit 0
+    glUniform1i(m_nTextureUniform, 0); // Texture unit 0
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_pImage ? m_pImage->getTextureID() : 0);
@@ -87,9 +104,9 @@ void Quad::draw()
 
 void Quad::predrawSetShaderUniforms()
 {
-    glUniform1i(m_pShader->getSpriteSheetXCountLocation(), 1);
-    glUniform1i(m_pShader->getSpriteSheetYCountLocation(), 1);
-    glUniform2f(m_pShader->getUVOffsetLocation(), 0.0f, 0.0f);
+    glUniform1i(m_nSpriteXCountUniform, 1);
+    glUniform1i(m_nSpriteYCountUniform, 1);
+    glUniform2f(m_nUVOffsetUniform, 0.0f, 0.0f);
 }
 
 void Quad::serializeToWrapper(DataSerializer& serializer) const
@@ -163,8 +180,8 @@ void Sprite::draw()
 
 void Sprite::predrawSetShaderUniforms()
 {
-    glUniform1i(m_pShader->getSpriteSheetXCountLocation(), m_nSpriteSheetXCount);
-    glUniform1i(m_pShader->getSpriteSheetYCountLocation(), m_nSpriteSheetYCount);
+    glUniform1i(m_nSpriteXCountUniform, m_nSpriteSheetXCount);
+    glUniform1i(m_nSpriteYCountUniform, m_nSpriteSheetYCount);
 
-    glUniform2f(m_pShader->getUVOffsetLocation(), m_vecUVOOffset[0], m_vecUVOOffset[1]);
+    glUniform2f(m_nUVOffsetUniform, m_vecUVOOffset[0], m_vecUVOOffset[1]);
 }

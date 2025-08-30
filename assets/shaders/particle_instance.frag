@@ -1,6 +1,6 @@
 #version 330
 
-uniform bool UseTexture;
+uniform bool u_useTexture;
 uniform sampler2D u_tex0;
 
 in vec4 fragmentColor;
@@ -10,7 +10,7 @@ out vec4 fragment;
 
 void main()
 {
-    if (UseTexture)
+    if (u_useTexture)
     {
         fragment = texture(u_tex0, uv) * fragmentColor;
     }

@@ -121,6 +121,7 @@ private:
     GLuint m_nVertexBuffer = 0;
     GLuint m_nVertexArray = 0;
     GLuint m_nInstanceBuffer = 0;
+    GLuint m_nUseNodeTransformUniform, m_nUseTextureUniform, m_nMVPUniForm, m_nNodeTransformUniform, m_nTextureUniform;
 
     Shader* m_pShader = nullptr;
 

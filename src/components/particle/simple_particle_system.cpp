@@ -45,6 +45,14 @@ SimpleParticleSystem::SimpleParticleSystem(int nParticleCount)
     }
 }
 
+void SimpleParticleSystem::setShader(Shader* pShader)
+{
+    m_pShader = pShader;
+
+    m_nMVPUniform = m_pShader->getUniformLocation("u_MVP");
+    m_nColorUniform = m_pShader->getUniformLocation("u_particleColor");
+}
+
 void SimpleParticleSystem::registerBuffer()
 {
     Vertex arrQuadVerticies[4];
@@ -60,9 +68,10 @@ void SimpleParticleSystem::registerBuffer()
     glGenVertexArrays(1, &m_nVertexArray);
     glBindVertexArray(m_nVertexArray);
 
-    ParticleShader* pParticleShader = static_cast<ParticleShader*>(m_pShader);
-    glEnableVertexAttribArray(pParticleShader->getVPosLocation());
-    glVertexAttribPointer(pParticleShader->getVPosLocation(), 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, pos));
+    GLuint nVPosAttr = m_pShader->getAttributeLocation("a_vPos");
+
+    glEnableVertexAttribArray(nVPosAttr);
+    glVertexAttribPointer(nVPosAttr, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, pos));
 
     // Unbind
     glBindVertexArray(0);
@@ -96,11 +105,10 @@ void SimpleParticleSystem::draw()
         const mat4x4& cameraViewMatrix = Camera::main->getViewProjectionMatrix();
         mat4x4_mul(mvp, cameraViewMatrix, local);
 
-        ParticleShader* pParticleShader = static_cast<ParticleShader*>(m_pShader);
-        glUniformMatrix4fv(pParticleShader->getMvpLocation(), 1, GL_FALSE, (const GLfloat*) mvp);
+        glUniformMatrix4fv(m_nMVPUniform, 1, GL_FALSE, (const GLfloat*) mvp);
 
         const vec4& color = m_arrParticles[i].color; // Use the color of the first particle for now
-        glUniform4f(pParticleShader->getColorLocation(), color[0], color[1], color[2], color[3]);
+        glUniform4f(m_nColorUniform, color[0], color[1], color[2], color[3]);
 
         // glUniform1i(m_pShader->getTextureLocation(), 0); // Texture unit 0
 

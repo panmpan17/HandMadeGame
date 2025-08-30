@@ -3,12 +3,12 @@
 #include <linmath.h>
 
 #include "vertex.h"
-#include "shader.h"
 #include "drawable_interface.h"
 
 typedef unsigned int GLuint;
 
 class Image;
+class Shader;
 
 class Quad : public IDrawable
 {
@@ -20,7 +20,7 @@ public:
     void registerBuffer() override;
     void draw() override;
 
-    inline void setShader(Shader* pShader) override { m_pShader = static_cast<ImageShader*>(pShader); }
+    virtual void setShader(Shader* pShader) override;
     inline void setImage(Image* pImage) { m_pImage = pImage; }
 
     virtual void deserializeField(const std::string_view& strFieldName, const std::string_view& strFieldValue) override;
@@ -29,11 +29,13 @@ protected:
     virtual void predrawSetShaderUniforms();
 
     GLuint m_nVertexBuffer, m_nVertexArray;
+    GLuint m_nSpriteXCountUniform, m_nSpriteYCountUniform, m_nUVOffsetUniform;
+    GLuint m_nMVPUniform, m_nColorUniform, m_nTextureUniform;
 
     float m_fWidth, m_fHeight;
     vec4 m_color = {1.f, 1.f, 1.f, 1.f};
 
-    ImageShader* m_pShader = nullptr;
+    Shader* m_pShader = nullptr;
     Image* m_pImage = nullptr; // Optional, if the quad uses an image texture
 
     virtual void serializeToWrapper(DataSerializer& serializer) const override;

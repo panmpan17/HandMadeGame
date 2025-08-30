@@ -1,7 +1,7 @@
 #version 330
 
 
-uniform vec4 particleColor;
+uniform vec4 u_particleColor;
 
 // uniform sampler2D u_tex0;
 // uniform vec2 u_tex0Resolution;
@@ -14,5 +14,5 @@ void main()
     // vec2 diffToCenter = (gl_FragCoord.xy - ripperCenter.xy) / u_resolution.xy;
     // vec4 textColor = texture(u_tex0, uv);
     // fragment = textColor * imageColor;
-    fragment = particleColor;
+    fragment = u_particleColor;
 }

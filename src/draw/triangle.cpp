@@ -29,15 +29,15 @@ void Triangle::registerBuffer()
     arrVertices[2] = { {   0.f,  0.6f }, { 0.f, 0.f, 1.f } };
     glBufferData(GL_ARRAY_BUFFER, sizeof(arrVertices), arrVertices, GL_STATIC_DRAW);
 
-    GLuint vPosLocation =  m_pShader->getAttributeLocation("vPos");
-    GLuint vColLocation =  m_pShader->getAttributeLocation("vCol");
+    GLuint nVPosAttr =  m_pShader->getAttributeLocation("a_vPos");
+    GLuint nVColAttr =  m_pShader->getAttributeLocation("a_vCol");
 
     glGenVertexArrays(1, &m_nVertexArray);
     glBindVertexArray(m_nVertexArray);
-    glEnableVertexAttribArray(vPosLocation);
-    glVertexAttribPointer(vPosLocation, 2, GL_FLOAT, GL_FALSE, sizeof(VertexWColor), (void*)offsetof(VertexWColor, pos));
-    glEnableVertexAttribArray(vColLocation);
-    glVertexAttribPointer(vColLocation, 3, GL_FLOAT, GL_FALSE, sizeof(VertexWColor), (void*)offsetof(VertexWColor, col));
+    glEnableVertexAttribArray(nVPosAttr);
+    glVertexAttribPointer(nVPosAttr, 2, GL_FLOAT, GL_FALSE, sizeof(VertexWColor), (void*)offsetof(VertexWColor, pos));
+    glEnableVertexAttribArray(nVColAttr);
+    glVertexAttribPointer(nVColAttr, 3, GL_FLOAT, GL_FALSE, sizeof(VertexWColor), (void*)offsetof(VertexWColor, col));
 
     // Unbind
     glBindVertexArray(0);

@@ -30,7 +30,9 @@ void WorldScene::init()
     // TODO: remove this
     DataSerializer oSerializer("world.txt");
 
-    Shader* pShader = ShaderLoader::getInstance()->getShader("test");
+    Shader* pTestShader = ShaderLoader::getInstance()->getShader("test");
+    Shader* pImageShader = ShaderLoader::getInstance()->getShader("image");
+    Shader* pParticleShader = ShaderLoader::getInstance()->getShader("particle_instance");
 
     Image* pTestImage = ImageLoader::getInstance()->getImage("test");
     Image* pDustImage = ImageLoader::getInstance()->getImage("dust");
@@ -39,7 +41,7 @@ void WorldScene::init()
         auto pNode = new Node(-0.5f, 0.f, 0.f, 0.f);
 
         auto pTriangle = new Triangle();
-        pTriangle->setShader(pShader);
+        pTriangle->setShader(pTestShader);
         pTriangle->registerBuffer();
         pNode->addComponent(pTriangle);
 
@@ -56,7 +58,7 @@ void WorldScene::init()
         auto pNode = new Node(-0.4f, 0.f, 0.f, 0.f);
 
         auto pTriangle = new Triangle();
-        pTriangle->setShader(pShader);
+        pTriangle->setShader(pTestShader);
         pTriangle->registerBuffer();
         pNode->addComponent(pTriangle);
 
@@ -66,13 +68,13 @@ void WorldScene::init()
     }
 
     // Quads 1
-    /*
+    
     auto pNode2 = new Node(0.5f, 0.5f, 0.f, 0.f);
 
     vec4 red = {1.f, 0.f, 0.f, 1.f}; // Red color for the quad
     auto pQuad = new Quad(0.5f, 0.5f, red);
-    pQuad->setShader(m_pImageShader);
-    static_cast<Quad*>(pQuad)->setImage(pTestImage);
+    pQuad->setShader(pImageShader);
+    pQuad->setImage(pTestImage);
     pQuad->registerBuffer();
     pNode2->addComponent(pQuad);
 
@@ -87,8 +89,8 @@ void WorldScene::init()
 
     vec4 color = {0.5f, 0.5f, 1.f, 1.f}; // Blue color for the second quad
     auto pQuad2 = new Quad(0.3f, 0.3f, color);
-    pQuad2->setShader(m_pImageShader);
-    static_cast<Quad*>(pQuad2)->setImage(pDustImage);
+    pQuad2->setShader(pImageShader);
+    pQuad2->setImage(pDustImage);
     pQuad2->registerBuffer();
     pNode3->addComponent(pQuad2);
 
@@ -99,7 +101,7 @@ void WorldScene::init()
     // Particle System
     // auto pNode4 = new Node(0, 0, 0, 0);
     // auto particle = new SimpleParticleSystem(10000);
-    // particle->setShader(new ParticleShader());
+    // particle->setShader(ShaderLoader::getInstance()->getShader("particle"));
     // particle->registerBuffer();
     // pNode4->addComponent(particle);
     // addNode(pNode4);
@@ -107,7 +109,7 @@ void WorldScene::init()
     auto pNode5 = new Node(0, 0, 0, 0);
     auto particle2 = new ParticleSystem(100, false);
     particle2->setImage(pDustImage);
-    particle2->setShader(new ParticleInstanceShader());
+    particle2->setShader(pParticleShader);
     particle2->registerBuffer();
     particle2->setParticleStartColor({ 1.f, 0.f, 0.f, 1.f }, { 0.f, 1.f, 0.f, 1.f });
     particle2->setIsLooping(false);
@@ -124,14 +126,14 @@ void WorldScene::init()
     // particle2->addParticleModule(new ParticleBurstSpawn(1.0f, 20));
     pNode5->addComponent(particle2);
     pNode5->addComponent(new TwoPointsMovement({ -0.5f, 0.f }, { 0.5f, 0.f }, 2.0f));
-    pNode5->setActive(false);
+    pNode5->setActive(true);
     addNode(pNode5);
     oSerializer << pNode5;
 
 
     auto pNode6 = new Node(0.5f, 0, 0, 0);
     auto particle3 = new ParticleSystem(100);
-    particle3->setShader(new ParticleInstanceShader());
+    particle3->setShader(pParticleShader);
     particle3->registerBuffer();
     particle3->setParticleStartColor({ 0.f, 0.f, 1.f, 1.f }, { 0.f, 1.f, 0.f, 1.f });
     particle3->setSpawnShape(eParticleSpawnShape::BOX);
@@ -139,7 +141,7 @@ void WorldScene::init()
     // particle3->addParticleModule(new ParticleIntervalSpawn(10));
     particle3->addParticleModule(new ParticleBurstSpawn(1.0f, 20));
     pNode6->addComponent(particle3);
-    pNode6->setActive(false);
+    pNode6->setActive(true);
     addNode(pNode6);
 
     oSerializer << pNode6;
@@ -147,7 +149,7 @@ void WorldScene::init()
 
     auto pNode7 = new Node(-0.5f, 0, 0, 0);
     auto particle4 = new ParticleSystem(100);
-    particle4->setShader(new ParticleInstanceShader());
+    particle4->setShader(pParticleShader);
     particle4->registerBuffer();
     particle4->setSpawnShape(eParticleSpawnShape::CIRCLE);
     particle4->setSpawnShapeDimensions(0.4f, 0.4f);
@@ -155,7 +157,7 @@ void WorldScene::init()
     particle4->addParticleModule(new ParticleIntervalSpawn(10));
     particle4->addParticleModule(new ParticleBurstSpawn(0.0f, 20));
     pNode7->addComponent(particle4);
-    pNode7->setActive(false);
+    pNode7->setActive(true);
     addNode(pNode7);
 
     oSerializer << pNode7;
@@ -165,7 +167,7 @@ void WorldScene::init()
 
         auto pPlayer = new Node(0.f, 0.f, 0.f, 0.f);
         auto pSprite = new Sprite(pCharacter, 4, 4);
-        pSprite->setShader(m_pImageShader);
+        pSprite->setShader(pImageShader);
         pSprite->registerBuffer();
         pPlayer->addComponent(pSprite);
 
@@ -181,7 +183,6 @@ void WorldScene::init()
     }
 
     oSerializer.finish();
-    */
 }
 
 void WorldScene::readFromFiles(const std::string_view& strFilePath)
@@ -192,8 +193,9 @@ void WorldScene::readFromFiles(const std::string_view& strFilePath)
     std::vector<ISerializable*> deserializedObjects = deserializer.getDeserializedObjects();
 
     Shader* pTestShader = ShaderLoader::getInstance()->getShader("test");
+    Shader* pImageShader = ShaderLoader::getInstance()->getShader("image");
+    Shader* pParticleShader = ShaderLoader::getInstance()->getShader("particle_instance");
 
-    auto m_pImageShader = new ImageShader();
     Image* pTestImage = ImageLoader::getInstance()->getImage("test");
 
     int nSize = deserializedObjects.size();
@@ -214,13 +216,13 @@ void WorldScene::readFromFiles(const std::string_view& strFilePath)
         }
         else if (Quad* pQuad = dynamic_cast<Quad*>(pObject))
         {
-            pQuad->setShader(m_pImageShader);
+            pQuad->setShader(pImageShader);
             pQuad->registerBuffer();
             pCurrentNode->addComponent(pQuad);
         }
         else if (ParticleSystem* pParticleSystem = dynamic_cast<ParticleSystem*>(pObject))
         {
-            pParticleSystem->setShader(new ParticleInstanceShader());
+            pParticleSystem->setShader(pParticleShader);
             pParticleSystem->registerBuffer();
             pParticleSystem->addParticleModule(new ParticleIntervalSpawn(10));
             pParticleSystem->addParticleModule(new ParticleBurstSpawn(0.0f, 20));

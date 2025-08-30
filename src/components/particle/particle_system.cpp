@@ -125,12 +125,11 @@ void ParticleSystem::setShader(Shader* pShader)
 {
     m_pShader = pShader;
 
-    ParticleInstanceShader* pParticleShader = static_cast<ParticleInstanceShader*>(m_pShader);
-    glUseProgram(pParticleShader->getProgram());
-
-    glUniform1i(pParticleShader->getUseNodeTransformLocation(), m_bSimulateInLocal ? 1 : 0);
-
-    glUniform1i(pParticleShader->getUseTextureLocation(), m_pImage ? 1 : 0);
+    m_nMVPUniForm = pShader->getUniformLocation("u_MVP");
+    m_nNodeTransformUniform = pShader->getUniformLocation("u_nodeTransform");
+    m_nUseNodeTransformUniform = pShader->getUniformLocation("u_useNodeTransform");
+    m_nUseTextureUniform = pShader->getUniformLocation("UseTexture");
+    m_nTextureUniform = pShader->getUniformLocation("u_tex0");
 }
 
 void ParticleSystem::draw()
@@ -142,10 +141,14 @@ void ParticleSystem::draw()
     glBindVertexArray(m_nVertexArray);
     glUseProgram(m_pShader->getProgram());
 
+    glUniform1i(m_nUseNodeTransformUniform, m_bSimulateInLocal ? 1 : 0);
+    glUniform1i(m_nUseTextureUniform, m_pImage ? 1 : 0);
+
+    glUniform1i(m_nTextureUniform, 0);
+
     const mat4x4& cameraViewMatrix = Camera::main->getViewProjectionMatrix();
 
-    ParticleInstanceShader* pParticleShader = static_cast<ParticleInstanceShader*>(m_pShader);
-    glUniformMatrix4fv(pParticleShader->getMvpLocation(), 1, GL_FALSE, (const GLfloat*) cameraViewMatrix);
+    glUniformMatrix4fv(m_nMVPUniForm, 1, GL_FALSE, (const GLfloat*) cameraViewMatrix);
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_pImage ? m_pImage->getTextureID() : 0);
@@ -158,7 +161,7 @@ void ParticleSystem::draw()
         const vec3& nodePosition = getNode()->getPosition();
         mat4x4_translate(nodeTransform, nodePosition[0], nodePosition[1], nodePosition[2]);
 
-        glUniformMatrix4fv(pParticleShader->getNodeTransformLocation(), 1, GL_FALSE, (const GLfloat*) nodeTransform);
+        glUniformMatrix4fv(m_nNodeTransformUniform, 1, GL_FALSE, (const GLfloat*) nodeTransform);
     }
 
     glBindBuffer(GL_ARRAY_BUFFER, m_nInstanceBuffer);
