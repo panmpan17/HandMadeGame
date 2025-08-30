@@ -100,6 +100,7 @@ void Window::start()
     InputManager::Initialize();
     ImageLoader::Initialize();
     m_pCamera = new Camera();
+    m_pCamera->setWorldSizeScale(1.0f);
 
     glfwSetKeyCallback(m_pWindow, &InputManager::onKeyCallback);
     glfwSetCursorEnterCallback(m_pWindow, &InputManager::onMouseEnterCallback);

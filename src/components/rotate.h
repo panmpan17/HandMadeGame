@@ -25,14 +25,11 @@ public:
 
     virtual void draw() override {}
 
-    virtual void deserializeField(const std::string_view& strFieldName, const std::string_view& strFieldValue) override;
-
 protected:
     float m_fRotationSpeed = 0.0f; // Speed of rotation in degrees per second
 
-    virtual void serializeToWrapper(DataSerializer& serializer) const override
-    {
-        serializer.ADD_ATTRIBUTES(m_fRotationSpeed);
-    }
+    COMPONENT_REGISTER_SERIALIZABLE(Rotate)
 };
+
+REGISTER_CLASS(Rotate)
 

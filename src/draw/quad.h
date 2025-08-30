@@ -23,9 +23,6 @@ public:
     virtual void setShader(Shader* pShader) override;
     inline void setImage(Image* pImage) { m_pImage = pImage; }
 
-    virtual void deserializeField(const std::string_view& strFieldName, const std::string_view& strFieldValue) override;
-    virtual void onNodeFinishedDeserialization() override;
-
 protected:
     virtual void predrawSetShaderUniforms();
 
@@ -39,12 +36,15 @@ protected:
     Shader* m_pShader = nullptr;
     Image* m_pImage = nullptr; // Optional, if the quad uses an image texture
 
-    virtual void serializeToWrapper(DataSerializer& serializer) const override;
+    COMPONENT_REGISTER_SERIALIZABLE(Quad)
 };
+
+REGISTER_CLASS(Quad)
 
 class Sprite : public Quad
 {
 public:
+    Sprite() {}
     Sprite(Image* pImage, int nPixelPerUnit = 100);
     Sprite(Image* pImage, int nSpriteSheetXCount, int nSpriteSheetYCount, int nSpriteIndex = 0, int nPixelPerUnit = 100);
     ~Sprite();
@@ -60,4 +60,8 @@ protected:
     int m_nSpriteSheetYCount = 1;
     int m_nSpriteIndex = 0;
     vec2 m_vecUVOOffset;
+
+    COMPONENT_REGISTER_SERIALIZABLE(Sprite)
 };
+
+REGISTER_CLASS(Sprite)

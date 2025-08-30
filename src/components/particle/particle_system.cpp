@@ -369,6 +369,17 @@ void ParticleSystem::serializeToWrapper(DataSerializer& serializer) const
     {
         serializer.ADD_ATTRIBUTES_VALUE(m_pShader, m_pShader->getId());
     }
+
+    for (int i = 0; i < 4; ++i)
+    {
+        const IParticleModule* pModule = m_arrParticleModules[i];
+        if (pModule)
+        {
+            std::string strFieldName = "module" + std::to_string(i);
+            std::string strModuleDeserializeValue = pModule->getDeserializedValue();
+            serializer.ADD_ATTRIBUTES_VALUE(strFieldName, strModuleDeserializeValue);
+        }
+    }
 }
 
 void ParticleSystem::deserializeField(const std::string_view& strFieldName, const std::string_view& strFieldValue)

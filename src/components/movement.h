@@ -19,16 +19,16 @@ public:
 
     virtual void draw() override {}
 
-    virtual void deserializeField(const std::string_view& strFieldName, const std::string_view& strFieldValue) override;
-
 protected:
     float m_fMoveSpeed = 0.0f;
     std::bitset<4> m_bMovementKeyPressed = 0;
 
     void getMovementDirection(short& x, short& y);
 
-    virtual void serializeToWrapper(DataSerializer& serializer) const override;
+    COMPONENT_REGISTER_SERIALIZABLE(Movement)
 };
+
+REGISTER_CLASS(Movement)
 
 
 class TwoPointsMovement : public Component

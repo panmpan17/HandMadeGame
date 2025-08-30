@@ -1,6 +1,7 @@
 #include "serializer.h"
 #include "node.h"
 #include "iserializable.h"
+#include "debug_macro.h"
 #include "draw/triangle.h"
 #include "draw/quad.h"
 #include "components/rotate.h"
@@ -32,34 +33,26 @@ void DataDeserializer::read()
             m_strClassName = line.substr(0, line.size() - 2);
 
             const char* strClassName = m_strClassName.data();
+            // std::cout << "Class " << m_strClassName <<  " start" << "\n";
+
             if (memcmp(strClassName, "Node", 4) == 0)
             {
                 m_pCurrentDeserializingObject = new Node();
             }
-            else if (memcmp(strClassName, "8Triangle", 9) == 0)
-            {
-                m_pCurrentDeserializingObject = new Triangle();
-            }
-            else if (memcmp(strClassName, "6Rotate", 7) == 0)
-            {
-                m_pCurrentDeserializingObject = new Rotate();
-            }
-            else if (memcmp(strClassName, "8Movement", 9) == 0)
-            {
-                m_pCurrentDeserializingObject = new Movement();
-            }
-            else if (memcmp(strClassName, "4Quad", 5) == 0)
-            {
-                m_pCurrentDeserializingObject = new Quad();
-            }
-            else if (memcmp(strClassName, "14ParticleSystem", 16) == 0)
+            else if (memcmp(strClassName, "ParticleSystem", 16) == 0)
             {
                 m_pCurrentDeserializingObject = new ParticleSystem();
             }
+            else
+            {
+                m_pCurrentDeserializingObject = TypeRegistry::instance().create(std::string(m_strClassName));
+                if (!m_pCurrentDeserializingObject)
+                {
+                    LOGERRLN_EX("Failed to create object of type: {}", m_strClassName);
+                }
+            }
 
             m_bIsClassStarted = m_pCurrentDeserializingObject != nullptr;
-
-            std::cout << "Class " << m_strClassName <<  " start" << "\n";
         }
         else if (memcmp(&strBack, "}", 1) == 0) {
             if (m_bIsClassStarted) {
@@ -76,7 +69,7 @@ void DataDeserializer::read()
         else if (m_bIsClassStarted && m_pCurrentDeserializingObject) {
             size_t pos = line.find(":");
             if (pos != std::string::npos) {
-                std::cout << "Deserializing field " << line.substr(0, pos) << " with value " << line.substr(pos + 2) << "\n";
+                // std::cout << "Deserializing field " << line.substr(0, pos) << " with value " << line.substr(pos + 2) << "\n";
                 m_pCurrentDeserializingObject->deserializeField(line.substr(0, pos), line.substr(pos + 2));
             }
         }

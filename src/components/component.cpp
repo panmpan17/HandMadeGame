@@ -3,7 +3,7 @@
 
 void Component::serializedTo(DataSerializer& serializer) const
 {
-    serializer.startClassHeader(typeid(*this).name());
+    serializer.startClassHeader(getTypeName());
     
     serializeToWrapper(serializer);
 

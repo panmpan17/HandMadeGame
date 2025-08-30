@@ -37,6 +37,8 @@ public:
     virtual void update(ParticleSystem& particleSystem, float deltaTime) = 0;
 
     virtual void onActiveTimeReset() {}
+
+    virtual std::string getDeserializedValue() const { return typeid(*this).name(); }
 };
 
 class IParticleIndividualModule
@@ -112,9 +114,6 @@ public:
 
     void setIsLooping(bool bLooping) { m_bIsLooping = bLooping; }
 
-    virtual void deserializeField(const std::string_view& strFieldName, const std::string_view& strFieldValue) override;
-    void onNodeFinishedDeserialization() override;
-
 private:
     ParticleGPUInstance* m_arrParticlesGPU = nullptr;
     ParticleCPUInstance* m_arrParticlesCPU = nullptr;
@@ -170,5 +169,7 @@ private:
     void updateParticle(int& nIndex, float fDeltaTime);
     void sortAliveParticleInFront();
 
-    void serializeToWrapper(DataSerializer& serializer) const override;
+    COMPONENT_REGISTER_SERIALIZABLE(ParticleSystem)
 };
+
+REGISTER_CLASS(ParticleSystem)

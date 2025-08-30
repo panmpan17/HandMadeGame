@@ -3,13 +3,13 @@ m_position: -0.5, 0, 0
 m_fRotation: 0
 m_bIsActive: 1
 }
-8Triangle {
+Triangle {
 m_pShader: 4
 }
-6Rotate {
+Rotate {
 m_fRotationSpeed: -1
 }
-8Movement {
+Movement {
 m_fMoveSpeed: 1
 }
 Node {
@@ -17,7 +17,7 @@ m_position: -0.4, 0, 0
 m_fRotation: 0
 m_bIsActive: 1
 }
-8Triangle {
+Triangle {
 m_pShader: 4
 }
 Node {
@@ -25,14 +25,14 @@ m_position: 0.5, 0.5, 0
 m_fRotation: 0
 m_bIsActive: 1
 }
-4Quad {
+Quad {
 m_fWidth: 0.5
 m_fHeight: 0.5
 m_color: 1, 0, 0, 1
 m_pImage: assets/images/test.png
 m_pShader: 1
 }
-6Rotate {
+Rotate {
 m_fRotationSpeed: 1
 }
 Node {
@@ -40,7 +40,7 @@ m_position: 0.5, 0.5, 0
 m_fRotation: 0
 m_bIsActive: 1
 }
-4Quad {
+Quad {
 m_fWidth: 0.3
 m_fHeight: 0.3
 m_color: 0.5, 0.5, 1, 1
@@ -52,7 +52,7 @@ m_position: 0, 0, 0
 m_fRotation: 0
 m_bIsActive: 1
 }
-14ParticleSystem {
+ParticleSystem {
 m_nAllParticleCount: 100
 m_eSpawnShape: 0
 m_fSpawnShapeWidth: 0.1
@@ -65,13 +65,14 @@ m_fStartRotationSpeedMin: 0
 m_fStartRotationSpeedMax: 0
 m_fStartScaleMin: 0.2
 m_fStartScaleMax: 0.4
-m_vecStartColorMin: 1, 0, 0, 1
-m_vecStartColorMax: 0, 1, 0, 1
+m_vecStartColorMin: 1, 1, 1, 1
+m_vecStartColorMax: 0.9, 0.9, 0.9, 1
 m_fStartVelocityMin: 1
 m_fStartVelocityMax: 1
 m_pShader: 3
+strFieldName: 21ParticleIntervalSpawn
 }
-17TwoPointsMovement {
+Component {
 m_vecStart: -0.5, 0
 m_vecEnd: 0.5, 0
 m_fDuration: 2
@@ -81,7 +82,7 @@ m_position: 0.5, 0, 0
 m_fRotation: 0
 m_bIsActive: 1
 }
-14ParticleSystem {
+ParticleSystem {
 m_nAllParticleCount: 100
 m_eSpawnShape: 2
 m_fSpawnShapeWidth: 0.2
@@ -94,18 +95,19 @@ m_fStartRotationSpeedMin: 0
 m_fStartRotationSpeedMax: 0
 m_fStartScaleMin: 0.2
 m_fStartScaleMax: 0.4
-m_vecStartColorMin: 0, 0, 1, 1
-m_vecStartColorMax: 0, 1, 0, 1
+m_vecStartColorMin: 1, 0, 0, 1
+m_vecStartColorMax: 0.9, 0, 0, 1
 m_fStartVelocityMin: 0.3
 m_fStartVelocityMax: 0.5
 m_pShader: 3
+strFieldName: 18ParticleBurstSpawn
 }
 Node {
 m_position: -0.5, 0, 0
 m_fRotation: 0
 m_bIsActive: 1
 }
-14ParticleSystem {
+ParticleSystem {
 m_nAllParticleCount: 100
 m_eSpawnShape: 1
 m_fSpawnShapeWidth: 0.4
@@ -118,25 +120,27 @@ m_fStartRotationSpeedMin: 0
 m_fStartRotationSpeedMax: 0
 m_fStartScaleMin: 0.2
 m_fStartScaleMax: 0.4
-m_vecStartColorMin: 1, 0, 0, 1
+m_vecStartColorMin: 0, 0, 0.9, 1
 m_vecStartColorMax: 0, 0, 1, 1
 m_fStartVelocityMin: 0.3
 m_fStartVelocityMax: 0.5
 m_pShader: 3
+strFieldName: 21ParticleIntervalSpawn
+strFieldName: 18ParticleBurstSpawn
 }
 Node {
 m_position: 0, 0, 0
 m_fRotation: 0
 m_bIsActive: 1
 }
-6Sprite {
+Sprite {
 m_fWidth: 0.36
 m_fHeight: 0.48
 m_color: 1, 1, 1, 1
 m_pImage: assets/images/character_animation.png
 m_pShader: 1
 }
-15SpriteAnimation {
+Component {
 }
-11Character2d {
+Component {
 }

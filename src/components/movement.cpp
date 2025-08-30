@@ -74,6 +74,8 @@ void Movement::deserializeField(const std::string_view& strFieldName, const std:
     DESERIALIZE_FIELD(m_fMoveSpeed);
 }
 
+void Movement::onNodeFinishedDeserialization() {}
+
 
 #if defined(__APPLE__) || defined(__MACH__)
 float lerp(float fStart, float fEnd, float fT)

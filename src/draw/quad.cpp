@@ -200,3 +200,19 @@ void Sprite::predrawSetShaderUniforms()
 
     glUniform2f(m_nUVOffsetUniform, m_vecUVOOffset[0], m_vecUVOOffset[1]);
 }
+
+void Sprite::serializeToWrapper(DataSerializer& serializer) const
+{
+    Quad::serializeToWrapper(serializer);
+}
+
+void Sprite::deserializeField(const std::string_view& strFieldName, const std::string_view& strFieldValue)
+{
+    Quad::deserializeField(strFieldName, strFieldValue);
+}
+
+void Sprite::onNodeFinishedDeserialization()
+{
+    Quad::onNodeFinishedDeserialization();
+}
+
