@@ -205,38 +205,34 @@ void WorldScene::readFromFiles(const std::string_view& strFilePath)
         ISerializable* pObject = deserializedObjects[i];
         if (Node* pNode = dynamic_cast<Node*>(pObject))
         {
+            if (pCurrentNode)
+            {
+                pCurrentNode->onFinishedDeserialization();
+            }
+
             pCurrentNode = pNode;
             addNode(pNode);
         }
-        else if (Triangle* pTriangle = dynamic_cast<Triangle*>(pObject))
-        {
-            pTriangle->setShader(pTestShader);
-            pTriangle->registerBuffer();
-            pCurrentNode->addComponent(pTriangle);
-        }
-        else if (Quad* pQuad = dynamic_cast<Quad*>(pObject))
-        {
-            pQuad->setShader(pImageShader);
-            pQuad->registerBuffer();
-            pCurrentNode->addComponent(pQuad);
-        }
         else if (ParticleSystem* pParticleSystem = dynamic_cast<ParticleSystem*>(pObject))
-        {
-            pParticleSystem->setShader(pParticleShader);
-            pParticleSystem->registerBuffer();
+        {;
             pParticleSystem->addParticleModule(new ParticleIntervalSpawn(10));
             pParticleSystem->addParticleModule(new ParticleBurstSpawn(0.0f, 20));
             pCurrentNode->addComponent(pParticleSystem);
         }
-        else if (Component* pRotate = dynamic_cast<Component*>(pObject))
+        else if (Component* pComponent = dynamic_cast<Component*>(pObject))
         {
-            pCurrentNode->addComponent(pRotate);
+            pCurrentNode->addComponent(pComponent);
         }
         else
         {
             // Unknown object type, handle accordingly
             delete pObject; // Prevent memory leak
         }
+    }
+
+    if (pCurrentNode)
+    {
+        pCurrentNode->onFinishedDeserialization();
     }
 }
 

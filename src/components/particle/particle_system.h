@@ -113,6 +113,7 @@ public:
     void setIsLooping(bool bLooping) { m_bIsLooping = bLooping; }
 
     virtual void deserializeField(const std::string_view& strFieldName, const std::string_view& strFieldValue) override;
+    void onNodeFinishedDeserialization() override;
 
 private:
     ParticleGPUInstance* m_arrParticlesGPU = nullptr;

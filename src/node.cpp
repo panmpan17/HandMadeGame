@@ -36,6 +36,19 @@ void Node::deserializeField(const std::string_view& strFieldName, const std::str
     DESERIALIZE_FIELD(m_bIsActive);
 }
 
+void Node::onFinishedDeserialization()
+{
+    int nSize = m_oComponentArray.getSize();
+    for (int i = 0; i < nSize; ++i)
+    {
+        Component* pComponent = m_oComponentArray.getElement(i);
+        if (pComponent)
+        {
+            pComponent->onNodeFinishedDeserialization();
+        }
+    }
+}
+
 void Node::update(float deltaTime)
 {
     // Update logic for the node, if any

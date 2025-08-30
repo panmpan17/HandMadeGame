@@ -16,6 +16,7 @@ public:
     ~Shader();
 
     inline const std::string& getName() const { return m_strName; }
+    inline int getId() const { return m_nId; }
 
     inline GLuint getProgram() const { return m_nProgram; }
 

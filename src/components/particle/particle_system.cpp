@@ -3,6 +3,7 @@
 #include <glad/gl.h>
 #include "../../draw/shader.h"
 #include "../../draw/vertex.h"
+#include "../../draw/shader_loader.h"
 #include "../../debug_macro.h"
 #include "../../node.h"
 #include "../../camera.h"
@@ -128,7 +129,7 @@ void ParticleSystem::setShader(Shader* pShader)
     m_nMVPUniForm = pShader->getUniformLocation("u_MVP");
     m_nNodeTransformUniform = pShader->getUniformLocation("u_nodeTransform");
     m_nUseNodeTransformUniform = pShader->getUniformLocation("u_useNodeTransform");
-    m_nUseTextureUniform = pShader->getUniformLocation("UseTexture");
+    m_nUseTextureUniform = pShader->getUniformLocation("u_useTexture");
     m_nTextureUniform = pShader->getUniformLocation("u_tex0");
 }
 
@@ -363,6 +364,11 @@ void ParticleSystem::serializeToWrapper(DataSerializer& serializer) const
     serializer.ADD_ATTRIBUTES(m_vecStartColorMax);
     serializer.ADD_ATTRIBUTES(m_fStartVelocityMin);
     serializer.ADD_ATTRIBUTES(m_fStartVelocityMax);
+
+    if (m_pShader)
+    {
+        serializer.ADD_ATTRIBUTES_VALUE(m_pShader, m_pShader->getId());
+    }
 }
 
 void ParticleSystem::deserializeField(const std::string_view& strFieldName, const std::string_view& strFieldValue)
@@ -388,4 +394,18 @@ void ParticleSystem::deserializeField(const std::string_view& strFieldName, cons
     DESERIALIZE_FIELD(m_vecStartColorMax);
     DESERIALIZE_FIELD(m_fStartVelocityMin);
     DESERIALIZE_FIELD(m_fStartVelocityMax);
+
+    IF_DESERIALIZE_FIELD_CHECK(m_pShader)
+    {
+        m_pShader = ShaderLoader::getInstance()->getShader(std::atoi(strFieldValue.data()));
+    }
+}
+
+void ParticleSystem::onNodeFinishedDeserialization()
+{
+    if (m_pShader)
+    {
+        setShader(m_pShader);
+        registerBuffer();
+    }
 }

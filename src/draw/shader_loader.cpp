@@ -40,6 +40,11 @@ void ShaderLoader::readRegistryFromFile()
     std::string strLine;
     while (reader.readLine(strLine))
     {
+        if (strLine.front() == '#')
+        {
+            continue;
+        }
+
         if (strLine.front() != ' ')
         {
             if (nCurrentShaderId != -1 && !strCurrentShaderName.empty() && !strCurrentVertexPath.empty() && !strCurrentFragmentPath.empty())
@@ -88,7 +93,6 @@ Shader* ShaderLoader::getShader(const std::string_view& strName) const
 {
     for (const auto& pair : m_mapShaders)
     {
-        LOGLN_EX("Checking shader: {}, {}", pair.second->getName(), strName);
         if (pair.second->getName() == strName)
         {
             return pair.second;

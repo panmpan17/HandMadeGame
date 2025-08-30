@@ -23,6 +23,7 @@ public:
 
     void serializedTo(DataSerializer& serializer) const override;
     virtual void deserializeField(const std::string_view& strFieldName, const std::string_view& strFieldValue) override;
+    virtual void onNodeFinishedDeserialization() {}
 
 protected:
     Node* m_pNode = nullptr;

@@ -2,10 +2,10 @@
   name: image
   vertex: assets/shaders/image.vert
   fragment: assets/shaders/image.frag
-2:
-  name: particle
-  vertex: assets/shaders/particle.vert
-  fragment: assets/shaders/particle.frag
+# 2:
+#   name: particle
+#   vertex: assets/shaders/particle.vert
+#   fragment: assets/shaders/particle.frag
 3:
   name: particle_instance
   vertex: assets/shaders/particle_instance.vert

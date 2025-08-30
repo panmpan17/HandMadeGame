@@ -3,9 +3,11 @@
 
 #include "triangle.h"
 #include "shader.h"
+#include "shader_loader.h"
 #include "../camera.h"
 #include "../node.h"
 #include "../window.h"
+#include "../serializer.h"
 
 #include "../debug_macro.h"
 
@@ -65,4 +67,29 @@ void Triangle::draw()
     glDrawArrays(GL_TRIANGLES, 0, 3);
     INCREASE_DRAW_CALL_COUNT();
     glUseProgram(0);
+}
+
+void Triangle::serializeToWrapper(DataSerializer& serializer) const
+{
+    if (m_pShader)
+    {
+        serializer.ADD_ATTRIBUTES_VALUE(m_pShader, m_pShader->getId());
+    }
+}
+
+void Triangle::deserializeField(const std::string_view& strFieldName, const std::string_view& strFieldValue)
+{
+    IF_DESERIALIZE_FIELD_CHECK(m_pShader)
+    {
+        m_pShader = ShaderLoader::getInstance()->getShader(std::atoi(strFieldValue.data()));
+    }
+}
+
+void Triangle::onNodeFinishedDeserialization()
+{
+    if (m_pShader)
+    {
+        setShader(m_pShader);
+        registerBuffer();
+    }
 }

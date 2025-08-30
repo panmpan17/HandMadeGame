@@ -24,6 +24,7 @@ public:
     inline void setImage(Image* pImage) { m_pImage = pImage; }
 
     virtual void deserializeField(const std::string_view& strFieldName, const std::string_view& strFieldValue) override;
+    virtual void onNodeFinishedDeserialization() override;
 
 protected:
     virtual void predrawSetShaderUniforms();

@@ -11,6 +11,7 @@
 #include "../window.h"
 #include "../serializer.h"
 #include "shader.h"
+#include "shader_loader.h"
 
 
 Quad::Quad(float fWidth, float fHeight, vec4 color) : m_fWidth(fWidth), m_fHeight(fHeight)
@@ -120,13 +121,14 @@ void Quad::serializeToWrapper(DataSerializer& serializer) const
         serializer.ADD_ATTRIBUTES_VALUE(m_pImage, m_pImage->getPath());
     }
 
-    // TODO: add a link to image
+    if (m_pShader)
+    {
+        serializer.ADD_ATTRIBUTES_VALUE(m_pShader, m_pShader->getId());
+    }
 }
 
 void Quad::deserializeField(const std::string_view& strFieldName, const std::string_view& strFieldValue)
 {
-    std::cout << "Deserializing Quad: " << strFieldName << " = " << strFieldValue << std::endl;
-
     DESERIALIZE_FIELD(m_fWidth);
     DESERIALIZE_FIELD(m_fHeight);
     DESERIALIZE_FIELD(m_color);
@@ -134,7 +136,20 @@ void Quad::deserializeField(const std::string_view& strFieldName, const std::str
     IF_DESERIALIZE_FIELD_CHECK(m_pImage)
     {
         m_pImage = ImageLoader::getInstance()->getImageByPath(strFieldValue);
-        std::cout << "Deserializing Quad: " << strFieldName << " = " << strFieldValue << ", " << m_pImage << std::endl;
+    }
+
+    IF_DESERIALIZE_FIELD_CHECK(m_pShader)
+    {
+        m_pShader = ShaderLoader::getInstance()->getShader(std::atoi(strFieldValue.data()));
+    }
+}
+
+void Quad::onNodeFinishedDeserialization()
+{
+    if (m_pShader)
+    {
+        setShader(m_pShader);
+        registerBuffer();
     }
 }
 
