@@ -13,7 +13,7 @@
 #define DESERIALIZE_FIELD(fileName) \
     if (memcmp(strFieldName.data(), #fileName, sizeof(#fileName) - 1) == 0) { \
         DataDeserializer::deserializeField(fileName, strFieldValue); \
-        return; \
+        return true; \
     }
 #define IF_DESERIALIZE_FIELD_CHECK(fileName) \
     if (memcmp(strFieldName.data(), #fileName, sizeof(#fileName) - 1) == 0)

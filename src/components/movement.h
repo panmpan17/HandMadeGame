@@ -67,5 +67,7 @@ protected:
     // TODO: make this flexible
     bool m_bIsMovingForward = false;
 
-    virtual void serializeToWrapper(DataSerializer& serializer) const override;
+    COMPONENT_REGISTER_SERIALIZABLE(TwoPointsMovement)
 };
+
+REGISTER_CLASS(TwoPointsMovement)

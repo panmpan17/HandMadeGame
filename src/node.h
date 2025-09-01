@@ -60,7 +60,7 @@ public:
     bool isActive() const { return m_bIsActive; }
 
     void serializedTo(DataSerializer& serializer) const override;
-    void deserializeField(const std::string_view& strFieldName, const std::string_view& strFieldValue) override;
+    bool deserializeField(const std::string_view& strFieldName, const std::string_view& strFieldValue) override;
     void onFinishedDeserialization();
 
     friend std::ostream& operator<<(std::ostream& os, const Node& node)

@@ -29,11 +29,13 @@ void Node::serializedTo(DataSerializer& serializer) const
     }
 }
 
-void Node::deserializeField(const std::string_view& strFieldName, const std::string_view& strFieldValue)
+bool Node::deserializeField(const std::string_view& strFieldName, const std::string_view& strFieldValue)
 {
     DESERIALIZE_FIELD(m_position);
     DESERIALIZE_FIELD(m_fRotation);
     DESERIALIZE_FIELD(m_bIsActive);
+
+    return false;
 }
 
 void Node::onFinishedDeserialization()

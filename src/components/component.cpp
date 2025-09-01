@@ -10,6 +10,7 @@ void Component::serializedTo(DataSerializer& serializer) const
     serializer.endClassHeader();
 }
 
-void Component::deserializeField(const std::string_view& strFieldName, const std::string_view& strFieldValue)
+bool Component::deserializeField(const std::string_view& strFieldName, const std::string_view& strFieldValue)
 {
+    return false;
 }

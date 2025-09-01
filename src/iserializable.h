@@ -15,7 +15,7 @@ public:
     virtual ~ISerializable() = default;
 
     virtual void serializedTo(DataSerializer& serializer) const = 0;
-    virtual void deserializeField(const std::string_view& strFieldName, const std::string_view& strFieldValue) = 0;
+    virtual bool deserializeField(const std::string_view& strFieldName, const std::string_view& strFieldValue) = 0;
 };
 
 

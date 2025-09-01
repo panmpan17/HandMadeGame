@@ -127,7 +127,7 @@ void Quad::serializeToWrapper(DataSerializer& serializer) const
     }
 }
 
-void Quad::deserializeField(const std::string_view& strFieldName, const std::string_view& strFieldValue)
+bool Quad::deserializeField(const std::string_view& strFieldName, const std::string_view& strFieldValue)
 {
     DESERIALIZE_FIELD(m_fWidth);
     DESERIALIZE_FIELD(m_fHeight);
@@ -136,12 +136,16 @@ void Quad::deserializeField(const std::string_view& strFieldName, const std::str
     IF_DESERIALIZE_FIELD_CHECK(m_pImage)
     {
         m_pImage = ImageLoader::getInstance()->getImageByPath(strFieldValue);
+        return true;
     }
 
     IF_DESERIALIZE_FIELD_CHECK(m_pShader)
     {
         m_pShader = ShaderLoader::getInstance()->getShader(std::atoi(strFieldValue.data()));
+        return true;
     }
+
+    return false;
 }
 
 void Quad::onNodeFinishedDeserialization()
@@ -204,11 +208,24 @@ void Sprite::predrawSetShaderUniforms()
 void Sprite::serializeToWrapper(DataSerializer& serializer) const
 {
     Quad::serializeToWrapper(serializer);
+
+    serializer.ADD_ATTRIBUTES(m_nSpriteSheetXCount);
+    serializer.ADD_ATTRIBUTES(m_nSpriteSheetYCount);
+    serializer.ADD_ATTRIBUTES(m_nSpriteIndex);
 }
 
-void Sprite::deserializeField(const std::string_view& strFieldName, const std::string_view& strFieldValue)
+bool Sprite::deserializeField(const std::string_view& strFieldName, const std::string_view& strFieldValue)
 {
-    Quad::deserializeField(strFieldName, strFieldValue);
+    if (Quad::deserializeField(strFieldName, strFieldValue))
+    {
+        return true;
+    }
+
+    DESERIALIZE_FIELD(m_nSpriteSheetXCount);
+    DESERIALIZE_FIELD(m_nSpriteSheetYCount);
+    DESERIALIZE_FIELD(m_nSpriteIndex);
+
+    return false;
 }
 
 void Sprite::onNodeFinishedDeserialization()

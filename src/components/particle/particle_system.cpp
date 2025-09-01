@@ -364,6 +364,7 @@ void ParticleSystem::serializeToWrapper(DataSerializer& serializer) const
     serializer.ADD_ATTRIBUTES(m_vecStartColorMax);
     serializer.ADD_ATTRIBUTES(m_fStartVelocityMin);
     serializer.ADD_ATTRIBUTES(m_fStartVelocityMax);
+    serializer.ADD_ATTRIBUTES(m_bSimulateInLocal);
 
     if (m_pShader)
     {
@@ -382,13 +383,14 @@ void ParticleSystem::serializeToWrapper(DataSerializer& serializer) const
     }
 }
 
-void ParticleSystem::deserializeField(const std::string_view& strFieldName, const std::string_view& strFieldValue)
+bool ParticleSystem::deserializeField(const std::string_view& strFieldName, const std::string_view& strFieldValue)
 {
     DESERIALIZE_FIELD(m_nAllParticleCount);
 
     IF_DESERIALIZE_FIELD_CHECK(m_eSpawnShape)
     {
         m_eSpawnShape = static_cast<eParticleSpawnShape>(std::atoi(strFieldValue.data()));
+        return true;
     }
 
     DESERIALIZE_FIELD(m_fSpawnShapeWidth);
@@ -405,11 +407,15 @@ void ParticleSystem::deserializeField(const std::string_view& strFieldName, cons
     DESERIALIZE_FIELD(m_vecStartColorMax);
     DESERIALIZE_FIELD(m_fStartVelocityMin);
     DESERIALIZE_FIELD(m_fStartVelocityMax);
+    DESERIALIZE_FIELD(m_bSimulateInLocal);
 
     IF_DESERIALIZE_FIELD_CHECK(m_pShader)
     {
         m_pShader = ShaderLoader::getInstance()->getShader(std::atoi(strFieldValue.data()));
+        return true;
     }
+
+    return false;
 }
 
 void ParticleSystem::onNodeFinishedDeserialization()
