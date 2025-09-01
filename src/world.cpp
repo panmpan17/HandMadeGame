@@ -172,6 +172,7 @@ void WorldScene::init()
         pPlayer->addComponent(pSprite);
 
         auto pSpriteAnimation = new SpriteAnimation(pSprite);
+        pSpriteAnimation->openAnimationFile("assets/character_animation.yaml");
         pPlayer->addComponent(pSpriteAnimation);
 
         auto pCharacter2d = new Character2d(pSpriteAnimation);

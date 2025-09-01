@@ -21,6 +21,7 @@ struct SpriteAnimationInfo
         delete[] m_nSpriteIndexArray;
     }
 
+    std::string m_strName;
     int m_nSpriteIndexArraySize;
     ushort* m_nSpriteIndexArray;
     float m_fAnimateInterval;
@@ -34,6 +35,8 @@ public:
 
     virtual bool isIDrawable() const override { return false; }
     virtual bool isUpdatable() const override { return true; }
+
+    void openAnimationFile(const std::string_view& strFilePath);
 
     int addAnimationInfo(SpriteAnimationInfo* pAnimationInfo)
     {
@@ -63,6 +66,19 @@ public:
         m_fIntervalTimer = 0;
 
         m_pSprite->setSpriteIndex(m_pAnimationInfo->m_nSpriteIndexArray[m_nCurrentFrame]);
+    }
+
+    int getAnimationIndexByName(const std::string& name) const
+    {
+        for (int i = 0; i < m_pAnimationInfoArray.getSize(); ++i)
+        {
+            SpriteAnimationInfo* pInfo = m_pAnimationInfoArray.getElement(i);
+            if (pInfo && pInfo->m_strName == name)
+            {
+                return i;
+            }
+        }
+        return -1;
     }
 
     virtual void update(float deltaTime) override
