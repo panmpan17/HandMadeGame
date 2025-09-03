@@ -18,7 +18,7 @@ OBJS := $(patsubst %.c,$(BUILD_DIR)/%.o,$(OBJS))
 INCLUDES := -I./include
 CPP_STD := -std=c++23
 WARNING_FLAG :=  -Wall -Wextra -O2
-CXXFLAGS := $(CPP_STD) -MMD -MP
+CXXFLAGS := $(CPP_STD) -MMD -MP -g -O0
 RELEASE_BUILD_FLAG := -DDEBUG_FLAG=0
 DEBUG_BUILD_FLAG := -DDEBUG_FLAG=1
 
