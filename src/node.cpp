@@ -4,7 +4,17 @@
 #include <iostream>
 #include "debug_macro.h"
 #include "serializer.h"
+#include "random.h"
 
+
+Node::Node(float fX, float fY, float fZ, float fRotationZ) : m_fRotation(fRotationZ)
+{
+    m_position[0] = fX;
+    m_position[1] = fY;
+    m_position[2] = fZ;
+
+    m_nID = generateRandomUUID();
+}
 
 Node::~Node()
 {
@@ -14,6 +24,7 @@ Node::~Node()
 void Node::serializedTo(DataSerializer& serializer) const
 {
     serializer.startClassHeader("Node");
+    serializer.ADD_ATTRIBUTES(m_nID);
     serializer.ADD_ATTRIBUTES(m_position);
     serializer.ADD_ATTRIBUTES(m_fRotation);
     serializer.ADD_ATTRIBUTES(m_bIsActive);
@@ -29,8 +40,9 @@ void Node::serializedTo(DataSerializer& serializer) const
     }
 }
 
-bool Node::deserializeField(const std::string_view& strFieldName, const std::string_view& strFieldValue)
+bool Node::deserializeField(DataDeserializer& deserializer, const std::string_view& strFieldName, const std::string_view& strFieldValue)
 {
+    DESERIALIZE_FIELD(m_nID);
     DESERIALIZE_FIELD(m_position);
     DESERIALIZE_FIELD(m_fRotation);
     DESERIALIZE_FIELD(m_bIsActive);

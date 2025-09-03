@@ -31,7 +31,8 @@ struct SpriteAnimationInfo
 class SpriteAnimation : public Component
 {
 public:
-    SpriteAnimation(Sprite* pSprite) : m_pSprite(pSprite) {}
+    SpriteAnimation() {}
+    SpriteAnimation(Sprite* pSprite);
 
     virtual bool isIDrawable() const override { return false; }
     virtual bool isUpdatable() const override { return true; }
@@ -104,6 +105,7 @@ public:
 
 protected:
     Sprite* m_pSprite;
+    std::string m_strAnimationFileName;
     PointerExpandableArray<SpriteAnimationInfo*> m_pAnimationInfoArray = PointerExpandableArray<SpriteAnimationInfo*>(5);
     SpriteAnimationInfo* m_pAnimationInfo = nullptr;
     int m_nActiveAnimationIndex = -1;
@@ -111,6 +113,8 @@ protected:
 
     float m_fIntervalTimer = 0;
 
-    virtual void serializeToWrapper(DataSerializer& serializer) const override;
+    COMPONENT_REGISTER_SERIALIZABLE(SpriteAnimation)
 };
+
+REGISTER_CLASS(SpriteAnimation)
 

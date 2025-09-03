@@ -12,10 +12,12 @@
 #include "../serializer.h"
 #include "shader.h"
 #include "shader_loader.h"
+#include "../random.h"
 
 
 Quad::Quad(float fWidth, float fHeight, vec4 color) : m_fWidth(fWidth), m_fHeight(fHeight)
 {
+    m_nID = generateRandomUUID();
     vec4_dup(m_color, color);
 }
 
@@ -127,8 +129,10 @@ void Quad::serializeToWrapper(DataSerializer& serializer) const
     }
 }
 
-bool Quad::deserializeField(const std::string_view& strFieldName, const std::string_view& strFieldValue)
+bool Quad::deserializeField(DataDeserializer& deserializer, const std::string_view& strFieldName, const std::string_view& strFieldValue)
 {
+    if (Component::deserializeField(deserializer, strFieldName, strFieldValue)) return true;
+
     DESERIALIZE_FIELD(m_fWidth);
     DESERIALIZE_FIELD(m_fHeight);
     DESERIALIZE_FIELD(m_color);
@@ -161,6 +165,8 @@ void Quad::onNodeFinishedDeserialization()
 Sprite::Sprite(Image* pImage, int nPixelPerUnit/* = 100*/)
     // : Quad(0.5f, 0.5f, {1.f, 1.f, 1.f, 1.f})
 {
+    m_nID = generateRandomUUID();
+
     m_pImage = pImage;
     m_fWidth = pImage->getWidth() * (1.f / nPixelPerUnit);
     m_fHeight = pImage->getHeight() * (1.f / nPixelPerUnit);
@@ -170,6 +176,8 @@ Sprite::Sprite(Image* pImage, int nPixelPerUnit/* = 100*/)
 
 Sprite::Sprite(Image* pImage, int nSpriteSheetXCount, int nSpriteSheetYCount, int nSpriteIndex/* = 0 */, int nPixelPerUnit/* = 100*/)
 {
+    m_nID = generateRandomUUID();
+    
     m_pImage = pImage;
     m_fWidth = (pImage->getWidth() / (float)nSpriteSheetXCount) * (1.f / nPixelPerUnit);
     m_fHeight = (pImage->getHeight() / (float)nSpriteSheetYCount) * (1.f / nPixelPerUnit);
@@ -214,9 +222,9 @@ void Sprite::serializeToWrapper(DataSerializer& serializer) const
     serializer.ADD_ATTRIBUTES(m_nSpriteIndex);
 }
 
-bool Sprite::deserializeField(const std::string_view& strFieldName, const std::string_view& strFieldValue)
+bool Sprite::deserializeField(DataDeserializer& deserializer, const std::string_view& strFieldName, const std::string_view& strFieldValue)
 {
-    if (Quad::deserializeField(strFieldName, strFieldValue))
+    if (Quad::deserializeField(deserializer, strFieldName, strFieldValue))
     {
         return true;
     }

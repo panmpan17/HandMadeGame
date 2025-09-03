@@ -383,7 +383,7 @@ void ParticleSystem::serializeToWrapper(DataSerializer& serializer) const
     }
 }
 
-bool ParticleSystem::deserializeField(const std::string_view& strFieldName, const std::string_view& strFieldValue)
+bool ParticleSystem::deserializeField(DataDeserializer& deserializer, const std::string_view& strFieldName, const std::string_view& strFieldValue)
 {
     DESERIALIZE_FIELD(m_nAllParticleCount);
 

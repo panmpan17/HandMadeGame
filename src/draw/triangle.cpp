@@ -77,7 +77,7 @@ void Triangle::serializeToWrapper(DataSerializer& serializer) const
     }
 }
 
-bool Triangle::deserializeField(const std::string_view& strFieldName, const std::string_view& strFieldValue)
+bool Triangle::deserializeField(DataDeserializer& deserializer, const std::string_view& strFieldName, const std::string_view& strFieldValue)
 {
     IF_DESERIALIZE_FIELD_CHECK(m_pShader)
     {

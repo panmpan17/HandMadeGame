@@ -1,7 +1,13 @@
 #include "sprite_animation.h"
 #include "../serializer.h"
 #include "../file_utils.h"
+#include "../random.h"
 
+
+SpriteAnimation::SpriteAnimation(Sprite* pSprite) : m_pSprite(pSprite)
+{
+    m_nID = generateRandomUUID();
+}
 
 void SpriteAnimation::openAnimationFile(const std::string_view& strFilePath)
 {
@@ -67,11 +73,44 @@ void SpriteAnimation::openAnimationFile(const std::string_view& strFilePath)
     {
         playAnimationInfo(0);
     }
+
+    m_strAnimationFileName = strFilePath.data();
 }
 
 
 void SpriteAnimation::serializeToWrapper(DataSerializer& serializer) const
 {
+    serializer.ADD_ATTRIBUTES(m_pSprite);
+    serializer.ADD_ATTRIBUTES(m_strAnimationFileName);
+
     // TODO: add m_pSprite link
     // TODO: add animation infos
+}
+
+bool SpriteAnimation::deserializeField(DataDeserializer& deserializer, const std::string_view& strFieldName, const std::string_view& strFieldValue)
+{
+    if (Component::deserializeField(deserializer, strFieldName, strFieldValue))
+    {
+        return true;
+    }
+
+    IF_DESERIALIZE_FIELD_CHECK(m_pSprite)
+    {
+        size_t nId = std::stoull(strFieldValue.data());
+        deserializer.getSerializableFromId(nId, [this](ISerializable* pObj) {
+            m_pSprite = static_cast<Sprite*>(pObj);
+        });
+    }
+
+    IF_DESERIALIZE_FIELD_CHECK(m_strAnimationFileName)
+    {
+        openAnimationFile(strFieldValue);
+    }
+
+    return false;
+}
+
+void SpriteAnimation::onNodeFinishedDeserialization()
+{
+    
 }

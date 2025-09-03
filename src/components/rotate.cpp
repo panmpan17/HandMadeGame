@@ -1,8 +1,10 @@
 #include "rotate.h"
 #include "../serializer.h"
 
-bool Rotate::deserializeField(const std::string_view& strFieldName, const std::string_view& strFieldValue)
+bool Rotate::deserializeField(DataDeserializer& deserializer, const std::string_view& strFieldName, const std::string_view& strFieldValue)
 {
+    if (Component::deserializeField(deserializer, strFieldName, strFieldValue)) return true;
+
     DESERIALIZE_FIELD(m_fRotationSpeed);
 
     return false;

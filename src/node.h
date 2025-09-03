@@ -14,13 +14,7 @@ class Node : public ISerializable
 {
 public:
     Node() {}
-    Node(float fX, float fY, float fZ, float fRotationZ) : m_fRotation(fRotationZ)
-    {
-        m_position[0] = fX;
-        m_position[1] = fY;
-        m_position[2] = fZ;
-    }
-
+    Node(float fX, float fY, float fZ, float fRotationZ);
     ~Node();
 
     inline void setPosition(float fX, float fY) {
@@ -60,7 +54,7 @@ public:
     bool isActive() const { return m_bIsActive; }
 
     void serializedTo(DataSerializer& serializer) const override;
-    bool deserializeField(const std::string_view& strFieldName, const std::string_view& strFieldValue) override;
+    bool deserializeField(DataDeserializer& deserializer, const std::string_view& strFieldName, const std::string_view& strFieldValue) override;
     void onFinishedDeserialization();
 
     friend std::ostream& operator<<(std::ostream& os, const Node& node)

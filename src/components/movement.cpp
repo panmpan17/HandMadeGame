@@ -69,8 +69,10 @@ void Movement::serializeToWrapper(DataSerializer& serializer) const
     serializer.ADD_ATTRIBUTES(m_fMoveSpeed);
 }
 
-bool Movement::deserializeField(const std::string_view& strFieldName, const std::string_view& strFieldValue)
+bool Movement::deserializeField(DataDeserializer& deserializer, const std::string_view& strFieldName, const std::string_view& strFieldValue)
 {
+    if (Component::deserializeField(deserializer, strFieldName, strFieldValue)) return true;
+
     DESERIALIZE_FIELD(m_fMoveSpeed);
 
     return false;
@@ -124,8 +126,10 @@ void TwoPointsMovement::serializeToWrapper(DataSerializer& serializer) const
     serializer.ADD_ATTRIBUTES(m_fDuration);
 }
 
-bool TwoPointsMovement::deserializeField(const std::string_view& strFieldName, const std::string_view& strFieldValue)
+bool TwoPointsMovement::deserializeField(DataDeserializer& deserializer, const std::string_view& strFieldName, const std::string_view& strFieldValue)
 {
+    if (Component::deserializeField(deserializer, strFieldName, strFieldValue)) return true;
+
     DESERIALIZE_FIELD(m_vecStart);
     DESERIALIZE_FIELD(m_vecEnd);
     DESERIALIZE_FIELD(m_fDuration);

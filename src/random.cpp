@@ -65,3 +65,9 @@ void randomOnUnitSphere(vec3& vResult)
     vResult[1] = sin(phi) * sin(theta);
     vResult[2] = cos(phi);
 }
+
+size_t generateRandomUUID()
+{
+    std::uniform_int_distribution<size_t> randomRange(0, SIZE_MAX);
+    return randomRange(gen);
+}

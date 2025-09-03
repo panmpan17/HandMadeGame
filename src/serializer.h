@@ -5,6 +5,7 @@
 #include <fstream>
 #include <iostream>
 #include <vector>
+#include <functional>
 
 
 #define CHECK_FILE_IS_OPEN if (!m_oOutputFile.is_open()) { std::cerr << "Error: File not open\n"; return; }
@@ -59,6 +60,11 @@ public:
         CHECK_FILE_IS_OPEN;
         m_oOutputFile << strAttributeNames << ": " << fValue << "\n";
     }
+    void addAttributes(const std::string_view& strAttributeNames, size_t nValue)
+    {
+        CHECK_FILE_IS_OPEN;
+        m_oOutputFile << strAttributeNames << ": " << nValue << "\n";
+    }
     void addAttributes(const std::string_view& strAttributeNames, const vec2& vecValue)
     {
         CHECK_FILE_IS_OPEN;
@@ -84,6 +90,7 @@ public:
         CHECK_FILE_IS_OPEN;
         m_oOutputFile << strAttributeNames << ": " << strValue << "\n";
     }
+    void addAttributes(const std::string_view& strAttributeNames, ISerializable* pValue);
 
     DataSerializer& operator<<(const ISerializable* pObject);
 
@@ -121,6 +128,10 @@ public:
     {
         outFloat = std::stof(strFieldValue.data());
     }
+    static void deserializeField(size_t& outSizeT, const std::string_view& strFieldValue)
+    {
+        outSizeT = static_cast<size_t>(std::stoull(strFieldValue.data()));
+    }
     static void deserializeField(bool& outBool, const std::string_view& strFieldValue)
     {
         outBool = std::string(strFieldValue) == "1";
@@ -143,6 +154,8 @@ public:
 
     void read();
 
+    void getSerializableFromId(size_t nId, std::function<void(ISerializable*)> outSerializable);
+
 protected:
     std::ifstream m_oInputFile;
     bool m_bIsClassStarted = false;
@@ -150,4 +163,7 @@ protected:
 
     ISerializable* m_pCurrentDeserializingObject = nullptr;
     std::vector<ISerializable*> m_vecDeserializedObjects;
+    // Don't create or delete anything when using this map
+    std::unordered_map<size_t, ISerializable*> m_mapIDToObject;
+    std::unordered_map<size_t, std::vector<std::function<void(ISerializable*)>>> m_vecPendingCallbacks;
 };

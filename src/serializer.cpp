@@ -8,6 +8,11 @@
 #include "components/movement.h"
 #include "components/particle/particle_system.h"
 
+void DataSerializer::addAttributes(const std::string_view& strAttributeNames, ISerializable* pValue)
+{
+    CHECK_FILE_IS_OPEN;
+    m_oOutputFile << strAttributeNames << ": " << (pValue ? pValue->getID() : 0) << "\n";
+}
 
 DataSerializer& DataSerializer::operator<<(const ISerializable* pObject)
 {
@@ -54,24 +59,66 @@ void DataDeserializer::read()
 
             m_bIsClassStarted = m_pCurrentDeserializingObject != nullptr;
         }
-        else if (memcmp(&strBack, "}", 1) == 0) {
-            if (m_bIsClassStarted) {
-
-                // TODO: store it somewhere
-                // std::cout << "Class " << m_strClassName << ' ' << *(static_cast<Node*>(m_pCurrentDeserializingObject)) <<  " end" << "\n";
-
+        else if (memcmp(&strBack, "}", 1) == 0)
+        {
+            if (m_bIsClassStarted)
+            {
                 m_vecDeserializedObjects.push_back(m_pCurrentDeserializingObject);
+
+
+                size_t nId = m_pCurrentDeserializingObject->getID();
+                // LOGLN_EX("Deserialized object of type: {}, ID {}", typeid(*m_pCurrentDeserializingObject).name(), nId);
+                if (nId != 0)
+                {
+                    m_mapIDToObject[nId] = m_pCurrentDeserializingObject;
+
+                    auto iterPending = m_vecPendingCallbacks.find(nId);
+                    if (iterPending != m_vecPendingCallbacks.end())
+                    {
+                        for (const auto& callback : iterPending->second)
+                        {
+                            callback(m_mapIDToObject[nId]);
+                        }
+                        m_vecPendingCallbacks.erase(iterPending);
+                    }
+                }
+
                 m_pCurrentDeserializingObject = nullptr;
 
                 m_bIsClassStarted = false;                
             }
         }
-        else if (m_bIsClassStarted && m_pCurrentDeserializingObject) {
+        else if (m_bIsClassStarted && m_pCurrentDeserializingObject)
+        {
             size_t pos = line.find(":");
-            if (pos != std::string::npos) {
+            if (pos != std::string::npos)
+            {
                 // std::cout << "Deserializing field " << line.substr(0, pos) << " with value " << line.substr(pos + 2) << "\n";
-                m_pCurrentDeserializingObject->deserializeField(line.substr(0, pos), line.substr(pos + 2));
+                m_pCurrentDeserializingObject->deserializeField(*this, line.substr(0, pos), line.substr(pos + 2));
             }
         }
+    }
+}
+
+void DataDeserializer::getSerializableFromId(size_t nId, std::function<void(ISerializable*)> outSerializable)
+{
+    auto iterSerializable = m_mapIDToObject.find(nId);
+    if (iterSerializable != m_mapIDToObject.end())
+    {
+        // LOGLN_EX("Deserialized object of type: {}", nId);
+        outSerializable(iterSerializable->second);
+        return;
+    }
+
+    auto iterPending = m_vecPendingCallbacks.find(nId);
+    if (iterPending != m_vecPendingCallbacks.end())
+    {
+        // LOGLN_EX("Deserialized object of type: {}, add to pending callbacks", nId);
+        iterPending->second.push_back(outSerializable);
+    }
+    else
+    {
+        // LOGLN_EX("Deserialized object of type: {}, add to pending callbacks, new list", nId);
+        m_vecPendingCallbacks[nId] = { outSerializable };
     }
 }

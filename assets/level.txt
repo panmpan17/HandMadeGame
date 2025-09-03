@@ -1,31 +1,39 @@
 Node {
+m_nID: 2120936912887583754
 m_position: -0.5, 0, 0
 m_fRotation: 0
 m_bIsActive: 1
 }
 Triangle {
+m_nID: 0
 m_pShader: 4
 }
 Rotate {
+m_nID: 0
 m_fRotationSpeed: -1
 }
 Movement {
+m_nID: 0
 m_fMoveSpeed: 1
 }
 Node {
+m_nID: 4384744924341887338
 m_position: -0.4, 0, 0
 m_fRotation: 0
 m_bIsActive: 1
 }
 Triangle {
+m_nID: 0
 m_pShader: 4
 }
 Node {
+m_nID: 10136305636115165793
 m_position: 0.5, 0.5, 0
 m_fRotation: 0
 m_bIsActive: 1
 }
 Quad {
+m_nID: 17084995004656355177
 m_fWidth: 0.5
 m_fHeight: 0.5
 m_color: 1, 0, 0, 1
@@ -33,14 +41,17 @@ m_pImage: assets/images/test.png
 m_pShader: 1
 }
 Rotate {
+m_nID: 0
 m_fRotationSpeed: 1
 }
 Node {
+m_nID: 12553582189840071478
 m_position: 0.5, 0.5, 0
 m_fRotation: 0
 m_bIsActive: 1
 }
 Quad {
+m_nID: 18105447294551548846
 m_fWidth: 0.3
 m_fHeight: 0.3
 m_color: 0.5, 0.5, 1, 1
@@ -48,11 +59,13 @@ m_pImage: assets/images/dust_1.png
 m_pShader: 1
 }
 Node {
+m_nID: 556982749953812755
 m_position: 0, 0, 0
 m_fRotation: 0
 m_bIsActive: 1
 }
 ParticleSystem {
+m_nID: 0
 m_nAllParticleCount: 100
 m_eSpawnShape: 0
 m_fSpawnShapeWidth: 0.1
@@ -69,20 +82,24 @@ m_vecStartColorMin: 1, 1, 1, 1
 m_vecStartColorMax: 0.9, 0.9, 0.9, 1
 m_fStartVelocityMin: 1
 m_fStartVelocityMax: 1
+m_bSimulateInLocal: 0
 m_pShader: 3
 strFieldName: 21ParticleIntervalSpawn
 }
-Component {
+TwoPointsMovement {
+m_nID: 0
 m_vecStart: -0.5, 0
 m_vecEnd: 0.5, 0
 m_fDuration: 2
 }
 Node {
+m_nID: 8612391121475381053
 m_position: 0.5, 0, 0
 m_fRotation: 0
 m_bIsActive: 1
 }
 ParticleSystem {
+m_nID: 0
 m_nAllParticleCount: 100
 m_eSpawnShape: 2
 m_fSpawnShapeWidth: 0.2
@@ -99,15 +116,18 @@ m_vecStartColorMin: 1, 0, 0, 1
 m_vecStartColorMax: 0.9, 0, 0, 1
 m_fStartVelocityMin: 0.3
 m_fStartVelocityMax: 0.5
+m_bSimulateInLocal: 0
 m_pShader: 3
 strFieldName: 18ParticleBurstSpawn
 }
 Node {
+m_nID: 2489070322615582361
 m_position: -0.5, 0, 0
 m_fRotation: 0
 m_bIsActive: 1
 }
 ParticleSystem {
+m_nID: 0
 m_nAllParticleCount: 100
 m_eSpawnShape: 1
 m_fSpawnShapeWidth: 0.4
@@ -124,23 +144,34 @@ m_vecStartColorMin: 0, 0, 0.9, 1
 m_vecStartColorMax: 0, 0, 1, 1
 m_fStartVelocityMin: 0.3
 m_fStartVelocityMax: 0.5
+m_bSimulateInLocal: 0
 m_pShader: 3
 strFieldName: 21ParticleIntervalSpawn
 strFieldName: 18ParticleBurstSpawn
 }
 Node {
+m_nID: 11819591936210013925
 m_position: 0, 0, 0
 m_fRotation: 0
 m_bIsActive: 1
 }
 Sprite {
+m_nID: 11357837167011343764
 m_fWidth: 0.36
 m_fHeight: 0.48
 m_color: 1, 1, 1, 1
 m_pImage: assets/images/character_animation.png
 m_pShader: 1
+m_nSpriteSheetXCount: 4
+m_nSpriteSheetYCount: 4
+m_nSpriteIndex: 12
 }
-Component {
+SpriteAnimation {
+m_nID: 7412052118297562900
+m_pSprite: 11357837167011343764
+m_strAnimationFileName: assets/character_animation.yaml
 }
-Component {
+Character2d {
+m_nID: 0
+m_pAnimation: 7412052118297562900
 }
