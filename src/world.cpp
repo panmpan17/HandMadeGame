@@ -214,12 +214,6 @@ void WorldScene::readFromFiles(const std::string_view& strFilePath)
             pCurrentNode = pNode;
             addNode(pNode);
         }
-        else if (ParticleSystem* pParticleSystem = dynamic_cast<ParticleSystem*>(pObject))
-        {;
-            pParticleSystem->addParticleModule(new ParticleIntervalSpawn(10));
-            pParticleSystem->addParticleModule(new ParticleBurstSpawn(0.0f, 20));
-            pCurrentNode->addComponent(pParticleSystem);
-        }
         else if (Component* pComponent = dynamic_cast<Component*>(pObject))
         {
             pCurrentNode->addComponent(pComponent);
@@ -235,6 +229,11 @@ void WorldScene::readFromFiles(const std::string_view& strFilePath)
     {
         pCurrentNode->onFinishedDeserialization();
     }
+}
+
+void WorldScene::clearAllNodes()
+{
+    m_oNodeArray.clear();
 }
 
 void WorldScene::update(float fDeltatime)

@@ -76,6 +76,20 @@ void Window::configureAndCreateWindow()
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
 #endif
 
+    // GLFWmonitor* pPrimaryMonitor = glfwGetPrimaryMonitor();
+    // const GLFWvidmode* pVideoMode = glfwGetVideoMode(pPrimaryMonitor);
+
+    // m_nWidth = pVideoMode->width;
+    // m_nHeight = pVideoMode->height;
+
+    // // Set window hints to create a borderless, resizable window
+    // glfwWindowHint(GLFW_RED_BITS, pVideoMode->redBits);
+    // glfwWindowHint(GLFW_GREEN_BITS, pVideoMode->greenBits);
+    // glfwWindowHint(GLFW_BLUE_BITS, pVideoMode->blueBits);
+    // glfwWindowHint(GLFW_REFRESH_RATE, pVideoMode->refreshRate);
+    // glfwWindowHint(GLFW_DECORATED, GLFW_FALSE); // This is key for borderless
+
+
     m_pWindow = glfwCreateWindow(m_nWidth, m_nHeight, "My GLFW Window", NULL, NULL);
     if (!m_pWindow)
     {
@@ -83,6 +97,8 @@ void Window::configureAndCreateWindow()
         glfwTerminate();
         return;
     }
+
+    // glfwSetWindowMonitor(m_pWindow, pPrimaryMonitor, 0, 0, pVideoMode->width, pVideoMode->height, pVideoMode->refreshRate);
 
     // GLint flags;
     // glGetIntegerv(GL_CONTEXT_FLAGS, &flags);
@@ -120,8 +136,9 @@ void Window::start()
     ImageLoader::getInstance()->registerImage("character", "assets/images/character_animation.png");
 
     m_pWorldScene = new WorldScene();
-    // m_pWorldScene->readFromFiles("assets/level.txt");
     m_pWorldScene->init();
+    m_pWorldScene->clearAllNodes();
+    m_pWorldScene->readFromFiles("assets/level.txt");
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

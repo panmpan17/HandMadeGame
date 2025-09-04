@@ -125,6 +125,15 @@ public:
         m_nSize = nSize;
     }
 
+    void clear()
+    {
+        for (int i = 0; i < m_nSize; ++i)
+        {
+            delete m_pArray[i];
+            m_pArray[i] = nullptr;
+        }
+    }
+
     int getSize() const { return m_nSize; }
 
     void printAll() const

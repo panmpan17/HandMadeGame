@@ -1,5 +1,5 @@
 Node {
-m_nID: 2120936912887583754
+m_nID: 14516880372141013206
 m_position: -0.5, 0, 0
 m_fRotation: 0
 m_bIsActive: 1
@@ -17,7 +17,7 @@ m_nID: 0
 m_fMoveSpeed: 1
 }
 Node {
-m_nID: 4384744924341887338
+m_nID: 10374726558848727630
 m_position: -0.4, 0, 0
 m_fRotation: 0
 m_bIsActive: 1
@@ -27,13 +27,13 @@ m_nID: 0
 m_pShader: 4
 }
 Node {
-m_nID: 10136305636115165793
+m_nID: 739447017821983722
 m_position: 0.5, 0.5, 0
 m_fRotation: 0
 m_bIsActive: 1
 }
 Quad {
-m_nID: 17084995004656355177
+m_nID: 11818028003685256581
 m_fWidth: 0.5
 m_fHeight: 0.5
 m_color: 1, 0, 0, 1
@@ -45,13 +45,13 @@ m_nID: 0
 m_fRotationSpeed: 1
 }
 Node {
-m_nID: 12553582189840071478
+m_nID: 4934834829670315205
 m_position: 0.5, 0.5, 0
 m_fRotation: 0
 m_bIsActive: 1
 }
 Quad {
-m_nID: 18105447294551548846
+m_nID: 13257856587142742688
 m_fWidth: 0.3
 m_fHeight: 0.3
 m_color: 0.5, 0.5, 1, 1
@@ -59,7 +59,7 @@ m_pImage: assets/images/dust_1.png
 m_pShader: 1
 }
 Node {
-m_nID: 556982749953812755
+m_nID: 5652328788309658183
 m_position: 0, 0, 0
 m_fRotation: 0
 m_bIsActive: 1
@@ -84,7 +84,7 @@ m_fStartVelocityMin: 1
 m_fStartVelocityMax: 1
 m_bSimulateInLocal: 0
 m_pShader: 3
-strFieldName: 21ParticleIntervalSpawn
+module: ParticleIntervalSpawn:0.1
 }
 TwoPointsMovement {
 m_nID: 0
@@ -93,7 +93,7 @@ m_vecEnd: 0.5, 0
 m_fDuration: 2
 }
 Node {
-m_nID: 8612391121475381053
+m_nID: 17712965780210811900
 m_position: 0.5, 0, 0
 m_fRotation: 0
 m_bIsActive: 1
@@ -118,10 +118,10 @@ m_fStartVelocityMin: 0.3
 m_fStartVelocityMax: 0.5
 m_bSimulateInLocal: 0
 m_pShader: 3
-strFieldName: 18ParticleBurstSpawn
+module: ParticleBurstSpawn:1,20
 }
 Node {
-m_nID: 2489070322615582361
+m_nID: 17207359706545591951
 m_position: -0.5, 0, 0
 m_fRotation: 0
 m_bIsActive: 1
@@ -146,17 +146,17 @@ m_fStartVelocityMin: 0.3
 m_fStartVelocityMax: 0.5
 m_bSimulateInLocal: 0
 m_pShader: 3
-strFieldName: 21ParticleIntervalSpawn
-strFieldName: 18ParticleBurstSpawn
+module: ParticleIntervalSpawn:0.1
+module: ParticleBurstSpawn:0,20
 }
 Node {
-m_nID: 11819591936210013925
+m_nID: 9281159641772241837
 m_position: 0, 0, 0
 m_fRotation: 0
 m_bIsActive: 1
 }
 Sprite {
-m_nID: 11357837167011343764
+m_nID: 10726867637315612275
 m_fWidth: 0.36
 m_fHeight: 0.48
 m_color: 1, 1, 1, 1
@@ -167,11 +167,11 @@ m_nSpriteSheetYCount: 4
 m_nSpriteIndex: 12
 }
 SpriteAnimation {
-m_nID: 7412052118297562900
-m_pSprite: 11357837167011343764
+m_nID: 5057278739387019391
+m_pSprite: 10726867637315612275
 m_strAnimationFileName: assets/character_animation.yaml
 }
 Character2d {
 m_nID: 0
-m_pAnimation: 7412052118297562900
+m_pAnimation: 5057278739387019391
 }

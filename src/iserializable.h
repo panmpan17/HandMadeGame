@@ -40,6 +40,7 @@ public:
         auto it = m_mapRegistry.find(strTypeName);
         if (it == m_mapRegistry.end())
         {
+            std::cout << "Registered type: " << strTypeName << std::endl;
             m_mapRegistry[strTypeName] = funcCreator;
         }
     }
@@ -51,6 +52,7 @@ public:
         {
             return it->second();
         }
+        std::cout << "Cant find Registered type: " << strTypeName << std::endl;
         return nullptr;
     }
 

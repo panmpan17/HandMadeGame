@@ -17,6 +17,8 @@ public:
 
     void readFromFiles(const std::string_view& strFilePath);
 
+    void clearAllNodes();
+
 private:
     PointerExpandableArray<Node*> m_oNodeArray = PointerExpandableArray<Node*>(10);
 };

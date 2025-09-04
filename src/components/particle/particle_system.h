@@ -29,7 +29,7 @@ struct ParticleCPUInstance
 
 
 class ParticleSystem;
-class IParticleModule
+class IParticleModule : public ISerializable
 {
 public:
     virtual ~IParticleModule() = default;
@@ -39,6 +39,10 @@ public:
     virtual void onActiveTimeReset() {}
 
     virtual std::string getDeserializedValue() const { return typeid(*this).name(); }
+    virtual void deserializeFromField(const std::string_view& strFieldValue) = 0;
+
+    virtual void serializedTo(DataSerializer& serializer) const override {};
+    virtual bool deserializeField(DataDeserializer& deserializer, const std::string_view& strFieldName, const std::string_view& strFieldValue) override { return false; }
 };
 
 class IParticleIndividualModule

@@ -376,9 +376,8 @@ void ParticleSystem::serializeToWrapper(DataSerializer& serializer) const
         const IParticleModule* pModule = m_arrParticleModules[i];
         if (pModule)
         {
-            std::string strFieldName = "module" + std::to_string(i);
             std::string strModuleDeserializeValue = pModule->getDeserializedValue();
-            serializer.ADD_ATTRIBUTES_VALUE(strFieldName, strModuleDeserializeValue);
+            serializer.ADD_ATTRIBUTES_VALUE(module, strModuleDeserializeValue);
         }
     }
 }
@@ -413,6 +412,27 @@ bool ParticleSystem::deserializeField(DataDeserializer& deserializer, const std:
     {
         m_pShader = ShaderLoader::getInstance()->getShader(std::atoi(strFieldValue.data()));
         return true;
+    }
+
+    IF_DESERIALIZE_FIELD_CHECK(module)
+    {
+        size_t pos = strFieldValue.find(":", 10);
+        if (pos != std::string::npos)
+        {
+            std::string_view strModuleType = strFieldValue.substr(0, pos);
+            std::string_view strModuleValue = strFieldValue.substr(pos + 1);
+
+            ISerializable* pModule = TypeRegistry::instance().create(std::string(strModuleType));
+
+            LOGLN_EX("Deserializing module: {}, value: {}, {}", strModuleType, strModuleValue, pModule == nullptr ? "failed" : "succeeded");
+            if (pModule)
+            {
+                IParticleModule* pParticleModule = static_cast<IParticleModule*>(pModule);
+                pParticleModule->deserializeFromField(strModuleValue);
+                addParticleModule(pParticleModule);
+                return true;
+            }
+        }
     }
 
     return false;
