@@ -45,12 +45,18 @@ public:
     virtual bool deserializeField(DataDeserializer& deserializer, const std::string_view& strFieldName, const std::string_view& strFieldValue) override { return false; }
 };
 
-class IParticleIndividualModule
+class IParticleIndividualModule : public ISerializable
 {
 public:
     virtual ~IParticleIndividualModule() = default;
 
     virtual void update(ParticleSystem& particleSystem, ParticleGPUInstance* pParticleGpu, ParticleCPUInstance* pParticleCpu, float deltaTime) = 0;
+
+    virtual std::string getDeserializedValue() const { return typeid(*this).name(); }
+    virtual void deserializeFromField(const std::string_view& strFieldValue) = 0;
+
+    virtual void serializedTo(DataSerializer& serializer) const override {};
+    virtual bool deserializeField(DataDeserializer& deserializer, const std::string_view& strFieldName, const std::string_view& strFieldValue) override { return false; }
 };
 
 

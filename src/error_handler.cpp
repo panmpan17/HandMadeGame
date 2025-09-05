@@ -26,44 +26,51 @@ void printBackTrace()
     }
 }
 
-void segmentationFaultHandler(int signalCode)
+void segmentationFaultHandler(int nSignalCode)
 {
-    std::cerr << "Segmentation fault (signal " << signalCode << ")\n";
+    std::cerr << "Segmentation fault (signal " << nSignalCode << ")\n";
     printBackTrace();
     exit(EXIT_FAILURE); // Exit the program
 }
 
-void abortHandler(int signalCode)
+void abortHandler(int nSignalCode)
 {
-    std::cerr << "Aborted (signal " << signalCode << ")\n";
+    std::cerr << "Aborted (signal " << nSignalCode << ")\n";
     printBackTrace();
     exit(EXIT_FAILURE);
 }
 
-void floatingPointExceptionHandler(int signalCode)
+void floatingPointExceptionHandler(int nSignalCode)
 {
-    std::cerr << "Floating point exception (signal " << signalCode << ")\n";
+    std::cerr << "Floating point exception (signal " << nSignalCode << ")\n";
     printBackTrace();
     exit(EXIT_FAILURE);
 }
 
-void illegalInstructionHandler(int signalCode)
+void illegalInstructionHandler(int nSignalCode)
 {
-    std::cerr << "Illegal instruction (signal " << signalCode << ")\n";
+    std::cerr << "Illegal instruction (signal " << nSignalCode << ")\n";
     printBackTrace();
     exit(EXIT_FAILURE);
 }
 
-void busErrorHandler(int signalCode)
+void busErrorHandler(int nSignalCode)
 {
-    std::cerr << "Bus error (signal " << signalCode << ")\n";
+    std::cerr << "Bus error (signal " << nSignalCode << ")\n";
     printBackTrace();
     exit(EXIT_FAILURE);
 }
 
-void badSystemCallHandler(int signalCode)
+void badSystemCallHandler(int nSignalCode)
 {
-    std::cerr << "Illegal instruction (signal " << signalCode << ")\n";
+    std::cerr << "Illegal instruction (signal " << nSignalCode << ")\n";
+    printBackTrace();
+    exit(EXIT_FAILURE);
+}
+
+void trapHandler(int nSignalCode)
+{
+    std::cerr << "Trap (signal " << nSignalCode << ")\n";
     printBackTrace();
     exit(EXIT_FAILURE);
 }
@@ -76,6 +83,7 @@ void registerSignalHandlers()
     std::signal(SIGILL, illegalInstructionHandler);
     std::signal(SIGBUS, busErrorHandler);
     std::signal(SIGSYS, badSystemCallHandler);
+    std::signal(SIGTRAP, trapHandler);
 
     // SIGTERM, SIGKILL, SIGHUP, SIGQUIT, SIGINT
 }

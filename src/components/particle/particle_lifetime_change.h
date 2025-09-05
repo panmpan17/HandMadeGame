@@ -6,6 +6,7 @@
 class ScaleThroughParticleLifetime : public IParticleIndividualModule
 {
 public:
+    ScaleThroughParticleLifetime() {}
     ScaleThroughParticleLifetime(float fMin, float fMax) : m_fMinScale(fMin), m_fMaxScale(fMax) {}
 
     void update(ParticleSystem& particleSystem, ParticleGPUInstance* pParticleGpu, ParticleCPUInstance* pParticleCpu, float deltaTime) override
@@ -15,6 +16,11 @@ public:
         pParticleGpu->m_fScale = pParticleCpu->m_fBaseScale * fScaleMultiplier;
     }
 
+    std::string getDeserializedValue() const override;
+    void deserializeFromField(const std::string_view& strFieldValue) override;
+
 private:
-    float m_fMinScale, m_fMaxScale;
+    float m_fMinScale = 0, m_fMaxScale = 0;
 };
+
+REGISTER_CLASS(ScaleThroughParticleLifetime)

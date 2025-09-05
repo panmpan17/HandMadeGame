@@ -1,5 +1,5 @@
 Node {
-m_nID: 14516880372141013206
+m_nID: 12847284222576575601
 m_position: -0.5, 0, 0
 m_fRotation: 0
 m_bIsActive: 1
@@ -17,7 +17,7 @@ m_nID: 0
 m_fMoveSpeed: 1
 }
 Node {
-m_nID: 10374726558848727630
+m_nID: 1685882158123023130
 m_position: -0.4, 0, 0
 m_fRotation: 0
 m_bIsActive: 1
@@ -27,13 +27,13 @@ m_nID: 0
 m_pShader: 4
 }
 Node {
-m_nID: 739447017821983722
+m_nID: 7510090851377713988
 m_position: 0.5, 0.5, 0
 m_fRotation: 0
 m_bIsActive: 1
 }
 Quad {
-m_nID: 11818028003685256581
+m_nID: 16648256714775422564
 m_fWidth: 0.5
 m_fHeight: 0.5
 m_color: 1, 0, 0, 1
@@ -45,13 +45,13 @@ m_nID: 0
 m_fRotationSpeed: 1
 }
 Node {
-m_nID: 4934834829670315205
+m_nID: 9479431398052871935
 m_position: 0.5, 0.5, 0
 m_fRotation: 0
 m_bIsActive: 1
 }
 Quad {
-m_nID: 13257856587142742688
+m_nID: 12263163689916627873
 m_fWidth: 0.3
 m_fHeight: 0.3
 m_color: 0.5, 0.5, 1, 1
@@ -59,7 +59,7 @@ m_pImage: assets/images/dust_1.png
 m_pShader: 1
 }
 Node {
-m_nID: 5652328788309658183
+m_nID: 4943873078340986457
 m_position: 0, 0, 0
 m_fRotation: 0
 m_bIsActive: 1
@@ -83,8 +83,10 @@ m_vecStartColorMax: 0.9, 0.9, 0.9, 1
 m_fStartVelocityMin: 1
 m_fStartVelocityMax: 1
 m_bSimulateInLocal: 0
+m_fGravity: 0, -0.6
 m_pShader: 3
 module: ParticleIntervalSpawn:0.1
+module: ScaleThroughParticleLifetime:0.1,1
 }
 TwoPointsMovement {
 m_nID: 0
@@ -93,7 +95,7 @@ m_vecEnd: 0.5, 0
 m_fDuration: 2
 }
 Node {
-m_nID: 17712965780210811900
+m_nID: 3976462031484154567
 m_position: 0.5, 0, 0
 m_fRotation: 0
 m_bIsActive: 1
@@ -117,11 +119,12 @@ m_vecStartColorMax: 0.9, 0, 0, 1
 m_fStartVelocityMin: 0.3
 m_fStartVelocityMax: 0.5
 m_bSimulateInLocal: 0
+m_fGravity: 0, -0.981
 m_pShader: 3
 module: ParticleBurstSpawn:1,20
 }
 Node {
-m_nID: 17207359706545591951
+m_nID: 157096339459230814
 m_position: -0.5, 0, 0
 m_fRotation: 0
 m_bIsActive: 1
@@ -145,18 +148,19 @@ m_vecStartColorMax: 0, 0, 1, 1
 m_fStartVelocityMin: 0.3
 m_fStartVelocityMax: 0.5
 m_bSimulateInLocal: 0
+m_fGravity: 0, -0.981
 m_pShader: 3
 module: ParticleIntervalSpawn:0.1
 module: ParticleBurstSpawn:0,20
 }
 Node {
-m_nID: 9281159641772241837
+m_nID: 6730433566913365015
 m_position: 0, 0, 0
 m_fRotation: 0
 m_bIsActive: 1
 }
 Sprite {
-m_nID: 10726867637315612275
+m_nID: 16792238324006037102
 m_fWidth: 0.36
 m_fHeight: 0.48
 m_color: 1, 1, 1, 1
@@ -167,11 +171,11 @@ m_nSpriteSheetYCount: 4
 m_nSpriteIndex: 12
 }
 SpriteAnimation {
-m_nID: 5057278739387019391
-m_pSprite: 10726867637315612275
+m_nID: 17137057858047415162
+m_pSprite: 16792238324006037102
 m_strAnimationFileName: assets/character_animation.yaml
 }
 Character2d {
 m_nID: 0
-m_pAnimation: 5057278739387019391
+m_pAnimation: 17137057858047415162
 }

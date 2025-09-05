@@ -365,6 +365,7 @@ void ParticleSystem::serializeToWrapper(DataSerializer& serializer) const
     serializer.ADD_ATTRIBUTES(m_fStartVelocityMin);
     serializer.ADD_ATTRIBUTES(m_fStartVelocityMax);
     serializer.ADD_ATTRIBUTES(m_bSimulateInLocal);
+    serializer.ADD_ATTRIBUTES(m_fGravity);
 
     if (m_pShader)
     {
@@ -374,6 +375,16 @@ void ParticleSystem::serializeToWrapper(DataSerializer& serializer) const
     for (int i = 0; i < 4; ++i)
     {
         const IParticleModule* pModule = m_arrParticleModules[i];
+        if (pModule)
+        {
+            std::string strModuleDeserializeValue = pModule->getDeserializedValue();
+            serializer.ADD_ATTRIBUTES_VALUE(module, strModuleDeserializeValue);
+        }
+    }
+
+    for (int i = 0; i < 4; ++i)
+    {
+        const IParticleIndividualModule* pModule = m_arrParticleIndividualModules[i];
         if (pModule)
         {
             std::string strModuleDeserializeValue = pModule->getDeserializedValue();
@@ -407,6 +418,7 @@ bool ParticleSystem::deserializeField(DataDeserializer& deserializer, const std:
     DESERIALIZE_FIELD(m_fStartVelocityMin);
     DESERIALIZE_FIELD(m_fStartVelocityMax);
     DESERIALIZE_FIELD(m_bSimulateInLocal);
+    DESERIALIZE_FIELD(m_fGravity);
 
     IF_DESERIALIZE_FIELD_CHECK(m_pShader)
     {
@@ -417,22 +429,35 @@ bool ParticleSystem::deserializeField(DataDeserializer& deserializer, const std:
     IF_DESERIALIZE_FIELD_CHECK(module)
     {
         size_t pos = strFieldValue.find(":", 10);
-        if (pos != std::string::npos)
+        if (pos == std::string::npos)
         {
-            std::string_view strModuleType = strFieldValue.substr(0, pos);
-            std::string_view strModuleValue = strFieldValue.substr(pos + 1);
-
-            ISerializable* pModule = TypeRegistry::instance().create(std::string(strModuleType));
-
-            LOGLN_EX("Deserializing module: {}, value: {}, {}", strModuleType, strModuleValue, pModule == nullptr ? "failed" : "succeeded");
-            if (pModule)
-            {
-                IParticleModule* pParticleModule = static_cast<IParticleModule*>(pModule);
-                pParticleModule->deserializeFromField(strModuleValue);
-                addParticleModule(pParticleModule);
-                return true;
-            }
+            return true;
         }
+
+        std::string_view strModuleType = strFieldValue.substr(0, pos);
+        std::string_view strModuleValue = strFieldValue.substr(pos + 1);
+
+        ISerializable* pModule = TypeRegistry::instance().create(std::string(strModuleType));
+
+        LOGLN_EX("Deserializing module: {}, value: {}, {}", strModuleType, strModuleValue, pModule == nullptr ? "failed" : "succeeded");
+        if (!pModule) { return true;}
+
+        IParticleModule* pParticleModule = dynamic_cast<IParticleModule*>(pModule);
+        if (pParticleModule)
+        {
+            pParticleModule->deserializeFromField(strModuleValue);
+            addParticleModule(pParticleModule);
+            return true;
+        }
+        
+        IParticleIndividualModule* pParticleIndividualModule = dynamic_cast<IParticleIndividualModule*>(pModule);
+        if (pParticleIndividualModule)
+        {
+            pParticleIndividualModule->deserializeFromField(strModuleValue);
+            addParticleIndividualModule(pParticleIndividualModule);
+        }
+
+        return true;
     }
 
     return false;
