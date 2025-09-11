@@ -17,6 +17,8 @@
 #include "random.h"
 #include "serialization/serializer.h"
 
+#include "game/pingpong/paddle_control.h"
+
 
 WorldScene::WorldScene()
 {
@@ -207,6 +209,10 @@ void WorldScene::createPinPongGame()
         pQuad->registerBuffer();
         pPaddleLeft->addComponent(pQuad);
 
+        auto pPaddleControl = new PaddleControl(PaddleControlType::PLAYER1, 5.f);
+        pPaddleControl->setPositionBounds(-2.3f, 2.3f);
+        pPaddleLeft->addComponent(pPaddleControl);
+
         addNode(pPaddleLeft);
     }
 
@@ -220,6 +226,10 @@ void WorldScene::createPinPongGame()
         pQuad->registerBuffer();
         pPaddleRight->addComponent(pQuad);
 
+        auto pPaddleControl = new PaddleControl(PaddleControlType::PLAYER2, 5.f);
+        pPaddleControl->setPositionBounds(-2.3f, 2.3f);
+        pPaddleRight->addComponent(pPaddleControl);
+
         addNode(pPaddleRight);
     }
 
@@ -227,7 +237,7 @@ void WorldScene::createPinPongGame()
         auto pCenterLine = new Node();
         pCenterLine->setPosition(0.f, 0.f);
 
-        auto pQuad = new Quad(.1f, 7.5f, vecGray);
+        auto pQuad = new Quad(.1f, 5.625f, vecGray);
         pQuad->setShader(pImageShader);
         pQuad->registerBuffer();
         pCenterLine->addComponent(pQuad);

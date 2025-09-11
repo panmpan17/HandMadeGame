@@ -10,7 +10,7 @@ BUILD_DIR := build
 OUTPUT_FOLDER := output
 OUTPUT_NAME := MyGLFWApp
 
-SRCS := $(wildcard $(SRC_DIR)/*.cpp $(SRC_DIR)/**/*.cpp $(SRC_DIR)/**/**/*.cpp include/glad/glad.c)
+SRCS := $(wildcard $(SRC_DIR)/*.cpp $(SRC_DIR)/**/*.cpp $(SRC_DIR)/**/**/*.cpp $(SRC_DIR)/**/**/**/*.cpp include/glad/glad.c)
 OBJS := $(patsubst %.cpp,$(BUILD_DIR)/%.o,$(SRCS))
 OBJS := $(patsubst %.c,$(BUILD_DIR)/%.o,$(OBJS))
 

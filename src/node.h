@@ -25,6 +25,7 @@ public:
         m_position[1] = fY;
         m_position[2] = fZ;
     }
+    inline void setPosition(const vec3& position) { m_position[0] = position[0]; m_position[1] = position[1]; m_position[2] = position[2]; }
 
     inline void move(float fX, float fY) {
         m_position[0] += fX;
@@ -37,7 +38,9 @@ public:
     }
 
     inline const vec3& getPosition() const { return const_cast<vec3&>(m_position); }
-    inline void setPosition(const vec3& position) { m_position[0] = position[0]; m_position[1] = position[1]; m_position[2] = position[2]; }
+    inline float getPositionX() const { return m_position[0]; }
+    inline float getPositionY() const { return m_position[1]; }
+    inline float getPositionZ() const { return m_position[2]; }
 
     inline void setRotation(float fRotation) { m_fRotation = fRotation; }
     inline float getRotation() const { return m_fRotation; }
