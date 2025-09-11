@@ -118,7 +118,6 @@ void Window::start()
     InputManager::Initialize();
     ImageLoader::Initialize();
     m_pCamera = new Camera();
-    m_pCamera->setWorldSizeScale(1.0f);
 
     glfwSetKeyCallback(m_pWindow, &InputManager::onKeyCallback);
     glfwSetCursorEnterCallback(m_pWindow, &InputManager::onMouseEnterCallback);
@@ -138,9 +137,9 @@ void Window::start()
     ImageLoader::getInstance()->registerImage("character", "assets/images/character_animation.png");
 
     m_pWorldScene = new WorldScene();
-    m_pWorldScene->init();
-    m_pWorldScene->clearAllNodes();
-    m_pWorldScene->readFromFiles("assets/level.txt");
+    m_pWorldScene->createPinPongGame();
+    // m_pWorldScene->clearAllNodes();
+    // m_pWorldScene->readFromFiles("assets/level.txt");
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

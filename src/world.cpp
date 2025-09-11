@@ -1,6 +1,7 @@
 #include "world.h"
 #include "node.h"
 #include "image.h"
+#include "camera.h"
 #include "draw/shader.h"
 #include "draw/quad.h"
 #include "draw/triangle.h"
@@ -27,6 +28,8 @@ WorldScene::~WorldScene()
 
 void WorldScene::init()
 {
+    Camera::main->setWorldSizeScale(1.0f);
+
     // TODO: remove this
     DataSerializer oSerializer("assets/level.txt");
 
@@ -186,8 +189,71 @@ void WorldScene::init()
     oSerializer.finish();
 }
 
+void WorldScene::createPinPongGame()
+{
+    Camera::main->setWorldSizeScale(5.0f);
+
+    Shader* pImageShader = ShaderLoader::getInstance()->getShader("image");
+
+    vec4 vecWhite = {1.f, 1.f, 1.f, 1.f};
+    vec4 vecGray = {.5f, .5f, .5f, 1.f};
+
+    {// Player 1 paddle (left side)
+        auto pPaddleLeft = new Node();
+        pPaddleLeft->setPosition(-4.5f, 0.f);
+
+        auto pQuad = new Quad(.3f, 1.f, vecWhite);
+        pQuad->setShader(pImageShader);
+        pQuad->registerBuffer();
+        pPaddleLeft->addComponent(pQuad);
+
+        addNode(pPaddleLeft);
+    }
+
+    {// Player 2 paddle (right side)
+        auto pPaddleRight = new Node();
+        pPaddleRight->setPosition(4.5f, 0.f);
+
+        
+        auto pQuad = new Quad(.3f, 1.f, vecWhite);
+        pQuad->setShader(pImageShader);
+        pQuad->registerBuffer();
+        pPaddleRight->addComponent(pQuad);
+
+        addNode(pPaddleRight);
+    }
+
+    {// Center line
+        auto pCenterLine = new Node();
+        pCenterLine->setPosition(0.f, 0.f);
+
+        auto pQuad = new Quad(.1f, 7.5f, vecGray);
+        pQuad->setShader(pImageShader);
+        pQuad->registerBuffer();
+        pCenterLine->addComponent(pQuad);
+
+        addNode(pCenterLine);
+    }
+
+    {// Ball
+        auto pBall = new Node();
+        pBall->setPosition(0.f, 0.f);
+
+        auto pQuad = new Quad(.6f, .6f, vecWhite);
+        pQuad->setShader(pImageShader);
+        pQuad->registerBuffer();
+        pBall->addComponent(pQuad);
+
+        // pBall->addComponent(new Movement(3.0f, vec2{1.f, 1.f}));
+
+        addNode(pBall);
+    }
+}
+
 void WorldScene::readFromFiles(const std::string_view& strFilePath)
 {
+    Camera::main->setWorldSizeScale(1.0f);
+
     DataDeserializer deserializer(strFilePath);
     deserializer.read();
 

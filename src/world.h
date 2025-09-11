@@ -10,14 +10,14 @@ public:
     ~WorldScene();
 
     void init();
-    void update(float fDeltatime);
-    void render();
-
-    void addNode(Node* pNode);
-
+    void createPinPongGame();
     void readFromFiles(const std::string_view& strFilePath);
 
+    void addNode(Node* pNode);
     void clearAllNodes();
+
+    void update(float fDeltatime);
+    void render();
 
 private:
     PointerExpandableArray<Node*> m_oNodeArray = PointerExpandableArray<Node*>(10);
