@@ -28,7 +28,7 @@ protected:
 
     GLuint m_nVertexBuffer, m_nVertexArray;
     GLuint m_nSpriteXCountUniform, m_nSpriteYCountUniform, m_nUVOffsetUniform;
-    GLuint m_nMVPUniform, m_nColorUniform, m_nTextureUniform;
+    GLuint m_nMVPUniform, m_nColorUniform, m_nTextureUniform, m_nUseTextureUniform;
 
     float m_fWidth, m_fHeight;
     vec4 m_color = {1.f, 1.f, 1.f, 1.f};

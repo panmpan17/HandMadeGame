@@ -32,7 +32,7 @@ public:
 private:
     GLFWwindow* m_pWindow = nullptr;
 
-    int m_nWidth = 800, m_nHeight = 600;
+    int m_nWidth = 80, m_nHeight = 45;
     int m_nActualWidth = 800, m_nActualHeight = 600;
     float m_fRatio = 1.0f;
 

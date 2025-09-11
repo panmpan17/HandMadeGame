@@ -58,9 +58,17 @@ public:
     }
     inline float getWorldSizeScale() const { return m_fWorldSizeScale; }
 
+    inline bool isFitScreenWidth() const { return m_bFitScreenWidth; }
+    inline void setFitScreenWidth(bool bFit)
+    {
+        m_bFitScreenWidth = bFit;
+        m_bViewMatrixDirty = true;
+    }
+
     const mat4x4& getViewProjectionMatrix();
 
 private:
+    bool m_bFitScreenWidth = true;
     float m_fWorldSizeScale = 5;
     float m_fRatio = 5.0f;
     vec3 m_position = {0.f, 0.f, 0.f};

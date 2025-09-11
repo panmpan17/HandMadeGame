@@ -38,6 +38,7 @@ void Quad::setShader(Shader* pShader)
     m_nMVPUniform = m_pShader->getUniformLocation("u_MVP");
     m_nColorUniform = m_pShader->getUniformLocation("u_imageColor");
     m_nTextureUniform = m_pShader->getUniformLocation("u_tex0");
+    m_nUseTextureUniform = m_pShader->getUniformLocation("u_useTexture");
 }
 
 void Quad::registerBuffer()
@@ -90,11 +91,18 @@ void Quad::draw()
     glUniform4f(m_nColorUniform, m_color[0], m_color[1], m_color[2], 1);
     predrawSetShaderUniforms();
 
-    glUniform1i(m_nTextureUniform, 0); // Texture unit 0
+    if (m_pImage)
+    {
+        glUniform1i(m_nUseTextureUniform, 1);
+        glUniform1i(m_nTextureUniform, 0); // Texture unit 0
 
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, m_pImage ? m_pImage->getTextureID() : 0);
-    // LOGLN_EX("Quad::draw() - Using texture location: {}", m_pShader->getTextureLocation());
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, m_pImage ? m_pImage->getTextureID() : 0);
+    }
+    else
+    {
+        glUniform1i(m_nUseTextureUniform, 0);
+    }
 
     glBindVertexArray(m_nVertexArray);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4); // Draw the quad using triangle strip

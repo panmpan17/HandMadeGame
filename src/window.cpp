@@ -98,6 +98,8 @@ void Window::configureAndCreateWindow()
         return;
     }
 
+    glfwSetWindowAspectRatio(m_pWindow, m_nWidth, m_nHeight);
+
     // glfwSetWindowMonitor(m_pWindow, pPrimaryMonitor, 0, 0, pVideoMode->width, pVideoMode->height, pVideoMode->refreshRate);
 
     // GLint flags;
