@@ -3,9 +3,8 @@
 #include "component.h"
 #include "../node.h"
 #include "../expandable_array.h"
-#include "../draw/quad.h"
+#include "../components/quad.h"
 #include "../debug_macro.h"
-
 
 struct SpriteAnimationInfo
 {

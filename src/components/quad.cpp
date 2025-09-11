@@ -4,14 +4,14 @@
 #include <GLFW/glfw3.h>
 
 #include "quad.h"
-#include "../image.h"
+#include "../draw/image.h"
 #include "../camera.h"
 #include "../debug_macro.h"
 #include "../node.h"
 #include "../window.h"
-#include "../serializer.h"
-#include "shader.h"
-#include "shader_loader.h"
+#include "../serialization/serializer.h"
+#include "../draw/shader.h"
+#include "../draw/shader_loader.h"
 #include "../random.h"
 
 

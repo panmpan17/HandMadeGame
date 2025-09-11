@@ -1,12 +1,7 @@
 #include "serializer.h"
-#include "node.h"
 #include "iserializable.h"
-#include "debug_macro.h"
-#include "draw/triangle.h"
-#include "draw/quad.h"
-#include "components/rotate.h"
-#include "components/movement.h"
-#include "components/particle/particle_system.h"
+#include "../debug_macro.h"
+#include "../node.h"
 
 void DataSerializer::addAttributes(const std::string_view& strAttributeNames, ISerializable* pValue)
 {
@@ -43,10 +38,6 @@ void DataDeserializer::read()
             if (memcmp(strClassName, "Node", 4) == 0)
             {
                 m_pCurrentDeserializingObject = new Node();
-            }
-            else if (memcmp(strClassName, "ParticleSystem", 16) == 0)
-            {
-                m_pCurrentDeserializingObject = new ParticleSystem();
             }
             else
             {

@@ -2,7 +2,7 @@
 
 #include <linmath.h>
 
-#include "vertex.h"
+#include "../draw/vertex.h"
 #include "drawable_interface.h"
 
 typedef unsigned int GLuint;

@@ -1,28 +1,8 @@
 #pragma once
 
-#include <string>
-#include <unordered_map>
 #include <functional>
-#include <iostream>
-// #include "Base.h"
 
-class DataSerializer;
-class DataDeserializer;
-
-class ISerializable
-{
-public:
-    ISerializable() = default;
-    virtual ~ISerializable() = default;
-
-    virtual void serializedTo(DataSerializer& serializer) const = 0;
-    virtual bool deserializeField(DataDeserializer& deserializer, const std::string_view& strFieldName, const std::string_view& strFieldValue) = 0;
-
-    size_t getID() const { return m_nID; }
-
-protected:
-    size_t m_nID = 0;
-};
+class ISerializable;
 
 
 class TypeRegistry {
@@ -40,7 +20,6 @@ public:
         auto it = m_mapRegistry.find(strTypeName);
         if (it == m_mapRegistry.end())
         {
-            std::cout << "Registered type: " << strTypeName << std::endl;
             m_mapRegistry[strTypeName] = funcCreator;
         }
     }
@@ -52,7 +31,6 @@ public:
         {
             return it->second();
         }
-        std::cout << "Cant find Registered type: " << strTypeName << std::endl;
         return nullptr;
     }
 

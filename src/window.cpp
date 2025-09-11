@@ -12,7 +12,7 @@
 #include "window.h"
 #include "camera.h"
 #include "input_handle.h"
-#include "image.h"
+#include "draw/image.h"
 #include "draw/shader_loader.h"
 #include "world.h"
 

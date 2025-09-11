@@ -1,9 +1,9 @@
 #include "node.h"
 #include "components/component.h"
-#include "draw/drawable_interface.h"
+#include "components/drawable_interface.h"
 #include <iostream>
 #include "debug_macro.h"
-#include "serializer.h"
+#include "serialization/serializer.h"
 #include "random.h"
 
 

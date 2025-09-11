@@ -2,7 +2,6 @@
 
 #include <linmath.h>
 #include "expandable_array.h"
-#include "iserializable.h"
 #include "components/component.h"
 
 

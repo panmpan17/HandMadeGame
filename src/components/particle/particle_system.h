@@ -1,7 +1,7 @@
 #pragma once
 
 // #include "../component.h"
-#include "../../draw/drawable_interface.h"
+#include "../drawable_interface.h"
 #include <linmath.h>
 #include <functional>
 

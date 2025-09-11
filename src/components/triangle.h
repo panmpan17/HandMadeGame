@@ -1,7 +1,6 @@
 #pragma once
 
-#include "vertex.h"
-#include "shader.h"
+#include "../draw/vertex.h"
 #include "drawable_interface.h"
 
 typedef unsigned int GLuint;
@@ -32,7 +31,7 @@ public:
     void registerBuffer() override;
     void draw() override;
 
-    inline void setShader(Shader* pShader) override { m_pShader = pShader; m_nMVPUniform = m_pShader->getUniformLocation("u_MVP"); }
+    void setShader(Shader* pShader) override;
 
 private:
     Shader* m_pShader = nullptr;

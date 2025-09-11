@@ -1,5 +1,5 @@
 #include "character2d.h"
-#include "../serializer.h"
+#include "../serialization/serializer.h"
 #include "../debug_macro.h"
 
 Character2d::Character2d(SpriteAnimation* pAnimation) : m_pAnimation(pAnimation)

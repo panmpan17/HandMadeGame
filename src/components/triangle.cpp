@@ -2,12 +2,12 @@
 #include <GLFW/glfw3.h>
 
 #include "triangle.h"
-#include "shader.h"
-#include "shader_loader.h"
+#include "../draw/shader.h"
+#include "../draw/shader_loader.h"
 #include "../camera.h"
 #include "../node.h"
 #include "../window.h"
-#include "../serializer.h"
+#include "../serialization/serializer.h"
 
 #include "../debug_macro.h"
 
@@ -18,6 +18,12 @@ Triangle::Triangle()
 
 Triangle::~Triangle()
 {
+}
+
+void Triangle::setShader(Shader* pShader)
+{
+    m_pShader = pShader;
+    m_nMVPUniform = m_pShader->getUniformLocation("u_MVP");
 }
 
 void Triangle::registerBuffer()

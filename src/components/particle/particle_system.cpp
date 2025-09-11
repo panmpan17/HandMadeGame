@@ -4,14 +4,14 @@
 #include "../../draw/shader.h"
 #include "../../draw/vertex.h"
 #include "../../draw/shader_loader.h"
+#include "../../draw/image.h"
 #include "../../debug_macro.h"
 #include "../../node.h"
 #include "../../camera.h"
 #include "../../window.h"
 #include "../../random.h"
-#include "../../image.h"
 #include "../../platform.h"
-#include "../../serializer.h"
+#include "../../serialization/serializer.h"
 
 
 #define SWAP_PARTICLE_POSITION(i, j) \

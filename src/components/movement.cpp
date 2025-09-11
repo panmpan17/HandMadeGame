@@ -1,6 +1,6 @@
 #include "movement.h"
 #include "../input_handle.h"
-#include "../serializer.h"
+#include "../serialization/serializer.h"
 
 
 Movement::Movement(float fMoveSpeed)

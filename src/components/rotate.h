@@ -2,7 +2,7 @@
 
 #include "component.h"
 #include "../node.h"
-#include "../serializer.h"
+#include "../serialization/type_registry.h"
 
 
 class Rotate : public Component

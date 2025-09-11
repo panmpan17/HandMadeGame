@@ -1,11 +1,11 @@
 #include "world.h"
 #include "node.h"
-#include "image.h"
 #include "camera.h"
+#include "draw/image.h"
 #include "draw/shader.h"
-#include "draw/quad.h"
-#include "draw/triangle.h"
 #include "draw/shader_loader.h"
+#include "components/quad.h"
+#include "components/triangle.h"
 #include "components/rotate.h"
 #include "components/movement.h"
 #include "components/sprite_animation.h"
@@ -15,7 +15,7 @@
 #include "components/particle/particle_spawn.h"
 #include "components/particle/particle_lifetime_change.h"
 #include "random.h"
-#include "serializer.h"
+#include "serialization/serializer.h"
 
 
 WorldScene::WorldScene()

@@ -1,5 +1,5 @@
 #include "sprite_animation.h"
-#include "../serializer.h"
+#include "../serialization/serializer.h"
 #include "../file_utils.h"
 #include "../random.h"
 
