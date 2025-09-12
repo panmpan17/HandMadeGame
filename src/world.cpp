@@ -16,6 +16,7 @@
 #include "components/particle/particle_lifetime_change.h"
 #include "random.h"
 #include "serialization/serializer.h"
+#include "physics/box.h"
 
 #include "game/pingpong/paddle_control.h"
 #include "game/pingpong/pong.h"
@@ -205,14 +206,12 @@ void WorldScene::createPinPongGame()
         auto pPaddleLeft = new Node();
         pPaddleLeft->setPosition(-4.5f, 0.f);
 
-        auto pQuad = new Quad(.3f, 1.f, vecWhite);
-        pQuad->setShader(pImageShader);
-        pQuad->registerBuffer();
-        pPaddleLeft->addComponent(pQuad);
+        Box oBox = Box::fromCenter(pPaddleLeft->getPosition(), 0.3f, 1.f);
 
-        auto pPaddleControl = new PaddleControl(PaddleControlType::PLAYER1, 5.f);
+        auto pPaddleControl = new PaddleControl(oBox, PaddleControlType::PLAYER1, 5.f);
         pPaddleControl->setPositionBounds(-2.3f, 2.3f);
         pPaddleLeft->addComponent(pPaddleControl);
+        pPaddleControl->start();
 
         addNode(pPaddleLeft);
     }
@@ -221,15 +220,12 @@ void WorldScene::createPinPongGame()
         auto pPaddleRight = new Node();
         pPaddleRight->setPosition(4.5f, 0.f);
 
-        
-        auto pQuad = new Quad(.3f, 1.f, vecWhite);
-        pQuad->setShader(pImageShader);
-        pQuad->registerBuffer();
-        pPaddleRight->addComponent(pQuad);
+        Box oBox = Box::fromCenter(pPaddleRight->getPosition(), 0.3f, 1.f);
 
-        auto pPaddleControl = new PaddleControl(PaddleControlType::PLAYER2, 5.f);
+        auto pPaddleControl = new PaddleControl(oBox, PaddleControlType::PLAYER2, 5.f);
         pPaddleControl->setPositionBounds(-2.3f, 2.3f);
         pPaddleRight->addComponent(pPaddleControl);
+        pPaddleControl->start();
 
         addNode(pPaddleRight);
     }

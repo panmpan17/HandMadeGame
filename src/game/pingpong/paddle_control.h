@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../../components/component.h"
+#include "../../physics/box.h"
 
 enum class PaddleControlType
 {
@@ -13,7 +14,7 @@ enum class PaddleControlType
 class PaddleControl : public Component
 {
 public:
-    PaddleControl(PaddleControlType eControlType, float fMaxSpeed = 5.0f);
+    PaddleControl(const Box& oBox, PaddleControlType eControlType, float fMaxSpeed = 5.0f);
     ~PaddleControl();
 
     virtual bool isIDrawable() const override { return false; }
@@ -21,10 +22,12 @@ public:
 
     inline void setPositionBounds(float fMinY, float fMaxY) { m_fPositionMinY = fMinY; m_fPositionMaxY = fMaxY; }
 
+    void start();
     void update(float deltaTime) override;
     void draw() override {}
 
 private:
+    Box m_oBox;
     PaddleControlType m_eControlType;
     float m_fMaxSpeed;
 

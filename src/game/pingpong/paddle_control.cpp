@@ -1,11 +1,13 @@
 #include "paddle_control.h"
 #include "../../input_handle.h"
 #include "../../node.h"
+#include "../../components/quad.h"
+#include "../../draw/shader_loader.h"
 
 #define BIND_CALLBACK_1(func) std::bind(&PaddleControl::func, this, std::placeholders::_1)
 
 
-PaddleControl::PaddleControl(PaddleControlType eControlType, float fMaxSpeed) : m_eControlType(eControlType), m_fMaxSpeed(fMaxSpeed)
+PaddleControl::PaddleControl(const Box& oBox, PaddleControlType eControlType, float fMaxSpeed) : m_oBox(oBox), m_eControlType(eControlType), m_fMaxSpeed(fMaxSpeed)
 {
     switch (m_eControlType)
     {
@@ -27,6 +29,16 @@ PaddleControl::~PaddleControl()
 {
     // InputManager::getInstance()->unregisterKeyPressCallback(KeyCode::KEY_W);
     // InputManager::getInstance()->unregisterKeyPressCallback(KeyCode::KEY_S);
+}
+
+void PaddleControl::start()
+{
+    Shader* pImageShader = ShaderLoader::getInstance()->getShader("image");
+
+    auto pQuad = new Quad(m_oBox.getSizeX(), m_oBox.getSizeY(), vec4{ 1.f, 1.f, 1.f, 1.f });
+    pQuad->setShader(pImageShader);
+    pQuad->registerBuffer();
+    m_pNode->addComponent(pQuad);
 }
 
 void PaddleControl::onUpPressCallback(bool bPressed)
