@@ -159,8 +159,8 @@ void ParticleSystem::draw()
         mat4x4 nodeTransform;
 
         mat4x4_identity(nodeTransform);
-        const vec3& nodePosition = getNode()->getPosition();
-        mat4x4_translate(nodeTransform, nodePosition[0], nodePosition[1], nodePosition[2]);
+        const Vector3& nodePosition = getNode()->getPosition();
+        mat4x4_translate(nodeTransform, nodePosition.x, nodePosition.y, nodePosition.z);
 
         glUniformMatrix4fv(m_nNodeTransformUniform, 1, GL_FALSE, (const GLfloat*) nodeTransform);
     }
@@ -268,9 +268,9 @@ void ParticleSystem::spawnNewParticles(int nSpawnCount/* = 1*/)
             }
             else
             {
-                const vec3& vecBasePosition = getNode()->getPosition();
-                vecBasePositionX = vecBasePosition[0];
-                vecBasePositionY = vecBasePosition[1];
+                const Vector3& vecBasePosition = getNode()->getPosition();
+                vecBasePositionX = vecBasePosition.x;
+                vecBasePositionY = vecBasePosition.y;
             }
 
             switch (m_eSpawnShape)

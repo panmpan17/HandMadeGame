@@ -9,9 +9,9 @@
 
 Node::Node(float fX, float fY, float fZ, float fRotationZ) : m_fRotation(fRotationZ)
 {
-    m_position[0] = fX;
-    m_position[1] = fY;
-    m_position[2] = fZ;
+    m_vecPosition.x = fX;
+    m_vecPosition.y = fY;
+    m_vecPosition.z = fZ;
 
     m_nID = generateRandomUUID();
 }
@@ -25,7 +25,7 @@ void Node::serializedTo(DataSerializer& serializer) const
 {
     serializer.startClassHeader("Node");
     serializer.ADD_ATTRIBUTES(m_nID);
-    serializer.ADD_ATTRIBUTES(m_position);
+    serializer.ADD_ATTRIBUTES(m_vecPosition);
     serializer.ADD_ATTRIBUTES(m_fRotation);
     serializer.ADD_ATTRIBUTES(m_bIsActive);
     serializer.endClassHeader();
@@ -43,7 +43,7 @@ void Node::serializedTo(DataSerializer& serializer) const
 bool Node::deserializeField(DataDeserializer& deserializer, const std::string_view& strFieldName, const std::string_view& strFieldValue)
 {
     DESERIALIZE_FIELD(m_nID);
-    DESERIALIZE_FIELD(m_position);
+    DESERIALIZE_FIELD(m_vecPosition);
     DESERIALIZE_FIELD(m_fRotation);
     DESERIALIZE_FIELD(m_bIsActive);
 

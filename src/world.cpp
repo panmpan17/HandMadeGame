@@ -18,6 +18,7 @@
 #include "serialization/serializer.h"
 
 #include "game/pingpong/paddle_control.h"
+#include "game/pingpong/pong.h"
 
 
 WorldScene::WorldScene()
@@ -254,7 +255,9 @@ void WorldScene::createPinPongGame()
         pQuad->registerBuffer();
         pBall->addComponent(pQuad);
 
-        // pBall->addComponent(new Movement(3.0f, vec2{1.f, 1.f}));
+        auto pPong = new Pong(.6f, 2);
+        pPong->setPositionBounds(-2.8125, 2.8125);
+        pBall->addComponent(pPong);
 
         addNode(pBall);
     }

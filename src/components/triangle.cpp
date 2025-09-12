@@ -59,8 +59,8 @@ void Triangle::draw()
     mat4x4 mvp, local;
     mat4x4_identity(local);
 
-    const vec3& position = m_pNode->getPosition();
-    mat4x4_translate(local, position[0], position[1], position[2]);
+    const Vector3& position = m_pNode->getPosition();
+    mat4x4_translate(local, position.x, position.y, position.z);
 
     mat4x4_rotate_Z(local, local, m_pNode->getRotation());
 

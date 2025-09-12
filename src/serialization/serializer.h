@@ -6,6 +6,7 @@
 #include <iostream>
 #include <vector>
 #include <functional>
+#include "../vector.h"
 
 
 #define CHECK_FILE_IS_OPEN if (!m_oOutputFile.is_open()) { std::cerr << "Error: File not open\n"; return; }
@@ -80,6 +81,16 @@ public:
         CHECK_FILE_IS_OPEN;
         m_oOutputFile << strAttributeNames << ": " << vecValue[0] << ", " << vecValue[1] << ", " << vecValue[2] << ", " << vecValue[3] << "\n";
     }
+    void addAttributes(const std::string_view& strAttributeNames, const Vector2& vecValue)
+    {
+        CHECK_FILE_IS_OPEN;
+        m_oOutputFile << strAttributeNames << ": " << vecValue.x << ", " << vecValue.y << "\n";
+    }
+    void addAttributes(const std::string_view& strAttributeNames, const Vector3& vecValue)
+    {
+        CHECK_FILE_IS_OPEN;
+        m_oOutputFile << strAttributeNames << ": " << vecValue.x << ", " << vecValue.y << ", " << vecValue.z << "\n";
+    }
     void addAttributes(const std::string_view& strAttributeNames, bool bValue)
     {
         CHECK_FILE_IS_OPEN;
@@ -119,6 +130,14 @@ public:
     static void deserializeField(vec4& outVec, const std::string_view& strFieldValue)
     {
         sscanf(strFieldValue.data(), "%f, %f, %f, %f", &outVec[0], &outVec[1], &outVec[2], &outVec[3]);
+    }
+    static void deserializeField(Vector2& outVec, const std::string_view& strFieldValue)
+    {
+        sscanf(strFieldValue.data(), "%f, %f", &outVec.x, &outVec.y);
+    }
+    static void deserializeField(Vector3& outVec, const std::string_view& strFieldValue)
+    {
+        sscanf(strFieldValue.data(), "%f, %f, %f", &outVec.x, &outVec.y, &outVec.z);
     }
     static void deserializeField(int& outInt, const std::string_view& strFieldValue)
     {
