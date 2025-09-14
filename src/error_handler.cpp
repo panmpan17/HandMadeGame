@@ -2,13 +2,24 @@
 
 #include <csignal>
 #include <cstdlib>
+#include <iostream>
+#include "platform.h"
+
+#if IS_PLATFORM_MACOS
+
 #include <execinfo.h>
 #include <unistd.h>
-#include <iostream>
+
+#elif IS_PLATFORM_WINDOWS
+
+
+
+#endif
 
 
 void printBackTrace()
 {
+#if IS_PLATFORM_MACOS
     void* pArray[50];
     size_t nSize = backtrace(pArray, 50);
 
@@ -24,6 +35,7 @@ void printBackTrace()
         }
         free(symbols);
     }
+#endif
 }
 
 void segmentationFaultHandler(int nSignalCode)
@@ -81,9 +93,12 @@ void registerSignalHandlers()
     std::signal(SIGABRT, abortHandler);
     std::signal(SIGFPE, floatingPointExceptionHandler);
     std::signal(SIGILL, illegalInstructionHandler);
+
+#if IS_PLATFORM_MACOS
     std::signal(SIGBUS, busErrorHandler);
     std::signal(SIGSYS, badSystemCallHandler);
     std::signal(SIGTRAP, trapHandler);
+#endif
 
     // SIGTERM, SIGKILL, SIGHUP, SIGQUIT, SIGINT
 }

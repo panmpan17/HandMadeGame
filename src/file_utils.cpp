@@ -114,9 +114,17 @@ FileReader::FileReader(const std::string_view& strPath)
     }
     else
     {
+#if IS_PLATFORM_MACOS
         if (fs::exists(strPath))
+#elif IS_PLATFORM_WINDOWS
+        if (fs::exists(strPath.data()))
+#endif
         {
+#if IS_PLATFORM_MACOS
             file.open(strPath);
+#elif IS_PLATFORM_WINDOWS
+            file.open(strPath.data());
+#endif
         }
         else
         {

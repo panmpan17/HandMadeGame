@@ -2,7 +2,12 @@
 #include "shader.h"
 #include "../file_utils.h"
 #include "../debug_macro.h"
+#include "../platform.h"
 
+#if IS_PLATFORM_MACOS
+#elif IS_PLATFORM_WINDOWS
+#include <cstring>
+#endif
 
 constexpr std::string_view SHADER_REGISTRY_FILE = "assets/shaders/shader_registry.yaml";
 

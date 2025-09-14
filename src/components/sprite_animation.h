@@ -5,14 +5,22 @@
 #include "../expandable_array.h"
 #include "../components/quad.h"
 #include "../debug_macro.h"
+#include "../platform.h"
+
+#if IS_PLATFORM_MACOS
+#define USHORT ushort
+#elif IS_PLATFORM_WINDOWS
+#include <windows.h>
+#define USHORT USHORT
+#endif
 
 struct SpriteAnimationInfo
 {
-    SpriteAnimationInfo(ushort nSpriteIndexArray[], int nArraySize, float fAnimateInterval)
+    SpriteAnimationInfo(USHORT nSpriteIndexArray[], int nArraySize, float fAnimateInterval)
         : m_nSpriteIndexArraySize(nArraySize), m_fAnimateInterval(fAnimateInterval)
     {
-        m_nSpriteIndexArray = new ushort[nArraySize];
-        memcpy(m_nSpriteIndexArray, nSpriteIndexArray, sizeof(ushort) * nArraySize);
+        m_nSpriteIndexArray = new USHORT[nArraySize];
+        memcpy(m_nSpriteIndexArray, nSpriteIndexArray, sizeof(USHORT) * nArraySize);
     }
 
     ~SpriteAnimationInfo()
@@ -22,7 +30,7 @@ struct SpriteAnimationInfo
 
     std::string m_strName;
     int m_nSpriteIndexArraySize;
-    ushort* m_nSpriteIndexArray;
+    USHORT* m_nSpriteIndexArray;
     float m_fAnimateInterval;
 };
 

@@ -42,16 +42,16 @@ void SpriteAnimation::openAnimationFile(const std::string_view& strFilePath)
         else if (memcmp(strLine.data() + 2, "frames", 6) == 0)
         {
             std::string strFrames = strLine.substr(2 + 8);
-            std::vector<ushort> vecFrames;
+            std::vector<USHORT> vecFrames;
             size_t start = 0;
             size_t end = strFrames.find(',');
             while (end != std::string::npos)
             {
-                vecFrames.push_back(static_cast<ushort>(std::stoi(strFrames.substr(start, end - start))));
+                vecFrames.push_back(static_cast<USHORT>(std::stoi(strFrames.substr(start, end - start))));
                 start = end + 1;
                 end = strFrames.find(',', start);
             }
-            vecFrames.push_back(static_cast<ushort>(std::stoi(strFrames.substr(start))));
+            vecFrames.push_back(static_cast<USHORT>(std::stoi(strFrames.substr(start))));
 
             if (!strCurrentAnimationName.empty() && fCurrentAnimationInterval > 0.0f && !vecFrames.empty())
             {

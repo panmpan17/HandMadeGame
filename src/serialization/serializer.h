@@ -7,6 +7,7 @@
 #include <vector>
 #include <functional>
 #include "../vector.h"
+#include "../platform.h"
 
 
 #define CHECK_FILE_IS_OPEN if (!m_oOutputFile.is_open()) { std::cerr << "Error: File not open\n"; return; }
@@ -158,7 +159,11 @@ public:
 
     DataDeserializer(const std::string_view& strFilename)
     {
+#if IS_PLATFORM_MACOS
         m_oInputFile.open(strFilename, std::ios::in);
+#elif IS_PLATFORM_WINDOWS
+        m_oInputFile.open(strFilename.data(), std::ios::in);
+#endif
     }
 
     ~DataDeserializer()
