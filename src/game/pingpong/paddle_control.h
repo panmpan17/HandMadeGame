@@ -26,6 +26,10 @@ public:
     void update(float deltaTime) override;
     void draw() override {}
 
+    Box getBox() const;
+
+    void setPong(Node* pPong) { m_pPong = pPong; }
+
 private:
     Box m_oBox;
     PaddleControlType m_eControlType;
@@ -37,6 +41,10 @@ private:
     bool m_bUpPressed = false;
     bool m_bDownPressed = false;
 
+    Node* m_pPong = nullptr;
+
     void onUpPressCallback(bool bPressed);
     void onDownPressCallback(bool bPressed);
+
+    void updateAI(float fDeltaTime);
 };

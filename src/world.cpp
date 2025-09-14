@@ -198,20 +198,27 @@ void WorldScene::createPinPongGame()
     Camera::main->setWorldSizeScale(5.0f);
 
     Shader* pImageShader = ShaderLoader::getInstance()->getShader("image");
+    Shader* pParticleShader = ShaderLoader::getInstance()->getShader("particle_instance");
 
     vec4 vecWhite = {1.f, 1.f, 1.f, 1.f};
     vec4 vecGray = {.5f, .5f, .5f, 1.f};
+
+    PaddleControl* pPaddleControlLeft;
+    PaddleControl* pPaddleControlRight;
+
+    auto pBall = new Node();
 
     {// Player 1 paddle (left side)
         auto pPaddleLeft = new Node();
         pPaddleLeft->setPosition(-4.5f, 0.f);
 
-        Box oBox = Box::fromCenter(pPaddleLeft->getPosition(), 0.3f, 1.f);
+        Box oBox = Box::fromCenter(0, 0, 0.3f, 1.f);
 
-        auto pPaddleControl = new PaddleControl(oBox, PaddleControlType::PLAYER1, 5.f);
-        pPaddleControl->setPositionBounds(-2.3f, 2.3f);
-        pPaddleLeft->addComponent(pPaddleControl);
-        pPaddleControl->start();
+        pPaddleControlLeft = new PaddleControl(oBox, PaddleControlType::AI, 2.5f);
+        pPaddleControlLeft->setPositionBounds(-2.3f, 2.3f);
+        pPaddleLeft->addComponent(pPaddleControlLeft);
+        pPaddleControlLeft->setPong(pBall);
+        pPaddleControlLeft->start();
 
         addNode(pPaddleLeft);
     }
@@ -220,12 +227,13 @@ void WorldScene::createPinPongGame()
         auto pPaddleRight = new Node();
         pPaddleRight->setPosition(4.5f, 0.f);
 
-        Box oBox = Box::fromCenter(pPaddleRight->getPosition(), 0.3f, 1.f);
+        Box oBox = Box::fromCenter(0, 0, 0.3f, 1.f);
 
-        auto pPaddleControl = new PaddleControl(oBox, PaddleControlType::PLAYER2, 5.f);
-        pPaddleControl->setPositionBounds(-2.3f, 2.3f);
-        pPaddleRight->addComponent(pPaddleControl);
-        pPaddleControl->start();
+        pPaddleControlRight = new PaddleControl(oBox, PaddleControlType::AI, 2.5f);
+        pPaddleControlRight->setPositionBounds(-2.3f, 2.3f);
+        pPaddleRight->addComponent(pPaddleControlRight);
+        pPaddleControlRight->setPong(pBall);
+        pPaddleControlRight->start();
 
         addNode(pPaddleRight);
     }
@@ -243,17 +251,30 @@ void WorldScene::createPinPongGame()
     }
 
     {// Ball
-        auto pBall = new Node();
         pBall->setPosition(0.f, 0.f);
 
-        auto pQuad = new Quad(.6f, .6f, vecWhite);
-        pQuad->setShader(pImageShader);
-        pQuad->registerBuffer();
-        pBall->addComponent(pQuad);
+        Box oBox = Box::fromCenter(0, 0, 0.6f, 0.6f);
 
-        auto pPong = new Pong(.6f, 2);
+        vec4 vecTransparentWhite = {1.f, 1.f, 1.f, 0.5f};
+
+        auto particle = new ParticleSystem(10);
+        // particle->setImage(nullptr);
+        particle->setShader(pParticleShader);
+        particle->registerBuffer();
+        particle->setParticleStartScale(0.6f, 0.6f);
+        particle->setParticleStartColor(vecTransparentWhite, vecTransparentWhite);
+        particle->setIsLooping(true);
+        particle->addParticleModule(new ParticleIntervalSpawn(10));
+        particle->setParticleLifetime(0.5, 0.5);
+        particle->setParticleStartVelocity(0, 0);
+        particle->setGravity({ 0, 0 });
+        particle->addParticleIndividualModule(new OpacityThroughParticleLifetime(1.f, 0.f));
+        pBall->addComponent(particle);
+
+        auto pPong = new Pong(oBox, pPaddleControlLeft, pPaddleControlRight, 8, 8);
         pPong->setPositionBounds(-2.8125, 2.8125);
         pBall->addComponent(pPong);
+        pPong->start();
 
         addNode(pBall);
     }

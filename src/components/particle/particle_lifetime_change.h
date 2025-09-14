@@ -24,3 +24,26 @@ private:
 };
 
 REGISTER_CLASS(ScaleThroughParticleLifetime)
+
+
+class OpacityThroughParticleLifetime : public IParticleIndividualModule
+{
+public:
+    OpacityThroughParticleLifetime() {}
+    OpacityThroughParticleLifetime(float fMin, float fMax) : m_fMinOpacity(fMin), m_fMaxOpacity(fMax) {}
+
+    void update(ParticleSystem& particleSystem, ParticleGPUInstance* pParticleGpu, ParticleCPUInstance* pParticleCpu, float deltaTime) override
+    {
+        float fLifeTimeRatio = pParticleCpu->m_fLifetime / pParticleCpu->m_fMaxLifetime;
+        float fOpacity = m_fMinOpacity + (m_fMaxOpacity - m_fMinOpacity) * (1.0f - fLifeTimeRatio);
+        pParticleGpu->m_fOpacity = fOpacity;
+    }
+
+    std::string getDeserializedValue() const override;
+    void deserializeFromField(const std::string_view& strFieldValue) override;
+
+private:
+    float m_fMinOpacity = 0, m_fMaxOpacity = 0;
+};
+
+REGISTER_CLASS(OpacityThroughParticleLifetime)

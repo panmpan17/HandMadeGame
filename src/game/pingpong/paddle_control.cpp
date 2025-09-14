@@ -3,6 +3,7 @@
 #include "../../node.h"
 #include "../../components/quad.h"
 #include "../../draw/shader_loader.h"
+#include "../../debug_macro.h"
 
 #define BIND_CALLBACK_1(func) std::bind(&PaddleControl::func, this, std::placeholders::_1)
 
@@ -31,6 +32,11 @@ PaddleControl::~PaddleControl()
     // InputManager::getInstance()->unregisterKeyPressCallback(KeyCode::KEY_S);
 }
 
+Box PaddleControl::getBox() const 
+{
+    return m_oBox + m_pNode->getPosition();
+}
+
 void PaddleControl::start()
 {
     Shader* pImageShader = ShaderLoader::getInstance()->getShader("image");
@@ -51,11 +57,14 @@ void PaddleControl::onDownPressCallback(bool bPressed)
     m_bDownPressed = bPressed;
 }
 
-void PaddleControl::update(float deltaTime)
+void PaddleControl::update(float fDeltaTime)
 {
-    if (!m_pNode) return;
+    if (m_eControlType == PaddleControlType::AI)
+    {
+        updateAI(fDeltaTime);
+    }
 
-    float fMoveDistance = m_fMaxSpeed * deltaTime;
+    float fMoveDistance = m_fMaxSpeed * fDeltaTime;
     float posY = m_pNode->getPositionY();
     if (m_bUpPressed && !m_bDownPressed)
     {
@@ -70,5 +79,28 @@ void PaddleControl::update(float deltaTime)
 
         if (posY < m_fPositionMinY) posY = m_fPositionMinY;
         m_pNode->setPosition(m_pNode->getPositionX(), posY);
+    }
+}
+
+void PaddleControl::updateAI(float fDeltaTime)
+{
+    if (!m_pPong) return;
+
+    float fBallY = m_pPong->getPositionY();
+
+    if (fBallY > m_pNode->getPositionY() + 0.5)
+    {
+        m_bUpPressed = true;
+        m_bDownPressed = false;
+    }
+    else if (fBallY < m_pNode->getPositionY() - 0.5)
+    {
+        m_bUpPressed = false;
+        m_bDownPressed = true;
+    }
+    else if (fabs(fBallY - m_pNode->getPositionY()) <= 0.03f)
+    {
+        m_bUpPressed = false;
+        m_bDownPressed = false;
     }
 }

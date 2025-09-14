@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../vector.h"
+#include <format>
 
 
 struct Box
@@ -36,4 +37,36 @@ struct Box
     Vector2 getSize() const { return Vector2{m_fEndX - m_fStartX, m_fEndY - m_fStartY}; }
     float getSizeX() const { return m_fEndX - m_fStartX; }
     float getSizeY() const { return m_fEndY - m_fStartY; }
+
+    Box operator+(const Vector2& vecOther) const { return Box(m_fStartX + vecOther.x, m_fStartY + vecOther.y, m_fEndX + vecOther.x, m_fEndY + vecOther.y); }
+    Box operator+(const Vector3& vecOther) const { return Box(m_fStartX + vecOther.x, m_fStartY + vecOther.y, m_fEndX + vecOther.x, m_fEndY + vecOther.y); }
+
+    std::string getString() const
+    {
+         return std::format("Box(start=({}, {}), end=({}, {}))",
+            m_fStartX, m_fStartY, m_fEndX, m_fEndY );
+    }
 };
+
+
+// template<>
+// struct std::formatter<Box> : std::formatter<std::string> {
+//     // Parse the format specifier (e.g., "{:N}" for name only, "{:V}" for value only)
+//     // This example supports simple specifiers for demonstration.
+//     char presentation_format = 'F'; // Default to full format
+
+//     auto parse(format_parse_context& ctx) {
+//         auto it = ctx.begin();
+//         if (it != ctx.end() && *it != '}') {
+//             presentation_format = *it;
+//             ++it;
+//         }
+//         return it;
+//     }
+
+//     // Format the Box object based on the parsed specifier
+//     auto format(const Box& obj, format_context& ctx) const {
+//         return std::format_to(ctx.out(), "Box(start=({}, {}), end=({}, {}))",
+//             obj.m_fStartX, obj.m_fStartY, obj.m_fEndX, obj.m_fEndY );
+//     }
+// };

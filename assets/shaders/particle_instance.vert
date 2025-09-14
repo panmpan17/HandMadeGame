@@ -10,6 +10,7 @@ layout (location = 2) in vec2 instancePos;
 layout (location = 3) in vec4 instanceColor;
 layout (location = 4) in float rotation;
 layout (location = 5) in float scale;
+layout (location = 6) in float opacity;
 
 out vec4 fragmentColor;
 out vec2 uv;
@@ -28,6 +29,6 @@ void main()
         gl_Position = u_MVP * vec4((rotationMatrix * scaledPos) + instancePos, 0.0, 1.0);
     }
 
-    fragmentColor = instanceColor;
+    fragmentColor = instanceColor * vec4(1.0, 1.0, 1.0, opacity);
     uv = quadTexCoord;
 }

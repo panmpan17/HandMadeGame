@@ -14,6 +14,7 @@ struct ParticleGPUInstance
     vec4 m_vecColor;
     float m_fRotation;
     float m_fScale;
+    float m_fOpacity;
 };
 
 struct ParticleCPUInstance

@@ -79,10 +79,10 @@ void ParticleSystem::registerBuffer()
 {
     // Four corner vertex datas
     VertexWUV arrQuadVerticies[4];
-    arrQuadVerticies[0] = { { -0.1f, -0.1f }, { 0.f, 0.f } };
-    arrQuadVerticies[1] = { { 0.1f, -0.1f }, { 1.f, 0.f } };
-    arrQuadVerticies[2] = { { -0.1f, 0.1f }, { 0.f, 1.f } };
-    arrQuadVerticies[3] = { { 0.1f, 0.1f }, { 1.f, 1.f } };
+    arrQuadVerticies[0] = { { -.5f, -.5f }, { 0.f, 0.f } };
+    arrQuadVerticies[1] = { { .5f, -.5f }, { 1.f, 0.f } };
+    arrQuadVerticies[2] = { { -.5f, .5f }, { 0.f, 1.f } };
+    arrQuadVerticies[3] = { { .5f, .5f }, { 1.f, 1.f } };
 
     glGenBuffers(1, &m_nVertexBuffer);
     glBindBuffer(GL_ARRAY_BUFFER, m_nVertexBuffer);
@@ -117,6 +117,10 @@ void ParticleSystem::registerBuffer()
     glEnableVertexAttribArray(5);
     glVertexAttribPointer(5, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleGPUInstance), (void*)offsetof(ParticleGPUInstance, m_fScale));
     glVertexAttribDivisor(5, 1);
+
+    glEnableVertexAttribArray(6);
+    glVertexAttribPointer(6, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleGPUInstance), (void*)offsetof(ParticleGPUInstance, m_fOpacity));
+    glVertexAttribDivisor(6, 1);
 
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -312,6 +316,7 @@ void ParticleSystem::spawnNewParticles(int nSpawnCount/* = 1*/)
             randomBetweenVec4(m_arrParticlesGPU[i].m_vecColor, m_vecStartColorMin, m_vecStartColorMax);
             m_arrParticlesGPU[i].m_fRotation = randomFloat(m_fStartRotationMin, m_fStartRotationMax);
             m_arrParticlesGPU[i].m_fScale = randomFloat(m_fStartScaleMin, m_fStartScaleMax);
+            m_arrParticlesGPU[i].m_fOpacity = 1.0f;
             m_arrParticlesCPU[i].m_fBaseScale = m_arrParticlesGPU[i].m_fScale;
 
             ++m_nAliveParticleCount;
