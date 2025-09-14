@@ -280,6 +280,27 @@ void WorldScene::createPinPongGame()
     }
 }
 
+void WorldScene::bloomTest()
+{
+    Camera::main->setWorldSizeScale(1.0f);
+
+    Shader* pImageShader = ShaderLoader::getInstance()->getShader("image");
+
+    Image* pTestImage = ImageLoader::getInstance()->getImage("test");
+
+    { // Quad
+        auto pNode = new Node(0.f, 0.f, 0.f, 0.f);
+
+        auto pQuad = new Quad(1.f, 1.f, vec4 { 1.5f, 1.5f, 1.5f, 1.f });
+        pQuad->setShader(pImageShader);
+        pQuad->setImage(pTestImage);
+        pQuad->registerBuffer();
+        pNode->addComponent(pQuad);
+
+        addNode(pNode);
+    }
+}
+
 void WorldScene::readFromFiles(const std::string_view& strFilePath)
 {
     Camera::main->setWorldSizeScale(1.0f);

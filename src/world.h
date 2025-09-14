@@ -11,6 +11,7 @@ public:
 
     void init();
     void createPinPongGame();
+    void bloomTest();
     void readFromFiles(const std::string_view& strFilePath);
 
     void addNode(Node* pNode);

@@ -14,3 +14,7 @@
   name: test
   vertex: assets/shaders/test.vert
   fragment: assets/shaders/test.frag
+4:
+  name: bloom_filter
+  vertex: assets/shaders/bloom_filter.vert
+  fragment: assets/shaders/bloom_filter.frag

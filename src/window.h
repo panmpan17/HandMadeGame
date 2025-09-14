@@ -8,6 +8,8 @@ class WorldScene;
 
 typedef unsigned int GLuint;
 
+class BloomTest;
+
 class Window {
 public:
     static Window* ins;
@@ -24,12 +26,16 @@ public:
         height = ins->m_nHeight;
     }
 
+    inline int GetActualWidth() const { return m_nActualWidth; }
+    inline int GetActualHeight() const { return m_nActualHeight; }
+
     void configureAndCreateWindow();
     void start();
 
     void increaseDrawCallCount();
 
 private:
+    BloomTest* m_pBloomTest = nullptr;
     GLFWwindow* m_pWindow = nullptr;
 
     int m_nWidth = 800, m_nHeight = 450;

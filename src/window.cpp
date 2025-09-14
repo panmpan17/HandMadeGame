@@ -15,6 +15,7 @@
 #include "draw/image.h"
 #include "draw/shader_loader.h"
 #include "world.h"
+#include "bloom_test.h"
 
 
 Window* Window::ins = nullptr;
@@ -100,6 +101,9 @@ void Window::configureAndCreateWindow()
 
     glfwSetWindowAspectRatio(m_pWindow, m_nWidth, m_nHeight);
 
+    glfwGetFramebufferSize(m_pWindow, &m_nActualWidth, &m_nActualHeight);
+    // m_fRatio = m_nActualWidth / (float)m_nActualHeight;
+
     // glfwSetWindowMonitor(m_pWindow, pPrimaryMonitor, 0, 0, pVideoMode->width, pVideoMode->height, pVideoMode->refreshRate);
 
     // GLint flags;
@@ -136,8 +140,12 @@ void Window::start()
     ImageLoader::getInstance()->registerImage("dust", "assets/images/dust_1.png");
     ImageLoader::getInstance()->registerImage("character", "assets/images/character_animation.png");
 
+    m_pBloomTest = new BloomTest();
+    m_pBloomTest->initialize(this);
+
     m_pWorldScene = new WorldScene();
-    m_pWorldScene->createPinPongGame();
+    m_pWorldScene->bloomTest();
+    // m_pWorldScene->createPinPongGame();
     // m_pWorldScene->init();
     // m_pWorldScene->clearAllNodes();
     // m_pWorldScene->readFromFiles("assets/level.txt");
@@ -164,8 +172,14 @@ void Window::mainLoop()
             m_pCamera->setRatio(m_fRatio);
         }
 
-        glViewport(0, 0, m_nActualWidth, m_nActualHeight);
-        glClear(GL_COLOR_BUFFER_BIT);
+        m_fCurrentDrawTime = glfwGetTime();
+        m_fDeltaTime = m_fCurrentDrawTime - m_fLastDrawTime;
+        m_fLastDrawTime = m_fCurrentDrawTime;
+
+        m_pWorldScene->update(m_fDeltaTime);
+
+        // glViewport(0, 0, m_nActualWidth, m_nActualHeight);
+        // glClear(GL_COLOR_BUFFER_BIT);
 
         drawFrame();
 
@@ -178,14 +192,11 @@ void Window::mainLoop()
 
 void Window::drawFrame()
 {
-    m_fCurrentDrawTime = glfwGetTime();
-    m_fDeltaTime = m_fCurrentDrawTime - m_fLastDrawTime;
-    m_fLastDrawTime = m_fCurrentDrawTime;
-
-    m_pWorldScene->update(m_fDeltaTime);
-    
     m_nDrawCallCount = 0;
+
+    m_pBloomTest->startRenderingFBO(this);
     m_pWorldScene->render();
+    m_pBloomTest->endRenderingFBO(this);
     LOG_EX("Draw call count: {}, Fps: {}\r", m_nDrawCallCount, 1.0f / m_fDeltaTime);
 }
 
