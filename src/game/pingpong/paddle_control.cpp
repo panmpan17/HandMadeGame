@@ -41,7 +41,7 @@ void PaddleControl::start()
 {
     Shader* pImageShader = ShaderLoader::getInstance()->getShader("image");
 
-    auto pQuad = new Quad(m_oBox.getSizeX(), m_oBox.getSizeY(), vec4{ 1.f, 1.f, 1.f, 1.f });
+    auto pQuad = new Quad(m_oBox.getSizeX(), m_oBox.getSizeY(), vec4{ 1.8f, 1.8f, 1.8f, 1.f });
     pQuad->setShader(pImageShader);
     pQuad->registerBuffer();
     m_pNode->addComponent(pQuad);

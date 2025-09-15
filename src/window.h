@@ -38,7 +38,7 @@ private:
     BloomTest* m_pBloomTest = nullptr;
     GLFWwindow* m_pWindow = nullptr;
 
-    int m_nWidth = 800, m_nHeight = 450;
+    int m_nWidth = 320, m_nHeight = 180;
     int m_nActualWidth = 800, m_nActualHeight = 600;
     float m_fRatio = 1.0f;
 

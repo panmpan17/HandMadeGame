@@ -200,7 +200,6 @@ void WorldScene::createPinPongGame()
     Shader* pImageShader = ShaderLoader::getInstance()->getShader("image");
     Shader* pParticleShader = ShaderLoader::getInstance()->getShader("particle_instance");
 
-    vec4 vecWhite = {1.f, 1.f, 1.f, 1.f};
     vec4 vecGray = {.5f, .5f, .5f, 1.f};
 
     PaddleControl* pPaddleControlLeft;

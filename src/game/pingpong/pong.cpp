@@ -28,7 +28,7 @@ Box Pong::getBox() const
 
 void Pong::start()
 {
-    auto pQuad = new Quad(.6f, .6f, vec4 { 1.f, 1.f, 1.f, 1.f });
+    auto pQuad = new Quad(.6f, .6f, vec4 { 1.8f, 1.8f, 1.8f, 1.f });
     pQuad->setShader(ShaderLoader::getInstance()->getShader("image"));
     pQuad->registerBuffer();
     m_pNode->addComponent(pQuad);

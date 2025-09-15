@@ -26,3 +26,7 @@
   name: vertical_blur
   vertex: assets/shaders/bloom_filter.vert
   fragment: assets/shaders/vertical_blur.frag
+8:
+  name: bloom_composite
+  vertex: assets/shaders/bloom_filter.vert
+  fragment: assets/shaders/bloom_composite.frag

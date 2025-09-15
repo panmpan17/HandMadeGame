@@ -17,6 +17,9 @@ public:
     void endRenderingGame(const Window* pWindow);
 
 private:
+    GLuint m_nFBOID_original = 0;
+    GLuint m_nRenderTexture_original = 0;
+
     GLuint m_nFBOID_ColorHighlight = 0;
     GLuint m_nRenderTexture_ColorHighlight = 0;
 
@@ -42,6 +45,15 @@ private:
     GLuint m_nTextureUniform_VerticalBlur;
     GLuint m_nTextureHeightUniform_VerticalBlur;
 
+    Shader* m_pCompositeShader = nullptr;
+    GLuint m_nOriginalTextureUniform;
+    GLuint m_nBloomTextureUniform;
+    GLuint m_nBloomTextureScaleUniform;
+    GLuint m_nIntensityUniform;
+
+    float m_nIntensity = 1.0f;
+
+    void initializeOriginalFBO();
     void initializeColorHighlightFBO();
     void initializeHorizontalBlurFBO();
     void initializeVerticalBlurFBO();
@@ -51,4 +63,5 @@ private:
     void renderColorHighlight(const Window* pWindow);
     void renderHorizontalBlur(const Window* pWindow);
     void renderVerticalBlur(const Window* pWindow);
+    void renderComposite(const Window* pWindow);
 };
