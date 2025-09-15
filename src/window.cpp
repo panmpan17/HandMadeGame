@@ -194,9 +194,9 @@ void Window::drawFrame()
 {
     m_nDrawCallCount = 0;
 
-    m_pBloomTest->startRenderingFBO(this);
+    m_pBloomTest->startRenderingGame(this);
     m_pWorldScene->render();
-    m_pBloomTest->endRenderingFBO(this);
+    m_pBloomTest->endRenderingGame(this);
     LOG_EX("Draw call count: {}, Fps: {}\r", m_nDrawCallCount, 1.0f / m_fDeltaTime);
 }
 

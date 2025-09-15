@@ -13,20 +13,42 @@ public:
     BloomTest() {}
 
     void initialize(const Window* pWindow);
-    void startRenderingFBO(const Window* pWindow);
-    void endRenderingFBO(const Window* pWindow);
+    void startRenderingGame(const Window* pWindow);
+    void endRenderingGame(const Window* pWindow);
 
 private:
-    GLuint m_nFBOID;
-    GLuint m_nRenderTexture;
+    GLuint m_nFBOID_ColorHighlight = 0;
+    GLuint m_nRenderTexture_ColorHighlight = 0;
+
+    GLuint m_nFBOID_HorizontalBlur = 0;
+    GLuint m_nRenderTexture_HorizontalBlur = 0;
+
+    GLuint m_nFBOID_VerticalBlur = 0;
+    GLuint m_nRenderTexture_VerticalBlur = 0;
+
     GLuint m_nVertexBuffer;
     GLuint m_nVertexArray;
-    GLuint m_nTextureUniform;
 
     int m_nRenderWidth, m_nRenderHeight;
 
-    Shader* m_pShader = nullptr;
+    Shader* m_pColorHighlightShader = nullptr;
+    GLuint m_nTextureUniform_ColorHighlight;
 
-    void initializeColorHighlightFBO(const Window* pWindow);
+    Shader* m_pHorizontalBlurShader = nullptr;
+    GLuint m_nTextureUniform_HorizontalBlur;
+    GLuint m_nTextureWidthUniform_HorizontalBlur;
+
+    Shader* m_pVerticalBlurShader = nullptr;
+    GLuint m_nTextureUniform_VerticalBlur;
+    GLuint m_nTextureHeightUniform_VerticalBlur;
+
+    void initializeColorHighlightFBO();
+    void initializeHorizontalBlurFBO();
+    void initializeVerticalBlurFBO();
+
     void initializeQuad();
+
+    void renderColorHighlight(const Window* pWindow);
+    void renderHorizontalBlur(const Window* pWindow);
+    void renderVerticalBlur(const Window* pWindow);
 };

@@ -14,7 +14,15 @@
   name: test
   vertex: assets/shaders/test.vert
   fragment: assets/shaders/test.frag
-4:
+5:
   name: bloom_filter
   vertex: assets/shaders/bloom_filter.vert
   fragment: assets/shaders/bloom_filter.frag
+6:
+  name: horizontal_blur
+  vertex: assets/shaders/bloom_filter.vert
+  fragment: assets/shaders/horizontal_blur.frag
+7:
+  name: vertical_blur
+  vertex: assets/shaders/bloom_filter.vert
+  fragment: assets/shaders/vertical_blur.frag
