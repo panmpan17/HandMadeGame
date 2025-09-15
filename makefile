@@ -38,7 +38,7 @@ WIN_OUTPUT_NAME := $(OUTPUT_NAME).exe
 $(OUTPUT_FOLDER)/$(OUTPUT_NAME): $(OBJS)
 	@echo "Linking $(OUTPUT_NAME)..."
 	@mkdir -p $(OUTPUT_FOLDER)
-	@$(MAC_CXX) $(OBJS) -o $@ $(MAC_FRAMEWORK) $(MAC_RPATH) $(MAC_LIBS)
+	@$(MAC_CXX) -g -O0 $(OBJS) -o $@ $(MAC_FRAMEWORK) $(MAC_RPATH) $(MAC_LIBS)
 
 # Compile each .cpp/.c into .o
 $(BUILD_DIR)/%.o: %.cpp
@@ -51,6 +51,8 @@ $(BUILD_DIR)/%.o: %.c
 	@mkdir -p $(dir $@)
 	@$(MAC_CXX) $(CXXFLAGS) $(DEBUG_BUILD_FLAG) $(INCLUDES) -c $< -o $@
 
+# export LDFLAGS="-L/opt/homebrew/opt/binutils/lib"
+# export CPPFLAGS="-I/opt/homebrew/opt/binutils/include"
 
 # --- Mac Targets ---
 mac-compile: $(OUTPUT_FOLDER)/$(OUTPUT_NAME)

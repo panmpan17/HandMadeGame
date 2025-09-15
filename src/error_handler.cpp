@@ -36,6 +36,8 @@ void printBackTrace()
         free(symbols);
     }
 #endif
+
+// atos -o output/MyGLFWApp -l 0x000000010452d224
 }
 
 void segmentationFaultHandler(int nSignalCode)
