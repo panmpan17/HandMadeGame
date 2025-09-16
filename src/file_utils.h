@@ -2,8 +2,8 @@
 
 #include <string>
 #include <fstream>
-// #include <vector>
 
+using OStreamManipulator = std::ostream& (*)(std::ostream&);
 
 class path;
 
@@ -29,4 +29,32 @@ public:
 
 private:
     std::ifstream file;
+};
+
+class FileWriter
+{
+public:
+    // FileWriter(const std::string& strPath, bool bAppend = false);
+    FileWriter(const std::string_view& strPath, bool bAppend = false);
+    ~FileWriter();
+
+    bool isOpen() const;
+
+    std::ofstream& getStream() { return file; }
+
+    template <class T>
+    FileWriter& operator<<(const T& x)
+    {
+        file << x;
+        return *this;
+    }
+
+    FileWriter& operator<<(OStreamManipulator manip)
+    {
+        manip(file);
+        return *this;
+    }
+
+private:
+    std::ofstream file;
 };

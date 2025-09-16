@@ -2,13 +2,16 @@
 
 #include <csignal>
 #include <cstdlib>
-#include <iostream>
+#include <vector>
+#include <sstream>
 #include "platform.h"
+#include "file_utils.h"
 
 #if IS_PLATFORM_MACOS
 
 #include <execinfo.h>
 #include <unistd.h>
+#include <mach-o/dyld.h>
 
 #elif IS_PLATFORM_WINDOWS
 
@@ -19,22 +22,39 @@
 
 void printBackTrace()
 {
+    ErrorOutputter oErrorOutputter;
+
 #if IS_PLATFORM_MACOS
-    void* pArray[50];
-    size_t nSize = backtrace(pArray, 50);
+    // 1. Find load address of main binary
+    const struct mach_header* pMachHeader = _dyld_get_image_header(0);
+    uintptr_t nLoadAddr = reinterpret_cast<uintptr_t>(pMachHeader);
 
-    // Print to stderr (async-signal-safe)
-    std::cerr << "Stack trace (" << nSize << " frames):\n";
+    oErrorOutputter << "=== Crash Backtrace ===\nBinary load address: 0x" << std::hex << nLoadAddr << std::dec << "\n" << std::endl;
 
-    // Get symbols for the stack
-    char** symbols = backtrace_symbols(pArray, nSize);
-    if (symbols)
-    {
-        for (size_t i = 0; i < nSize; i++) {
-            std::cerr << symbols[i] << "\n";
+    // 2. Collect backtrace
+    constexpr int MAX_FRAMES = 64;
+    void* arrBuffers[MAX_FRAMES];
+    int nBacktracePointer = backtrace(arrBuffers, MAX_FRAMES);
+
+    // 3. Print raw addresses & backtrace
+    char** pSymbols = backtrace_symbols(arrBuffers, nBacktracePointer);
+    if (pSymbols) {
+        for (int i = 0; i < nBacktracePointer; i++) {
+            oErrorOutputter << pSymbols[i] << std::endl;
         }
-        free(symbols);
+        free(pSymbols);
     }
+
+    // 4. Print suggested atos command
+    oErrorOutputter << "\nTo symbolize, run:\natos -o <your_binary_path> -l 0x"
+              << std::hex << nLoadAddr;
+    for (int i = 0; i < nBacktracePointer; i++) {
+        oErrorOutputter << " 0x" << std::hex << reinterpret_cast<uintptr_t>(arrBuffers[i]);
+    }
+    oErrorOutputter << std::dec << std::endl;
+    oErrorOutputter << "=======================" << std::endl;
+
+    // TODO: For some functions, it gets the wrong function name, need to investigate
 #endif
 
 // atos -o output/MyGLFWApp -l 0x000000010452d224

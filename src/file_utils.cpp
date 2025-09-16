@@ -186,3 +186,51 @@ void FileReader::close()
         file.close();
     }
 }
+
+
+// FileWriter::FileWriter(const std::string& strPath, bool bAppend)
+// {
+//     std::ios_base::openmode mode = std::ios::out;
+//     if (bAppend) mode |= std::ios::app;
+
+//     if (*strPath.begin() != '/')
+//     {
+//         std::string executablePath = FileUtils::getExecutablePath();
+//         std::string strFullPath = fs::path(executablePath).parent_path().append(strPath).string();
+//         file.open(strFullPath, mode);
+//     }
+//     else
+//     {
+//         file.open(strPath, mode);
+//     }
+// }
+
+FileWriter::FileWriter(const std::string_view& strPath, bool bAppend)
+{
+    std::ios_base::openmode mode = std::ios::out;
+    if (bAppend) mode |= std::ios::app;
+
+    if (*strPath.begin() != '/')
+    {
+        std::string executablePath = FileUtils::getExecutablePath();
+        std::string strFullPath = fs::path(executablePath).parent_path().append(strPath).string();
+        file.open(strFullPath, mode);
+    }
+    else
+    {
+        file.open(strPath.data(), mode);
+    }
+}
+
+FileWriter::~FileWriter()
+{
+    if (file.is_open())
+    {
+        file.close();
+    }
+}
+
+bool FileWriter::isOpen() const
+{
+    return file.is_open();
+}
