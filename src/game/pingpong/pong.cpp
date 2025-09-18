@@ -7,6 +7,8 @@
 #include "../../draw/shader_loader.h"
 #include "../../physics/aabb.h"
 #include "../../random.h"
+#include "../../components/particle/particle_system.h"
+#include "../../components/particle/particle_spawn.h"
 
 
 Pong::Pong(const Box& oBox, PaddleControl* pPaddleControlLeft, PaddleControl* pPaddleControlRight, float fStartSpeed, float fMaxSpeed) :
@@ -28,10 +30,30 @@ Box Pong::getBox() const
 
 void Pong::start()
 {
-    auto pQuad = new Quad(.6f, .6f, vec4 { 1.8f, 1.8f, 1.8f, 1.f });
-    pQuad->setShader(ShaderLoader::getInstance()->getShader("image"));
-    pQuad->registerBuffer();
-    m_pNode->addComponent(pQuad);
+    m_pQuad = new Quad(.6f, .6f, vec4 { 1.8f, 1.8f, 1.8f, 1.f });
+    m_pQuad->setShader(ShaderLoader::getInstance()->getShader("image"));
+    m_pQuad->registerBuffer();
+    m_pNode->addComponent(m_pQuad);
+
+
+
+    Shader* pParticleShader = ShaderLoader::getInstance()->getShader("particle_instance");
+
+    m_pTestParticle = new ParticleSystem(20, false);
+
+    m_pTestParticle->setShader(pParticleShader);
+    m_pTestParticle->registerBuffer();
+    m_pTestParticle->setParticleStartColor({ 1.f, 1.f, .3f, .2f }, { 1.f, 1.f, 0.3f, .4f });
+    m_pTestParticle->setIsLooping(false);
+    m_pTestParticle->addParticleModule(new ParticleBurstSpawn(0, 20));
+    // m_pTestParticle->addParticleIndividualModule(new ScaleThroughParticleLifetime(0.1f, 1.f));
+    m_pTestParticle->setParticleLifetime(.8f, 1);
+    m_pTestParticle->setParticleStartVelocity(.8, 1);
+    m_pTestParticle->setParticleStartScale(0.2f, 0.25f);
+    m_pTestParticle->setGravity({ 0, -0.6f });
+    m_pTestParticle->stop();
+
+    m_pNode->addComponent(m_pTestParticle);
 }
 
 void Pong::update(float fDeltaTime)
@@ -44,6 +66,14 @@ void Pong::update(float fDeltaTime)
             m_vecDirection.normalize();
             m_fSpeed = m_fStartSpeed;
             m_eState = PongState::PLAY;
+
+            float fProgress = ((m_fSpeed - m_fStartSpeed) / (m_fMaxSpeed - m_fStartSpeed));
+            m_pQuad->setColor(
+                m_vecStartColor[0],
+                m_vecStartColor[1],
+                m_vecStartColor[2],
+                1.f
+            );
         }
         break;
     case PongState::PLAY:
@@ -80,6 +110,16 @@ void Pong::updatePlaying(float fDeltaTime)
         m_vecDirection.x = std::abs(m_vecDirection.x);
 
         m_fSpeed = std::min(m_fSpeed + m_fSpeedIncreasePerHit, m_fMaxSpeed);
+
+        float fProgress = ((m_fSpeed - m_fStartSpeed) / (m_fMaxSpeed - m_fStartSpeed));
+        m_pQuad->setColor(
+            m_vecStartColor[0] + (m_vecEndColor[0] - m_vecStartColor[0]) * fProgress,
+            m_vecStartColor[1] + (m_vecEndColor[1] - m_vecStartColor[1]) * fProgress,
+            m_vecStartColor[2] + (m_vecEndColor[2] - m_vecStartColor[2]) * fProgress,
+            1.f
+        );
+
+        m_pTestParticle->play(true);
     }
     else if (AABB::isColliding(boxPong, boxRight))
     {
@@ -87,6 +127,16 @@ void Pong::updatePlaying(float fDeltaTime)
         m_vecDirection.x =  -std::abs(m_vecDirection.x);
 
         m_fSpeed = std::min(m_fSpeed + m_fSpeedIncreasePerHit, m_fMaxSpeed);
+
+        float fProgress = ((m_fSpeed - m_fStartSpeed) / (m_fMaxSpeed - m_fStartSpeed));
+        m_pQuad->setColor(
+            m_vecStartColor[0] + (m_vecEndColor[0] - m_vecStartColor[0]) * fProgress,
+            m_vecStartColor[1] + (m_vecEndColor[1] - m_vecStartColor[1]) * fProgress,
+            m_vecStartColor[2] + (m_vecEndColor[2] - m_vecStartColor[2]) * fProgress,
+            1.f
+        );
+
+        m_pTestParticle->play(true);
     }
     else if (vecPos.x < -5.0f || vecPos.x > 5.0f)
     {

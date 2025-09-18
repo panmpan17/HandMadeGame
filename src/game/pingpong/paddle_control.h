@@ -45,6 +45,7 @@ private:
 
     void onUpPressCallback(bool bPressed);
     void onDownPressCallback(bool bPressed);
+    void onPrimaryPressCallback(bool bPressed);
 
     void updateAI(float fDeltaTime);
 };

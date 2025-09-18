@@ -15,10 +15,12 @@ PaddleControl::PaddleControl(const Box& oBox, PaddleControlType eControlType, fl
     case PaddleControlType::PLAYER1:
         InputManager::getInstance()->registerKeyPressCallback(KeyCode::KEY_W, BIND_CALLBACK_1(onUpPressCallback));
         InputManager::getInstance()->registerKeyPressCallback(KeyCode::KEY_S, BIND_CALLBACK_1(onDownPressCallback));
+        InputManager::getInstance()->registerKeyPressCallback(KeyCode::KEY_SPACE, BIND_CALLBACK_1(onPrimaryPressCallback));
         break;
     case PaddleControlType::PLAYER2:
         InputManager::getInstance()->registerKeyPressCallback(KeyCode::KEY_O, BIND_CALLBACK_1(onUpPressCallback));
         InputManager::getInstance()->registerKeyPressCallback(KeyCode::KEY_L, BIND_CALLBACK_1(onDownPressCallback));
+        InputManager::getInstance()->registerKeyPressCallback(KeyCode::KEY_SPACE, BIND_CALLBACK_1(onPrimaryPressCallback));
         break;
 
     default:
@@ -57,6 +59,11 @@ void PaddleControl::onDownPressCallback(bool bPressed)
     m_bDownPressed = bPressed;
 }
 
+void PaddleControl::onPrimaryPressCallback(bool bPressed)
+{
+    if (!bPressed) return;
+}
+
 void PaddleControl::update(float fDeltaTime)
 {
     if (m_eControlType == PaddleControlType::AI)
@@ -88,12 +95,12 @@ void PaddleControl::updateAI(float fDeltaTime)
 
     float fBallY = m_pPong->getPositionY();
 
-    if (fBallY > m_pNode->getPositionY() + 0.5)
+    if (fBallY > m_pNode->getPositionY() + 0.3)
     {
         m_bUpPressed = true;
         m_bDownPressed = false;
     }
-    else if (fBallY < m_pNode->getPositionY() - 0.5)
+    else if (fBallY < m_pNode->getPositionY() - 0.3)
     {
         m_bUpPressed = false;
         m_bDownPressed = true;

@@ -116,8 +116,17 @@ public:
         if (bResetActiveTimer)
         {
             m_fActiveTimer = 0.0f;
+
+            for (IParticleModule*& pModule : m_arrParticleModules)
+            {
+                if (pModule)
+                {
+                    pModule->onActiveTimeReset();
+                }
+            }
         }
     }
+    void stop() { m_bIsEmitting = false; }
     bool getIsEmitting() const { return m_bIsEmitting; }
 
     void setActiveTime(float fTime) { m_fActiveTime = fTime; }

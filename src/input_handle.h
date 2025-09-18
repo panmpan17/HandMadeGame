@@ -10,6 +10,7 @@ typedef struct GLFWwindow GLFWwindow;
 enum class KeyCode : int
 {
     KEY_UNKNOWN = -1,
+    KEY_SPACE = 32,
     KEY_A = 65,
     KEY_B = 66,
     KEY_C = 67,
@@ -82,7 +83,7 @@ public:
 
     void registerKeyPressCallback(KeyCode key, std::function<void(bool)> callback)
     {
-        if (key >= KeyCode::KEY_A && key <= KeyCode::KEY_Z)
+        if (key >= KeyCode::KEY_SPACE && key <= KeyCode::KEY_Z)
         {
             m_KeyPressEvent[static_cast<int>(key)].add(callback);
         }

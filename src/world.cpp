@@ -204,6 +204,7 @@ void WorldScene::createPinPongGame()
 
     PaddleControl* pPaddleControlLeft;
     PaddleControl* pPaddleControlRight;
+    
 
     auto pBall = new Node();
 
@@ -213,7 +214,7 @@ void WorldScene::createPinPongGame()
 
         Box oBox = Box::fromCenter(0, 0, 0.3f, 1.f);
 
-        pPaddleControlLeft = new PaddleControl(oBox, PaddleControlType::AI, 2.5f);
+        pPaddleControlLeft = new PaddleControl(oBox, PaddleControlType::PLAYER1, 2.5f);
         pPaddleControlLeft->setPositionBounds(-2.3f, 2.3f);
         pPaddleLeft->addComponent(pPaddleControlLeft);
         pPaddleControlLeft->setPong(pBall);
@@ -270,7 +271,7 @@ void WorldScene::createPinPongGame()
         particle->addParticleIndividualModule(new OpacityThroughParticleLifetime(1.f, 0.f));
         pBall->addComponent(particle);
 
-        auto pPong = new Pong(oBox, pPaddleControlLeft, pPaddleControlRight, 8, 8);
+        auto pPong = new Pong(oBox, pPaddleControlLeft, pPaddleControlRight, 4, 8);
         pPong->setPositionBounds(-2.8125, 2.8125);
         pBall->addComponent(pPong);
         pPong->start();
