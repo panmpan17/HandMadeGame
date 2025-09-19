@@ -1,9 +1,28 @@
 #pragma once
 
+#include "../expandable_array.h"
+
 typedef unsigned int GLuint;
 
 class Shader;
 class Window;
+
+class RenderProcessQueue;
+
+class IRenderProcess
+{
+public:
+    IRenderProcess(RenderProcessQueue* pQueue) : m_pProcessQueue(pQueue) {}
+    virtual ~IRenderProcess() = default;
+
+    virtual void renderProcess() = 0;
+
+protected:
+    RenderProcessQueue* m_pProcessQueue = nullptr;
+
+    virtual void initialize() = 0;
+};
+
 
 class RenderProcessQueue
 {
@@ -12,12 +31,25 @@ public:
     ~RenderProcessQueue();
 
     // void resize(int width, int height);
+    void setupProcesses();
 
     void beginFrame();
     void endFrame();
 
     void startProcessing();
     void renderToScreen();
+
+    inline int getRenderWidth() const { return m_nRenderWidth; }
+    inline int getRenderHeight() const { return m_nRenderHeight; }
+    int getActualWidth() const;
+    int getActualHeight() const;
+
+    inline GLuint getOriginalRenderTexture() const { return m_nRenderTexture_original; }
+    inline GLuint getFinalRenderTexture() const { return m_nFinalRenderTexture; }
+    inline void setFinalRenderTexture(GLuint texture) { m_nFinalRenderTexture = texture; }
+
+    inline GLuint getFullScreenVertexArray() const { return m_nVertexArray; }
+    inline GLuint getFullScreenVertexBuffer() const { return m_nVertexBuffer; }
 
 private:
     Window* m_pWindow = nullptr;
@@ -34,6 +66,8 @@ private:
     GLuint m_nVertexArray = 0;
 
     GLuint m_nFinalRenderTexture = 0;
+
+    PointerExpandableArray<IRenderProcess*> m_oProcessArray = PointerExpandableArray<IRenderProcess*>(2);
 
     void init(int nWidth, int nHeight);
     void initializeQuad();

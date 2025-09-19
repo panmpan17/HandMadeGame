@@ -30,7 +30,7 @@
   name: bloom_composite
   vertex: assets/shaders/bloom_filter.vert
   fragment: assets/shaders/bloom_composite.frag
-8:
+9:
   name: pure_texture
   vertex: assets/shaders/bloom_filter.vert
   fragment: assets/shaders/pure_texture.frag

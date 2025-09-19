@@ -5,11 +5,9 @@
 typedef struct GLFWwindow GLFWwindow;
 class Camera;
 class WorldScene;
+class RenderProcessQueue;
 
 typedef unsigned int GLuint;
-
-class BloomTest;
-class RenderProcessQueue;
 
 class Window {
 public:
@@ -36,7 +34,6 @@ public:
     void increaseDrawCallCount();
 
 private:
-    BloomTest* m_pBloomTest = nullptr;
     GLFWwindow* m_pWindow = nullptr;
     RenderProcessQueue* m_pRenderProcessQueue = nullptr;
 

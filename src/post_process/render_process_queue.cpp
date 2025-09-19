@@ -5,6 +5,7 @@
 #include "../draw/vertex.h"
 #include "../draw/shader.h"
 #include "../draw/shader_loader.h"
+#include "bloom_test.h"
 
 
 
@@ -19,6 +20,9 @@ RenderProcessQueue::~RenderProcessQueue()
 {
 }
 
+int RenderProcessQueue::getActualWidth() const { return m_pWindow->GetActualWidth(); }
+int RenderProcessQueue::getActualHeight() const { return m_pWindow->GetActualHeight(); }
+
 void RenderProcessQueue::init(int nWidth, int nHeight)
 {
     m_nRenderWidth = nWidth;
@@ -27,7 +31,6 @@ void RenderProcessQueue::init(int nWidth, int nHeight)
     initializeQuad();
     initializeOriginalFBO();
 }
-
 
 void RenderProcessQueue::initializeQuad()
 {
@@ -84,6 +87,16 @@ void RenderProcessQueue::initializeOriginalFBO()
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
+void RenderProcessQueue::setupProcesses()
+{
+    auto pBloomTest = new BloomTest(this);
+    pBloomTest->initialize();
+
+    m_oProcessArray.addElement(pBloomTest);
+    // pBloomTest->initialize(this);
+}
+
+#pragma mark Drawing every frame
 void RenderProcessQueue::beginFrame()
 {
     glBindFramebuffer(GL_FRAMEBUFFER, m_nFBOID_original);
@@ -101,8 +114,21 @@ void RenderProcessQueue::endFrame()
 
 void RenderProcessQueue::startProcessing()
 {
-    
-    m_nFinalRenderTexture = m_nRenderTexture_original;
+    int nSize = m_oProcessArray.getSize();
+    if (nSize == 0)
+    {
+        m_nFinalRenderTexture = m_nRenderTexture_original;
+        return;
+    }
+
+    for (int i = 0; i < nSize; ++i)
+    {
+        IRenderProcess* pProcess = m_oProcessArray.getElement(i);
+        if (pProcess)
+        {
+            pProcess->renderProcess();
+        }
+    }
 }
 
 void RenderProcessQueue::renderToScreen()

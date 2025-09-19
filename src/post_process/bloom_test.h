@@ -1,5 +1,6 @@
 #pragma once
 
+#include "render_process_queue.h"
 
 class Window;
 class Shader;
@@ -7,19 +8,16 @@ class Shader;
 
 typedef unsigned int GLuint;
 
-class BloomTest
+class BloomTest : public IRenderProcess
 {
 public:
-    BloomTest() {}
+    BloomTest(RenderProcessQueue* pQueue) : IRenderProcess(pQueue) {}
 
-    void initialize(const Window* pWindow);
-    void startRenderingGame(const Window* pWindow);
-    void endRenderingGame(const Window* pWindow);
+    void initialize() override;
+
+    void renderProcess() override;
 
 private:
-    GLuint m_nFBOID_original = 0;
-    GLuint m_nRenderTexture_original = 0;
-
     GLuint m_nFBOID_ColorHighlight = 0;
     GLuint m_nRenderTexture_ColorHighlight = 0;
 
@@ -29,8 +27,8 @@ private:
     GLuint m_nFBOID_VerticalBlur = 0;
     GLuint m_nRenderTexture_VerticalBlur = 0;
 
-    GLuint m_nVertexBuffer;
-    GLuint m_nVertexArray;
+    GLuint m_nFBOID_Final = 0;
+    GLuint m_nRenderTexture_Final = 0;
 
     int m_nRenderWidth, m_nRenderHeight;
 
@@ -53,15 +51,15 @@ private:
 
     float m_nIntensity = 1.0f;
 
-    void initializeOriginalFBO();
     void initializeColorHighlightFBO();
     void initializeHorizontalBlurFBO();
     void initializeVerticalBlurFBO();
+    void initializeFinalFBO();
 
     void initializeQuad();
 
-    void renderColorHighlight(const Window* pWindow);
-    void renderHorizontalBlur(const Window* pWindow);
-    void renderVerticalBlur(const Window* pWindow);
-    void renderComposite(const Window* pWindow);
+    void renderColorHighlight();
+    void renderHorizontalBlur();
+    void renderVerticalBlur();
+    void renderComposite();
 };
