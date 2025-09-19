@@ -16,6 +16,7 @@
 #include "draw/shader_loader.h"
 #include "world.h"
 #include "bloom_test.h"
+#include "post_process/render_process_queue.h"
 
 
 Window* Window::ins = nullptr;
@@ -140,8 +141,10 @@ void Window::start()
     ImageLoader::getInstance()->registerImage("dust", "assets/images/dust_1.png");
     ImageLoader::getInstance()->registerImage("character", "assets/images/character_animation.png");
 
-    m_pBloomTest = new BloomTest();
-    m_pBloomTest->initialize(this);
+    m_pRenderProcessQueue = new RenderProcessQueue(this);
+
+    // m_pBloomTest = new BloomTest();
+    // m_pBloomTest->initialize(this);
 
     m_pWorldScene = new WorldScene();
     // m_pWorldScene->bloomTest();
@@ -178,9 +181,6 @@ void Window::mainLoop()
 
         m_pWorldScene->update(m_fDeltaTime);
 
-        // glViewport(0, 0, m_nActualWidth, m_nActualHeight);
-        // glClear(GL_COLOR_BUFFER_BIT);
-
         drawFrame();
 
         glfwSwapBuffers(m_pWindow);
@@ -194,9 +194,22 @@ void Window::drawFrame()
 {
     m_nDrawCallCount = 0;
 
-    m_pBloomTest->startRenderingGame(this);
-    m_pWorldScene->render();
-    m_pBloomTest->endRenderingGame(this);
+    if (true) // Enable post process
+    {
+        // m_pBloomTest->startRenderingGame(this);
+        m_pRenderProcessQueue->beginFrame();
+        m_pWorldScene->render();
+        m_pRenderProcessQueue->endFrame();
+        m_pRenderProcessQueue->startProcessing();
+        m_pRenderProcessQueue->renderToScreen();
+        // m_pBloomTest->endRenderingGame(this);
+    }
+    else
+    {
+        glViewport(0, 0, m_nActualWidth, m_nActualHeight);
+        glClear(GL_COLOR_BUFFER_BIT);
+        m_pWorldScene->render();
+    }
     LOG_EX("Draw call count: {}, Fps: {}\r", m_nDrawCallCount, 1.0f / m_fDeltaTime);
 }
 
