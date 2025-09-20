@@ -285,7 +285,7 @@ void BloomTest::renderComposite()
 
     glUniform1i(m_nOriginalTextureUniform, 0);
     glUniform1i(m_nBloomTextureUniform, 1);
-    glUniform1f(m_nBloomTextureScaleUniform, BLUR_TEXTURE_RATIO);
+    glUniform1f(m_nBloomTextureScaleUniform, 1);
     glUniform1f(m_nIntensityUniform, m_nIntensity);
 
     glActiveTexture(GL_TEXTURE0);
