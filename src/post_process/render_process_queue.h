@@ -21,6 +21,9 @@ protected:
     RenderProcessQueue* m_pProcessQueue = nullptr;
 
     virtual void initialize() = 0;
+
+    void registerShaderPosAndUV(Shader* pShader);
+    void renderTextureToBufferWithShader(GLuint nBuffer, GLuint nTexture, Shader* pShader);
 };
 
 
@@ -38,6 +41,7 @@ public:
 
     void startProcessing();
     void renderToScreen();
+    void renderToScreenSplit();
 
     inline int getRenderWidth() const { return m_nRenderWidth; }
     inline int getRenderHeight() const { return m_nRenderHeight; }
@@ -62,6 +66,12 @@ private:
 
     Shader* m_pShader = nullptr;
     GLuint m_nTextureUniform = 0;
+
+    Shader* m_pSplitShader = nullptr;
+    GLuint m_nOriginalTextureUniform_Split = 0;
+    GLuint m_nFinalTextureUniform_Split = 0;
+    GLuint m_nSplitFactorUniform = 0;
+
     GLuint m_nVertexBuffer = 0;
     GLuint m_nVertexArray = 0;
 

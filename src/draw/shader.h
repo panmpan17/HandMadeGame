@@ -23,9 +23,16 @@ public:
     GLuint getUniformLocation(const std::string& name) const;
     GLuint getAttributeLocation(const std::string& name) const;
 
+    void reload();
+
 protected:
     GLuint m_nProgram;
+    GLuint m_nVertexShader;
+    GLuint m_nFragmentShader;
 
     int m_nId;
     std::string m_strName;
+
+    std::string m_strVertexShaderPath;
+    std::string m_strFragmentShaderPath;
 };

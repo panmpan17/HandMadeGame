@@ -11,6 +11,18 @@ enum class KeyCode : int
 {
     KEY_UNKNOWN = -1,
     KEY_SPACE = 32,
+    KEY_MINUS = 45,
+    KEY_0 = 48,
+    KEY_1 = 49,
+    KEY_2 = 50,
+    KEY_3 = 51,
+    KEY_4 = 52,
+    KEY_5 = 53,
+    KEY_6 = 54,
+    KEY_7 = 55,
+    KEY_8 = 56,
+    KEY_9 = 57,
+    KEY_EQUAL = 61,
     KEY_A = 65,
     KEY_B = 66,
     KEY_C = 67,
@@ -37,6 +49,25 @@ enum class KeyCode : int
     KEY_X = 88,
     KEY_Y = 89,
     KEY_Z = 90,
+    KEY_BLACKSLASH = 92,
+    KEY_TILDE = 96, // ` (~)
+    KEY_ESCAPE = 256,
+    KEY_RETURN = 257,
+    KEY_TAB = 258,
+    KEY_ARROW_RIGHT = 262,
+    KEY_ARROW_LEFT = 263,
+    KEY_ARROW_DOWN = 264,
+    KEY_ARROW_UP = 265,
+    KEY_CAP_LOCK = 280,
+    KEY_LEFT_SHIFT = 340,
+    KEY_LEFT_CONTROL = 341,
+    KEY_LEFT_ALT = 342,
+    KEY_LEFT_META = 343,
+    KEY_RIGHT_SHIFT = 344,
+    KEY_RIGHT_CONTROL = 345,
+    KEY_RIGHT_ALT = 346,
+    KEY_RIGHT_META = 347,
+    MAX_KEY_CODE,
 };
 
 
@@ -83,7 +114,7 @@ public:
 
     void registerKeyPressCallback(KeyCode key, std::function<void(bool)> callback)
     {
-        if (key >= KeyCode::KEY_SPACE && key <= KeyCode::KEY_Z)
+        if (key > KeyCode::KEY_UNKNOWN && key < KeyCode::MAX_KEY_CODE)
         {
             m_KeyPressEvent[static_cast<int>(key)].add(callback);
         }
@@ -98,7 +129,7 @@ private:
     InputManager();
     ~InputManager() = default;
 
-    bool m_bKeyPressed[256]; // Array to track key states, if needed
+    bool m_bKeyPressed[(int)KeyCode::MAX_KEY_CODE]; // Array to track key states, if needed
 
-    Event m_KeyPressEvent[256]; // Event for key press callbacks
+    Event m_KeyPressEvent[(int)KeyCode::MAX_KEY_CODE]; // Event for key press callbacks
 };

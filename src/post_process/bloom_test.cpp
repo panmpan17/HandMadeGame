@@ -133,41 +133,12 @@ void BloomTest::initializeQuad()
     m_nIntensityUniform = m_pCompositeShader->getUniformLocation("u_intensity");
 
     glBindBuffer(GL_ARRAY_BUFFER, m_pProcessQueue->getFullScreenVertexBuffer());
-
-    GLuint nVPosAttr_ColorHighlight = m_pColorHighlightShader->getAttributeLocation("a_vPos");
-    GLuint nVUVAttr_ColorHighlight = m_pColorHighlightShader->getAttributeLocation("a_vUV");
-
-    GLuint nVPosAttr_HorizontalBlur = m_pHorizontalBlurShader->getAttributeLocation("a_vPos");
-    GLuint nVUVAttr_HorizontalBlur = m_pHorizontalBlurShader->getAttributeLocation("a_vUV");
-
-    GLuint nVPosAttr_VerticalBlur = m_pVerticalBlurShader->getAttributeLocation("a_vPos");
-    GLuint nVUVAttr_VerticalBlur = m_pVerticalBlurShader->getAttributeLocation("a_vUV");
-
-    GLuint nVPosAttr_Composite = m_pCompositeShader->getAttributeLocation("a_vPos");
-    GLuint nVUVAttr_Composite = m_pCompositeShader->getAttributeLocation("a_vUV");
-
-    // glGenVertexArrays(1, &m_nVertexArray);
     glBindVertexArray(m_pProcessQueue->getFullScreenVertexArray());
 
-    glEnableVertexAttribArray(nVPosAttr_ColorHighlight);
-    glVertexAttribPointer(nVPosAttr_ColorHighlight, 2, GL_FLOAT, GL_FALSE, sizeof(VertexWUV), (void*)offsetof(VertexWUV, pos));
-    glEnableVertexAttribArray(nVUVAttr_ColorHighlight);
-    glVertexAttribPointer(nVUVAttr_ColorHighlight, 2, GL_FLOAT, GL_FALSE, sizeof(VertexWUV), (void*)offsetof(VertexWUV, uv));
-
-    glEnableVertexAttribArray(nVPosAttr_HorizontalBlur);
-    glVertexAttribPointer(nVPosAttr_HorizontalBlur, 2, GL_FLOAT, GL_FALSE, sizeof(VertexWUV), (void*)offsetof(VertexWUV, pos));
-    glEnableVertexAttribArray(nVUVAttr_HorizontalBlur);
-    glVertexAttribPointer(nVUVAttr_HorizontalBlur, 2, GL_FLOAT, GL_FALSE, sizeof(VertexWUV), (void*)offsetof(VertexWUV, uv));
-
-    glEnableVertexAttribArray(nVPosAttr_VerticalBlur);
-    glVertexAttribPointer(nVPosAttr_VerticalBlur, 2, GL_FLOAT, GL_FALSE, sizeof(VertexWUV), (void*)offsetof(VertexWUV, pos));
-    glEnableVertexAttribArray(nVUVAttr_VerticalBlur);
-    glVertexAttribPointer(nVUVAttr_VerticalBlur, 2, GL_FLOAT, GL_FALSE, sizeof(VertexWUV), (void*)offsetof(VertexWUV, uv));
-
-    glEnableVertexAttribArray(nVPosAttr_Composite);
-    glVertexAttribPointer(nVPosAttr_Composite, 2, GL_FLOAT, GL_FALSE, sizeof(VertexWUV), (void*)offsetof(VertexWUV, pos));
-    glEnableVertexAttribArray(nVUVAttr_Composite);
-    glVertexAttribPointer(nVUVAttr_Composite, 2, GL_FLOAT, GL_FALSE, sizeof(VertexWUV), (void*)offsetof(VertexWUV, uv));
+    registerShaderPosAndUV(m_pColorHighlightShader);
+    registerShaderPosAndUV(m_pHorizontalBlurShader);
+    registerShaderPosAndUV(m_pVerticalBlurShader);
+    registerShaderPosAndUV(m_pCompositeShader);
 
     // Unbind
     glBindVertexArray(0);
@@ -176,6 +147,8 @@ void BloomTest::initializeQuad()
 
 void BloomTest::renderProcess()
 {
+    m_nOriginalRenderTexture = m_pProcessQueue->getFinalRenderTexture();
+
     renderColorHighlight();
     renderHorizontalBlur();
     renderVerticalBlur();
@@ -197,7 +170,7 @@ void BloomTest::renderColorHighlight()
     glUniform1i(m_nTextureUniform_ColorHighlight, 0); // Texture unit 0
 
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, m_pProcessQueue->getOriginalRenderTexture());
+    glBindTexture(GL_TEXTURE_2D, m_nOriginalRenderTexture);
 
     glBindVertexArray(m_pProcessQueue->getFullScreenVertexArray());
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4); // Draw the quad using triangle strip
@@ -289,7 +262,7 @@ void BloomTest::renderComposite()
     glUniform1f(m_nIntensityUniform, m_nIntensity);
 
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, m_pProcessQueue->getOriginalRenderTexture());
+    glBindTexture(GL_TEXTURE_2D, m_nOriginalRenderTexture);
 
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, m_nRenderTexture_VerticalBlur);

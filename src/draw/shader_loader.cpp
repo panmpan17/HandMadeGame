@@ -105,3 +105,11 @@ Shader* ShaderLoader::getShader(const std::string_view& strName) const
     }
     return nullptr;
 }
+
+void ShaderLoader::reloadAllShaders()
+{
+    for (auto& pair : m_mapShaders)
+    {
+        pair.second->reload();
+    }
+}

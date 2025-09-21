@@ -18,6 +18,8 @@ public:
     Shader* getShader(int nId) const;
     Shader* getShader(const std::string_view& strName) const;
 
+    void reloadAllShaders();
+
 private:
     static ShaderLoader* ins;
 

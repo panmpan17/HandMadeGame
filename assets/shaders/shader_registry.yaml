@@ -16,21 +16,29 @@
   fragment: assets/shaders/test.frag
 5:
   name: bloom_filter
-  vertex: assets/shaders/bloom_filter.vert
+  vertex: assets/shaders/screen_pos.vert
   fragment: assets/shaders/bloom_filter.frag
 6:
   name: horizontal_blur
-  vertex: assets/shaders/bloom_filter.vert
+  vertex: assets/shaders/screen_pos.vert
   fragment: assets/shaders/horizontal_blur.frag
 7:
   name: vertical_blur
-  vertex: assets/shaders/bloom_filter.vert
+  vertex: assets/shaders/screen_pos.vert
   fragment: assets/shaders/vertical_blur.frag
 8:
   name: bloom_composite
-  vertex: assets/shaders/bloom_filter.vert
+  vertex: assets/shaders/screen_pos.vert
   fragment: assets/shaders/bloom_composite.frag
 9:
   name: pure_texture
-  vertex: assets/shaders/bloom_filter.vert
+  vertex: assets/shaders/screen_pos.vert
   fragment: assets/shaders/pure_texture.frag
+10:
+  name: split_texture
+  vertex: assets/shaders/screen_pos.vert
+  fragment: assets/shaders/split_texture.frag
+11:
+  name: order_dithering
+  vertex: assets/shaders/screen_pos.vert
+  fragment: assets/shaders/order_dithering.frag

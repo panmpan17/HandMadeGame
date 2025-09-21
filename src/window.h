@@ -36,6 +36,7 @@ public:
 private:
     GLFWwindow* m_pWindow = nullptr;
     RenderProcessQueue* m_pRenderProcessQueue = nullptr;
+    bool m_bRenderProcessQueueUseSplit = false;
 
     int m_nWidth = 320, m_nHeight = 180;
     int m_nActualWidth = 800, m_nActualHeight = 600;

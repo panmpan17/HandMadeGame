@@ -31,8 +31,8 @@ Shader::Shader(int nId, const std::string& strShaderName, const std::string &str
     m_nId = nId;
     m_strName = strShaderName;
 
-    GLuint vertex_shader;
-    GLuint fragment_shader;
+    m_strVertexShaderPath = strVertexShaderPath;
+    m_strFragmentShaderPath = strFragmentShaderPath;
 
     {
         auto reader = FileReader(strVertexShaderPath);
@@ -43,13 +43,13 @@ Shader::Shader(int nId, const std::string& strShaderName, const std::string &str
         std::string vertex_shader_text = reader.readAll();
         reader.close();
 
-        vertex_shader = glCreateShader(GL_VERTEX_SHADER);
+        m_nVertexShader = glCreateShader(GL_VERTEX_SHADER);
         const char* vertex_shader_source = vertex_shader_text.c_str();
-        glShaderSource(vertex_shader, 1, &vertex_shader_source, NULL);
-        glCompileShader(vertex_shader);
-        
+        glShaderSource(m_nVertexShader, 1, &vertex_shader_source, NULL);
+        glCompileShader(m_nVertexShader);
+
 #if IS_DEBUG_VERSION
-        checkShaderCompilResult(strVertexShaderPath, vertex_shader);
+        checkShaderCompilResult(strVertexShaderPath, m_nVertexShader);
 #endif
     }
 
@@ -62,19 +62,19 @@ Shader::Shader(int nId, const std::string& strShaderName, const std::string &str
         std::string fragment_shader_text = reader.readAll();
         reader.close();
 
-        fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
+        m_nFragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
         const char* fragment_shader_source = fragment_shader_text.c_str();
-        glShaderSource(fragment_shader, 1, &fragment_shader_source, NULL);
-        glCompileShader(fragment_shader);
+        glShaderSource(m_nFragmentShader, 1, &fragment_shader_source, NULL);
+        glCompileShader(m_nFragmentShader);
 
 #if IS_DEBUG_VERSION
-        checkShaderCompilResult(strFragmentShaderPath, fragment_shader);
+        checkShaderCompilResult(strFragmentShaderPath, m_nFragmentShader);
 #endif
     }
 
     m_nProgram = glCreateProgram();
-    glAttachShader(m_nProgram, vertex_shader);
-    glAttachShader(m_nProgram, fragment_shader);
+    glAttachShader(m_nProgram, m_nVertexShader);
+    glAttachShader(m_nProgram, m_nFragmentShader);
     glLinkProgram(m_nProgram);
 }
 
@@ -94,4 +94,8 @@ GLuint Shader::getUniformLocation(const std::string& name) const
 GLuint Shader::getAttributeLocation(const std::string& name) const
 {
     return glGetAttribLocation(m_nProgram, name.c_str());
+}
+
+void Shader::reload()
+{
 }

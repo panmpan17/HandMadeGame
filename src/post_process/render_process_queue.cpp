@@ -6,8 +6,17 @@
 #include "../draw/shader.h"
 #include "../draw/shader_loader.h"
 #include "bloom_test.h"
+#include "order_dithering.h"
 
-
+void IRenderProcess::registerShaderPosAndUV(Shader* pShader)
+{
+    GLuint nVPosAttr = pShader->getAttributeLocation("a_vPos");
+    GLuint nVUVAttr = pShader->getAttributeLocation("a_vUV");
+    glEnableVertexAttribArray(nVPosAttr);
+    glVertexAttribPointer(nVPosAttr, 2, GL_FLOAT, GL_FALSE, sizeof(VertexWUV), (void*)offsetof(VertexWUV, pos));
+    glEnableVertexAttribArray(nVUVAttr);
+    glVertexAttribPointer(nVUVAttr, 2, GL_FLOAT, GL_FALSE, sizeof(VertexWUV), (void*)offsetof(VertexWUV, uv));
+}
 
 RenderProcessQueue::RenderProcessQueue(Window* pWindow)
 {
@@ -37,6 +46,11 @@ void RenderProcessQueue::initializeQuad()
     m_pShader = ShaderLoader::getInstance()->getShader("pure_texture");
     m_nTextureUniform = m_pShader->getUniformLocation("u_tex0");
 
+    m_pSplitShader = ShaderLoader::getInstance()->getShader("split_texture");
+    m_nOriginalTextureUniform_Split = m_pSplitShader->getUniformLocation("u_tex0");
+    m_nFinalTextureUniform_Split = m_pSplitShader->getUniformLocation("u_tex1");
+    m_nSplitFactorUniform = m_pSplitShader->getUniformLocation("u_splitFactor");
+
     glGenBuffers(1, &m_nVertexBuffer);
     glBindBuffer(GL_ARRAY_BUFFER, m_nVertexBuffer);
 
@@ -50,6 +64,9 @@ void RenderProcessQueue::initializeQuad()
     GLuint nVPosAttr = m_pShader->getAttributeLocation("a_vPos");
     GLuint nVUVAttr = m_pShader->getAttributeLocation("a_vUV");
 
+    GLuint nVPosAttr_Split = m_pSplitShader->getAttributeLocation("a_vPos");
+    GLuint nVUVAttr_Split = m_pSplitShader->getAttributeLocation("a_vUV");
+
     glGenVertexArrays(1, &m_nVertexArray);
     glBindVertexArray(m_nVertexArray);
 
@@ -57,6 +74,11 @@ void RenderProcessQueue::initializeQuad()
     glVertexAttribPointer(nVPosAttr, 2, GL_FLOAT, GL_FALSE, sizeof(VertexWUV), (void*)offsetof(VertexWUV, pos));
     glEnableVertexAttribArray(nVUVAttr);
     glVertexAttribPointer(nVUVAttr, 2, GL_FLOAT, GL_FALSE, sizeof(VertexWUV), (void*)offsetof(VertexWUV, uv));
+
+    glEnableVertexAttribArray(nVPosAttr_Split);
+    glVertexAttribPointer(nVPosAttr_Split, 2, GL_FLOAT, GL_FALSE, sizeof(VertexWUV), (void*)offsetof(VertexWUV, pos));
+    glEnableVertexAttribArray(nVUVAttr_Split);
+    glVertexAttribPointer(nVUVAttr_Split, 2, GL_FLOAT, GL_FALSE, sizeof(VertexWUV), (void*)offsetof(VertexWUV, uv));
 
     // Unbind
     glBindVertexArray(0);
@@ -91,9 +113,11 @@ void RenderProcessQueue::setupProcesses()
 {
     auto pBloomTest = new BloomTest(this);
     pBloomTest->initialize();
-
     m_oProcessArray.addElement(pBloomTest);
-    // pBloomTest->initialize(this);
+
+    auto pOrderDithering = new OrderDithering(this);
+    pOrderDithering->initialize();
+    m_oProcessArray.addElement(pOrderDithering);
 }
 
 #pragma mark Drawing every frame
@@ -114,13 +138,9 @@ void RenderProcessQueue::endFrame()
 
 void RenderProcessQueue::startProcessing()
 {
+    m_nFinalRenderTexture = m_nRenderTexture_original;
+    
     int nSize = m_oProcessArray.getSize();
-    if (nSize == 0)
-    {
-        m_nFinalRenderTexture = m_nRenderTexture_original;
-        return;
-    }
-
     for (int i = 0; i < nSize; ++i)
     {
         IRenderProcess* pProcess = m_oProcessArray.getElement(i);
@@ -141,6 +161,32 @@ void RenderProcessQueue::renderToScreen()
     glUniform1i(m_nTextureUniform, 0);
 
     glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, m_nFinalRenderTexture);
+
+    glBindVertexArray(m_nVertexArray);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4); // Draw the quad using triangle strip
+    INCREASE_DRAW_CALL_COUNT();
+
+    glBindTexture(GL_TEXTURE_2D, 0); // Unbind the texture
+    glBindVertexArray(0); // Unbind the vertex array
+    glUseProgram(0);
+}
+
+void RenderProcessQueue::renderToScreenSplit()
+{
+    glViewport(0, 0, m_pWindow->GetActualWidth(), m_pWindow->GetActualHeight());
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    glUseProgram(m_pSplitShader->getProgram());
+
+    glUniform1i(m_nFinalTextureUniform_Split, 0);
+    glUniform1i(m_nOriginalTextureUniform_Split, 1);
+    glUniform1f(m_nSplitFactorUniform, 0.5f);
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, m_nRenderTexture_original);
+
+    glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, m_nFinalRenderTexture);
 
     glBindVertexArray(m_nVertexArray);

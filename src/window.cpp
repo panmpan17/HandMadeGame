@@ -123,6 +123,21 @@ void Window::start()
     ImageLoader::Initialize();
     m_pCamera = new Camera();
 
+    InputManager::getInstance()->registerKeyPressCallback(KeyCode::KEY_ESCAPE, [this](bool pressed) {
+        if (pressed)
+        {
+            m_bRenderProcessQueueUseSplit = !m_bRenderProcessQueueUseSplit;
+        }
+    });
+
+    InputManager::getInstance()->registerKeyPressCallback(KeyCode::KEY_R, [](bool pressed) {
+        if (pressed)
+        {
+            LOGLN("Reloading all shaders...");
+            ShaderLoader::getInstance()->reloadAllShaders();
+        }
+    });
+
     glfwSetKeyCallback(m_pWindow, &InputManager::onKeyCallback);
     glfwSetCursorEnterCallback(m_pWindow, &InputManager::onMouseEnterCallback);
     glfwSetCursorPosCallback(m_pWindow, &InputManager::onMousePosCallback);
@@ -139,13 +154,14 @@ void Window::start()
     ImageLoader::getInstance()->registerImage("test", "assets/images/test.png");
     ImageLoader::getInstance()->registerImage("dust", "assets/images/dust_1.png");
     ImageLoader::getInstance()->registerImage("character", "assets/images/character_animation.png");
+    ImageLoader::getInstance()->registerImage("cover_test", "assets/images/cover_test.jpg");
 
     m_pRenderProcessQueue = new RenderProcessQueue(this);
     m_pRenderProcessQueue->setupProcesses();
 
     m_pWorldScene = new WorldScene();
-    // m_pWorldScene->bloomTest();
-    m_pWorldScene->createPinPongGame();
+    m_pWorldScene->bloomTest();
+    // m_pWorldScene->createPinPongGame();
     // m_pWorldScene->init();
     // m_pWorldScene->clearAllNodes();
     // m_pWorldScene->readFromFiles("assets/level.txt");
@@ -197,7 +213,15 @@ void Window::drawFrame()
         m_pWorldScene->render();
         m_pRenderProcessQueue->endFrame();
         m_pRenderProcessQueue->startProcessing();
-        m_pRenderProcessQueue->renderToScreen();
+
+        if (m_bRenderProcessQueueUseSplit)
+        {
+            m_pRenderProcessQueue->renderToScreenSplit();
+        }
+        else
+        {
+            m_pRenderProcessQueue->renderToScreen();
+        }
     }
     else
     {

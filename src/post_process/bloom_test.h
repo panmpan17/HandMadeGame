@@ -2,7 +2,6 @@
 
 #include "render_process_queue.h"
 
-class Window;
 class Shader;
 
 
@@ -18,6 +17,8 @@ public:
     void renderProcess() override;
 
 private:
+    GLuint m_nOriginalRenderTexture = 0;
+
     GLuint m_nFBOID_ColorHighlight = 0;
     GLuint m_nRenderTexture_ColorHighlight = 0;
 

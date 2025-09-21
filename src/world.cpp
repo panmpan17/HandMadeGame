@@ -286,12 +286,12 @@ void WorldScene::bloomTest()
 
     Shader* pImageShader = ShaderLoader::getInstance()->getShader("image");
 
-    Image* pTestImage = ImageLoader::getInstance()->getImage("test");
+    Image* pTestImage = ImageLoader::getInstance()->getImage("cover_test");
 
     { // Quad
         auto pNode = new Node(0.f, 0.f, 0.f, 0.f);
 
-        auto pQuad = new Quad(1.f, 1.f, vec4 { 1.5f, 1.5f, 1.5f, 1.f });
+        auto pQuad = new Quad(1.280f * 1.6f, .720f * 1.6f, vec4 { 1.f, 1.f, 1.f, 1.f });
         pQuad->setShader(pImageShader);
         pQuad->setImage(pTestImage);
         pQuad->registerBuffer();
