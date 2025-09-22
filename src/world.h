@@ -3,8 +3,6 @@
 #include "expandable_array.h"
 
 class Node;
-class TestShader;
-class ImageShader;
 
 class WorldScene {
 public:
@@ -12,14 +10,16 @@ public:
     ~WorldScene();
 
     void init();
+    void createPinPongGame();
+    void bloomTest();
+    void readFromFiles(const std::string_view& strFilePath);
+
+    void addNode(Node* pNode);
+    void clearAllNodes();
+
     void update(float fDeltatime);
     void render();
 
-    void addNode(Node* pNode);
-
 private:
-    TestShader* m_pBaseShader = nullptr;
-    ImageShader* m_pImageShader = nullptr;
-
     PointerExpandableArray<Node*> m_oNodeArray = PointerExpandableArray<Node*>(10);
 };

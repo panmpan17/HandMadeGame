@@ -6,6 +6,7 @@
 class ParticleIntervalSpawn : public IParticleModule
 {
 public:
+    ParticleIntervalSpawn() {}
     ParticleIntervalSpawn(float fInterval) : m_fSpawnInterval(fInterval) {}
     ParticleIntervalSpawn(int nParticlePerSeconds) : m_fSpawnInterval(1.0f / nParticlePerSeconds) {}
 
@@ -24,14 +25,20 @@ public:
         }
     }
 
+    std::string getDeserializedValue() const override;
+    void deserializeFromField(const std::string_view& strFieldValue) override;
+
 private:
     float m_fSpawnInterval;
     float m_fSpawnTimer = 0.0f;
 };
 
+REGISTER_CLASS(ParticleIntervalSpawn)
+
 class ParticleBurstSpawn : public IParticleModule
 {
 public:
+    ParticleBurstSpawn() {}
     ParticleBurstSpawn(float fBurstAt, int nBurstCount) : m_fBurstAt(fBurstAt), m_nBurstCount(nBurstCount) {}
 
     void update(ParticleSystem& rParticleSystem, float fDeltaTime) override
@@ -48,6 +55,9 @@ public:
         }
     }
 
+    std::string getDeserializedValue() const override;
+    void deserializeFromField(const std::string_view& strFieldValue) override;
+
     void onActiveTimeReset() override
     {
         m_bHasBursted = false;
@@ -58,3 +68,5 @@ private:
     bool m_bHasBursted = false;
     int m_nBurstCount;
 };
+
+REGISTER_CLASS(ParticleBurstSpawn)

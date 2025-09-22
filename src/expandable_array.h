@@ -29,7 +29,7 @@ public:
     {
         m_nSize = nInitialSize;
         m_pArray = static_cast<T*>(malloc(sizeof(T) * m_nSize));
-        std::memset(m_pArray, 0, sizeof(T) * nInitialSize);
+        memset(m_pArray, 0, sizeof(T) * nInitialSize);
     }
 
     ~PointerExpandableArray()
@@ -117,12 +117,21 @@ public:
             throw MemoryAllocateException("Failed to allocate memory for array expansion.");
         }
 
-        std::memcpy(pNewArray, m_pArray, sizeof(T) * m_nSize);
-        std::memset(pNewArray + m_nSize, 0, sizeof(T) * (nSize - m_nSize));
+        memcpy(pNewArray, m_pArray, sizeof(T) * m_nSize);
+        memset(pNewArray + m_nSize, 0, sizeof(T) * (nSize - m_nSize));
 
         free(m_pArray);
         m_pArray = pNewArray;
         m_nSize = nSize;
+    }
+
+    void clear()
+    {
+        for (int i = 0; i < m_nSize; ++i)
+        {
+            delete m_pArray[i];
+            m_pArray[i] = nullptr;
+        }
     }
 
     int getSize() const { return m_nSize; }

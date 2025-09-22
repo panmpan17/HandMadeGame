@@ -1,5 +1,6 @@
 #include "movement.h"
 #include "../input_handle.h"
+#include "../serialization/serializer.h"
 
 
 Movement::Movement(float fMoveSpeed)
@@ -63,6 +64,23 @@ void Movement::getMovementDirection(short& x, short& y)
     y = m_bMovementKeyPressed.test(0) - m_bMovementKeyPressed.test(1);
 }
 
+void Movement::serializeToWrapper(DataSerializer& serializer) const
+{
+    serializer.ADD_ATTRIBUTES(m_fMoveSpeed);
+}
+
+bool Movement::deserializeField(DataDeserializer& deserializer, const std::string_view& strFieldName, const std::string_view& strFieldValue)
+{
+    if (Component::deserializeField(deserializer, strFieldName, strFieldValue)) return true;
+
+    DESERIALIZE_FIELD(m_fMoveSpeed);
+
+    return false;
+}
+
+void Movement::onNodeFinishedDeserialization() {}
+
+
 #if defined(__APPLE__) || defined(__MACH__)
 float lerp(float fStart, float fEnd, float fT)
 {
@@ -100,3 +118,23 @@ void TwoPointsMovement::update(float fDeltaTime)
 
     pNode->setPosition(fX, fY);
 }
+
+void TwoPointsMovement::serializeToWrapper(DataSerializer& serializer) const
+{
+    serializer.ADD_ATTRIBUTES(m_vecStart);
+    serializer.ADD_ATTRIBUTES(m_vecEnd);
+    serializer.ADD_ATTRIBUTES(m_fDuration);
+}
+
+bool TwoPointsMovement::deserializeField(DataDeserializer& deserializer, const std::string_view& strFieldName, const std::string_view& strFieldValue)
+{
+    if (Component::deserializeField(deserializer, strFieldName, strFieldValue)) return true;
+
+    DESERIALIZE_FIELD(m_vecStart);
+    DESERIALIZE_FIELD(m_vecEnd);
+    DESERIALIZE_FIELD(m_fDuration);
+
+    return false;
+}
+
+void TwoPointsMovement::onNodeFinishedDeserialization() {}

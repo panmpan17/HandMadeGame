@@ -67,22 +67,69 @@ std::string FileUtils::getExecutableDirectory()
 }
 
 
-FileReader::FileReader(const std::string& path)
+FileReader::FileReader(const std::string& strPath)
 {
-    std::string fullPath = path;
-    if (*path.begin() != '/')
+    if (*strPath.begin() != '/')
     {
         std::string executablePath = FileUtils::getExecutablePath();
-        fullPath = fs::path(executablePath).parent_path().append(path).string();
-    }
+        std::string strFullPath = fs::path(executablePath).parent_path().append(strPath).string();
 
-    if (fs::exists(fullPath))
-    {
-        file.open(fullPath);
+        if (fs::exists(strFullPath))
+        {
+            file.open(strFullPath);
+        }
+        else
+        {
+            throw std::runtime_error("File does not exist: " + strFullPath);
+        }
     }
     else
     {
-        throw std::runtime_error("File does not exist: " + fullPath);
+        if (fs::exists(strPath))
+        {
+            file.open(strPath);
+        }
+        else
+        {
+            throw std::runtime_error("File does not exist: " + strPath);
+        }
+    }
+}
+
+FileReader::FileReader(const std::string_view& strPath)
+{
+    if (*strPath.begin() != '/')
+    {
+        std::string executablePath = FileUtils::getExecutablePath();
+        std::string strFullPath = fs::path(executablePath).parent_path().append(strPath).string();
+
+        if (fs::exists(strFullPath))
+        {
+            file.open(strFullPath);
+        }
+        else
+        {
+            throw std::runtime_error("File does not exist: " + strFullPath);
+        }
+    }
+    else
+    {
+#if IS_PLATFORM_MACOS
+        if (fs::exists(strPath))
+#elif IS_PLATFORM_WINDOWS
+        if (fs::exists(strPath.data()))
+#endif
+        {
+#if IS_PLATFORM_MACOS
+            file.open(strPath);
+#elif IS_PLATFORM_WINDOWS
+            file.open(strPath.data());
+#endif
+        }
+        else
+        {
+            throw std::runtime_error("File does not exist: " + std::string(strPath));
+        }
     }
 }
 
@@ -108,6 +155,17 @@ std::string FileReader::readAll()
     return ss.str();
 }
 
+bool FileReader::readLine(std::string& outStrLine)
+{
+    if (!file.is_open()) return false;
+
+    if (std::getline(file, outStrLine))
+    {
+        return true;
+    }
+    return false;
+}
+
 // std::vector<std::string> FileReader::readLines()
 // {
 //     std::vector<std::string> lines;
@@ -127,4 +185,52 @@ void FileReader::close()
     {
         file.close();
     }
+}
+
+
+// FileWriter::FileWriter(const std::string& strPath, bool bAppend)
+// {
+//     std::ios_base::openmode mode = std::ios::out;
+//     if (bAppend) mode |= std::ios::app;
+
+//     if (*strPath.begin() != '/')
+//     {
+//         std::string executablePath = FileUtils::getExecutablePath();
+//         std::string strFullPath = fs::path(executablePath).parent_path().append(strPath).string();
+//         file.open(strFullPath, mode);
+//     }
+//     else
+//     {
+//         file.open(strPath, mode);
+//     }
+// }
+
+FileWriter::FileWriter(const std::string_view& strPath, bool bAppend)
+{
+    std::ios_base::openmode mode = std::ios::out;
+    if (bAppend) mode |= std::ios::app;
+
+    if (*strPath.begin() != '/')
+    {
+        std::string executablePath = FileUtils::getExecutablePath();
+        std::string strFullPath = fs::path(executablePath).parent_path().append(strPath).string();
+        file.open(strFullPath, mode);
+    }
+    else
+    {
+        file.open(strPath.data(), mode);
+    }
+}
+
+FileWriter::~FileWriter()
+{
+    if (file.is_open())
+    {
+        file.close();
+    }
+}
+
+bool FileWriter::isOpen() const
+{
+    return file.is_open();
 }

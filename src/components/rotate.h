@@ -2,12 +2,13 @@
 
 #include "component.h"
 #include "../node.h"
+#include "../serialization/type_registry.h"
 
 
 class Rotate : public Component
 {
 public:
-    Rotate(float rotationSpeed) : m_fRotationSpeed(rotationSpeed) {}
+    Rotate(float rotationSpeed = 0) : m_fRotationSpeed(rotationSpeed) {}
 
     virtual bool isIDrawable() const override { return false; }
     virtual bool isUpdatable() const override { return true; }
@@ -24,7 +25,11 @@ public:
 
     virtual void draw() override {}
 
-private:
+protected:
     float m_fRotationSpeed = 0.0f; // Speed of rotation in degrees per second
+
+    COMPONENT_REGISTER_SERIALIZABLE(Rotate)
 };
+
+REGISTER_CLASS(Rotate)
 

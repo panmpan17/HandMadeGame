@@ -4,8 +4,8 @@
 #include <glad/gl.h>
 #include <GLFW/glfw3.h>
 
-#include "file_utils.h"
-#include "debug_macro.h"
+#include "../file_utils.h"
+#include "../debug_macro.h"
 
 #ifndef __has_include
   static_assert(false, "__has_include not supported");
@@ -25,6 +25,8 @@
 Image::Image(const std::string& strPath)
 {
     stbi_set_flip_vertically_on_load(true);
+
+    m_strPath = strPath;
 
     if (*strPath.begin() != '/')
     {
@@ -50,6 +52,8 @@ Image::Image(const std::string& strPath)
 Image::Image(const std::string_view& strPath)
 {
     stbi_set_flip_vertically_on_load(true);
+
+    m_strPath = strPath;
 
     if (*strPath.begin() != '/')
     {
@@ -170,6 +174,18 @@ Image* ImageLoader::getImage(const std::string_view& strName)
     if (iterFind != m_mapLoadedImages.end())
     {
         return iterFind->second;
+    }
+    return nullptr;
+}
+
+Image* ImageLoader::getImageByPath(const std::string_view& strPath)
+{
+    for (const auto& pair : m_mapLoadedImages)
+    {
+        if (pair.second && pair.second->getPath() == strPath)
+        {
+            return pair.second;
+        }
     }
     return nullptr;
 }

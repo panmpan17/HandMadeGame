@@ -19,6 +19,8 @@
 
 #define M_PI 3.14159265358979323846
 
+#define SIZE_MAX 18446744073709551615UL
+
 #elif defined(__APPLE__) || defined(__MACH__)
 #define IS_PLATFORM_WINDOWS false
 #define IS_PLATFORM_LINUX false

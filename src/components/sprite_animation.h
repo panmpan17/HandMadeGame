@@ -3,17 +3,24 @@
 #include "component.h"
 #include "../node.h"
 #include "../expandable_array.h"
-#include "../draw/quad.h"
+#include "../components/quad.h"
 #include "../debug_macro.h"
+#include "../platform.h"
 
+#if IS_PLATFORM_MACOS
+#define USHORT ushort
+#elif IS_PLATFORM_WINDOWS
+#include <windows.h>
+#define USHORT USHORT
+#endif
 
 struct SpriteAnimationInfo
 {
-    SpriteAnimationInfo(ushort nSpriteIndexArray[], int nArraySize, float fAnimateInterval)
+    SpriteAnimationInfo(USHORT nSpriteIndexArray[], int nArraySize, float fAnimateInterval)
         : m_nSpriteIndexArraySize(nArraySize), m_fAnimateInterval(fAnimateInterval)
     {
-        m_nSpriteIndexArray = new ushort[nArraySize];
-        memcpy(m_nSpriteIndexArray, nSpriteIndexArray, sizeof(ushort) * nArraySize);
+        m_nSpriteIndexArray = new USHORT[nArraySize];
+        memcpy(m_nSpriteIndexArray, nSpriteIndexArray, sizeof(USHORT) * nArraySize);
     }
 
     ~SpriteAnimationInfo()
@@ -21,8 +28,9 @@ struct SpriteAnimationInfo
         delete[] m_nSpriteIndexArray;
     }
 
+    std::string m_strName;
     int m_nSpriteIndexArraySize;
-    ushort* m_nSpriteIndexArray;
+    USHORT* m_nSpriteIndexArray;
     float m_fAnimateInterval;
 };
 
@@ -30,10 +38,13 @@ struct SpriteAnimationInfo
 class SpriteAnimation : public Component
 {
 public:
-    SpriteAnimation(Sprite* pSprite) : m_pSprite(pSprite) {}
+    SpriteAnimation() {}
+    SpriteAnimation(Sprite* pSprite);
 
     virtual bool isIDrawable() const override { return false; }
     virtual bool isUpdatable() const override { return true; }
+
+    void openAnimationFile(const std::string_view& strFilePath);
 
     int addAnimationInfo(SpriteAnimationInfo* pAnimationInfo)
     {
@@ -65,6 +76,19 @@ public:
         m_pSprite->setSpriteIndex(m_pAnimationInfo->m_nSpriteIndexArray[m_nCurrentFrame]);
     }
 
+    int getAnimationIndexByName(const std::string& name) const
+    {
+        for (int i = 0; i < m_pAnimationInfoArray.getSize(); ++i)
+        {
+            SpriteAnimationInfo* pInfo = m_pAnimationInfoArray.getElement(i);
+            if (pInfo && pInfo->m_strName == name)
+            {
+                return i;
+            }
+        }
+        return -1;
+    }
+
     virtual void update(float deltaTime) override
     {
         if (!m_pAnimationInfo)
@@ -86,13 +110,18 @@ public:
 
     virtual void draw() override {}
 
-private:
+protected:
     Sprite* m_pSprite;
+    std::string m_strAnimationFileName;
     PointerExpandableArray<SpriteAnimationInfo*> m_pAnimationInfoArray = PointerExpandableArray<SpriteAnimationInfo*>(5);
     SpriteAnimationInfo* m_pAnimationInfo = nullptr;
     int m_nActiveAnimationIndex = -1;
     int m_nCurrentFrame = 0;
 
     float m_fIntervalTimer = 0;
+
+    COMPONENT_REGISTER_SERIALIZABLE(SpriteAnimation)
 };
+
+REGISTER_CLASS(SpriteAnimation)
 

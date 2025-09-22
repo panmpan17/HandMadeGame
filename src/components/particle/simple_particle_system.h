@@ -1,7 +1,7 @@
 #pragma once
 
 // #include "../component.h"
-#include "../../draw/drawable_interface.h"
+#include "../drawable_interface.h"
 #include <linmath.h>
 
 typedef unsigned int GLuint;
@@ -32,7 +32,7 @@ public:
     
     void registerBuffer() override;
     void draw() override;
-    void setShader(Shader* pShader) override { m_pShader = pShader; }
+    void setShader(Shader* pShader) override;
 
     void update(float deltaTime) override;
 
@@ -43,6 +43,7 @@ private:
 
     GLuint m_nVertexBuffer = 0;
     GLuint m_nVertexArray = 0;
+    GLuint m_nMVPUniform, m_nColorUniform;
 
     Shader* m_pShader = nullptr;
 

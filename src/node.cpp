@@ -1,9 +1,20 @@
 #include "node.h"
 #include "components/component.h"
-#include "draw/drawable_interface.h"
+#include "components/drawable_interface.h"
 #include <iostream>
 #include "debug_macro.h"
+#include "serialization/serializer.h"
+#include "random.h"
 
+
+Node::Node(float fX, float fY, float fZ, float fRotationZ) : m_fRotation(fRotationZ)
+{
+    m_vecPosition.x = fX;
+    m_vecPosition.y = fY;
+    m_vecPosition.z = fZ;
+
+    m_nID = generateRandomUUID();
+}
 
 Node::~Node()
 {
@@ -13,17 +24,43 @@ Node::~Node()
 void Node::serializedTo(DataSerializer& serializer) const
 {
     serializer.startClassHeader("Node");
-    serializer.ADD_ATTRIBUTES(m_position);
+    serializer.ADD_ATTRIBUTES(m_nID);
+    serializer.ADD_ATTRIBUTES(m_vecPosition);
     serializer.ADD_ATTRIBUTES(m_fRotation);
     serializer.ADD_ATTRIBUTES(m_bIsActive);
     serializer.endClassHeader();
+
+    for (int i = 0; i < m_oComponentArray.getSize(); ++i)
+    {
+        Component* pComponent = m_oComponentArray.getElement(i);
+        if (pComponent)
+        {
+            serializer << pComponent;
+        }
+    }
 }
 
-void Node::deserializeField(const std::string_view& strFieldName, const std::string_view& strFieldValue)
+bool Node::deserializeField(DataDeserializer& deserializer, const std::string_view& strFieldName, const std::string_view& strFieldValue)
 {
-    DESERIALIZE_FIELD(m_position);
+    DESERIALIZE_FIELD(m_nID);
+    DESERIALIZE_FIELD(m_vecPosition);
     DESERIALIZE_FIELD(m_fRotation);
     DESERIALIZE_FIELD(m_bIsActive);
+
+    return false;
+}
+
+void Node::onFinishedDeserialization()
+{
+    int nSize = m_oComponentArray.getSize();
+    for (int i = 0; i < nSize; ++i)
+    {
+        Component* pComponent = m_oComponentArray.getElement(i);
+        if (pComponent)
+        {
+            pComponent->onNodeFinishedDeserialization();
+        }
+    }
 }
 
 void Node::update(float deltaTime)

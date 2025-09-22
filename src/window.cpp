@@ -12,8 +12,10 @@
 #include "window.h"
 #include "camera.h"
 #include "input_handle.h"
-#include "image.h"
+#include "draw/image.h"
+#include "draw/shader_loader.h"
 #include "world.h"
+#include "post_process/render_process_queue.h"
 
 
 Window* Window::ins = nullptr;
@@ -75,6 +77,20 @@ void Window::configureAndCreateWindow()
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
 #endif
 
+    // GLFWmonitor* pPrimaryMonitor = glfwGetPrimaryMonitor();
+    // const GLFWvidmode* pVideoMode = glfwGetVideoMode(pPrimaryMonitor);
+
+    // m_nWidth = pVideoMode->width;
+    // m_nHeight = pVideoMode->height;
+
+    // // Set window hints to create a borderless, resizable window
+    // glfwWindowHint(GLFW_RED_BITS, pVideoMode->redBits);
+    // glfwWindowHint(GLFW_GREEN_BITS, pVideoMode->greenBits);
+    // glfwWindowHint(GLFW_BLUE_BITS, pVideoMode->blueBits);
+    // glfwWindowHint(GLFW_REFRESH_RATE, pVideoMode->refreshRate);
+    // glfwWindowHint(GLFW_DECORATED, GLFW_FALSE); // This is key for borderless
+
+
     m_pWindow = glfwCreateWindow(m_nWidth, m_nHeight, "My GLFW Window", NULL, NULL);
     if (!m_pWindow)
     {
@@ -82,6 +98,13 @@ void Window::configureAndCreateWindow()
         glfwTerminate();
         return;
     }
+
+    glfwSetWindowAspectRatio(m_pWindow, m_nWidth, m_nHeight);
+
+    glfwGetFramebufferSize(m_pWindow, &m_nActualWidth, &m_nActualHeight);
+    // m_fRatio = m_nActualWidth / (float)m_nActualHeight;
+
+    // glfwSetWindowMonitor(m_pWindow, pPrimaryMonitor, 0, 0, pVideoMode->width, pVideoMode->height, pVideoMode->refreshRate);
 
     // GLint flags;
     // glGetIntegerv(GL_CONTEXT_FLAGS, &flags);
@@ -98,8 +121,22 @@ void Window::start()
 {
     InputManager::Initialize();
     ImageLoader::Initialize();
-
     m_pCamera = new Camera();
+
+    InputManager::getInstance()->registerKeyPressCallback(KeyCode::KEY_ESCAPE, [this](bool pressed) {
+        if (pressed)
+        {
+            m_bRenderProcessQueueUseSplit = !m_bRenderProcessQueueUseSplit;
+        }
+    });
+
+    InputManager::getInstance()->registerKeyPressCallback(KeyCode::KEY_R, [](bool pressed) {
+        if (pressed)
+        {
+            LOGLN("Reloading all shaders...");
+            ShaderLoader::getInstance()->reloadAllShaders();
+        }
+    });
 
     glfwSetKeyCallback(m_pWindow, &InputManager::onKeyCallback);
     glfwSetCursorEnterCallback(m_pWindow, &InputManager::onMouseEnterCallback);
@@ -111,15 +148,23 @@ void Window::start()
     glfwMakeContextCurrent(m_pWindow);
     gladLoadGL(glfwGetProcAddress);
     glfwSwapInterval(1); // Enable vsync
+
+    ShaderLoader::Initialize();
     
     ImageLoader::getInstance()->registerImage("test", "assets/images/test.png");
     ImageLoader::getInstance()->registerImage("dust", "assets/images/dust_1.png");
     ImageLoader::getInstance()->registerImage("character", "assets/images/character_animation.png");
+    ImageLoader::getInstance()->registerImage("cover_test", "assets/images/cover_test.jpg");
 
-    // setupShaders();
+    m_pRenderProcessQueue = new RenderProcessQueue(this);
+    m_pRenderProcessQueue->setupProcesses();
 
     m_pWorldScene = new WorldScene();
-    m_pWorldScene->init();
+    m_pWorldScene->bloomTest();
+    // m_pWorldScene->createPinPongGame();
+    // m_pWorldScene->init();
+    // m_pWorldScene->clearAllNodes();
+    // m_pWorldScene->readFromFiles("assets/level.txt");
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -136,11 +181,18 @@ void Window::mainLoop()
         // Because mac's retina display has a different pixel ratio (and moving to different monitors)
         // need to adjust the viewport to match the actual framebuffer size.
         glfwGetFramebufferSize(m_pWindow, &m_nActualWidth, &m_nActualHeight);
-        m_fRatio = m_nActualWidth / (float) m_nActualHeight;
-        m_pCamera->setRatio(m_fRatio);
+        float fNewRatio = m_nActualWidth / (float) m_nActualHeight;
+        if (m_fRatio != fNewRatio)
+        {
+            m_fRatio = fNewRatio;
+            m_pCamera->setRatio(m_fRatio);
+        }
 
-        glViewport(0, 0, m_nActualWidth, m_nActualHeight);
-        glClear(GL_COLOR_BUFFER_BIT);
+        m_fCurrentDrawTime = glfwGetTime();
+        m_fDeltaTime = m_fCurrentDrawTime - m_fLastDrawTime;
+        m_fLastDrawTime = m_fCurrentDrawTime;
+
+        m_pWorldScene->update(m_fDeltaTime);
 
         drawFrame();
 
@@ -153,14 +205,30 @@ void Window::mainLoop()
 
 void Window::drawFrame()
 {
-    m_fCurrentDrawTime = glfwGetTime();
-    m_fDeltaTime = m_fCurrentDrawTime - m_fLastDrawTime;
-    m_fLastDrawTime = m_fCurrentDrawTime;
-
-    m_pWorldScene->update(m_fDeltaTime);
-    
     m_nDrawCallCount = 0;
-    m_pWorldScene->render();
+
+    if (true) // Enable post process
+    {
+        m_pRenderProcessQueue->beginFrame();
+        m_pWorldScene->render();
+        m_pRenderProcessQueue->endFrame();
+        m_pRenderProcessQueue->startProcessing();
+
+        if (m_bRenderProcessQueueUseSplit)
+        {
+            m_pRenderProcessQueue->renderToScreenSplit();
+        }
+        else
+        {
+            m_pRenderProcessQueue->renderToScreen();
+        }
+    }
+    else
+    {
+        glViewport(0, 0, m_nActualWidth, m_nActualHeight);
+        glClear(GL_COLOR_BUFFER_BIT);
+        m_pWorldScene->render();
+    }
     LOG_EX("Draw call count: {}, Fps: {}\r", m_nDrawCallCount, 1.0f / m_fDeltaTime);
 }
 

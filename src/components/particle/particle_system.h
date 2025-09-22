@@ -1,7 +1,7 @@
 #pragma once
 
 // #include "../component.h"
-#include "../../draw/drawable_interface.h"
+#include "../drawable_interface.h"
 #include <linmath.h>
 #include <functional>
 
@@ -14,6 +14,7 @@ struct ParticleGPUInstance
     vec4 m_vecColor;
     float m_fRotation;
     float m_fScale;
+    float m_fOpacity;
 };
 
 struct ParticleCPUInstance
@@ -29,7 +30,7 @@ struct ParticleCPUInstance
 
 
 class ParticleSystem;
-class IParticleModule
+class IParticleModule : public ISerializable
 {
 public:
     virtual ~IParticleModule() = default;
@@ -37,14 +38,26 @@ public:
     virtual void update(ParticleSystem& particleSystem, float deltaTime) = 0;
 
     virtual void onActiveTimeReset() {}
+
+    virtual std::string getDeserializedValue() const { return typeid(*this).name(); }
+    virtual void deserializeFromField(const std::string_view& strFieldValue) = 0;
+
+    virtual void serializedTo(DataSerializer& serializer) const override {};
+    virtual bool deserializeField(DataDeserializer& deserializer, const std::string_view& strFieldName, const std::string_view& strFieldValue) override { return false; }
 };
 
-class IParticleIndividualModule
+class IParticleIndividualModule : public ISerializable
 {
 public:
     virtual ~IParticleIndividualModule() = default;
 
     virtual void update(ParticleSystem& particleSystem, ParticleGPUInstance* pParticleGpu, ParticleCPUInstance* pParticleCpu, float deltaTime) = 0;
+
+    virtual std::string getDeserializedValue() const { return typeid(*this).name(); }
+    virtual void deserializeFromField(const std::string_view& strFieldValue) = 0;
+
+    virtual void serializedTo(DataSerializer& serializer) const override {};
+    virtual bool deserializeField(DataDeserializer& deserializer, const std::string_view& strFieldName, const std::string_view& strFieldValue) override { return false; }
 };
 
 
@@ -61,7 +74,7 @@ typedef std::function<void(vec2&)> ParticleStartVelocityDirectionOverride;
 class ParticleSystem : public IDrawable
 {
 public:
-    ParticleSystem(int nParticleCount, bool bSimulateInLocal = false);
+    ParticleSystem(int nParticleCount = 100, bool bSimulateInLocal = false);
 
     ~ParticleSystem() override;
 
@@ -103,8 +116,17 @@ public:
         if (bResetActiveTimer)
         {
             m_fActiveTimer = 0.0f;
+
+            for (IParticleModule*& pModule : m_arrParticleModules)
+            {
+                if (pModule)
+                {
+                    pModule->onActiveTimeReset();
+                }
+            }
         }
     }
+    void stop() { m_bIsEmitting = false; }
     bool getIsEmitting() const { return m_bIsEmitting; }
 
     void setActiveTime(float fTime) { m_fActiveTime = fTime; }
@@ -119,6 +141,7 @@ private:
     GLuint m_nVertexBuffer = 0;
     GLuint m_nVertexArray = 0;
     GLuint m_nInstanceBuffer = 0;
+    GLuint m_nUseNodeTransformUniform, m_nUseTextureUniform, m_nMVPUniForm, m_nNodeTransformUniform, m_nTextureUniform;
 
     Shader* m_pShader = nullptr;
 
@@ -165,4 +188,8 @@ private:
 
     void updateParticle(int& nIndex, float fDeltaTime);
     void sortAliveParticleInFront();
+
+    COMPONENT_REGISTER_SERIALIZABLE(ParticleSystem)
 };
+
+REGISTER_CLASS(ParticleSystem)

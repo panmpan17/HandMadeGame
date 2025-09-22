@@ -1,6 +1,9 @@
 #include "window.h"
+#include "error_handler.h"
 
 int main() {
+    registerSignalHandlers();
+
     Window window;
 
     try

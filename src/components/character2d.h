@@ -6,30 +6,8 @@
 class Character2d : public Component
 {
 public:
-    Character2d(SpriteAnimation* pAnimation) : m_pAnimation(pAnimation)
-    {
-        auto IdleAnimationIndex = new ushort[] {12};
-        auto pIdleAnimation = new SpriteAnimationInfo(IdleAnimationIndex, 1, 3.f);
-        m_nIdleAnimationIndex = m_pAnimation->addAnimationInfo(pIdleAnimation);
-
-        auto nWalkAnimationIndex = new ushort[] {15, 8, 9, 10, 11, 4, 5, 6, 7, 0, 1};
-        auto pWalkAnimation = new SpriteAnimationInfo(nWalkAnimationIndex, 11, 0.06f);
-        m_nWalkAnimationIndex = m_pAnimation->addAnimationInfo(pWalkAnimation);
-
-        pAnimation->playAnimationInfo(m_nIdleAnimationIndex);
-
-        delete[] nWalkAnimationIndex;
-        delete[] IdleAnimationIndex;
-
-
-        InputManager::getInstance()->registerKeyPressCallback(KeyCode::KEY_D, [this](bool bPressed) {
-            if (bPressed) {
-                m_pAnimation->playAnimationInfo(m_nWalkAnimationIndex);
-            } else {
-                m_pAnimation->playAnimationInfo(m_nIdleAnimationIndex);
-            }
-        });
-    }
+    Character2d() {};
+    Character2d(SpriteAnimation* pAnimation);
 
 
     ~Character2d()
@@ -44,8 +22,13 @@ public:
     virtual void draw() override {}
 
 private:
-    SpriteAnimation* m_pAnimation;
+    SpriteAnimation* m_pAnimation = nullptr;
 
-    int m_nIdleAnimationIndex;
-    int m_nWalkAnimationIndex;
+    int m_nIdleAnimationIndex = -1;
+    int m_nWalkAnimationIndex = -1;
+
+    COMPONENT_REGISTER_SERIALIZABLE(Character2d)
 };
+
+REGISTER_CLASS(Character2d)
+

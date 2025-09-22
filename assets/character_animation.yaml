@@ -1,0 +1,6 @@
+idle:
+  interval: 3
+  frames: 12
+walk:
+  interval: 0.06
+  frames: 15,8,9,10,11,4,5,6,7,0,1

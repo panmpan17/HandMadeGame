@@ -62,7 +62,7 @@ void InputManager::onKeyCallback(GLFWwindow* pWindow, int nKey, int nScanNode, i
     switch (nAction)
     {
         case GLFW_PRESS:
-            if (nKey >= 0 && nKey < 256)
+            if (nKey >= 0 && nKey < (int)KeyCode::MAX_KEY_CODE)
             {
                 ins->m_bKeyPressed[nKey] = true;
                 ins->m_KeyPressEvent[nKey].invoke(true);

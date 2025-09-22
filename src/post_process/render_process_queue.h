@@ -1,0 +1,85 @@
+#pragma once
+
+#include "../expandable_array.h"
+
+typedef unsigned int GLuint;
+
+class Shader;
+class Window;
+
+class RenderProcessQueue;
+
+class IRenderProcess
+{
+public:
+    IRenderProcess(RenderProcessQueue* pQueue) : m_pProcessQueue(pQueue) {}
+    virtual ~IRenderProcess() = default;
+
+    virtual void renderProcess() = 0;
+
+protected:
+    RenderProcessQueue* m_pProcessQueue = nullptr;
+
+    virtual void initialize() = 0;
+
+    void registerShaderPosAndUV(Shader* pShader);
+    void renderTextureToBufferWithShader(GLuint nBuffer, GLuint nTexture, Shader* pShader);
+};
+
+
+class RenderProcessQueue
+{
+public:
+    RenderProcessQueue(Window* pWindow);
+    ~RenderProcessQueue();
+
+    // void resize(int width, int height);
+    void setupProcesses();
+
+    void beginFrame();
+    void endFrame();
+
+    void startProcessing();
+    void renderToScreen();
+    void renderToScreenSplit();
+
+    inline int getRenderWidth() const { return m_nRenderWidth; }
+    inline int getRenderHeight() const { return m_nRenderHeight; }
+    int getActualWidth() const;
+    int getActualHeight() const;
+
+    inline GLuint getOriginalRenderTexture() const { return m_nRenderTexture_original; }
+    inline GLuint getFinalRenderTexture() const { return m_nFinalRenderTexture; }
+    inline void setFinalRenderTexture(GLuint texture) { m_nFinalRenderTexture = texture; }
+
+    inline GLuint getFullScreenVertexArray() const { return m_nVertexArray; }
+    inline GLuint getFullScreenVertexBuffer() const { return m_nVertexBuffer; }
+
+private:
+    Window* m_pWindow = nullptr;
+
+    int m_nRenderWidth = 0;
+    int m_nRenderHeight = 0;
+
+    GLuint m_nFBOID_original = 0;
+    GLuint m_nRenderTexture_original = 0;
+
+    Shader* m_pShader = nullptr;
+    GLuint m_nTextureUniform = 0;
+
+    Shader* m_pSplitShader = nullptr;
+    GLuint m_nOriginalTextureUniform_Split = 0;
+    GLuint m_nFinalTextureUniform_Split = 0;
+    GLuint m_nSplitFactorUniform = 0;
+
+    GLuint m_nVertexBuffer = 0;
+    GLuint m_nVertexArray = 0;
+
+    GLuint m_nFinalRenderTexture = 0;
+
+    PointerExpandableArray<IRenderProcess*> m_oProcessArray = PointerExpandableArray<IRenderProcess*>(2);
+
+    void init(int nWidth, int nHeight);
+    void initializeQuad();
+    void initializeOriginalFBO();
+};

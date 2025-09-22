@@ -5,6 +5,7 @@
 typedef struct GLFWwindow GLFWwindow;
 class Camera;
 class WorldScene;
+class RenderProcessQueue;
 
 typedef unsigned int GLuint;
 
@@ -24,6 +25,9 @@ public:
         height = ins->m_nHeight;
     }
 
+    inline int GetActualWidth() const { return m_nActualWidth; }
+    inline int GetActualHeight() const { return m_nActualHeight; }
+
     void configureAndCreateWindow();
     void start();
 
@@ -31,8 +35,10 @@ public:
 
 private:
     GLFWwindow* m_pWindow = nullptr;
+    RenderProcessQueue* m_pRenderProcessQueue = nullptr;
+    bool m_bRenderProcessQueueUseSplit = false;
 
-    int m_nWidth = 80, m_nHeight = 60;
+    int m_nWidth = 320, m_nHeight = 180;
     int m_nActualWidth = 800, m_nActualHeight = 600;
     float m_fRatio = 1.0f;
 

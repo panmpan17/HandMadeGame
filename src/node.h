@@ -2,8 +2,8 @@
 
 #include <linmath.h>
 #include "expandable_array.h"
-#include "serializer.h"
 #include "components/component.h"
+#include "vector.h"
 
 
 class Component;
@@ -14,37 +14,42 @@ class Node : public ISerializable
 {
 public:
     Node() {}
-    Node(float fX, float fY, float fZ, float fRotationZ) : m_fRotation(fRotationZ)
-    {
-        m_position[0] = fX;
-        m_position[1] = fY;
-        m_position[2] = fZ;
-    }
-
+    Node(float fX, float fY, float fZ, float fRotationZ);
     ~Node();
 
-    inline void setPosition(float fX, float fY) {
-        m_position[0] = fX;
-        m_position[1] = fY;
+    inline void setPosition(float fX, float fY)
+    {
+        m_vecPosition.x = fX;
+        m_vecPosition.y = fY;
     }
-    inline void setPosition(float fX, float fY, float fZ) {
-        m_position[0] = fX;
-        m_position[1] = fY;
-        m_position[2] = fZ;
+    inline void setPosition(float fX, float fY, float fZ)
+    {
+        m_vecPosition.x = fX;
+        m_vecPosition.y = fY;
+        m_vecPosition.z = fZ;
     }
+    inline void setPosition(const vec3& position) { m_vecPosition.x = position[0]; m_vecPosition.y = position[1]; m_vecPosition.z = position[2]; }
+    inline void setPosition(const Vector2& position) { m_vecPosition.x = position.x; m_vecPosition.y = position.y; }
+    inline void setPosition(const Vector3& position) { m_vecPosition.x = position.x; m_vecPosition.y = position.y; m_vecPosition.z = position.z; }
 
-    inline void move(float fX, float fY) {
-        m_position[0] += fX;
-        m_position[1] += fY;
+    inline void move(float fX, float fY)
+    {
+        m_vecPosition.x += fX;
+        m_vecPosition.y += fY;
     }
-    inline void move(float fX, float fY, float fZ) {
-        m_position[0] += fX;
-        m_position[1] += fY;
-        m_position[2] += fZ;
+    inline void move(float fX, float fY, float fZ)
+    {
+        m_vecPosition.x += fX;
+        m_vecPosition.y += fY;
+        m_vecPosition.z += fZ;
     }
+    inline void move(const Vector2& position) { m_vecPosition += position; }
+    inline void move(const Vector3& position) { m_vecPosition += position; }
 
-    inline const vec3& getPosition() const { return const_cast<vec3&>(m_position); }
-    inline void setPosition(const vec3& position) { m_position[0] = position[0]; m_position[1] = position[1]; m_position[2] = position[2]; }
+    inline const Vector3 getPosition() const { return m_vecPosition; }
+    inline float getPositionX() const { return m_vecPosition.x; }
+    inline float getPositionY() const { return m_vecPosition.y; }
+    inline float getPositionZ() const { return m_vecPosition.z; }
 
     inline void setRotation(float fRotation) { m_fRotation = fRotation; }
     inline float getRotation() const { return m_fRotation; }
@@ -60,11 +65,12 @@ public:
     bool isActive() const { return m_bIsActive; }
 
     void serializedTo(DataSerializer& serializer) const override;
-    void deserializeField(const std::string_view& strFieldName, const std::string_view& strFieldValue) override;
+    bool deserializeField(DataDeserializer& deserializer, const std::string_view& strFieldName, const std::string_view& strFieldValue) override;
+    void onFinishedDeserialization();
 
     friend std::ostream& operator<<(std::ostream& os, const Node& node)
     {
-        os << "Node(pos=" <<  node.m_position[0] << "," <<  node.m_position[1] << "," <<  node.m_position[2] << "; "
+        os << "Node(pos=" <<  node.m_vecPosition.x << "," <<  node.m_vecPosition.y << "," <<  node.m_vecPosition.z << "; "
            << "rotation=" << node.m_fRotation << "; "
            << "active=" << node.m_bIsActive
            << " )";
@@ -72,7 +78,7 @@ public:
     }
 
 private:
-    vec3 m_position = {0.f, 0.f, 0.f};
+    Vector3 m_vecPosition;
     float m_fRotation = 0;
     bool m_bIsActive = true;
 

@@ -9,7 +9,7 @@
 class Movement : public Component
 {
 public:
-    Movement(float fMoveSpeed);
+    Movement(float fMoveSpeed = 0);
     virtual ~Movement();
 
     virtual bool isIDrawable() const override { return false; }
@@ -19,17 +19,29 @@ public:
 
     virtual void draw() override {}
 
-private:
+protected:
     float m_fMoveSpeed = 0.0f;
     std::bitset<4> m_bMovementKeyPressed = 0;
 
     void getMovementDirection(short& x, short& y);
+
+    COMPONENT_REGISTER_SERIALIZABLE(Movement)
 };
+
+REGISTER_CLASS(Movement)
 
 
 class TwoPointsMovement : public Component
 {
 public:
+    TwoPointsMovement()
+    {
+        m_vecStart[0] = 0;
+        m_vecStart[1] = 0;
+        m_vecEnd[0] = 0;
+        m_vecEnd[1] = 0;
+        m_fDuration = 1.0f;
+    }
     TwoPointsMovement(const vec2& vecStart, const vec2& vecEnd, float duration)
         : m_fDuration(duration)
     {
@@ -46,7 +58,7 @@ public:
 
     virtual void draw() override {}
 
-private:
+protected:
     vec2 m_vecStart;
     vec2 m_vecEnd;
     float m_fDuration;
@@ -54,4 +66,8 @@ private:
 
     // TODO: make this flexible
     bool m_bIsMovingForward = false;
+
+    COMPONENT_REGISTER_SERIALIZABLE(TwoPointsMovement)
 };
+
+REGISTER_CLASS(TwoPointsMovement)

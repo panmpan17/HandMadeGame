@@ -20,6 +20,8 @@ public:
     inline bool isCPULoaded() const { return m_pData != nullptr; }
     inline bool isGPULoaded() const { return m_nTextureID != 0; }
 
+    inline std::string_view getPath() const { return m_strPath; }
+
     void loadTextureToGL();
     void freeCPUData();
 
@@ -29,6 +31,7 @@ private:
     int m_nChannels;
     unsigned char* m_pData;
     GLuint m_nTextureID = 0; // Texture ID for OpenGL texture binding
+    std::string_view m_strPath;
 };
 
 
@@ -42,6 +45,7 @@ public:
 
     void registerImage(const std::string_view& strName, const std::string_view& strPath);
     Image* getImage(const std::string_view& strName);
+    Image* getImageByPath(const std::string_view& strPath);
 
 private:
     ImageLoader();

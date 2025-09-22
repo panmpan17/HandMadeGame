@@ -12,3 +12,5 @@ void randomBetweenVec4(vec4& vResult, const vec4& vMin, const vec4& vMax);
 
 void randomOnUnitCircle(vec2& vResult);
 void randomOnUnitSphere(vec3& vResult);
+
+size_t generateRandomUUID();

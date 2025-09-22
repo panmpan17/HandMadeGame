@@ -3,13 +3,15 @@
 #include <glad/gl.h>
 #include "../../draw/shader.h"
 #include "../../draw/vertex.h"
+#include "../../draw/shader_loader.h"
+#include "../../draw/image.h"
 #include "../../debug_macro.h"
 #include "../../node.h"
 #include "../../camera.h"
 #include "../../window.h"
 #include "../../random.h"
-#include "../../image.h"
 #include "../../platform.h"
+#include "../../serialization/serializer.h"
 
 
 #define SWAP_PARTICLE_POSITION(i, j) \
@@ -77,10 +79,10 @@ void ParticleSystem::registerBuffer()
 {
     // Four corner vertex datas
     VertexWUV arrQuadVerticies[4];
-    arrQuadVerticies[0] = { { -0.1f, -0.1f }, { 0.f, 0.f } };
-    arrQuadVerticies[1] = { { 0.1f, -0.1f }, { 1.f, 0.f } };
-    arrQuadVerticies[2] = { { -0.1f, 0.1f }, { 0.f, 1.f } };
-    arrQuadVerticies[3] = { { 0.1f, 0.1f }, { 1.f, 1.f } };
+    arrQuadVerticies[0] = { { -.5f, -.5f }, { 0.f, 0.f } };
+    arrQuadVerticies[1] = { { .5f, -.5f }, { 1.f, 0.f } };
+    arrQuadVerticies[2] = { { -.5f, .5f }, { 0.f, 1.f } };
+    arrQuadVerticies[3] = { { .5f, .5f }, { 1.f, 1.f } };
 
     glGenBuffers(1, &m_nVertexBuffer);
     glBindBuffer(GL_ARRAY_BUFFER, m_nVertexBuffer);
@@ -116,6 +118,10 @@ void ParticleSystem::registerBuffer()
     glVertexAttribPointer(5, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleGPUInstance), (void*)offsetof(ParticleGPUInstance, m_fScale));
     glVertexAttribDivisor(5, 1);
 
+    glEnableVertexAttribArray(6);
+    glVertexAttribPointer(6, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleGPUInstance), (void*)offsetof(ParticleGPUInstance, m_fOpacity));
+    glVertexAttribDivisor(6, 1);
+
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -124,12 +130,11 @@ void ParticleSystem::setShader(Shader* pShader)
 {
     m_pShader = pShader;
 
-    ParticleInstanceShader* pParticleShader = static_cast<ParticleInstanceShader*>(m_pShader);
-    glUseProgram(pParticleShader->getProgram());
-
-    glUniform1i(pParticleShader->getUseNodeTransformLocation(), m_bSimulateInLocal ? 1 : 0);
-
-    glUniform1i(pParticleShader->getUseTextureLocation(), m_pImage ? 1 : 0);
+    m_nMVPUniForm = pShader->getUniformLocation("u_MVP");
+    m_nNodeTransformUniform = pShader->getUniformLocation("u_nodeTransform");
+    m_nUseNodeTransformUniform = pShader->getUniformLocation("u_useNodeTransform");
+    m_nUseTextureUniform = pShader->getUniformLocation("u_useTexture");
+    m_nTextureUniform = pShader->getUniformLocation("u_tex0");
 }
 
 void ParticleSystem::draw()
@@ -141,11 +146,14 @@ void ParticleSystem::draw()
     glBindVertexArray(m_nVertexArray);
     glUseProgram(m_pShader->getProgram());
 
-    mat4x4 cameraViewMatrix;
-    Camera::main->getViewMatrix(cameraViewMatrix);
+    glUniform1i(m_nUseNodeTransformUniform, m_bSimulateInLocal ? 1 : 0);
+    glUniform1i(m_nUseTextureUniform, m_pImage ? 1 : 0);
 
-    ParticleInstanceShader* pParticleShader = static_cast<ParticleInstanceShader*>(m_pShader);
-    glUniformMatrix4fv(pParticleShader->getMvpLocation(), 1, GL_FALSE, (const GLfloat*) cameraViewMatrix);
+    glUniform1i(m_nTextureUniform, 0);
+
+    const mat4x4& cameraViewMatrix = Camera::main->getViewProjectionMatrix();
+
+    glUniformMatrix4fv(m_nMVPUniForm, 1, GL_FALSE, (const GLfloat*) cameraViewMatrix);
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_pImage ? m_pImage->getTextureID() : 0);
@@ -155,10 +163,10 @@ void ParticleSystem::draw()
         mat4x4 nodeTransform;
 
         mat4x4_identity(nodeTransform);
-        const vec3& nodePosition = getNode()->getPosition();
-        mat4x4_translate(nodeTransform, nodePosition[0], nodePosition[1], nodePosition[2]);
+        const Vector3& nodePosition = getNode()->getPosition();
+        mat4x4_translate(nodeTransform, nodePosition.x, nodePosition.y, nodePosition.z);
 
-        glUniformMatrix4fv(pParticleShader->getNodeTransformLocation(), 1, GL_FALSE, (const GLfloat*) nodeTransform);
+        glUniformMatrix4fv(m_nNodeTransformUniform, 1, GL_FALSE, (const GLfloat*) nodeTransform);
     }
 
     glBindBuffer(GL_ARRAY_BUFFER, m_nInstanceBuffer);
@@ -264,9 +272,9 @@ void ParticleSystem::spawnNewParticles(int nSpawnCount/* = 1*/)
             }
             else
             {
-                const vec3& vecBasePosition = getNode()->getPosition();
-                vecBasePositionX = vecBasePosition[0];
-                vecBasePositionY = vecBasePosition[1];
+                const Vector3& vecBasePosition = getNode()->getPosition();
+                vecBasePositionX = vecBasePosition.x;
+                vecBasePositionY = vecBasePosition.y;
             }
 
             switch (m_eSpawnShape)
@@ -308,6 +316,7 @@ void ParticleSystem::spawnNewParticles(int nSpawnCount/* = 1*/)
             randomBetweenVec4(m_arrParticlesGPU[i].m_vecColor, m_vecStartColorMin, m_vecStartColorMax);
             m_arrParticlesGPU[i].m_fRotation = randomFloat(m_fStartRotationMin, m_fStartRotationMax);
             m_arrParticlesGPU[i].m_fScale = randomFloat(m_fStartScaleMin, m_fStartScaleMax);
+            m_arrParticlesGPU[i].m_fOpacity = 1.0f;
             m_arrParticlesCPU[i].m_fBaseScale = m_arrParticlesGPU[i].m_fScale;
 
             ++m_nAliveParticleCount;
@@ -339,5 +348,131 @@ void ParticleSystem::sortAliveParticleInFront()
         {
             break;
         }
+    }
+}
+
+void ParticleSystem::serializeToWrapper(DataSerializer& serializer) const
+{
+    serializer.ADD_ATTRIBUTES(m_nAllParticleCount);
+    serializer.ADD_ATTRIBUTES_VALUE(m_eSpawnShape, static_cast<int>(m_eSpawnShape));
+    serializer.ADD_ATTRIBUTES(m_fSpawnShapeWidth);
+    serializer.ADD_ATTRIBUTES(m_fSpawnShapeHeight);
+    serializer.ADD_ATTRIBUTES(m_fLifetimeMin);
+    serializer.ADD_ATTRIBUTES(m_fLifetimeMax);
+    serializer.ADD_ATTRIBUTES(m_fStartRotationMin);
+    serializer.ADD_ATTRIBUTES(m_fStartRotationMax);
+    serializer.ADD_ATTRIBUTES(m_fStartRotationSpeedMin);
+    serializer.ADD_ATTRIBUTES(m_fStartRotationSpeedMax);
+    serializer.ADD_ATTRIBUTES(m_fStartScaleMin);
+    serializer.ADD_ATTRIBUTES(m_fStartScaleMax);
+    serializer.ADD_ATTRIBUTES(m_vecStartColorMin);
+    serializer.ADD_ATTRIBUTES(m_vecStartColorMax);
+    serializer.ADD_ATTRIBUTES(m_fStartVelocityMin);
+    serializer.ADD_ATTRIBUTES(m_fStartVelocityMax);
+    serializer.ADD_ATTRIBUTES(m_bSimulateInLocal);
+    serializer.ADD_ATTRIBUTES(m_fGravity);
+
+    if (m_pShader)
+    {
+        serializer.ADD_ATTRIBUTES_VALUE(m_pShader, m_pShader->getId());
+    }
+
+    for (int i = 0; i < 4; ++i)
+    {
+        const IParticleModule* pModule = m_arrParticleModules[i];
+        if (pModule)
+        {
+            std::string strModuleDeserializeValue = pModule->getDeserializedValue();
+            serializer.ADD_ATTRIBUTES_VALUE(module, strModuleDeserializeValue);
+        }
+    }
+
+    for (int i = 0; i < 4; ++i)
+    {
+        const IParticleIndividualModule* pModule = m_arrParticleIndividualModules[i];
+        if (pModule)
+        {
+            std::string strModuleDeserializeValue = pModule->getDeserializedValue();
+            serializer.ADD_ATTRIBUTES_VALUE(module, strModuleDeserializeValue);
+        }
+    }
+}
+
+bool ParticleSystem::deserializeField(DataDeserializer& deserializer, const std::string_view& strFieldName, const std::string_view& strFieldValue)
+{
+    DESERIALIZE_FIELD(m_nAllParticleCount);
+
+    IF_DESERIALIZE_FIELD_CHECK(m_eSpawnShape)
+    {
+        m_eSpawnShape = static_cast<eParticleSpawnShape>(std::atoi(strFieldValue.data()));
+        return true;
+    }
+
+    DESERIALIZE_FIELD(m_fSpawnShapeWidth);
+    DESERIALIZE_FIELD(m_fSpawnShapeHeight);
+    DESERIALIZE_FIELD(m_fLifetimeMin);
+    DESERIALIZE_FIELD(m_fLifetimeMax);
+    DESERIALIZE_FIELD(m_fStartRotationMin);
+    DESERIALIZE_FIELD(m_fStartRotationMax);
+    DESERIALIZE_FIELD(m_fStartRotationSpeedMin);
+    DESERIALIZE_FIELD(m_fStartRotationSpeedMax);
+    DESERIALIZE_FIELD(m_fStartScaleMin);
+    DESERIALIZE_FIELD(m_fStartScaleMax);
+    DESERIALIZE_FIELD(m_vecStartColorMin);
+    DESERIALIZE_FIELD(m_vecStartColorMax);
+    DESERIALIZE_FIELD(m_fStartVelocityMin);
+    DESERIALIZE_FIELD(m_fStartVelocityMax);
+    DESERIALIZE_FIELD(m_bSimulateInLocal);
+    DESERIALIZE_FIELD(m_fGravity);
+
+    IF_DESERIALIZE_FIELD_CHECK(m_pShader)
+    {
+        m_pShader = ShaderLoader::getInstance()->getShader(std::atoi(strFieldValue.data()));
+        return true;
+    }
+
+    IF_DESERIALIZE_FIELD_CHECK(module)
+    {
+        size_t pos = strFieldValue.find(":", 10);
+        if (pos == std::string::npos)
+        {
+            return true;
+        }
+
+        std::string_view strModuleType = strFieldValue.substr(0, pos);
+        std::string_view strModuleValue = strFieldValue.substr(pos + 1);
+
+        ISerializable* pModule = TypeRegistry::instance().create(std::string(strModuleType));
+
+        LOGLN_EX("Deserializing module: {}, value: {}, {}", strModuleType, strModuleValue, pModule == nullptr ? "failed" : "succeeded");
+        if (!pModule) { return true;}
+
+        IParticleModule* pParticleModule = dynamic_cast<IParticleModule*>(pModule);
+        if (pParticleModule)
+        {
+            pParticleModule->deserializeFromField(strModuleValue);
+            addParticleModule(pParticleModule);
+            return true;
+        }
+        
+        IParticleIndividualModule* pParticleIndividualModule = dynamic_cast<IParticleIndividualModule*>(pModule);
+        if (pParticleIndividualModule)
+        {
+            pParticleIndividualModule->deserializeFromField(strModuleValue);
+            addParticleIndividualModule(pParticleIndividualModule);
+        }
+
+        return true;
+    }
+
+    return false;
+}
+
+void ParticleSystem::onNodeFinishedDeserialization()
+{
+    if (m_pShader)
+    {
+        setShader(m_pShader);
+        registerBuffer();
     }
 }
