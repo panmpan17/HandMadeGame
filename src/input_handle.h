@@ -120,6 +120,15 @@ public:
         }
     }
 
+    inline bool isKeyPressed(KeyCode key) const
+    {
+        if (key > KeyCode::KEY_UNKNOWN && key < KeyCode::MAX_KEY_CODE)
+        {
+            return m_bKeyPressed[static_cast<int>(key)];
+        }
+        return false;
+    }
+
 private:
     static bool sm_bMouseEntered;
     static float sm_fMouseX, sm_fMouseY;

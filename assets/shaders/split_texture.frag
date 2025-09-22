@@ -10,7 +10,7 @@ out vec4 fragment;
 
 void main()
 {
-    if (uv.x < 0)
+    if (uv.x < u_splitFactor)
     {
         fragment = texture(u_tex0, uv);
     }

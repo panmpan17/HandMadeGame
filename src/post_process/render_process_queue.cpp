@@ -5,6 +5,7 @@
 #include "../draw/vertex.h"
 #include "../draw/shader.h"
 #include "../draw/shader_loader.h"
+#include "../input_handle.h"
 #include "bloom_test.h"
 #include "order_dithering.h"
 
@@ -114,10 +115,74 @@ void RenderProcessQueue::setupProcesses()
     auto pBloomTest = new BloomTest(this);
     pBloomTest->initialize();
     m_oProcessArray.addElement(pBloomTest);
+    // BloomTest::ins = pBloomTest;
 
-    auto pOrderDithering = new OrderDithering(this);
-    pOrderDithering->initialize();
-    m_oProcessArray.addElement(pOrderDithering);
+    auto pInput = InputManager::getInstance();
+    pInput->registerKeyPressCallback(KeyCode::KEY_ARROW_UP, [pBloomTest](bool pressed) {
+        if (!pressed) { return; }
+
+        bool bShiftPressed = InputManager::getInstance()->isKeyPressed(KeyCode::KEY_LEFT_SHIFT) ||
+                               InputManager::getInstance()->isKeyPressed(KeyCode::KEY_RIGHT_SHIFT);
+        bool bMetaPressed = InputManager::getInstance()->isKeyPressed(KeyCode::KEY_LEFT_META) ||
+                              InputManager::getInstance()->isKeyPressed(KeyCode::KEY_RIGHT_META);
+
+        if (!bShiftPressed && !bMetaPressed)
+        {
+            float fIntensity = pBloomTest->getIntensity();
+            fIntensity += 0.1f;
+            if (fIntensity > 5.0f) fIntensity = 5.0f;
+            pBloomTest->setIntensity(fIntensity);
+        }
+        else if (bShiftPressed && !bMetaPressed)
+        {
+            float fRadius = pBloomTest->getBlurRadius();
+            fRadius += 1.0f;
+            if (fRadius > 20.0f) fRadius = 20.0f;
+            pBloomTest->setBlurRadius(fRadius);
+        }
+        else if (!bShiftPressed && bMetaPressed)
+        {
+            float fSigma = pBloomTest->getBlurSigma();
+            fSigma += 1.0f;
+            if (fSigma > 20.0f) fSigma = 20.0f;
+            pBloomTest->setBlurSigma(fSigma);
+        }
+    });
+    pInput->registerKeyPressCallback(KeyCode::KEY_ARROW_DOWN, [pBloomTest](bool pressed) {
+        if (!pressed) { return; }
+
+        bool bShiftPressed = InputManager::getInstance()->isKeyPressed(KeyCode::KEY_LEFT_SHIFT) ||
+                               InputManager::getInstance()->isKeyPressed(KeyCode::KEY_RIGHT_SHIFT);
+        bool bMetaPressed = InputManager::getInstance()->isKeyPressed(KeyCode::KEY_LEFT_META) ||
+                              InputManager::getInstance()->isKeyPressed(KeyCode::KEY_RIGHT_META);
+
+        // LOGLN_EX("Shift: {}, Meta: {}", bShiftPressed, bMetaPressed);
+        if (!bShiftPressed && !bMetaPressed)
+        {
+            float fIntensity = pBloomTest->getIntensity();
+            fIntensity -= 0.1f;
+            if (fIntensity < 0.0f) fIntensity = 0.0f;
+            pBloomTest->setIntensity(fIntensity);
+        }
+        else if (bShiftPressed && !bMetaPressed)
+        {
+            float fRadius = pBloomTest->getBlurRadius();
+            fRadius -= 1.0f;
+            if (fRadius < 0.0f) fRadius = 0.0f;
+            pBloomTest->setBlurRadius(fRadius);
+        }
+        else if (!bShiftPressed && bMetaPressed)
+        {
+            float fSigma = pBloomTest->getBlurSigma();
+            fSigma -= 1.0f;
+            if (fSigma < 0.0f) fSigma = 0.0f;
+            pBloomTest->setBlurSigma(fSigma);
+        }
+    });
+
+    // auto pOrderDithering = new OrderDithering(this);
+    // pOrderDithering->initialize();
+    // m_oProcessArray.addElement(pOrderDithering);
 }
 
 #pragma mark Drawing every frame

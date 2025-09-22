@@ -1,5 +1,5 @@
 Node {
-m_nID: 12847284222576575601
+m_nID: 5159500681203908996
 m_position: -0.5, 0, 0
 m_fRotation: 0
 m_bIsActive: 1
@@ -17,7 +17,7 @@ m_nID: 0
 m_fMoveSpeed: 1
 }
 Node {
-m_nID: 1685882158123023130
+m_nID: 15045518160906793042
 m_position: -0.4, 0, 0
 m_fRotation: 0
 m_bIsActive: 1
@@ -27,13 +27,13 @@ m_nID: 0
 m_pShader: 4
 }
 Node {
-m_nID: 7510090851377713988
+m_nID: 8976749248697250113
 m_position: 0.5, 0.5, 0
 m_fRotation: 0
 m_bIsActive: 1
 }
 Quad {
-m_nID: 16648256714775422564
+m_nID: 17203429053536543726
 m_fWidth: 0.5
 m_fHeight: 0.5
 m_color: 1, 0, 0, 1
@@ -45,13 +45,13 @@ m_nID: 0
 m_fRotationSpeed: 1
 }
 Node {
-m_nID: 9479431398052871935
+m_nID: 10754374566684280974
 m_position: 0.5, 0.5, 0
 m_fRotation: 0
 m_bIsActive: 1
 }
 Quad {
-m_nID: 12263163689916627873
+m_nID: 12688512976713052313
 m_fWidth: 0.3
 m_fHeight: 0.3
 m_color: 0.5, 0.5, 1, 1
@@ -59,7 +59,7 @@ m_pImage: assets/images/dust_1.png
 m_pShader: 1
 }
 Node {
-m_nID: 4943873078340986457
+m_nID: 16798831836308924368
 m_position: 0, 0, 0
 m_fRotation: 0
 m_bIsActive: 1
@@ -95,7 +95,7 @@ m_vecEnd: 0.5, 0
 m_fDuration: 2
 }
 Node {
-m_nID: 3976462031484154567
+m_nID: 5877635045445257751
 m_position: 0.5, 0, 0
 m_fRotation: 0
 m_bIsActive: 1
@@ -124,7 +124,7 @@ m_pShader: 3
 module: ParticleBurstSpawn:1,20
 }
 Node {
-m_nID: 157096339459230814
+m_nID: 5493313357067186839
 m_position: -0.5, 0, 0
 m_fRotation: 0
 m_bIsActive: 1
@@ -154,13 +154,13 @@ module: ParticleIntervalSpawn:0.1
 module: ParticleBurstSpawn:0,20
 }
 Node {
-m_nID: 6730433566913365015
+m_nID: 3315044222630237208
 m_position: 0, 0, 0
 m_fRotation: 0
 m_bIsActive: 1
 }
 Sprite {
-m_nID: 16792238324006037102
+m_nID: 12147924336087126831
 m_fWidth: 0.36
 m_fHeight: 0.48
 m_color: 1, 1, 1, 1
@@ -171,11 +171,11 @@ m_nSpriteSheetYCount: 4
 m_nSpriteIndex: 12
 }
 SpriteAnimation {
-m_nID: 17137057858047415162
-m_pSprite: 16792238324006037102
+m_nID: 7696557522094702076
+m_pSprite: 12147924336087126831
 m_strAnimationFileName: assets/character_animation.yaml
 }
 Character2d {
 m_nID: 0
-m_pAnimation: 17137057858047415162
+m_pAnimation: 7696557522094702076
 }

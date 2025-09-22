@@ -121,10 +121,14 @@ void BloomTest::initializeQuad()
     m_pHorizontalBlurShader = ShaderLoader::getInstance()->getShader("horizontal_blur");
     m_nTextureUniform_HorizontalBlur = m_pHorizontalBlurShader->getUniformLocation("u_tex0");
     m_nTextureWidthUniform_HorizontalBlur = m_pHorizontalBlurShader->getUniformLocation("u_textureWidth");
+    m_nBlurRadiusUniform_HorizontalBlur = m_pHorizontalBlurShader->getUniformLocation("u_blurRadius");
+    m_nBlurSigmaUniform_HorizontalBlur = m_pHorizontalBlurShader->getUniformLocation("u_blurSigma");
 
     m_pVerticalBlurShader = ShaderLoader::getInstance()->getShader("vertical_blur");
     m_nTextureUniform_VerticalBlur = m_pVerticalBlurShader->getUniformLocation("u_tex0");
     m_nTextureHeightUniform_VerticalBlur = m_pVerticalBlurShader->getUniformLocation("u_textureHeight");
+    m_nBlurRadiusUniform_VerticalBlur = m_pVerticalBlurShader->getUniformLocation("u_blurRadius");
+    m_nBlurSigmaUniform_VerticalBlur = m_pVerticalBlurShader->getUniformLocation("u_blurSigma");
 
     m_pCompositeShader = ShaderLoader::getInstance()->getShader("bloom_composite");
     m_nOriginalTextureUniform = m_pCompositeShader->getUniformLocation("u_originalScreenTexture");
@@ -198,6 +202,8 @@ void BloomTest::renderHorizontalBlur()
 
     glUniform1i(m_nTextureUniform_HorizontalBlur, 0); // Texture unit 0
     glUniform1i(m_nTextureWidthUniform_HorizontalBlur, m_nRenderWidth * BLUR_TEXTURE_RATIO);
+    glUniform1f(m_nBlurRadiusUniform_HorizontalBlur, m_fBlurRadius);
+    glUniform1f(m_nBlurSigmaUniform_HorizontalBlur, m_fBlurSigma);
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_nRenderTexture_ColorHighlight);
@@ -228,6 +234,8 @@ void BloomTest::renderVerticalBlur()
 
     glUniform1i(m_nTextureUniform_VerticalBlur, 0); // Texture unit 0
     glUniform1i(m_nTextureHeightUniform_VerticalBlur, m_nRenderHeight * BLUR_TEXTURE_RATIO);
+    glUniform1f(m_nBlurRadiusUniform_VerticalBlur, m_fBlurRadius);
+    glUniform1f(m_nBlurSigmaUniform_VerticalBlur, m_fBlurSigma);
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_nRenderTexture_HorizontalBlur);

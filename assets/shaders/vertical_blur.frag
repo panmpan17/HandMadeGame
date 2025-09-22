@@ -2,6 +2,9 @@
 
 uniform sampler2D u_tex0;
 uniform int u_textureHeight;
+uniform int u_blurRadius; // 0 to 20
+uniform float u_blurSigma; // 0 to 20.0
+const int MAX_RADIUS = 20; // maximum radius for the blur
 
 in vec2 uv;
 
@@ -11,16 +14,15 @@ void main()
 {
     vec2 texelSize = vec2(0.0, 1.0 / u_textureHeight);
     vec4 sum = vec4(0.0);
+    float weightSum = 0.0;
 
-    sum += texture(u_tex0, uv - 4.0 * texelSize) * 0.05;
-    sum += texture(u_tex0, uv - 3.0 * texelSize) * 0.09;
-    sum += texture(u_tex0, uv - 2.0 * texelSize) * 0.12;
-    sum += texture(u_tex0, uv - 1.0 * texelSize) * 0.15;
-    sum += texture(u_tex0, uv) * 0.18;
-    sum += texture(u_tex0, uv + 1.0 * texelSize) * 0.15;
-    sum += texture(u_tex0, uv + 2.0 * texelSize) * 0.12;
-    sum += texture(u_tex0, uv + 3.0 * texelSize) * 0.09;
-    sum += texture(u_tex0, uv + 4.0 * texelSize) * 0.05;
+    int _min = -max(MAX_RADIUS, u_blurRadius);
+    int _max = max(MAX_RADIUS, u_blurRadius);
+    for (int i = _min; i <= _max; i++) {
+        float w = exp(-0.5 * (i * i) / (u_blurSigma * u_blurSigma));
+        sum += texture(u_tex0, uv + float(i) * texelSize) * w;
+        weightSum += w;
+    }
 
-    fragment = sum;
+    fragment = sum / weightSum; // normalize
 }
