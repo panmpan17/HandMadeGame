@@ -11,9 +11,11 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 if (APPLE)
-    set(CAMKE_MACOS_ARCHITECTURES "arm64;x86_64")
+    set(CMAKE_MACOS_ARCHITECTURES "arm64;x86_64")
 endif()
 
+
+# Source files
 set(SOURCES
     "src/camera.cpp"
     "src/components/character2d.cpp"
@@ -46,32 +48,47 @@ set(SOURCES
     "src/world.cpp"
 )
 
-message(STATUS "Source files: ${SOURCES}")
 add_executable(GLFWTest
                "src/main.cpp"
-               "include/glad/glad.c"
                ${SOURCES}
 )
 
 target_include_directories(GLFWTest PRIVATE ${CMAKE_SOURCE_DIR}/include)
 
-target_link_directories(GLFWTest PRIVATE ${CMAKE_SOURCE_DIR}/lib/mac)
-target_link_libraries(GLFWTest PRIVATE glfw.3)
+
+# General Library
+add_library(glad include/glad/glad.c)
+target_include_directories(glad PUBLIC ${CMAKE_SOURCE_DIR}/include)
+
+
+# Platform-specific settings
+if (APPLE)
+    # MacOS specific GLFW settings
+    add_library(glfw SHARED IMPORTED)
+    set_target_properties(glfw PROPERTIES
+        IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/lib/mac/libglfw.3.dylib
+        INTERFACE_INCLUDE_DIRECTORIES ${CMAKE_SOURCE_DIR}/include
+    )
+
+    # Add mac specific frameworks
+    add_library(mac_frameworks INTERFACE)
+    target_link_libraries(GLFWTest PRIVATE mac_frameworks)
+
+    # Properly set rpath for macOS
+    set_target_properties(GLFWTest PROPERTIES
+        BUILD_RPATH "@loader_path/lib"
+        INSTALL_RPATH "@loader_path/lib"
+    )
+
+elseif (WIN32)
+
+elseif(UNIX)
+
+endif()
+
 
 target_link_libraries(GLFWTest
     PRIVATE
-        "-framework Cocoa"
-        "-framework OpenGL"
-        "-framework IOKit"
-        "-framework CoreVideo"
+        glad
+        glfw
 )
-
-set_target_properties(GLFWTest PROPERTIES
-    BUILD_RPATH "@loader_path/lib"
-    INSTALL_RPATH "@loader_path/lib"
-)
-# target_include_directories(my_program PRIVATE include)
-
-
-
-# target_compile_options("main" PRIVATE)
