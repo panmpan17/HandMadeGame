@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(GLFWTest)
+project(GLFWTest
+        VERSION 0.1
+        DESCRIPTION "GLFW Test"
+        LANGUAGES CXX
+)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -11,13 +15,12 @@ if (APPLE)
 endif()
 
 set(SOURCES
-    src/*.cpp
-    src/draw/*.cpp
-
-    include/glad/glad.c
+    "utilites/check_gpp.cpp"
 )
 
 message(STATUS "Source files: ${SOURCES}")
-add_executable("main" ${SOURCES})
+add_executable(GLFWTest
+               "utilites/check_gpp.cpp"
+)
 
 # target_compile_options("main" PRIVATE)
