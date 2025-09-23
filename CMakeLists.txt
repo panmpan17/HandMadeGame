@@ -14,6 +14,11 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 # Options
 option(BUILD_MAC_APP "Build as a macOS .app bundle" OFF)
 
+# Default to Release if nothing is specified
+if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+    set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Build type" FORCE)
+endif()
+set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release") # "RelWithDebInfo" "MinSizeRel")
 
 
 if (APPLE)
@@ -99,6 +104,12 @@ else()
 endif()
 
 target_include_directories(GLFWTest PRIVATE ${CMAKE_SOURCE_DIR}/include)
+
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    target_compile_definitions(GLFWTest PRIVATE DEBUG_FLAG=1)
+else()
+    target_compile_definitions(GLFWTest PRIVATE DEBUG_FLAG=0)
+endif()
 
 
 # General Library
