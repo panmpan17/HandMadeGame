@@ -14,103 +14,17 @@ void BloomTest::initialize()
     m_nRenderWidth = m_pProcessQueue->getRenderWidth();
     m_nRenderHeight = m_pProcessQueue->getRenderHeight();
 
-    initializeColorHighlightFBO();
-    initializeHorizontalBlurFBO();
-    initializeVerticalBlurFBO();
-    initializeFinalFBO();
+    int nOneForthWidth = static_cast<int>(m_nRenderWidth * BLUR_TEXTURE_RATIO);
+    int nOneForthHeight = static_cast<int>(m_nRenderHeight * BLUR_TEXTURE_RATIO);
+    initializeRenderTextureAndFBO(m_nFBOID_ColorHighlight, m_nRenderTexture_ColorHighlight, m_nRenderWidth, m_nRenderHeight);
+    initializeRenderTextureAndFBO(m_nFBOID_HorizontalBlur, m_nRenderTexture_HorizontalBlur, nOneForthWidth, nOneForthHeight);
+    initializeRenderTextureAndFBO(m_nFBOID_VerticalBlur, m_nRenderTexture_VerticalBlur, nOneForthWidth, nOneForthHeight);
+    initializeRenderTextureAndFBO(m_nFBOID_Final, m_nRenderTexture_Final, m_nRenderWidth, m_nRenderHeight);
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0); // Unbind the FBO when done
     glBindTexture(GL_TEXTURE_2D, 0); // Unbind any texture when done
 
     initializeQuad();
-}
-
-void BloomTest::initializeColorHighlightFBO()
-{
-    glGenFramebuffers(1, &m_nFBOID_ColorHighlight);
-    glBindFramebuffer(GL_FRAMEBUFFER, m_nFBOID_ColorHighlight);
-
-    glGenTextures(1, &m_nRenderTexture_ColorHighlight);
-    glBindTexture(GL_TEXTURE_2D, m_nRenderTexture_ColorHighlight);
-
-    // Set the texture's format and size to match your window
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_nRenderWidth, m_nRenderHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-    // Set texture parameters for correct filtering and wrapping
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    // Attach the texture to the FBO's color attachment
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_nRenderTexture_ColorHighlight, 0);
-
-    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-    {
-        LOGERR("Framebuffer is not complete!");
-    }
-}
-
-void BloomTest::initializeHorizontalBlurFBO()
-{
-    glGenFramebuffers(1, &m_nFBOID_HorizontalBlur);
-    glBindFramebuffer(GL_FRAMEBUFFER, m_nFBOID_HorizontalBlur);
-
-    glGenTextures(1, &m_nRenderTexture_HorizontalBlur);
-    glBindTexture(GL_TEXTURE_2D, m_nRenderTexture_HorizontalBlur);
-
-    // Set the texture's format and size to match your window
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_nRenderWidth * BLUR_TEXTURE_RATIO, m_nRenderHeight * BLUR_TEXTURE_RATIO, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-    // Set texture parameters for correct filtering and wrapping
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    // Attach the texture to the FBO's color attachment
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_nRenderTexture_HorizontalBlur, 0);
-
-    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-    {
-        LOGERR("Framebuffer is not complete!");
-    }
-}
-
-void BloomTest::initializeVerticalBlurFBO()
-{
-    glGenFramebuffers(1, &m_nFBOID_VerticalBlur);
-    glBindFramebuffer(GL_FRAMEBUFFER, m_nFBOID_VerticalBlur);
-
-    glGenTextures(1, &m_nRenderTexture_VerticalBlur);
-    glBindTexture(GL_TEXTURE_2D, m_nRenderTexture_VerticalBlur);
-
-    // Set the texture's format and size to match your window
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_nRenderWidth * BLUR_TEXTURE_RATIO, m_nRenderHeight * BLUR_TEXTURE_RATIO, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-    // Set texture parameters for correct filtering and wrapping
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    // Attach the texture to the FBO's color attachment
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_nRenderTexture_VerticalBlur, 0);
-
-    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-    {
-        LOGERR("Framebuffer is not complete!");
-    }
-}
-
-void BloomTest::initializeFinalFBO()
-{
-    glGenFramebuffers(1, &m_nFBOID_Final);
-    glBindFramebuffer(GL_FRAMEBUFFER, m_nFBOID_Final);
-
-    glGenTextures(1, &m_nRenderTexture_Final);
-    glBindTexture(GL_TEXTURE_2D, m_nRenderTexture_Final);
-
-    // Set the texture's format and size to match your window
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_nRenderWidth, m_nRenderHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-    // Set texture parameters for correct filtering and wrapping
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    // Attach the texture to the FBO's color attachment
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_nRenderTexture_Final, 0);
-
-    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-    {
-        LOGERR("Framebuffer is not complete!");
-    }
 }
 
 void BloomTest::initializeQuad()

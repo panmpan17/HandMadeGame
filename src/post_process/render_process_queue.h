@@ -22,8 +22,8 @@ protected:
 
     virtual void initialize() = 0;
 
-    void registerShaderPosAndUV(Shader* pShader);
-    void renderTextureToBufferWithShader(GLuint nBuffer, GLuint nTexture, Shader* pShader);
+    static void registerShaderPosAndUV(Shader* pShader);
+    static void initializeRenderTextureAndFBO(GLuint& nFBO, GLuint& nTexture, int nWidth, int nHeight);
 };
 
 

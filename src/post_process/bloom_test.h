@@ -67,11 +67,6 @@ private:
     float m_fBlurRadius = 4.f; // 0 to 20
     float m_fBlurSigma = 4.f;  // 0 to 20
 
-    void initializeColorHighlightFBO();
-    void initializeHorizontalBlurFBO();
-    void initializeVerticalBlurFBO();
-    void initializeFinalFBO();
-
     void initializeQuad();
 
     void renderColorHighlight();

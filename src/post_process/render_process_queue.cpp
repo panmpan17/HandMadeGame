@@ -19,6 +19,30 @@ void IRenderProcess::registerShaderPosAndUV(Shader* pShader)
     glVertexAttribPointer(nVUVAttr, 2, GL_FLOAT, GL_FALSE, sizeof(VertexWUV), (void*)offsetof(VertexWUV, uv));
 }
 
+void IRenderProcess::initializeRenderTextureAndFBO(GLuint& nFBO, GLuint& nTexture, int nWidth, int nHeight)
+{
+    glGenFramebuffers(1, &nFBO);
+    glBindFramebuffer(GL_FRAMEBUFFER, nFBO);
+
+    glGenTextures(1, &nTexture);
+    glBindTexture(GL_TEXTURE_2D, nTexture);
+
+    // Set the texture's format and size to match your window
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, nWidth, nHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+    // Set texture parameters for correct filtering and wrapping
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    // Attach the texture to the FBO's color attachment
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, nTexture, 0);
+
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+    {
+        LOGERR("Framebuffer is not complete!");
+    }
+}
+
+
+
 RenderProcessQueue::RenderProcessQueue(Window* pWindow)
 {
     m_pWindow = pWindow;

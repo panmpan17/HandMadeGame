@@ -12,32 +12,9 @@ void OrderDithering::initialize()
     m_nRenderWidth = m_pProcessQueue->getRenderWidth();
     m_nRenderHeight = m_pProcessQueue->getRenderHeight();
 
-    initializeFBO();
+    initializeRenderTextureAndFBO(m_nFBOID, m_nRenderTexture, m_nRenderWidth, m_nRenderHeight);
+
     initializeShader();
-}
-
-void OrderDithering::initializeFBO()
-{
-    glGenFramebuffers(1, &m_nFBOID);
-    glBindFramebuffer(GL_FRAMEBUFFER, m_nFBOID);
-
-    glGenTextures(1, &m_nRenderTexture);
-    glBindTexture(GL_TEXTURE_2D, m_nRenderTexture);
-
-    // Set the texture's format and size to match your window
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_nRenderWidth, m_nRenderHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-    // Set texture parameters for correct filtering and wrapping
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    // Attach the texture to the FBO's color attachment
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_nRenderTexture, 0);
-
-    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-    {
-        LOGERR("Framebuffer is not complete!");
-    }
-
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void OrderDithering::initializeShader()
