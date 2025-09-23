@@ -16,6 +16,7 @@
 #include "draw/shader_loader.h"
 #include "world.h"
 #include "post_process/render_process_queue.h"
+#include "font_loader.h"
 
 
 Window* Window::ins = nullptr;
@@ -121,6 +122,8 @@ void Window::start()
 {
     InputManager::Initialize();
     ImageLoader::Initialize();
+    FontLoader::Initialize();
+
     m_pCamera = new Camera();
 
     InputManager::getInstance()->registerKeyPressCallback(KeyCode::KEY_ESCAPE, [this](bool pressed) {

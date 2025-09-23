@@ -10,6 +10,8 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
+set(FREETYPE_ROOT "/usr/local/freetype")
+
 
 # Options
 option(BUILD_MAC_APP "Build as a macOS .app bundle" OFF)
@@ -115,6 +117,15 @@ endif()
 # General Library
 add_library(glad include/glad/glad.c)
 target_include_directories(glad PUBLIC ${CMAKE_SOURCE_DIR}/include)
+
+
+add_library(freetype SHARED IMPORTED)
+set_target_properties(freetype PROPERTIES
+    IMPORTED_LOCATION ${FREETYPE_ROOT}/lib/libfreetype.6.20.4.dylib
+    INTERFACE_INCLUDE_DIRECTORIES ${FREETYPE_ROOT}/include/freetype2/
+)
+
+target_link_libraries(GLFWTest PRIVATE freetype)
 
 
 # Platform-specific settings
