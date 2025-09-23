@@ -8,6 +8,7 @@
 #include "../input_handle.h"
 #include "bloom_test.h"
 #include "order_dithering.h"
+#include "difference_of_gaussian.h"
 
 void IRenderProcess::registerShaderPosAndUV(Shader* pShader)
 {
@@ -136,6 +137,7 @@ void RenderProcessQueue::initializeOriginalFBO()
 
 void RenderProcessQueue::setupProcesses()
 {
+    /*
     auto pBloomTest = new BloomTest(this);
     pBloomTest->initialize();
     m_oProcessArray.addElement(pBloomTest);
@@ -207,6 +209,15 @@ void RenderProcessQueue::setupProcesses()
     // auto pOrderDithering = new OrderDithering(this);
     // pOrderDithering->initialize();
     // m_oProcessArray.addElement(pOrderDithering);
+    */
+
+    auto pDifferenceOfGaussian = new DifferenceOfGaussian(this);
+    pDifferenceOfGaussian->initialize();
+    m_oProcessArray.addElement(pDifferenceOfGaussian);
+
+    auto pOrderDithering = new OrderDithering(this);
+    pOrderDithering->initialize();
+    m_oProcessArray.addElement(pOrderDithering);
 }
 
 #pragma mark Drawing every frame

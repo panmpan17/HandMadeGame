@@ -42,3 +42,7 @@
   name: order_dithering
   vertex: assets/shaders/screen_pos.vert
   fragment: assets/shaders/order_dithering.frag
+12:
+  name: difference_of_gaussian_composite
+  vertex: assets/shaders/screen_pos.vert
+  fragment: assets/shaders/difference_of_gaussian_composite.frag

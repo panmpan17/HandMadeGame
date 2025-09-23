@@ -154,7 +154,7 @@ void Window::start()
     ImageLoader::getInstance()->registerImage("test", "assets/images/test.png");
     ImageLoader::getInstance()->registerImage("dust", "assets/images/dust_1.png");
     ImageLoader::getInstance()->registerImage("character", "assets/images/character_animation.png");
-    ImageLoader::getInstance()->registerImage("cover_test", "assets/images/cover_test.jpg");
+    ImageLoader::getInstance()->registerImage("cover_test", "assets/images/cover_test_3.jpg");
 
     m_pRenderProcessQueue = new RenderProcessQueue(this);
     m_pRenderProcessQueue->setupProcesses();
