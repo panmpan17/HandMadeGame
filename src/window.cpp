@@ -159,6 +159,8 @@ void Window::start()
     ImageLoader::getInstance()->registerImage("character", "assets/images/character_animation.png");
     ImageLoader::getInstance()->registerImage("cover_test", "assets/images/cover_test.jpg");
 
+    FontLoader::getInstance()->loadFont("assets/fonts/arial.ttf");
+
     m_pRenderProcessQueue = new RenderProcessQueue(this);
     m_pRenderProcessQueue->setupProcesses();
 
