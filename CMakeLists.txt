@@ -10,6 +10,12 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
+
+# Options
+option(BUILD_MAC_APP "Build as a macOS .app bundle" OFF)
+
+
+
 if (APPLE)
     set(CMAKE_MACOS_ARCHITECTURES "arm64;x86_64")
 endif()
@@ -17,6 +23,7 @@ endif()
 
 # Source files
 set(SOURCES
+    "src/main.cpp"
     "src/camera.cpp"
     "src/components/character2d.cpp"
     "src/components/component.cpp"
@@ -48,10 +55,48 @@ set(SOURCES
     "src/world.cpp"
 )
 
-add_executable(GLFWTest
-               "src/main.cpp"
-               ${SOURCES}
-)
+if (APPLE)
+    set(DYLIB_DIR ${CMAKE_SOURCE_DIR}/lib/mac)
+
+    if (BUILD_MAC_APP)
+        add_executable(GLFWTest MACOSX_BUNDLE
+                    ${SOURCES}
+                    ${CMAKE_SOURCE_DIR}/MacAppPack/icon-windowed.icns
+        )
+
+        set(MACOSX_BUNDLE_ICON_FILE icon-windowed.icns)
+        set_source_files_properties(${CMAKE_SOURCE_DIR}/MacAppPack/icon-windowed.icns
+                                    PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
+
+        set(EXECUTABLE_PATH ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/GLFWTest.app/Contents/MacOS)
+
+    else()
+        add_executable(GLFWTest
+                       ${SOURCES}
+        )
+
+        set(EXECUTABLE_PATH ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+    endif()
+
+    # copy assets folder to beside executable
+    add_custom_command(TARGET GLFWTest POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+            ${CMAKE_SOURCE_DIR}/assets
+            ${EXECUTABLE_PATH}/assets
+    )
+
+    add_custom_command(TARGET GLFWTest POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E make_directory
+            ${EXECUTABLE_PATH}/lib
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+            ${DYLIB_DIR}
+            ${EXECUTABLE_PATH}/lib
+    )
+else()
+    add_executable(GLFWTest
+                   ${SOURCES}
+    )
+endif()
 
 target_include_directories(GLFWTest PRIVATE ${CMAKE_SOURCE_DIR}/include)
 
