@@ -16,6 +16,7 @@
 #include "draw/shader_loader.h"
 #include "world.h"
 #include "post_process/render_process_queue.h"
+#include "models/simple_obj_reader.h"
 
 
 Window* Window::ins = nullptr;
@@ -155,6 +156,8 @@ void Window::start()
     ImageLoader::getInstance()->registerImage("dust", "assets/images/dust_1.png");
     ImageLoader::getInstance()->registerImage("character", "assets/images/character_animation.png");
     ImageLoader::getInstance()->registerImage("cover_test", "assets/images/cover_test_3.jpg");
+
+    SimpleObjReader reader("assets/models/monkey.obj");
 
     m_pRenderProcessQueue = new RenderProcessQueue(this);
     m_pRenderProcessQueue->setupProcesses();

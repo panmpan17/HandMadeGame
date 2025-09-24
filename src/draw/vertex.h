@@ -18,3 +18,10 @@ typedef struct VertexWUV
     vec2 pos;
     vec2 uv;
 } VertexWUV;
+
+typedef struct VertexWUVNormal
+{
+    vec3 pos;
+    vec2 uv;
+    vec3 normal;
+} VertexWUVNormal;
