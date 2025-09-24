@@ -157,8 +157,6 @@ void Window::start()
     ImageLoader::getInstance()->registerImage("character", "assets/images/character_animation.png");
     ImageLoader::getInstance()->registerImage("cover_test", "assets/images/cover_test_3.jpg");
 
-    SimpleObjReader reader("assets/models/monkey.obj");
-
     m_pRenderProcessQueue = new RenderProcessQueue(this);
     m_pRenderProcessQueue->setupProcesses();
 

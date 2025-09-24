@@ -22,7 +22,7 @@ SimpleObjReader::SimpleObjReader(const std::string_view& strFilename)
     }
 
     parse();
-    loadToGPU();
+    // loadToGPU();
 }
 
 SimpleObjReader::~SimpleObjReader()
@@ -188,54 +188,52 @@ void SimpleObjReader::parse()
 
 void SimpleObjReader::loadToGPU()
 {
-    GLuint m_nVertexBuffer;
+    // for (size_t i = 0; i < m_nVertexCount; ++i)
+    // {
+    //     VertexWUVNormal& vertex = m_pVertices[i];
+    //     LOGLN_EX("VertexWUVNormal {}f, {}f, {}f | {}f, {}f | {}f, {}f, {}f", 
+    //         vertex.pos[0], vertex.pos[1], vertex.pos[2],
+    //         vertex.uv[0], vertex.uv[1],
+    //         vertex.normal[0], vertex.normal[1], vertex.normal[2]);
+    // }
+
+    // for (size_t i = 0; i < m_vecFaces.size(); ++i)
+    // {
+    //     TriangleFace& face = m_vecFaces[i];
+    //     LOGLN_EX("TriangleFace {}, {}, {},", face.v1, face.v2, face.v3);
+    // }
+
+    glGenVertexArrays(1, &m_nVertexArray);
+    glBindVertexArray(m_nVertexArray);
+    
     glGenBuffers(1, &m_nVertexBuffer);
     glBindBuffer(GL_ARRAY_BUFFER, m_nVertexBuffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(VertexWUVNormal) * m_nVertexCount, m_pVertices, GL_STATIC_DRAW);
 
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-    GLuint ebo;
-    glGenBuffers(1, &ebo);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+    glGenBuffers(1, &m_nIndexBuffer);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_nIndexBuffer);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(TriangleFace) * m_vecFaces.size(), m_vecFaces.data(), GL_STATIC_DRAW);
 
+    // Get the attribute locations from the shader
+    // GLuint nVPosAttr = m_pShader->getAttributeLocation("a_vPos");
+    // GLuint nVUVAttr = m_pShader->getAttributeLocation("a_vUV");
+    // GLuint nVNormalAttr = m_pShader->getAttributeLocation("a_vNormal");
+
+    // Enable and set the vertex attributes using the retrieved locations
+    // glEnableVertexAttribArray(nVPosAttr);
+    // glVertexAttribPointer(nVPosAttr, 3, GL_FLOAT, GL_FALSE, sizeof(VertexWUVNormal), (void*)offsetof(VertexWUVNormal, pos));
+
+    // glEnableVertexAttribArray(nVUVAttr);
+    // glVertexAttribPointer(nVUVAttr, 2, GL_FLOAT, GL_FALSE, sizeof(VertexWUVNormal), (void*)offsetof(VertexWUVNormal, uv));
+
+    // glEnableVertexAttribArray(nVNormalAttr);
+    // glVertexAttribPointer(nVNormalAttr, 3, GL_FLOAT, GL_FALSE, sizeof(VertexWUVNormal), (void*)offsetof(VertexWUVNormal, normal));
+
+
+    glBindVertexArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-    /*GLuint vao;
-glGenVertexArrays(1, &vao);
-glBindVertexArray(vao);
-
-// Bind the VBO (vertex data)
-glBindBuffer(GL_ARRAY_BUFFER, vbo);
-
-// Bind the EBO (index data)
-glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-
-// Enable and describe attributes
-
-// layout(location = 0) in vec3 position
-glEnableVertexAttribArray(0);
-glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
-                      sizeof(VertexWUVNormal),
-                      (void*)offsetof(VertexWUVNormal, position));
-
-// layout(location = 1) in vec2 texcoord
-glEnableVertexAttribArray(1);
-glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE,
-                      sizeof(VertexWUVNormal),
-                      (void*)offsetof(VertexWUVNormal, uv));
-
-// layout(location = 2) in vec3 normal
-glEnableVertexAttribArray(2);
-glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE,
-                      sizeof(VertexWUVNormal),
-                      (void*)offsetof(VertexWUVNormal, normal));
-
-glBindVertexArray(0);
- */
-
- /*glBindVertexArray(vao);
-glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, 0);
-glBindVertexArray(0); */
 }
+
+

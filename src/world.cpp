@@ -14,9 +14,11 @@
 #include "components/particle/particle_system.h"
 #include "components/particle/particle_spawn.h"
 #include "components/particle/particle_lifetime_change.h"
+#include "components/mesh_renderer.h"
 #include "random.h"
 #include "serialization/serializer.h"
 #include "physics/box.h"
+#include "models/simple_obj_reader.h"
 
 #include "game/pingpong/paddle_control.h"
 #include "game/pingpong/pong.h"
@@ -288,17 +290,28 @@ void WorldScene::bloomTest()
 
     Image* pTestImage = ImageLoader::getInstance()->getImage("cover_test");
 
-    { // Quad
-        auto pNode = new Node(0.f, 0.f, 0.f, 0.f);
+    // { // Quad
+    //     auto pNode = new Node(0.f, 0.f, 0.f, 0.f);
 
-        auto pQuad = new Quad(1.280f * 1.6f, .720f * 1.6f, vec4 { 1.f, 1.f, 1.f, 1.f });
-        pQuad->setShader(pImageShader);
-        pQuad->setImage(pTestImage);
-        pQuad->registerBuffer();
-        pNode->addComponent(pQuad);
+    //     auto pQuad = new Quad(1.280f * 1.6f, .720f * 1.6f, vec4 { 1.f, 1.f, 1.f, 1.f });
+    //     pQuad->setShader(pImageShader);
+    //     pQuad->setImage(pTestImage);
+    //     pQuad->registerBuffer();
+    //     pNode->addComponent(pQuad);
 
-        addNode(pNode);
-    }
+    //     addNode(pNode);
+    // }
+
+    SimpleObjReader* reader = new SimpleObjReader("assets/models/monkey.obj");
+    Shader* p3DMeshShader = ShaderLoader::getInstance()->getShader("3d_mesh");
+
+    auto pNode = new Node(0.f, 0.f, 0.f, 0.f);
+
+    auto pMeshRenderer = new MeshRenderer(reader);
+    pMeshRenderer->setShader(p3DMeshShader);
+    pNode->addComponent(pMeshRenderer);
+
+    addNode(pNode);
 }
 
 void WorldScene::readFromFiles(const std::string_view& strFilePath)

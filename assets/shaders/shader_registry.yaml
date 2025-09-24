@@ -46,3 +46,7 @@
   name: difference_of_gaussian_composite
   vertex: assets/shaders/screen_pos.vert
   fragment: assets/shaders/difference_of_gaussian_composite.frag
+13:
+  name: 3d_mesh
+  vertex: assets/shaders/3d_mesh.vert
+  fragment: assets/shaders/3d_mesh.frag
