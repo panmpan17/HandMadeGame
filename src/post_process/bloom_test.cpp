@@ -81,7 +81,7 @@ void BloomTest::renderColorHighlight()
 
     glBindFramebuffer(GL_FRAMEBUFFER, m_nFBOID_ColorHighlight);
     glViewport(0, 0, m_nRenderWidth, m_nRenderHeight);
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glUseProgram(m_pColorHighlightShader->getProgram());
 
@@ -110,7 +110,7 @@ void BloomTest::renderHorizontalBlur()
 
     glBindFramebuffer(GL_FRAMEBUFFER, m_nFBOID_HorizontalBlur);
     glViewport(0, 0, m_nRenderWidth * BLUR_TEXTURE_RATIO, m_nRenderHeight * BLUR_TEXTURE_RATIO);
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glUseProgram(m_pHorizontalBlurShader->getProgram());
 
@@ -142,7 +142,7 @@ void BloomTest::renderVerticalBlur()
 
     glBindFramebuffer(GL_FRAMEBUFFER, m_nFBOID_VerticalBlur);
     glViewport(0, 0, m_nRenderWidth * BLUR_TEXTURE_RATIO, m_nRenderHeight * BLUR_TEXTURE_RATIO);
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glUseProgram(m_pVerticalBlurShader->getProgram());
 
@@ -174,7 +174,7 @@ void BloomTest::renderComposite()
 
     glBindFramebuffer(GL_FRAMEBUFFER, m_nFBOID_Final);
     glViewport(0, 0, m_nRenderWidth, m_nRenderHeight);
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glUseProgram(m_pCompositeShader->getProgram());
 

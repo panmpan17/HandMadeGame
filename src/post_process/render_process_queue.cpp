@@ -228,6 +228,8 @@ void RenderProcessQueue::beginFrame()
     glViewport(0, 0, m_nRenderWidth, m_nRenderHeight);
 
     glClearColor(0.f, 0.f, 0.f, 1.0f);
+
+    glEnable(GL_DEPTH_TEST);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
@@ -254,7 +256,7 @@ void RenderProcessQueue::startProcessing()
 void RenderProcessQueue::renderToScreen()
 {
     glViewport(0, 0, m_pWindow->GetActualWidth(), m_pWindow->GetActualHeight());
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glUseProgram(m_pShader->getProgram());
 
@@ -275,7 +277,7 @@ void RenderProcessQueue::renderToScreen()
 void RenderProcessQueue::renderToScreenSplit()
 {
     glViewport(0, 0, m_pWindow->GetActualWidth(), m_pWindow->GetActualHeight());
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glUseProgram(m_pSplitShader->getProgram());
 

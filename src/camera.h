@@ -78,7 +78,9 @@ public:
     const mat4x4& getProjectionMatrix();
 
 private:
+    bool m_bUseOrthoProjection = false;
     bool m_bFitScreenWidth = true;
+
     float m_fWorldSizeScale = 5;
     float m_fRatio = 5.0f;
     vec3 m_position = {0.f, 0.f, 0.f};

@@ -35,21 +35,28 @@ const mat4x4& Camera::getProjectionMatrix()
         return m_matProjectionCache;
     }
 
-    if (m_bFitScreenWidth)
+    if (m_bUseOrthoProjection)
     {
-        const float LEFT_CLIPPING_PLANE = -m_fWorldSizeScale;
-        const float RIGHT_CLIPPING_PLANE = m_fWorldSizeScale;
-        const float BOTTOM_CLIPPING_PLANE = -m_fWorldSizeScale / m_fRatio;
-        const float TOP_CLIPPING_PLANE = m_fWorldSizeScale / m_fRatio;
-        mat4x4_ortho(m_matProjectionCache, LEFT_CLIPPING_PLANE, RIGHT_CLIPPING_PLANE, BOTTOM_CLIPPING_PLANE, TOP_CLIPPING_PLANE, m_fNearPlane, m_fFarPlane);
+        if (m_bFitScreenWidth)
+        {
+            const float LEFT_CLIPPING_PLANE = -m_fWorldSizeScale;
+            const float RIGHT_CLIPPING_PLANE = m_fWorldSizeScale;
+            const float BOTTOM_CLIPPING_PLANE = -m_fWorldSizeScale / m_fRatio;
+            const float TOP_CLIPPING_PLANE = m_fWorldSizeScale / m_fRatio;
+            mat4x4_ortho(m_matProjectionCache, LEFT_CLIPPING_PLANE, RIGHT_CLIPPING_PLANE, BOTTOM_CLIPPING_PLANE, TOP_CLIPPING_PLANE, m_fNearPlane, m_fFarPlane);
+        }
+        else
+        {
+            const float LEFT_CLIPPING_PLANE = -m_fRatio * m_fWorldSizeScale;
+            const float RIGHT_CLIPPING_PLANE = m_fRatio * m_fWorldSizeScale;
+            const float BOTTOM_CLIPPING_PLANE = -m_fWorldSizeScale;
+            const float TOP_CLIPPING_PLANE = m_fWorldSizeScale;
+            mat4x4_ortho(m_matProjectionCache, LEFT_CLIPPING_PLANE, RIGHT_CLIPPING_PLANE, BOTTOM_CLIPPING_PLANE, TOP_CLIPPING_PLANE, m_fNearPlane, m_fFarPlane);
+        }
     }
     else
     {
-        const float LEFT_CLIPPING_PLANE = -m_fRatio * m_fWorldSizeScale;
-        const float RIGHT_CLIPPING_PLANE = m_fRatio * m_fWorldSizeScale;
-        const float BOTTOM_CLIPPING_PLANE = -m_fWorldSizeScale;
-        const float TOP_CLIPPING_PLANE = m_fWorldSizeScale;
-        mat4x4_ortho(m_matProjectionCache, LEFT_CLIPPING_PLANE, RIGHT_CLIPPING_PLANE, BOTTOM_CLIPPING_PLANE, TOP_CLIPPING_PLANE, m_fNearPlane, m_fFarPlane);
+        mat4x4_perspective(m_matProjectionCache, 1.57f, m_fRatio, 0.1f, 1000.0f);
     }
 
     m_bProjectionMatrixDirty = false;

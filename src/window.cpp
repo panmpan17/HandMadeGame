@@ -72,6 +72,8 @@ void Window::configureAndCreateWindow()
 
     glfwWindowHint(GLFW_RESIZABLE, m_bResizable ? GLFW_TRUE : GLFW_FALSE);
 
+    glfwWindowHint(GLFW_DEPTH_BITS, 24);
+
     glfwSwapInterval(1);
 
 #if IS_DEBUG_VERSION
@@ -227,7 +229,8 @@ void Window::drawFrame()
     else
     {
         glViewport(0, 0, m_nActualWidth, m_nActualHeight);
-        glClear(GL_COLOR_BUFFER_BIT);
+        glEnable(GL_DEPTH_TEST);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         m_pWorldScene->render();
     }
     LOG_EX("Draw call count: {}, Fps: {}\r", m_nDrawCallCount, 1.0f / m_fDeltaTime);
