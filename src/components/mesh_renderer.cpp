@@ -76,6 +76,7 @@ void MeshRenderer::bindTestingVertexArray()
         TriangleFace { 20, 22, 23 },
     };
 
+    m_nVertexCount = 12 * 3;
 
     glGenVertexArrays(1, &m_nVertexArray);
     glBindVertexArray(m_nVertexArray);
@@ -118,10 +119,11 @@ void MeshRenderer::bindVertexArray()
     glBindBuffer(GL_ARRAY_BUFFER, m_nVertexBuffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(VertexWUVNormal) * m_pMesh->getVertexCount(), m_pMesh->getVertices(), GL_STATIC_DRAW);
 
-
+    int nFaceCount = static_cast<int>(m_pMesh->getFaces().size());
+    m_nVertexCount = nFaceCount * 3;
     glGenBuffers(1, &m_nIndexBuffer);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_nIndexBuffer);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(TriangleFace) * m_pMesh->getFaces().size(), m_pMesh->getFaces().data(), GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(TriangleFace) * nFaceCount, m_pMesh->getFaces().data(), GL_STATIC_DRAW);
 
     // Get the attribute locations from the shader
     GLuint nVPosAttr = m_pShader->getAttributeLocation("a_vPos");
@@ -154,18 +156,18 @@ void MeshRenderer::draw()
     mat4x4_identity(local);
     const Vector3& position = m_pNode->getPosition();
     mat4x4_translate(local, position.x, position.y, position.z);
-    mat4x4_rotate_Z(local, local, 0.1f);
-    mat4x4_rotate_X(local, local, 0.1f);
-    mat4x4_rotate_Y(local, local, 0.1f);
-    mat4x4_mul(mvp, Camera::main->getViewProjectionMatrix(), local);
+    mat4x4 rotationMatrix;
+    m_pNode->getRotationQuaternion().toMat4x4(rotationMatrix);
 
+    mat4x4_mul(local, local, rotationMatrix);
+    mat4x4_mul(mvp, Camera::main->getViewProjectionMatrix(), local);
 
     glUseProgram(m_pShader->getProgram());
 
     glUniformMatrix4fv(m_nMVPUniform, 1, GL_FALSE, (const GLfloat*) mvp);
 
     glBindVertexArray(m_nVertexBuffer);
-    glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, m_nVertexCount, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 
     INCREASE_DRAW_CALL_COUNT();

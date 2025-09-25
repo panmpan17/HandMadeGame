@@ -306,6 +306,7 @@ void WorldScene::bloomTest()
     Shader* p3DMeshShader = ShaderLoader::getInstance()->getShader("3d_mesh");
 
     auto pNode = new Node(0.f, 0.f, 0.f, 0.f);
+    pNode->addComponent(new Rotate3D(3, 6, 4));
 
     auto pMeshRenderer = new MeshRenderer(reader);
     pMeshRenderer->setShader(p3DMeshShader);

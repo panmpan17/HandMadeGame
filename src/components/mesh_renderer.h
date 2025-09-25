@@ -33,6 +33,8 @@ private:
     GLuint m_nVertexBuffer = 0;
     GLuint m_nIndexBuffer = 0;
 
+    int m_nVertexCount = 0;
+
     void bindTestingVertexArray();
     void bindVertexArray();
 

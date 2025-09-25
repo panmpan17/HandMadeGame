@@ -4,6 +4,7 @@
 #include "expandable_array.h"
 #include "components/component.h"
 #include "vector.h"
+#include "quaternion.h"
 
 
 class Component;
@@ -54,6 +55,10 @@ public:
     inline void setRotation(float fRotation) { m_fRotation = fRotation; }
     inline float getRotation() const { return m_fRotation; }
 
+    inline const Quaternion& getRotationQuaternion() const { return m_oRotationQuaternion; }
+    inline void setRotationQuaternion(const Quaternion& quat) { m_oRotationQuaternion = quat; }
+    inline void rotateQuaternion(const Quaternion& quat) { m_oRotationQuaternion = m_oRotationQuaternion * quat; }
+
     // inline void setComponent(Component* pComponent) { m_pComponent = pComponent; m_pComponent->setNode(this); }
     void addComponent(Component* pComponent);
     // inline Component* getComponent() const { return m_pComponent; }
@@ -80,6 +85,7 @@ public:
 private:
     Vector3 m_vecPosition;
     float m_fRotation = 0;
+    Quaternion m_oRotationQuaternion = Quaternion(1, 0, 0, 0);
     bool m_bIsActive = true;
 
     PointerExpandableArray<Component*> m_oComponentArray = PointerExpandableArray<Component*>(5);
