@@ -26,7 +26,10 @@ void MeshRenderer::setShader(Shader* pShader)
 {
     m_pShader = pShader;
 
-    m_nMVPUniform = m_pShader->getUniformLocation("u_MVP");
+    // m_nMVPUniform = m_pShader->getUniformLocation("u_MVP");
+    m_nModelUniform = m_pShader->getUniformLocation("u_Model");
+    m_nViewUniform = m_pShader->getUniformLocation("u_View");
+    m_nProjectionUniform = m_pShader->getUniformLocation("u_Projection");
 
     bindVertexArray();
 }
@@ -160,11 +163,13 @@ void MeshRenderer::draw()
     m_pNode->getRotationQuaternion().toMat4x4(rotationMatrix);
 
     mat4x4_mul(local, local, rotationMatrix);
-    mat4x4_mul(mvp, Camera::main->getViewProjectionMatrix(), local);
+    // mat4x4_mul(mvp, Camera::main->getViewProjectionMatrix(), local);
 
     glUseProgram(m_pShader->getProgram());
 
-    glUniformMatrix4fv(m_nMVPUniform, 1, GL_FALSE, (const GLfloat*) mvp);
+    glUniformMatrix4fv(m_nModelUniform, 1, GL_FALSE, (const GLfloat*) local);
+    glUniformMatrix4fv(m_nViewUniform, 1, GL_FALSE, (const GLfloat*) Camera::main->getViewMatrix());
+    glUniformMatrix4fv(m_nProjectionUniform, 1, GL_FALSE, (const GLfloat*) Camera::main->getProjectionMatrix());
 
     glBindVertexArray(m_nVertexBuffer);
     glDrawElements(GL_TRIANGLES, m_nVertexCount, GL_UNSIGNED_INT, 0);
