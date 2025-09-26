@@ -101,6 +101,22 @@ else()
     add_executable(GLFWTest
                    ${SOURCES}
     )
+
+    set(EXECUTABLE_PATH ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+    set(DYLIB_DIR ${CMAKE_SOURCE_DIR}/lib/)
+    
+    # copy assets folder to beside executable
+    add_custom_command(TARGET GLFWTest POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+            ${CMAKE_SOURCE_DIR}/assets
+            ${EXECUTABLE_PATH}/assets
+    )
+
+    add_custom_command(TARGET GLFWTest POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+            ${DYLIB_DIR}
+            ${EXECUTABLE_PATH}
+    )
 endif()
 
 target_include_directories(GLFWTest PRIVATE ${CMAKE_SOURCE_DIR}/include)
@@ -123,7 +139,6 @@ if (APPLE)
     add_library(glfw SHARED IMPORTED)
     set_target_properties(glfw PROPERTIES
         IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/lib/mac/libglfw.3.dylib
-        INTERFACE_INCLUDE_DIRECTORIES ${CMAKE_SOURCE_DIR}/include
     )
 
     # Add mac specific frameworks
@@ -142,12 +157,16 @@ elseif (WIN32)
     set_target_properties(glfw PROPERTIES
         IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/lib/glfw3.dll
         IMPORTED_IMPLIB ${CMAKE_SOURCE_DIR}/lib/libglfw3dll.a
-        INTERFACE_INCLUDE_DIRECTORIES ${CMAKE_SOURCE_DIR}/include
     )
 
+    # target_link_options(GLFWTest PRIVATE -mwindows)
 elseif(UNIX)
 
 endif()
+
+set_target_properties(glfw PROPERTIES
+    INTERFACE_INCLUDE_DIRECTORIES ${CMAKE_SOURCE_DIR}/include
+)
 
 
 target_link_libraries(GLFWTest
