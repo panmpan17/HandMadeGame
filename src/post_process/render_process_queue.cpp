@@ -5,8 +5,10 @@
 #include "../draw/vertex.h"
 #include "../draw/shader.h"
 #include "../draw/shader_loader.h"
+#include "../input_handle.h"
 #include "bloom_test.h"
 #include "order_dithering.h"
+#include "difference_of_gaussian.h"
 
 void IRenderProcess::registerShaderPosAndUV(Shader* pShader)
 {
@@ -17,6 +19,30 @@ void IRenderProcess::registerShaderPosAndUV(Shader* pShader)
     glEnableVertexAttribArray(nVUVAttr);
     glVertexAttribPointer(nVUVAttr, 2, GL_FLOAT, GL_FALSE, sizeof(VertexWUV), (void*)offsetof(VertexWUV, uv));
 }
+
+void IRenderProcess::initializeRenderTextureAndFBO(GLuint& nFBO, GLuint& nTexture, int nWidth, int nHeight)
+{
+    glGenFramebuffers(1, &nFBO);
+    glBindFramebuffer(GL_FRAMEBUFFER, nFBO);
+
+    glGenTextures(1, &nTexture);
+    glBindTexture(GL_TEXTURE_2D, nTexture);
+
+    // Set the texture's format and size to match your window
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, nWidth, nHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+    // Set texture parameters for correct filtering and wrapping
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    // Attach the texture to the FBO's color attachment
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, nTexture, 0);
+
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+    {
+        LOGERR("Framebuffer is not complete!");
+    }
+}
+
+
 
 RenderProcessQueue::RenderProcessQueue(Window* pWindow)
 {
@@ -111,9 +137,83 @@ void RenderProcessQueue::initializeOriginalFBO()
 
 void RenderProcessQueue::setupProcesses()
 {
+    /*
     auto pBloomTest = new BloomTest(this);
     pBloomTest->initialize();
     m_oProcessArray.addElement(pBloomTest);
+    // BloomTest::ins = pBloomTest;
+
+    auto pInput = InputManager::getInstance();
+    pInput->registerKeyPressCallback(KeyCode::KEY_ARROW_UP, [pBloomTest](bool pressed) {
+        if (!pressed) { return; }
+
+        bool bShiftPressed = InputManager::getInstance()->isKeyPressed(KeyCode::KEY_LEFT_SHIFT) ||
+                               InputManager::getInstance()->isKeyPressed(KeyCode::KEY_RIGHT_SHIFT);
+        bool bMetaPressed = InputManager::getInstance()->isKeyPressed(KeyCode::KEY_LEFT_META) ||
+                              InputManager::getInstance()->isKeyPressed(KeyCode::KEY_RIGHT_META);
+
+        if (!bShiftPressed && !bMetaPressed)
+        {
+            float fIntensity = pBloomTest->getIntensity();
+            fIntensity += 0.1f;
+            if (fIntensity > 5.0f) fIntensity = 5.0f;
+            pBloomTest->setIntensity(fIntensity);
+        }
+        else if (bShiftPressed && !bMetaPressed)
+        {
+            float fRadius = pBloomTest->getBlurRadius();
+            fRadius += 1.0f;
+            if (fRadius > 20.0f) fRadius = 20.0f;
+            pBloomTest->setBlurRadius(fRadius);
+        }
+        else if (!bShiftPressed && bMetaPressed)
+        {
+            float fSigma = pBloomTest->getBlurSigma();
+            fSigma += 1.0f;
+            if (fSigma > 20.0f) fSigma = 20.0f;
+            pBloomTest->setBlurSigma(fSigma);
+        }
+    });
+    pInput->registerKeyPressCallback(KeyCode::KEY_ARROW_DOWN, [pBloomTest](bool pressed) {
+        if (!pressed) { return; }
+
+        bool bShiftPressed = InputManager::getInstance()->isKeyPressed(KeyCode::KEY_LEFT_SHIFT) ||
+                               InputManager::getInstance()->isKeyPressed(KeyCode::KEY_RIGHT_SHIFT);
+        bool bMetaPressed = InputManager::getInstance()->isKeyPressed(KeyCode::KEY_LEFT_META) ||
+                              InputManager::getInstance()->isKeyPressed(KeyCode::KEY_RIGHT_META);
+
+        // LOGLN_EX("Shift: {}, Meta: {}", bShiftPressed, bMetaPressed);
+        if (!bShiftPressed && !bMetaPressed)
+        {
+            float fIntensity = pBloomTest->getIntensity();
+            fIntensity -= 0.1f;
+            if (fIntensity < 0.0f) fIntensity = 0.0f;
+            pBloomTest->setIntensity(fIntensity);
+        }
+        else if (bShiftPressed && !bMetaPressed)
+        {
+            float fRadius = pBloomTest->getBlurRadius();
+            fRadius -= 1.0f;
+            if (fRadius < 0.0f) fRadius = 0.0f;
+            pBloomTest->setBlurRadius(fRadius);
+        }
+        else if (!bShiftPressed && bMetaPressed)
+        {
+            float fSigma = pBloomTest->getBlurSigma();
+            fSigma -= 1.0f;
+            if (fSigma < 0.0f) fSigma = 0.0f;
+            pBloomTest->setBlurSigma(fSigma);
+        }
+    });
+
+    // auto pOrderDithering = new OrderDithering(this);
+    // pOrderDithering->initialize();
+    // m_oProcessArray.addElement(pOrderDithering);
+    */
+
+    auto pDifferenceOfGaussian = new DifferenceOfGaussian(this);
+    pDifferenceOfGaussian->initialize();
+    m_oProcessArray.addElement(pDifferenceOfGaussian);
 
     auto pOrderDithering = new OrderDithering(this);
     pOrderDithering->initialize();
@@ -128,6 +228,8 @@ void RenderProcessQueue::beginFrame()
     glViewport(0, 0, m_nRenderWidth, m_nRenderHeight);
 
     glClearColor(0.f, 0.f, 0.f, 1.0f);
+
+    glEnable(GL_DEPTH_TEST);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
@@ -154,7 +256,7 @@ void RenderProcessQueue::startProcessing()
 void RenderProcessQueue::renderToScreen()
 {
     glViewport(0, 0, m_pWindow->GetActualWidth(), m_pWindow->GetActualHeight());
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glUseProgram(m_pShader->getProgram());
 
@@ -175,7 +277,7 @@ void RenderProcessQueue::renderToScreen()
 void RenderProcessQueue::renderToScreenSplit()
 {
     glViewport(0, 0, m_pWindow->GetActualWidth(), m_pWindow->GetActualHeight());
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glUseProgram(m_pSplitShader->getProgram());
 

@@ -25,7 +25,6 @@ private:
     Shader* m_pShader = nullptr;
     GLuint m_nTextureUniform;
 
-    void initializeFBO();
     void initializeShader();
 
     void render();

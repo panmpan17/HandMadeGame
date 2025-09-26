@@ -16,6 +16,7 @@
 #include "draw/shader_loader.h"
 #include "world.h"
 #include "post_process/render_process_queue.h"
+#include "models/simple_obj_reader.h"
 
 
 Window* Window::ins = nullptr;
@@ -70,6 +71,8 @@ void Window::configureAndCreateWindow()
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     glfwWindowHint(GLFW_RESIZABLE, m_bResizable ? GLFW_TRUE : GLFW_FALSE);
+
+    glfwWindowHint(GLFW_DEPTH_BITS, 24);
 
     glfwSwapInterval(1);
 
@@ -154,7 +157,7 @@ void Window::start()
     ImageLoader::getInstance()->registerImage("test", "assets/images/test.png");
     ImageLoader::getInstance()->registerImage("dust", "assets/images/dust_1.png");
     ImageLoader::getInstance()->registerImage("character", "assets/images/character_animation.png");
-    ImageLoader::getInstance()->registerImage("cover_test", "assets/images/cover_test.jpg");
+    ImageLoader::getInstance()->registerImage("cover_test", "assets/images/cover_test_3.jpg");
 
     m_pRenderProcessQueue = new RenderProcessQueue(this);
     m_pRenderProcessQueue->setupProcesses();
@@ -226,7 +229,8 @@ void Window::drawFrame()
     else
     {
         glViewport(0, 0, m_nActualWidth, m_nActualHeight);
-        glClear(GL_COLOR_BUFFER_BIT);
+        glEnable(GL_DEPTH_TEST);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         m_pWorldScene->render();
     }
     LOG_EX("Draw call count: {}, Fps: {}\r", m_nDrawCallCount, 1.0f / m_fDeltaTime);

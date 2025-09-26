@@ -12,43 +12,69 @@ Camera::~Camera()
 {
 }
 
-const mat4x4& Camera::getViewProjectionMatrix()
+const mat4x4& Camera::getViewMatrix()
 {
     if (!m_bViewMatrixDirty)
     {
-        return m_matViewMatrixCache;
+        return m_matViewCache;
     }
 
-    mat4x4 matViewMatrix, matProjectionMatrix;
-
-    mat4x4_translate(matViewMatrix, m_position[0], m_position[1], m_position[2]);
-    mat4x4_rotate_Z(matViewMatrix, matViewMatrix, (float) m_rotation[2]); // Rotate around Z-axis
-
-    if (m_bFitScreenWidth)
-    {
-        const float LEFT_CLIPPING_PLANE = -m_fWorldSizeScale;
-        const float RIGHT_CLIPPING_PLANE = m_fWorldSizeScale;
-        const float BOTTOM_CLIPPING_PLANE = -m_fWorldSizeScale / m_fRatio;
-        const float TOP_CLIPPING_PLANE = m_fWorldSizeScale / m_fRatio;
-        mat4x4_ortho(matProjectionMatrix, LEFT_CLIPPING_PLANE, RIGHT_CLIPPING_PLANE, BOTTOM_CLIPPING_PLANE, TOP_CLIPPING_PLANE, m_fNearPlane, m_fFarPlane);
-    }
-    else
-    {
-        const float LEFT_CLIPPING_PLANE = -m_fRatio * m_fWorldSizeScale;
-        const float RIGHT_CLIPPING_PLANE = m_fRatio * m_fWorldSizeScale;
-        const float BOTTOM_CLIPPING_PLANE = -m_fWorldSizeScale;
-        const float TOP_CLIPPING_PLANE = m_fWorldSizeScale;
-        mat4x4_ortho(matProjectionMatrix, LEFT_CLIPPING_PLANE, RIGHT_CLIPPING_PLANE, BOTTOM_CLIPPING_PLANE, TOP_CLIPPING_PLANE, m_fNearPlane, m_fFarPlane);
-    }
-
-    // constexpr float FOV_IN_RANGLES = 1.57f; // 90 degrees in radians
-    // constexpr float NEAR_PLANE = 1.f;
-    // constexpr float FAR_PLANE = 10.f;
-    // mat4x4_perspective(p, FOV_IN_RANGLES, m_fRatio, NEAR_PLANE, FAR_PLANE);
-
-    mat4x4_mul(m_matViewMatrixCache, matProjectionMatrix, matViewMatrix);
+    // TODO: The order of the calculations might be wrong, could try mat4x4_look_at
+    mat4x4_translate(m_matViewCache, m_position[0], m_position[1], m_position[2]);
+    mat4x4_rotate_Z(m_matViewCache, m_matViewCache, (float) m_rotation[2]); // Rotate around Z-axis
 
     m_bViewMatrixDirty = false;
 
-    return m_matViewMatrixCache;
+    return m_matViewCache;
+}
+
+const mat4x4& Camera::getProjectionMatrix()
+{
+    if (!m_bProjectionMatrixDirty)
+    {
+        return m_matProjectionCache;
+    }
+
+    if (m_bUseOrthoProjection)
+    {
+        if (m_bFitScreenWidth)
+        {
+            const float LEFT_CLIPPING_PLANE = -m_fWorldSizeScale;
+            const float RIGHT_CLIPPING_PLANE = m_fWorldSizeScale;
+            const float BOTTOM_CLIPPING_PLANE = -m_fWorldSizeScale / m_fRatio;
+            const float TOP_CLIPPING_PLANE = m_fWorldSizeScale / m_fRatio;
+            mat4x4_ortho(m_matProjectionCache, LEFT_CLIPPING_PLANE, RIGHT_CLIPPING_PLANE, BOTTOM_CLIPPING_PLANE, TOP_CLIPPING_PLANE, m_fNearPlane, m_fFarPlane);
+        }
+        else
+        {
+            const float LEFT_CLIPPING_PLANE = -m_fRatio * m_fWorldSizeScale;
+            const float RIGHT_CLIPPING_PLANE = m_fRatio * m_fWorldSizeScale;
+            const float BOTTOM_CLIPPING_PLANE = -m_fWorldSizeScale;
+            const float TOP_CLIPPING_PLANE = m_fWorldSizeScale;
+            mat4x4_ortho(m_matProjectionCache, LEFT_CLIPPING_PLANE, RIGHT_CLIPPING_PLANE, BOTTOM_CLIPPING_PLANE, TOP_CLIPPING_PLANE, m_fNearPlane, m_fFarPlane);
+        }
+    }
+    else
+    {
+        mat4x4_perspective(m_matProjectionCache, 1.57f, m_fRatio, 0.1f, 1000.0f);
+    }
+
+    m_bProjectionMatrixDirty = false;
+
+    return m_matProjectionCache;
+}
+
+const mat4x4& Camera::getViewProjectionMatrix()
+{
+    if (!m_bViewProjectionMatrixDirty && !m_bViewMatrixDirty && !m_bProjectionMatrixDirty)
+    {
+        return m_matViewProjectionCache;
+    }
+
+    const mat4x4& view = getViewMatrix();
+    const mat4x4& proj = getProjectionMatrix();
+
+    mat4x4_mul(m_matViewProjectionCache, proj, view);
+
+    return m_matViewProjectionCache;
 }
