@@ -5,7 +5,7 @@
 	<key>CFBundleDisplayName</key>
 	<string>My GLFW App</string>
 	<key>CFBundleExecutable</key>
-	<string>My GLFW App</string>
+	<string>mac</string>
 	<key>CFBundleIconFile</key>
 	<string>icon-windowed.icns</string>
 	<key>CFBundleIdentifier</key>

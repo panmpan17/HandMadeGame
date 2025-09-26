@@ -8,3 +8,4 @@ glfw-3.4/
 output/
 .DS_Store
 build/
+cmake-build/

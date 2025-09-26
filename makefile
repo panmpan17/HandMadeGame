@@ -1,110 +1,20 @@
-# --- Colors
-GREEN := \033[0;32m
-RED := \033[0;31m
-YELLOW := \033[0;33m
-RESET := \033[0m
+.PHONY: compile clean
 
-# --- General Configuration ---
-SRC_DIR := src
-BUILD_DIR := build
-OUTPUT_FOLDER := output
-OUTPUT_NAME := MyGLFWApp
+BUILD_DIR := cmake-build
+CMAKE_BIN := ${BUILD_DIR}/bin
+OUTPUT_NAME := GLFWTest
 
-SRCS := $(wildcard $(SRC_DIR)/*.cpp $(SRC_DIR)/**/*.cpp $(SRC_DIR)/**/**/*.cpp $(SRC_DIR)/**/**/**/*.cpp include/glad/glad.c)
-OBJS := $(patsubst %.cpp,$(BUILD_DIR)/%.o,$(SRCS))
-OBJS := $(patsubst %.c,$(BUILD_DIR)/%.o,$(OBJS))
+compile:
+	cmake -S . -B ${BUILD_DIR} -DBUILD_MAC_APP=OFF -DCMAKE_BUILD_TYPE=Debug
+	cmake --build ${BUILD_DIR} --parallel 8
 
-# Flags for all platforms
-INCLUDES := -I./include
-CPP_STD := -std=c++23
-WARNING_FLAG :=  -Wall -Wextra -O2
-CXXFLAGS := $(CPP_STD) -MMD -MP -g -O0
-RELEASE_BUILD_FLAG := -DDEBUG_FLAG=0
-DEBUG_BUILD_FLAG := -DDEBUG_FLAG=1
+quick: compile
+	@./$(CMAKE_BIN)/$(OUTPUT_NAME)
 
-# --- MacOS Configuration ---
-MAC_CXX := g++ # TODO: try use ccache if installed, fallback to g++
-MAC_LIBS := -L./lib/mac/ -lglfw.3
-MAC_FRAMEWORK := -framework Cocoa -framework OpenGL -framework IOKit -framework CoreVideo
-MAC_RPATH := -Wl,-rpath,@loader_path/lib
+build:
+	cmake -S . -B ${BUILD_DIR} -DBUILD_MAC_APP=ON -DCMAKE_BUILD_TYPE=Release
+	cmake --build ${BUILD_DIR} --parallel 8
 
-# --- Windows Configuration ---
-WIN_CXX := g++
-WIN_LIBS := -L./lib/ -lglfw3 -lstdc++exp -lopengl32 -lgdi32
-WIN_OUTPUT_NAME := $(OUTPUT_NAME).exe
-
-
-# --- Build Rules ---
-$(OUTPUT_FOLDER)/$(OUTPUT_NAME): $(OBJS)
-	@echo "Linking $(OUTPUT_NAME)..."
-	@mkdir -p $(OUTPUT_FOLDER)
-	@$(MAC_CXX) -g -O0 $(OBJS) -o $@ $(MAC_FRAMEWORK) $(MAC_RPATH) $(MAC_LIBS)
-
-# Compile each .cpp/.c into .o
-$(BUILD_DIR)/%.o: %.cpp
-	@echo "Compiling $<"
-	@mkdir -p $(dir $@)
-	@$(MAC_CXX) $(CXXFLAGS) $(DEBUG_BUILD_FLAG) $(INCLUDES) -c $< -o $@
-
-$(BUILD_DIR)/%.o: %.c
-	@echo "Compiling $<"
-	@mkdir -p $(dir $@)
-	@$(MAC_CXX) $(CXXFLAGS) $(DEBUG_BUILD_FLAG) $(INCLUDES) -c $< -o $@
-
-# export LDFLAGS="-L/opt/homebrew/opt/binutils/lib"
-# export CPPFLAGS="-I/opt/homebrew/opt/binutils/include"
-
-# --- Mac Targets ---
-mac-compile: $(OUTPUT_FOLDER)/$(OUTPUT_NAME)
-	@echo "$(GREEN)Build done -> $(OUTPUT_FOLDER)/$(OUTPUT_NAME)$(RESET)"
-
-mac-quick: mac-compile
-	@echo "$(YELLOW)Running $(OUTPUT_NAME)...$(RESET)"
-	@mkdir -p $(OUTPUT_FOLDER)/lib
-	@cp ./lib/mac/*.dylib $(OUTPUT_FOLDER)/lib
-	@cp -r ./assets $(OUTPUT_FOLDER)
-	@./$(OUTPUT_FOLDER)/$(OUTPUT_NAME)
-
-mac-build: mac-compile
-
-	mkdir -p $(OUTPUT_FOLDER)/$(OUTPUT_NAME).app/Contents/MacOS
-
-	cp $(OUTPUT_FOLDER)/$(OUTPUT_NAME) $(OUTPUT_FOLDER)/$(OUTPUT_NAME).app/Contents/MacOS/$(OUTPUT_NAME)
-	mkdir -p $(OUTPUT_FOLDER)/$(OUTPUT_NAME).app/Contents/MacOS/lib
-	cp ./lib/mac/*.dylib $(OUTPUT_FOLDER)/$(OUTPUT_NAME).app/Contents/MacOS/lib
-	cp -r ./assets $(OUTPUT_FOLDER)/$(OUTPUT_NAME).app/Contents/MacOS/
-
-	mkdir -p $(OUTPUT_FOLDER)/$(OUTPUT_NAME).app/Contents/Resources
-	cp MacAppPack/icon-windowed.icns $(OUTPUT_FOLDER)/$(OUTPUT_NAME).app/Contents/Resources/
-
-	cp MacAppPack/info.plist $(OUTPUT_FOLDER)/$(OUTPUT_NAME).app/Contents/
-
-	open -R $(OUTPUT_FOLDER)/$(OUTPUT_NAME).app
-
-# --- Windows Targets ---
-window-compile:
-	@echo "Compiling $(OUTPUT_NAME) for Windows"
-	@mkdir -p $(OUTPUT_FOLDER)
-	$(WIN_CXX) $(SRCS) $(CPP_STD) -o $(OUTPUT_FOLDER)/$(WIN_OUTPUT_NAME) $(INCLUDES) $(WIN_LIBS) -mwindows
-
-window-quick: window-compile
-	@echo "Not implemented for Windows yet"
-
-window-build: window-compile
-	cp -r ./assets $(OUTPUT_FOLDER)
-
-# --- Decide platform ---
-compile-all: mac-compile window-compile
-
-quick-all: mac-quick window-quick
-
-build-all: mac-build window-build
-
-# --- Others ---
 clean:
-	rm -rf $(OUTPUT_FOLDER) $(BUILD_DIR)
-	@echo "$(GREEN)Cleaned up build files$(RESET)"
-
-.PHONY: mac-compile mac-quick mac-build window-compile window-quick window-build compile-all quick-all build-all clean
-
--include $(OBJS:.o=.d)
+	@echo "Cleaning up..."
+	rm -rf $(BUILD_DIR)

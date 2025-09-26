@@ -1,8 +1,14 @@
 #pragma once
 
-#include <print>
+
 #include <format>
 #include <iostream>
+#include "platform.h"
+
+#if !IS_PLATFORM_WINDOWS
+#include <print>
+#endif
+
 
 #ifndef DEBUG_FLAG
 #define DEBUG_FLAG 1
@@ -11,7 +17,7 @@
 #define IS_DEBUG_VERSION (DEBUG_FLAG == 1)
 
 
-#if IS_DEBUG_VERSION
+#if IS_DEBUG_VERSION && !IS_PLATFORM_WINDOWS
 
 #define LOG(msg) std::print(msg)
 #define LOG_EX(msg, ...) std::print(msg, __VA_ARGS__)
