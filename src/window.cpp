@@ -59,7 +59,7 @@ void APIENTRY glDebugOutput(GLenum source, GLenum type, unsigned int id, GLenum 
     // ignore non-significant error/warnings
     if (id == 131169 || id == 131185 || id == 131218 || id == 131204) return;
 
-    std::println("Debug message ({}) at {}:{}: {}", id, __FILE__, __LINE__, message);
+    LOGLN_EX("Debug message ({}) at {}:{}: {}", id, __FILE__, __LINE__, message);
 }
 
 void Window::configureAndCreateWindow()

@@ -4,6 +4,11 @@
 #include <string_view>
 #include <iostream>
 #include <type_traits>
+#include "platform.h"
+
+#if IS_PLATFORM_WINDOWS
+#include <cstring>
+#endif
 
 
 class MemoryAllocateException : public std::exception {

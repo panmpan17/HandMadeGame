@@ -137,6 +137,13 @@ if (APPLE)
     )
 
 elseif (WIN32)
+    # MacOS specific GLFW settings
+    add_library(glfw SHARED IMPORTED)
+    set_target_properties(glfw PROPERTIES
+        IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/lib/glfw3.dll
+        IMPORTED_IMPLIB ${CMAKE_SOURCE_DIR}/lib/libglfw3dll.a
+        INTERFACE_INCLUDE_DIRECTORIES ${CMAKE_SOURCE_DIR}/include
+    )
 
 elseif(UNIX)
 
