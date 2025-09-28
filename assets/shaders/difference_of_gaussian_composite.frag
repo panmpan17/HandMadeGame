@@ -38,7 +38,7 @@ void main()
         // if (dog > 1.0)
         //     dog = 1.0;
 
-        fragment = vec4(vec3(lumOrg) + diff * 3, 1.0);
+        fragment = vec4(originalColor.rgb + diff * 3, 1.0);
     // }
     //     dog = 1.0;
 

@@ -2,6 +2,7 @@
 
 class SimpleObjReader;
 class Shader;
+class Image;
 
 
 typedef unsigned int GLuint;
@@ -25,6 +26,8 @@ public:
 
 private:
     SimpleObjReader* m_pMesh = nullptr;
+
+    Image* m_pMainTexture = nullptr;
 
     Shader* m_pShader = nullptr;
     GLuint m_nModelUniform = 0;

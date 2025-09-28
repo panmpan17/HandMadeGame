@@ -7,6 +7,7 @@
 #include "../window.h"
 #include "../node.h"
 #include "../camera.h"
+#include "../draw/image.h"
 
 MeshRenderer::MeshRenderer(SimpleObjReader* pMesh)
     : m_pMesh(pMesh)
@@ -30,6 +31,8 @@ void MeshRenderer::setShader(Shader* pShader)
     m_nModelUniform = m_pShader->getUniformLocation("u_Model");
     m_nViewUniform = m_pShader->getUniformLocation("u_View");
     m_nProjectionUniform = m_pShader->getUniformLocation("u_Projection");
+
+    m_pMainTexture = ImageLoader::getInstance()->getImage("box_uv");
 
     bindVertexArray();
 }
@@ -171,7 +174,17 @@ void MeshRenderer::draw()
     glUniformMatrix4fv(m_nViewUniform, 1, GL_FALSE, (const GLfloat*) Camera::main->getViewMatrix());
     glUniformMatrix4fv(m_nProjectionUniform, 1, GL_FALSE, (const GLfloat*) Camera::main->getProjectionMatrix());
 
+    if (m_pMainTexture)
+    {
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, m_pMainTexture->getTextureID());
+        GLuint nMainTexUniform = m_pShader->getUniformLocation("u_MainTex");
+        glUniform1i(nMainTexUniform, 0);
+    }
+
     glBindVertexArray(m_nVertexBuffer);
+    glCullFace(GL_FRONT);
+    glFrontFace(GL_CW);
     glDrawElements(GL_TRIANGLES, m_nVertexCount, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 

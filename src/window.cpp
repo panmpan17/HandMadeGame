@@ -152,12 +152,18 @@ void Window::start()
     gladLoadGL(glfwGetProcAddress);
     glfwSwapInterval(1); // Enable vsync
 
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
+    glDepthMask(GL_FALSE);
+    glEnable(GL_CULL_FACE);
+
     ShaderLoader::Initialize();
     
     ImageLoader::getInstance()->registerImage("test", "assets/images/test.png");
     ImageLoader::getInstance()->registerImage("dust", "assets/images/dust_1.png");
     ImageLoader::getInstance()->registerImage("character", "assets/images/character_animation.png");
     ImageLoader::getInstance()->registerImage("cover_test", "assets/images/cover_test_3.jpg");
+    ImageLoader::getInstance()->registerImage("box_uv", "assets/images/box_test_uv.jpg");
 
     m_pRenderProcessQueue = new RenderProcessQueue(this);
     m_pRenderProcessQueue->setupProcesses();
@@ -210,7 +216,7 @@ void Window::drawFrame()
 {
     m_nDrawCallCount = 0;
 
-    if (true) // Enable post process
+    if (false) // Enable post process
     {
         m_pRenderProcessQueue->beginFrame();
         m_pWorldScene->render();
@@ -228,8 +234,13 @@ void Window::drawFrame()
     }
     else
     {
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glViewport(0, 0, m_nActualWidth, m_nActualHeight);
-        glEnable(GL_DEPTH_TEST);
+        // glEnable(GL_DEPTH_TEST);
+        // glDepthFunc(GL_LESS);
+        // glDepthMask(GL_FALSE);
+        // glEnable(GL_CULL_FACE);
+        glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         m_pWorldScene->render();
     }

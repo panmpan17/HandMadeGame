@@ -284,7 +284,7 @@ void WorldScene::createPinPongGame()
 
 void WorldScene::bloomTest()
 {
-    Camera::main->setWorldSizeScale(1.0f);
+    Camera::main->setWorldSizeScale(3.0f);
 
     Shader* pImageShader = ShaderLoader::getInstance()->getShader("image");
 
@@ -302,11 +302,11 @@ void WorldScene::bloomTest()
     //     addNode(pNode);
     // }
 
-    SimpleObjReader* reader = new SimpleObjReader("assets/models/monkey.obj");
+    SimpleObjReader* reader = new SimpleObjReader("assets/models/box.obj");
     Shader* p3DMeshShader = ShaderLoader::getInstance()->getShader("3d_mesh");
 
     auto pNode = new Node(0.f, 0.f, 0.f, 0.f);
-    pNode->addComponent(new Rotate3D(3, 6, 4));
+    pNode->addComponent(new Rotate3D(15, 25, 35));
 
     auto pMeshRenderer = new MeshRenderer(reader);
     pMeshRenderer->setShader(p3DMeshShader);
