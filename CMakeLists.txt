@@ -86,13 +86,7 @@ if (APPLE)
         set(EXECUTABLE_PATH ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
     endif()
 
-    # copy assets folder to beside executable
-    add_custom_command(TARGET GLFWTest POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_directory
-            ${CMAKE_SOURCE_DIR}/assets
-            ${EXECUTABLE_PATH}/assets
-    )
-
+    # copy library folder to beside executable
     add_custom_command(TARGET GLFWTest POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E make_directory
             ${EXECUTABLE_PATH}/lib
@@ -108,13 +102,7 @@ else()
     set(EXECUTABLE_PATH ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
     set(DYLIB_DIR ${CMAKE_SOURCE_DIR}/lib/)
     
-    # copy assets folder to beside executable
-    add_custom_command(TARGET GLFWTest POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_directory
-            ${CMAKE_SOURCE_DIR}/assets
-            ${EXECUTABLE_PATH}/assets
-    )
-
+    # copy library folder to beside executable
     add_custom_command(TARGET GLFWTest POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory
             ${DYLIB_DIR}
@@ -129,6 +117,21 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
 else()
     target_compile_definitions(GLFWTest PRIVATE DEBUG_FLAG=0)
 endif()
+
+
+# Assets files
+file(GLOB_RECURSE ASSETS "${CMAKE_SOURCE_DIR}/assets/*")
+
+add_custom_command(
+    OUTPUT ${CMAKE_BINARY_DIR}/assets.timestamp
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${CMAKE_SOURCE_DIR}/assets
+        ${EXECUTABLE_PATH}/assets
+    COMMAND ${CMAKE_COMMAND} -E touch ${CMAKE_BINARY_DIR}/assets.timestamp
+    DEPENDS ${ASSETS}
+)
+add_custom_target(copy_assets ALL DEPENDS ${CMAKE_BINARY_DIR}/assets.timestamp)
+add_dependencies(GLFWTest copy_assets)
 
 
 # General Library
