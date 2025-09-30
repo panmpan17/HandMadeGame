@@ -137,10 +137,8 @@ void RenderProcessQueue::initializeOriginalFBO()
 
 void RenderProcessQueue::setupProcesses()
 {
-    /*
     auto pBloomTest = new BloomTest(this);
     pBloomTest->initialize();
-    m_oProcessArray.addElement(pBloomTest);
     // BloomTest::ins = pBloomTest;
 
     auto pInput = InputManager::getInstance();
@@ -209,7 +207,6 @@ void RenderProcessQueue::setupProcesses()
     // auto pOrderDithering = new OrderDithering(this);
     // pOrderDithering->initialize();
     // m_oProcessArray.addElement(pOrderDithering);
-    */
 
     auto pDifferenceOfGaussian = new DifferenceOfGaussian(this);
     pDifferenceOfGaussian->initialize();
@@ -218,6 +215,8 @@ void RenderProcessQueue::setupProcesses()
     auto pOrderDithering = new OrderDithering(this);
     pOrderDithering->initialize();
     m_oProcessArray.addElement(pOrderDithering);
+
+    m_oProcessArray.addElement(pBloomTest);
 }
 
 #pragma mark Drawing every frame

@@ -301,18 +301,31 @@ void WorldScene::bloomTest()
 
     //     addNode(pNode);
     // }
-
-    SimpleObjReader* reader = new SimpleObjReader("assets/models/box.obj");
     Shader* p3DMeshShader = ShaderLoader::getInstance()->getShader("3d_mesh");
+    SimpleObjReader* readerMonkey = new SimpleObjReader("assets/models/monkey.obj");
+    SimpleObjReader* readerBox = new SimpleObjReader("assets/models/box.obj");
 
-    auto pNode = new Node(0.f, 0.f, 0.f, 0.f);
-    pNode->addComponent(new Rotate3D(15, 25, 35));
+    {
+        auto pNode = new Node(-1.f, 0.f, 0.f, 0.f);
+        pNode->addComponent(new Rotate3D(15, 25, 35));
 
-    auto pMeshRenderer = new MeshRenderer(reader);
-    pMeshRenderer->setShader(p3DMeshShader);
-    pNode->addComponent(pMeshRenderer);
+        auto pMeshRenderer = new MeshRenderer(readerMonkey);
+        pMeshRenderer->setShader(p3DMeshShader);
+        pNode->addComponent(pMeshRenderer);
 
-    addNode(pNode);
+        addNode(pNode);
+    }
+
+    {
+        auto pNode = new Node(1.f, 0.f, 0.f, 0.f);
+        pNode->addComponent(new Rotate3D(15, 25, 35));
+
+        auto pMeshRenderer = new MeshRenderer(readerBox);
+        pMeshRenderer->setShader(p3DMeshShader);
+        pNode->addComponent(pMeshRenderer);
+
+        addNode(pNode);
+    }
 }
 
 void WorldScene::readFromFiles(const std::string_view& strFilePath)

@@ -6,6 +6,7 @@ Camera* Camera::main = nullptr;
 Camera::Camera()
 {
     main = this;
+    m_bUseOrthoProjection = true;
 }
 
 Camera::~Camera()
