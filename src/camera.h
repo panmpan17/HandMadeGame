@@ -11,6 +11,17 @@ public:
     Camera();
     ~Camera();
 
+    inline void useAsMain() { main = this; }
+    inline bool isMainCamera() const { return main == this; }
+    
+    inline bool isUsingOrthoProjection() const { return m_bUseOrthoProjection; }
+    inline void setUseOrthoProjection(bool bOrtho) 
+    { 
+        m_bUseOrthoProjection = bOrtho; 
+        m_bProjectionMatrixDirty = true; 
+        m_bViewProjectionMatrixDirty = true;
+    }
+
     inline void setRatio(float fRatio)
     {
         m_fRatio = fRatio;
@@ -19,44 +30,46 @@ public:
     }
     inline void setPosition(float fX, float fY)
     {
-        m_position[0] = fX;
-        m_position[1] = fY;
+        m_vecPosition[0] = fX;
+        m_vecPosition[1] = fY;
         m_bViewMatrixDirty = true;
         m_bViewProjectionMatrixDirty = true;
     }
     inline void setPosition(float fX, float fY, float fZ)
     {
-        m_position[0] = fX;
-        m_position[1] = fY;
-        m_position[2] = fZ;
+        m_vecPosition[0] = fX;
+        m_vecPosition[1] = fY;
+        m_vecPosition[2] = fZ;
         m_bViewMatrixDirty = true;
         m_bViewProjectionMatrixDirty = true;
     }
     inline void move(float fX, float fY, float fZ)
     {
-        m_position[0] += fX;
-        m_position[1] += fY;
-        m_position[2] += fZ;
+        m_vecPosition[0] += fX;
+        m_vecPosition[1] += fY;
+        m_vecPosition[2] += fZ;
         m_bViewMatrixDirty = true;
         m_bViewProjectionMatrixDirty = true;
     }
 
-    inline void setRotation(float fX, float fY, float fZ)
+    inline void setPointAt(float fX, float fY, float fZ)
     {
-        m_rotation[0] = fX;
-        m_rotation[1] = fY;
-        m_rotation[2] = fZ;
+        m_vecPointAt[0] = fX;
+        m_vecPointAt[1] = fY;
+        m_vecPointAt[2] = fZ;
         m_bViewMatrixDirty = true;
         m_bViewProjectionMatrixDirty = true;
     }
-    inline void rotate(float fX, float fY, float fZ)
+
+    inline void setVecUp(float fX, float fY, float fZ)
     {
-        m_rotation[0] += fX;
-        m_rotation[1] += fY;
-        m_rotation[2] += fZ;
+        m_vecUp[0] = fX;
+        m_vecUp[1] = fY;
+        m_vecUp[2] = fZ;
         m_bViewMatrixDirty = true;
         m_bViewProjectionMatrixDirty = true;
     }
+
     inline void setWorldSizeScale(float fScale)
     {
         m_fWorldSizeScale = fScale;
@@ -83,10 +96,13 @@ private:
 
     float m_fWorldSizeScale = 5;
     float m_fRatio = 5.0f;
-    vec3 m_position = {0.f, 0.f, 0.f};
-    vec3 m_rotation = {0.f, 0.f, 0.f};
-    float m_fNearPlane = 3.f;
-    float m_fFarPlane = -3.f;
+
+    vec3 m_vecPosition = {0.f, 0.f, 2.5f};
+    vec3 m_vecPointAt = {0.f, 0.f, 0.f};
+    vec3 m_vecUp = {0.f, 1.f, 0.f};
+
+    float m_fNearPlane = -3.f;
+    float m_fFarPlane = 10.f;
 
     bool m_bViewMatrixDirty = true;
     mat4x4 m_matViewCache;

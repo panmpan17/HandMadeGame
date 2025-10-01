@@ -5,8 +5,6 @@ Camera* Camera::main = nullptr;
 
 Camera::Camera()
 {
-    main = this;
-    m_bUseOrthoProjection = true;
 }
 
 Camera::~Camera()
@@ -20,9 +18,7 @@ const mat4x4& Camera::getViewMatrix()
         return m_matViewCache;
     }
 
-    // TODO: The order of the calculations might be wrong, could try mat4x4_look_at
-    mat4x4_translate(m_matViewCache, m_position[0], m_position[1], m_position[2]);
-    mat4x4_rotate_Z(m_matViewCache, m_matViewCache, (float) m_rotation[2]); // Rotate around Z-axis
+    mat4x4_look_at(m_matViewCache, m_vecPosition, m_vecPointAt, m_vecUp);
 
     m_bViewMatrixDirty = false;
 

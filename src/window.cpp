@@ -66,8 +66,13 @@ void APIENTRY glDebugOutput(GLenum source, GLenum type, unsigned int id, GLenum 
 void Window::configureAndCreateWindow()
 {
     // Configure GL version
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+#if __APPLE__
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+#else
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
+#endif
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     glfwWindowHint(GLFW_RESIZABLE, m_bResizable ? GLFW_TRUE : GLFW_FALSE);
@@ -109,15 +114,17 @@ void Window::configureAndCreateWindow()
 
     // glfwSetWindowMonitor(m_pWindow, pPrimaryMonitor, 0, 0, pVideoMode->width, pVideoMode->height, pVideoMode->refreshRate);
 
-    // GLint flags;
-    // glGetIntegerv(GL_CONTEXT_FLAGS, &flags);
-    // if (flags & GL_CONTEXT_FLAG_DEBUG_BIT)
-    // {
-    //     glEnable(GL_DEBUG_OUTPUT);
-    //     glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-    //     glDebugMessageCallback(glDebugOutput, nullptr);
-    //     glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
-    // }
+#if !__APPLE__
+    GLint flags;
+    glGetIntegerv(GL_CONTEXT_FLAGS, &flags);
+    if (flags & GL_CONTEXT_FLAG_DEBUG_BIT)
+    {
+        glEnable(GL_DEBUG_OUTPUT);
+        glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+        glDebugMessageCallback(glDebugOutput, nullptr);
+        glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
+    }
+#endif
 }
 
 void Window::start()
@@ -125,6 +132,8 @@ void Window::start()
     InputManager::Initialize();
     ImageLoader::Initialize();
     m_pCamera = new Camera();
+    m_pCamera->useAsMain();
+    m_pCamera->setUseOrthoProjection(true);
 
     InputManager::getInstance()->registerKeyPressCallback(KeyCode::KEY_ESCAPE, [this](bool pressed) {
         if (pressed)
