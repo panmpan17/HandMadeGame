@@ -216,7 +216,7 @@ void Window::drawFrame()
 {
     m_nDrawCallCount = 0;
 
-    if (false) // Enable post process
+    if (true) // Enable post process
     {
         m_pRenderProcessQueue->beginFrame();
         m_pWorldScene->render();
@@ -236,10 +236,6 @@ void Window::drawFrame()
     {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glViewport(0, 0, m_nActualWidth, m_nActualHeight);
-        // glEnable(GL_DEPTH_TEST);
-        // glDepthFunc(GL_LESS);
-        // glDepthMask(GL_FALSE);
-        // glEnable(GL_CULL_FACE);
         glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         m_pWorldScene->render();

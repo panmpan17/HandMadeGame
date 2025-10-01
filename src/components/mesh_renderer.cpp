@@ -37,85 +37,6 @@ void MeshRenderer::setShader(Shader* pShader)
     bindVertexArray();
 }
 
-void MeshRenderer::bindTestingVertexArray()
-{
-    // For testing, create a simple triangle mesh
-    VertexWUVNormal arrVertices[24] = {
-        VertexWUVNormal { { -0.5f, -0.5f, 0.5f }, { 0.375f, 0.f }, { -1.f, -0.f, -0.f} },
-        VertexWUVNormal { { -0.5f, 0.5f, 0.5f }, { 0.625f, 0.f }, { -1.f, -0.f, -0.f} },
-        VertexWUVNormal { { -0.5f, 0.5f, -0.5f }, { 0.625f, 0.25f }, { -1.f, -0.f, -0.f} },
-        VertexWUVNormal { { -0.5f, -0.5f, -0.5f }, { 0.375f, 0.25f }, { -1.f, -0.f, -0.f} },
-        VertexWUVNormal { { -0.5f, -0.5f, -0.5f }, { 0.375f, 0.25f }, { -0.f, -0.f, -1.f} },
-        VertexWUVNormal { { -0.5f, 0.5f, -0.5f }, { 0.625f, 0.25f }, { -0.f, -0.f, -1.f} },
-        VertexWUVNormal { { 0.5f, 0.5f, -0.5f }, { 0.625f, 0.5f }, { -0.f, -0.f, -1.f} },
-        VertexWUVNormal { { 0.5f, -0.5f, -0.5f }, { 0.375f, 0.5f }, { -0.f, -0.f, -1.f} },
-        VertexWUVNormal { { 0.5f, -0.5f, -0.5f }, { 0.375f, 0.5f }, { 1.f, -0.f, -0.f} },
-        VertexWUVNormal { { 0.5f, 0.5f, -0.5f }, { 0.625f, 0.5f }, { 1.f, -0.f, -0.f} },
-        VertexWUVNormal { { 0.5f, 0.5f, 0.5f }, { 0.625f, 0.75f }, { 1.f, -0.f, -0.f} },
-        VertexWUVNormal { { 0.5f, -0.5f, 0.5f }, { 0.375f, 0.75f }, { 1.f, -0.f, -0.f} },
-        VertexWUVNormal { { 0.5f, -0.5f, 0.5f }, { 0.375f, 0.75f }, { -0.f, -0.f, 1.f} },
-        VertexWUVNormal { { 0.5f, 0.5f, 0.5f }, { 0.625f, 0.75f }, { -0.f, -0.f, 1.f} },
-        VertexWUVNormal { { -0.5f, 0.5f, 0.5f }, { 0.625f, 1.f }, { -0.f, -0.f, 1.f} },
-        VertexWUVNormal { { -0.5f, -0.5f, 0.5f }, { 0.375f, 1.f }, { -0.f, -0.f, 1.f} },
-        VertexWUVNormal { { -0.5f, -0.5f, -0.5f }, { 0.125f, 0.5f }, { -0.f, -1.f, -0.f} },
-        VertexWUVNormal { { 0.5f, -0.5f, -0.5f }, { 0.375f, 0.5f }, { -0.f, -1.f, -0.f} },
-        VertexWUVNormal { { 0.5f, -0.5f, 0.5f }, { 0.375f, 0.75f }, { -0.f, -1.f, -0.f} },
-        VertexWUVNormal { { -0.5f, -0.5f, 0.5f }, { 0.125f, 0.75f }, { -0.f, -1.f, -0.f} },
-        VertexWUVNormal { { 0.5f, 0.5f, -0.5f }, { 0.625f, 0.5f }, { -0.f, 1.f, -0.f} },
-        VertexWUVNormal { { -0.5f, 0.5f, -0.5f }, { 0.875f, 0.5f }, { -0.f, 1.f, -0.f} },
-        VertexWUVNormal { { -0.5f, 0.5f, 0.5f }, { 0.875f, 0.75f }, { -0.f, 1.f, -0.f} },
-        VertexWUVNormal { { 0.5f, 0.5f, 0.5f }, { 0.625f, 0.75f }, { -0.f, 1.f, -0.f} },
-    };
-
-    TriangleFace arrFaces[12] = {
-        TriangleFace { 0, 1, 2 },
-        TriangleFace { 0, 2, 3 },
-        TriangleFace { 4, 5, 6 },
-        TriangleFace { 4, 6, 7 },
-        TriangleFace { 8, 9, 10 },
-        TriangleFace { 8, 10, 11 },
-        TriangleFace { 12, 13, 14 },
-        TriangleFace { 12, 14, 15 },
-        TriangleFace { 16, 17, 18 },
-        TriangleFace { 16, 18, 19 },
-        TriangleFace { 20, 21, 22 },
-        TriangleFace { 20, 22, 23 },
-    };
-
-    m_nVertexCount = 12 * 3;
-
-    glGenVertexArrays(1, &m_nVertexArray);
-    glBindVertexArray(m_nVertexArray);
-
-    glGenBuffers(1, &m_nVertexBuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, m_nVertexBuffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(arrVertices), arrVertices, GL_STATIC_DRAW);
-
-    glGenBuffers(1, &m_nIndexBuffer);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_nIndexBuffer);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(arrFaces), arrFaces, GL_STATIC_DRAW);
-
-    // Get the attribute locations from the shader
-    GLuint nVPosAttr = m_pShader->getAttributeLocation("a_vPos");
-    GLuint nVUVAttr = m_pShader->getAttributeLocation("a_vUV");
-    GLuint nVNormalAttr = m_pShader->getAttributeLocation("a_vNormal");
-
-    // Enable and set the vertex attributes using the retrieved locations
-    glEnableVertexAttribArray(nVPosAttr);
-    glVertexAttribPointer(nVPosAttr, 3, GL_FLOAT, GL_FALSE, sizeof(VertexWUVNormal), (void*)offsetof(VertexWUVNormal, pos));
-
-    glEnableVertexAttribArray(nVUVAttr);
-    glVertexAttribPointer(nVUVAttr, 2, GL_FLOAT, GL_FALSE, sizeof(VertexWUVNormal), (void*)offsetof(VertexWUVNormal, uv));
-
-    glEnableVertexAttribArray(nVNormalAttr);
-    glVertexAttribPointer(nVNormalAttr, 3, GL_FLOAT, GL_FALSE, sizeof(VertexWUVNormal), (void*)offsetof(VertexWUVNormal, normal));
-    
-
-    glBindVertexArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-}
-
 void MeshRenderer::bindVertexArray()
 {
     glGenVertexArrays(1, &m_nVertexArray);
@@ -182,7 +103,7 @@ void MeshRenderer::draw()
         glUniform1i(nMainTexUniform, 0);
     }
 
-    glBindVertexArray(m_nVertexBuffer);
+    glBindVertexArray(m_nVertexArray);
     glCullFace(GL_FRONT);
     glFrontFace(GL_CW);
     glDrawElements(GL_TRIANGLES, m_nVertexCount, GL_UNSIGNED_INT, 0);

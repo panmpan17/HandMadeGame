@@ -40,7 +40,6 @@ private:
 
     int m_nVertexCount = 0;
 
-    void bindTestingVertexArray();
     void bindVertexArray();
 
     // int m_nIdleAnimationIndex = -1;
