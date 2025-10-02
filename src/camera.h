@@ -17,6 +17,7 @@ public:
         m_bViewMatrixDirty = true;
         m_bViewProjectionMatrixDirty = true;
     }
+    inline void getPosition(vec3& outPosition) const { vec3_dup(outPosition, m_position); }
     inline void setPosition(float fX, float fY)
     {
         m_position[0] = fX;

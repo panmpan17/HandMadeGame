@@ -1,4 +1,4 @@
-.PHONY: compile clean
+.PHONY: compile clean build
 
 BUILD_DIR := cmake-build
 CMAKE_BIN := ${BUILD_DIR}/bin

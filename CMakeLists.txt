@@ -61,6 +61,7 @@ set(SOURCES
     "src/draw/image.cpp"
     "src/draw/shader_loader.cpp"
     "src/draw/shader.cpp"
+    "src/editor/camera_inspector.cpp"
 )
 
 if (APPLE)

@@ -17,6 +17,7 @@
 #include "world.h"
 #include "post_process/render_process_queue.h"
 #include "models/simple_obj_reader.h"
+#include "editor/camera_inspector.h"
 
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
@@ -204,6 +205,8 @@ void Window::mainLoop()
 {
     m_fLastDrawTime = glfwGetTime();
 
+    CameraInspector cameraInspector;
+
     while (!glfwWindowShouldClose(m_pWindow))
     {
         glfwPollEvents();
@@ -211,7 +214,7 @@ void Window::mainLoop()
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
-        ImGui::ShowDemoWindow();
+        cameraInspector.update(m_fDeltaTime);
 
         // Because mac's retina display has a different pixel ratio (and moving to different monitors)
         // need to adjust the viewport to match the actual framebuffer size.
@@ -266,7 +269,23 @@ void Window::drawFrame()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         m_pWorldScene->render();
     }
-    LOG_EX("Draw call count: {}, Fps: {}\r", m_nDrawCallCount, 1.0f / m_fDeltaTime);
+
+#if IS_DEBUG_VERSION
+    drawFrameInfo();
+#endif
+}
+
+void Window::drawFrameInfo()
+{
+    ImGui::Begin("Info", nullptr,
+                 ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar
+                 | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing
+                 | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoBackground);
+    ImGui::SetWindowSize(ImVec2(200, 100), ImGuiCond_Always);
+    ImGui::SetWindowPos(ImVec2(0, ImGui::GetIO().DisplaySize.y - 45), ImGuiCond_Always);
+    ImGui::Text("%.1f FPS (%.3f ms)", ImGui::GetIO().Framerate, 1000.0f / ImGui::GetIO().Framerate);
+    ImGui::Text("Draw Call Count: %d", m_nDrawCallCount);
+    ImGui::End();
 }
 
 void Window::increaseDrawCallCount()

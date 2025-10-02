@@ -55,6 +55,7 @@ private:
 
     void mainLoop();
     void drawFrame();
+    void drawFrameInfo();
 };
 
 #if IS_DEBUG_VERSION
