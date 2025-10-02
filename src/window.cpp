@@ -18,6 +18,10 @@
 #include "post_process/render_process_queue.h"
 #include "models/simple_obj_reader.h"
 
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
+
 
 Window* Window::ins = nullptr;
 
@@ -53,6 +57,9 @@ Window::~Window()
     ImageLoader::Cleanup();
 
     glfwTerminate();
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
 }
 
 void APIENTRY glDebugOutput(GLenum source, GLenum type, unsigned int id, GLenum severity, GLsizei length, const char* message, const void* userParam)
@@ -157,6 +164,18 @@ void Window::start()
     glDepthMask(GL_FALSE);
     glEnable(GL_CULL_FACE);
 
+
+    // Setup Dear ImGui context
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO();
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+
+    // Setup Platform/Renderer backends
+    ImGui_ImplGlfw_InitForOpenGL(m_pWindow, true);          // Second param install_callback=true will install GLFW callbacks and chain to existing ones.
+    ImGui_ImplOpenGL3_Init();
+
     ShaderLoader::Initialize();
     
     ImageLoader::getInstance()->registerImage("test", "assets/images/test.png");
@@ -187,6 +206,13 @@ void Window::mainLoop()
 
     while (!glfwWindowShouldClose(m_pWindow))
     {
+        glfwPollEvents();
+
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+        ImGui::ShowDemoWindow();
+
         // Because mac's retina display has a different pixel ratio (and moving to different monitors)
         // need to adjust the viewport to match the actual framebuffer size.
         glfwGetFramebufferSize(m_pWindow, &m_nActualWidth, &m_nActualHeight);
@@ -205,11 +231,11 @@ void Window::mainLoop()
 
         drawFrame();
 
-        glfwSwapBuffers(m_pWindow);
-        glfwPollEvents();
-    }
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
-    glfwTerminate();
+        glfwSwapBuffers(m_pWindow);
+    }
 }
 
 void Window::drawFrame()

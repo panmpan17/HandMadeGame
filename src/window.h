@@ -38,7 +38,7 @@ private:
     RenderProcessQueue* m_pRenderProcessQueue = nullptr;
     bool m_bRenderProcessQueueUseSplit = false;
 
-    int m_nWidth = 320, m_nHeight = 180;
+    int m_nWidth = 720, m_nHeight = 405;
     int m_nActualWidth = 800, m_nActualHeight = 600;
     float m_fRatio = 1.0f;
 
