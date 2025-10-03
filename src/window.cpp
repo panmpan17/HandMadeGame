@@ -208,15 +208,15 @@ void Window::start()
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    mainLoop();
+    m_oEditorWindows.addElement(new CameraInspector());
+    m_oEditorWindows.addElement(new HierarchyView());
+
+    // mainLoop();
 }
 
 void Window::mainLoop()
 {
     m_fLastDrawTime = glfwGetTime();
-
-    m_oEditorWindows.addElement(new CameraInspector());
-    m_oEditorWindows.addElement(new HierarchyView());
 
     while (!glfwWindowShouldClose(m_pWindow))
     {

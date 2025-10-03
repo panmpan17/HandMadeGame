@@ -38,6 +38,7 @@ set(SOURCES
     "src/window.cpp"
     "src/random.cpp"
     "src/serialization/serializer.cpp"
+    "src/serialization/type_registry.cpp"
     "src/node.cpp"
     "src/models/simple_obj_reader.cpp"
     "src/game/pingpong/pong.cpp"
