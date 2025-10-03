@@ -1,0 +1,16 @@
+#pragma once
+
+
+class IEditorWindow
+{
+public:
+    IEditorWindow() = default;
+    ~IEditorWindow() = default;
+
+    virtual void update(float fDeltaTime) = 0;
+
+    inline bool isActive() const { return m_bIsActive; }
+
+protected:
+    bool m_bIsActive = true;
+};

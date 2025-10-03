@@ -61,6 +61,8 @@ set(SOURCES
     "src/draw/image.cpp"
     "src/draw/shader_loader.cpp"
     "src/draw/shader.cpp"
+    "src/editor/camera_inspector.cpp"
+    "src/editor/hierarchy_view.cpp"
 )
 
 if (APPLE)
@@ -118,6 +120,11 @@ else()
     target_compile_definitions(GLFWTest PRIVATE DEBUG_FLAG=0)
 endif()
 
+target_compile_options(GLFWTest PRIVATE
+    -Wmacro-redefined
+    -Wno-delete-abstract-non-virtual-dtor
+)
+
 
 # Assets files
 file(GLOB_RECURSE ASSETS "${CMAKE_SOURCE_DIR}/assets/*")
@@ -137,6 +144,23 @@ add_dependencies(GLFWTest copy_assets)
 # General Library
 add_library(glad include/glad/glad.c)
 target_include_directories(glad PUBLIC ${CMAKE_SOURCE_DIR}/include)
+
+add_library(imgui STATIC
+    "imgui/imgui.cpp"
+    "imgui/imgui_demo.cpp"
+    "imgui/imgui_draw.cpp"
+    "imgui/imgui_tables.cpp"
+    "imgui/imgui_widgets.cpp"
+    "imgui/backends/imgui_impl_glfw.cpp"
+    "imgui/backends/imgui_impl_opengl3.cpp"
+)
+
+target_include_directories(imgui PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/imgui
+    ${CMAKE_CURRENT_SOURCE_DIR}/imgui/backends
+)
+
+target_link_libraries(GLFWTest PRIVATE imgui)
 
 
 # Platform-specific settings
@@ -180,3 +204,10 @@ target_link_libraries(GLFWTest
         glad
         glfw
 )
+
+
+target_link_libraries(imgui
+    PRIVATE
+        glfw
+)
+

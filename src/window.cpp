@@ -17,6 +17,12 @@
 #include "world.h"
 #include "post_process/render_process_queue.h"
 #include "models/simple_obj_reader.h"
+#include "editor/camera_inspector.h"
+#include "editor/hierarchy_view.h"
+
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
 
 
 Window* Window::ins = nullptr;
@@ -53,6 +59,9 @@ Window::~Window()
     ImageLoader::Cleanup();
 
     glfwTerminate();
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
 }
 
 void APIENTRY glDebugOutput(GLenum source, GLenum type, unsigned int id, GLenum severity, GLsizei length, const char* message, const void* userParam)
@@ -166,6 +175,18 @@ void Window::start()
     glDepthMask(GL_FALSE);
     glEnable(GL_CULL_FACE);
 
+
+    // Setup Dear ImGui context
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO();
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+
+    // Setup Platform/Renderer backends
+    ImGui_ImplGlfw_InitForOpenGL(m_pWindow, true);          // Second param install_callback=true will install GLFW callbacks and chain to existing ones.
+    ImGui_ImplOpenGL3_Init();
+
     ShaderLoader::Initialize();
     
     ImageLoader::getInstance()->registerImage("test", "assets/images/test.png");
@@ -178,8 +199,8 @@ void Window::start()
     m_pRenderProcessQueue->setupProcesses();
 
     m_pWorldScene = new WorldScene();
-    m_pWorldScene->bloomTest();
-    // m_pWorldScene->createPinPongGame();
+    // m_pWorldScene->bloomTest();
+    m_pWorldScene->createPinPongGame();
     // m_pWorldScene->init();
     // m_pWorldScene->clearAllNodes();
     // m_pWorldScene->readFromFiles("assets/level.txt");
@@ -194,8 +215,26 @@ void Window::mainLoop()
 {
     m_fLastDrawTime = glfwGetTime();
 
+    m_oEditorWindows.addElement(new CameraInspector());
+    m_oEditorWindows.addElement(new HierarchyView());
+
     while (!glfwWindowShouldClose(m_pWindow))
     {
+        glfwPollEvents();
+
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+        
+        int nSize = m_oEditorWindows.getSize();
+        for (int i = 0; i < nSize; ++i)
+        {
+            if (m_oEditorWindows.getElement(i)->isActive())
+            {
+                m_oEditorWindows.getElement(i)->update(m_fDeltaTime);
+            }
+        }
+
         // Because mac's retina display has a different pixel ratio (and moving to different monitors)
         // need to adjust the viewport to match the actual framebuffer size.
         glfwGetFramebufferSize(m_pWindow, &m_nActualWidth, &m_nActualHeight);
@@ -214,11 +253,11 @@ void Window::mainLoop()
 
         drawFrame();
 
-        glfwSwapBuffers(m_pWindow);
-        glfwPollEvents();
-    }
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
-    glfwTerminate();
+        glfwSwapBuffers(m_pWindow);
+    }
 }
 
 void Window::drawFrame()
@@ -249,7 +288,23 @@ void Window::drawFrame()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         m_pWorldScene->render();
     }
-    LOG_EX("Draw call count: {}, Fps: {}\r", m_nDrawCallCount, 1.0f / m_fDeltaTime);
+
+#if IS_DEBUG_VERSION
+    drawFrameInfo();
+#endif
+}
+
+void Window::drawFrameInfo()
+{
+    ImGui::Begin("Info", nullptr,
+                 ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar
+                 | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing
+                 | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoBackground);
+    ImGui::SetWindowSize(ImVec2(200, 100), ImGuiCond_Always);
+    ImGui::SetWindowPos(ImVec2(0, ImGui::GetIO().DisplaySize.y - 45), ImGuiCond_Always);
+    ImGui::Text("%.1f FPS (%.3f ms)", ImGui::GetIO().Framerate, 1000.0f / ImGui::GetIO().Framerate);
+    ImGui::Text("Draw Call Count: %d", m_nDrawCallCount);
+    ImGui::End();
 }
 
 void Window::increaseDrawCallCount()

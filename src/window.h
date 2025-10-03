@@ -1,11 +1,13 @@
 #pragma once
 
 #include "debug_macro.h"
+#include "expandable_array.h"
 
 typedef struct GLFWwindow GLFWwindow;
 class Camera;
 class WorldScene;
 class RenderProcessQueue;
+class IEditorWindow;
 
 typedef unsigned int GLuint;
 
@@ -38,7 +40,7 @@ private:
     RenderProcessQueue* m_pRenderProcessQueue = nullptr;
     bool m_bRenderProcessQueueUseSplit = false;
 
-    int m_nWidth = 320, m_nHeight = 180;
+    int m_nWidth = 720, m_nHeight = 405;
     int m_nActualWidth = 800, m_nActualHeight = 600;
     float m_fRatio = 1.0f;
 
@@ -53,8 +55,11 @@ private:
     bool m_bResizable = false;
     int m_nDrawCallCount = 0;
 
+    PointerExpandableArray<IEditorWindow*> m_oEditorWindows = PointerExpandableArray<IEditorWindow*>(2);
+
     void mainLoop();
     void drawFrame();
+    void drawFrameInfo();
 };
 
 #if IS_DEBUG_VERSION
