@@ -74,3 +74,5 @@ private:
     void renderVerticalBlur();
     void renderComposite();
 };
+
+REGISTER_CLASS_NO_CREATOR(BloomTest);

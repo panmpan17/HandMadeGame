@@ -69,3 +69,5 @@ private:
 
     void renderComposite();
 };
+
+REGISTER_CLASS_NO_CREATOR(DifferenceOfGaussian);

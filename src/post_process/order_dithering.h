@@ -29,3 +29,5 @@ private:
 
     void render();
 };
+
+REGISTER_CLASS_NO_CREATOR(OrderDithering);

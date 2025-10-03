@@ -126,6 +126,14 @@ void TwoPointsMovement::serializeToWrapper(DataSerializer& serializer) const
     serializer.ADD_ATTRIBUTES(m_fDuration);
 }
 
+// #define SERIALIZE_FIELD(serializer, field) serializer.ADD_ATTRIBUTES(field);
+// #define CLASS_SIMPLE_SERIALIZATION_IMPL(...) serializeToWrapper(DataSerializer& serializer) const\
+// {\
+//     __VA_ARGS__;\
+// }
+
+// void TwoPointsMovement::CLASS_SIMPLE_SERIALIZATION_IMPL(m_vecStart, m_vecEnd, m_fDuration);
+
 bool TwoPointsMovement::deserializeField(DataDeserializer& deserializer, const std::string_view& strFieldName, const std::string_view& strFieldValue)
 {
     if (Component::deserializeField(deserializer, strFieldName, strFieldValue)) return true;

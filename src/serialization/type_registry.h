@@ -29,10 +29,10 @@ public:
         return instance;
     }
 
-    void registerType(const std::string& strTypeName, const TypeInfo& typeInfo)
+    void registerType(const TypeInfo& typeInfo)
     {
         auto it = std::find_if(m_vecTypeInfos.begin(), m_vecTypeInfos.end(),
-            [&strTypeName](const TypeInfo& info) { return info.m_strTypeName == strTypeName; });
+            [&typeInfo](const TypeInfo& info) { return info.m_nTypeId == typeInfo.m_nTypeId; });
 
         if (it == m_vecTypeInfos.end())
         {
@@ -76,7 +76,18 @@ private:
         struct T##_Registrator { \
             T##_Registrator() { \
                 TypeInfo oInfo(typeid(T).hash_code(), #T, TypeRegistry::titlizeTypeIdName(#T), []() -> ISerializable* { return new T(); }); \
-                TypeRegistry::instance().registerType(#T, oInfo); \
+                TypeRegistry::instance().registerType(oInfo); \
+            } \
+        }; \
+        static T##_Registrator global_##T##_registrator; \
+    }
+
+#define REGISTER_CLASS_NO_CREATOR(T) \
+    namespace { \
+        struct T##_Registrator { \
+            T##_Registrator() { \
+                TypeInfo oInfo(typeid(T).hash_code(), #T, TypeRegistry::titlizeTypeIdName(#T)); \
+                TypeRegistry::instance().registerType(oInfo); \
             } \
         }; \
         static T##_Registrator global_##T##_registrator; \

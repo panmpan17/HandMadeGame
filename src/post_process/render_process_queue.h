@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../expandable_array.h"
+#include "../serialization/type_registry.h"
 
 typedef unsigned int GLuint;
 
