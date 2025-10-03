@@ -23,9 +23,12 @@
 #include "game/pingpong/paddle_control.h"
 #include "game/pingpong/pong.h"
 
+WorldScene* WorldScene::current = nullptr;
+
 
 WorldScene::WorldScene()
 {
+    current = this;
 }
 
 WorldScene::~WorldScene()

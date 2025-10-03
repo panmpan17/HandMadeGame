@@ -73,6 +73,9 @@ public:
     bool deserializeField(DataDeserializer& deserializer, const std::string_view& strFieldName, const std::string_view& strFieldValue) override;
     void onFinishedDeserialization();
 
+    inline int getComponentCount() const { return m_oComponentArray.getSize(); }
+    inline Component* getComponent(int nIndex) const { return m_oComponentArray.getElement(nIndex); }
+
     friend std::ostream& operator<<(std::ostream& os, const Node& node)
     {
         os << "Node(pos=" <<  node.m_vecPosition.x << "," <<  node.m_vecPosition.y << "," <<  node.m_vecPosition.z << "; "

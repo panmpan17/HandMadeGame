@@ -28,7 +28,7 @@ public:
         m_bViewMatrixDirty = true;
         m_bViewProjectionMatrixDirty = true;
     }
-    inline void getPosition(vec3& outPosition) const { vec3_dup(outPosition, m_position); }
+    inline void getPosition(vec3& outPosition) const { vec3_dup(outPosition, m_vecPosition); }
     inline void setPosition(float fX, float fY)
     {
         m_vecPosition[0] = fX;
@@ -53,6 +53,7 @@ public:
         m_bViewProjectionMatrixDirty = true;
     }
 
+    inline void getPointAt(vec3& outPointAt) const { vec3_dup(outPointAt, m_vecPointAt); }
     inline void setPointAt(float fX, float fY, float fZ)
     {
         m_vecPointAt[0] = fX;
@@ -62,6 +63,7 @@ public:
         m_bViewProjectionMatrixDirty = true;
     }
 
+    inline void getVecUp(vec3& outVecUp) const { vec3_dup(outVecUp, m_vecUp); }
     inline void setVecUp(float fX, float fY, float fZ)
     {
         m_vecUp[0] = fX;

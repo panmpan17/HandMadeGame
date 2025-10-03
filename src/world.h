@@ -6,6 +6,8 @@ class Node;
 
 class WorldScene {
 public:
+    static WorldScene* current;
+
     WorldScene();
     ~WorldScene();
 
@@ -19,6 +21,9 @@ public:
 
     void update(float fDeltatime);
     void render();
+
+    inline int getNodeCount() const { return m_oNodeArray.getSize(); }
+    inline Node* getNode(int nIndex) const { return m_oNodeArray.getElement(nIndex); }
 
 private:
     PointerExpandableArray<Node*> m_oNodeArray = PointerExpandableArray<Node*>(10);

@@ -199,8 +199,8 @@ void Window::start()
     m_pRenderProcessQueue->setupProcesses();
 
     m_pWorldScene = new WorldScene();
-    m_pWorldScene->bloomTest();
-    // m_pWorldScene->createPinPongGame();
+    // m_pWorldScene->bloomTest();
+    m_pWorldScene->createPinPongGame();
     // m_pWorldScene->init();
     // m_pWorldScene->clearAllNodes();
     // m_pWorldScene->readFromFiles("assets/level.txt");
