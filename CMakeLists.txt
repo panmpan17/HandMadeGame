@@ -62,6 +62,7 @@ set(SOURCES
     "src/draw/shader_loader.cpp"
     "src/draw/shader.cpp"
     "src/editor/camera_inspector.cpp"
+    "src/editor/hierarchy_view.cpp"
 )
 
 if (APPLE)
@@ -118,6 +119,11 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
 else()
     target_compile_definitions(GLFWTest PRIVATE DEBUG_FLAG=0)
 endif()
+
+target_compile_options(GLFWTest PRIVATE
+    -Wmacro-redefined
+    -Wno-delete-abstract-non-virtual-dtor
+)
 
 
 # Assets files

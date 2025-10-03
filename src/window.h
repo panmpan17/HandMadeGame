@@ -1,11 +1,13 @@
 #pragma once
 
 #include "debug_macro.h"
+#include "expandable_array.h"
 
 typedef struct GLFWwindow GLFWwindow;
 class Camera;
 class WorldScene;
 class RenderProcessQueue;
+class IEditorWindow;
 
 typedef unsigned int GLuint;
 
@@ -52,6 +54,8 @@ private:
 
     bool m_bResizable = false;
     int m_nDrawCallCount = 0;
+
+    PointerExpandableArray<IEditorWindow*> m_oEditorWindows = PointerExpandableArray<IEditorWindow*>(2);
 
     void mainLoop();
     void drawFrame();

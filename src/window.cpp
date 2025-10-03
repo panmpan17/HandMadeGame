@@ -18,6 +18,7 @@
 #include "post_process/render_process_queue.h"
 #include "models/simple_obj_reader.h"
 #include "editor/camera_inspector.h"
+#include "editor/hierarchy_view.h"
 
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
@@ -205,7 +206,8 @@ void Window::mainLoop()
 {
     m_fLastDrawTime = glfwGetTime();
 
-    CameraInspector cameraInspector;
+    m_oEditorWindows.addElement(new CameraInspector());
+    m_oEditorWindows.addElement(new HierarchyView());
 
     while (!glfwWindowShouldClose(m_pWindow))
     {
@@ -214,7 +216,15 @@ void Window::mainLoop()
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
-        cameraInspector.update(m_fDeltaTime);
+        
+        int nSize = m_oEditorWindows.getSize();
+        for (int i = 0; i < nSize; ++i)
+        {
+            if (m_oEditorWindows.getElement(i)->isActive())
+            {
+                m_oEditorWindows.getElement(i)->update(m_fDeltaTime);
+            }
+        }
 
         // Because mac's retina display has a different pixel ratio (and moving to different monitors)
         // need to adjust the viewport to match the actual framebuffer size.

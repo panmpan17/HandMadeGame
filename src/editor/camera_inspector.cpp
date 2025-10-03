@@ -1,6 +1,5 @@
 #include "camera_inspector.h"
 
-#include <linmath.h>
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
@@ -17,7 +16,7 @@ CameraInspector::~CameraInspector()
 
 void CameraInspector::update(float fDeltaTime)
 {
-    ImGui::Begin("Camera Inspector", &m_bIsActive);
+    ImGui::Begin("Camera Inspector", &m_bCollapsed);
     ImGui::SetWindowSize(ImVec2(300, 80), ImGuiCond_FirstUseEver);
     ImGui::SetWindowPos(ImVec2(5, 5), ImGuiCond_FirstUseEver);
 

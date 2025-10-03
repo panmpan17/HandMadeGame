@@ -1,13 +1,14 @@
 #pragma once
 
+
 #include "editor_window.h"
 
 
-class CameraInspector : public IEditorWindow
+class HierarchyView : public IEditorWindow
 {
 public:
-    CameraInspector();
-    ~CameraInspector();
+    HierarchyView();
+    ~HierarchyView();
 
     void update(float fDeltaTime) override;
 
