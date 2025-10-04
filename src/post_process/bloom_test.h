@@ -25,6 +25,9 @@ public:
     inline void setBlurSigma(float sigma) { m_fBlurSigma = sigma; }
     inline float getBlurSigma() const { return m_fBlurSigma; }
 
+    inline int getBloomProcessDebugStep() const { return m_nBloomProcessDebugStep; }
+    inline void setBloomProcessDebugStep(int step) { m_nBloomProcessDebugStep = step; }
+
 private:
     GLuint m_nOriginalRenderTexture = 0;
 
@@ -66,6 +69,8 @@ private:
     float m_nIntensity = 1.0f;
     float m_fBlurRadius = 4.f; // 0 to 20
     float m_fBlurSigma = 4.f;  // 0 to 20
+
+    int m_nBloomProcessDebugStep = 4;
 
     void initializeQuad();
 

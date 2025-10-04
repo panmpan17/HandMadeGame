@@ -13,26 +13,6 @@
 
 HierarchyView::HierarchyView()
 {
-    const TypeRegistry& typeRegistry = TypeRegistry::instance();
-
-    int nNodeCount = WorldScene::current->getNodeCount();
-    for (int i = 0; i < nNodeCount; ++i)
-    {
-        Node* pNode = WorldScene::current->getNode(i);
-        if (pNode)
-        {
-            int nComponentCount = pNode->getComponentCount();
-            for (int j = 0; j < nComponentCount; ++j)
-            {
-                Component* pComponent = pNode->getComponent(j);
-
-                if (pComponent)
-                {
-                    LOGLN_EX("Component type: {}, {}", typeid(*pComponent).name(), typeRegistry.getTitlizedName(typeid(*pComponent)));
-                }
-            }
-        }
-    }
 }
 
 HierarchyView::~HierarchyView()
@@ -41,37 +21,39 @@ HierarchyView::~HierarchyView()
 
 void HierarchyView::update(float fDeltaTime)
 {
-    ImGui::Begin("Hierarchy View", &m_bCollapsed);
-    ImGui::SetWindowSize(ImVec2(300, 400), ImGuiCond_FirstUseEver);
-    ImGui::SetWindowPos(ImVec2(5, 135), ImGuiCond_FirstUseEver);
-
-    const TypeRegistry& typeRegistry = TypeRegistry::instance();
-
-    if (WorldScene::current)
+    if (ImGui::Begin("Hierarchy View", &m_bCollapsed))
     {
-        int nNodeCount = WorldScene::current->getNodeCount();
-        for (int i = 0; i < nNodeCount; ++i)
-        {
-            Node* pNode = WorldScene::current->getNode(i);
-            if (pNode)
-            {
-                ImGui::Text("Node %d", i);
+        ImGui::SetWindowSize(ImVec2(300, 400), ImGuiCond_FirstUseEver);
+        ImGui::SetWindowPos(ImVec2(5, 155), ImGuiCond_FirstUseEver);
 
-                int nComponentCount = pNode->getComponentCount();
-                for (int j = 0; j < nComponentCount; ++j)
+        const TypeRegistry& typeRegistry = TypeRegistry::instance();
+
+        if (WorldScene::current)
+        {
+            int nNodeCount = WorldScene::current->getNodeCount();
+            for (int i = 0; i < nNodeCount; ++i)
+            {
+                Node* pNode = WorldScene::current->getNode(i);
+                if (pNode)
                 {
-                    Component* pComponent = pNode->getComponent(j);
-                    if (pComponent)
+                    ImGui::Text("Node %d", i);
+
+                    int nComponentCount = pNode->getComponentCount();
+                    for (int j = 0; j < nComponentCount; ++j)
                     {
-                        ImGui::Text("  %s", typeRegistry.getTitlizedName(typeid(*pComponent)).c_str());
+                        Component* pComponent = pNode->getComponent(j);
+                        if (pComponent)
+                        {
+                            ImGui::Text("  %s", typeRegistry.getTitlizedName(typeid(*pComponent)).c_str());
+                        }
                     }
                 }
             }
         }
-    }
-    else
-    {
-        ImGui::Text("No World Scene");
+        else
+        {
+            ImGui::Text("No World Scene");
+        }
     }
 
     ImGui::End();

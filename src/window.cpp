@@ -19,6 +19,7 @@
 #include "models/simple_obj_reader.h"
 #include "editor/camera_inspector.h"
 #include "editor/hierarchy_view.h"
+#include "editor/post_process_inspector.h"
 
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
@@ -144,20 +145,13 @@ void Window::start()
     m_pCamera->useAsMain();
     m_pCamera->setUseOrthoProjection(true);
 
-    InputManager::getInstance()->registerKeyPressCallback(KeyCode::KEY_ESCAPE, [this](bool pressed) {
-        if (pressed)
-        {
-            m_bRenderProcessQueueUseSplit = !m_bRenderProcessQueueUseSplit;
-        }
-    });
-
-    InputManager::getInstance()->registerKeyPressCallback(KeyCode::KEY_R, [](bool pressed) {
-        if (pressed)
-        {
-            LOGLN("Reloading all shaders...");
-            ShaderLoader::getInstance()->reloadAllShaders();
-        }
-    });
+    // InputManager::getInstance()->registerKeyPressCallback(KeyCode::KEY_R, [](bool pressed) {
+    //     if (pressed)
+    //     {
+    //         LOGLN("Reloading all shaders...");
+    //         ShaderLoader::getInstance()->reloadAllShaders();
+    //     }
+    // });
 
     glfwSetKeyCallback(m_pWindow, &InputManager::onKeyCallback);
     glfwSetCursorEnterCallback(m_pWindow, &InputManager::onMouseEnterCallback);
@@ -199,8 +193,8 @@ void Window::start()
     m_pRenderProcessQueue->setupProcesses();
 
     m_pWorldScene = new WorldScene();
-    // m_pWorldScene->bloomTest();
-    m_pWorldScene->createPinPongGame();
+    m_pWorldScene->bloomTest();
+    // m_pWorldScene->createPinPongGame();
     // m_pWorldScene->init();
     // m_pWorldScene->clearAllNodes();
     // m_pWorldScene->readFromFiles("assets/level.txt");
@@ -210,6 +204,7 @@ void Window::start()
 
     m_oEditorWindows.addElement(new CameraInspector());
     m_oEditorWindows.addElement(new HierarchyView());
+    m_oEditorWindows.addElement(new PostProcessInspector());
 
     mainLoop();
 }
@@ -222,19 +217,6 @@ void Window::mainLoop()
     {
         glfwPollEvents();
 
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
-        
-        int nSize = m_oEditorWindows.getSize();
-        for (int i = 0; i < nSize; ++i)
-        {
-            if (m_oEditorWindows.getElement(i)->isActive())
-            {
-                m_oEditorWindows.getElement(i)->update(m_fDeltaTime);
-            }
-        }
-
         // Because mac's retina display has a different pixel ratio (and moving to different monitors)
         // need to adjust the viewport to match the actual framebuffer size.
         glfwGetFramebufferSize(m_pWindow, &m_nActualWidth, &m_nActualHeight);
@@ -244,6 +226,8 @@ void Window::mainLoop()
             m_fRatio = fNewRatio;
             m_pCamera->setRatio(m_fRatio);
         }
+
+        mainLoop_IMGUI();
 
         m_fCurrentDrawTime = glfwGetTime();
         m_fDeltaTime = m_fCurrentDrawTime - m_fLastDrawTime;
@@ -260,6 +244,45 @@ void Window::mainLoop()
     }
 }
 
+void Window::mainLoop_IMGUI()
+{
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplGlfw_NewFrame();
+    ImGui::NewFrame();
+    
+    int nSize = m_oEditorWindows.getSize();
+    for (int i = 0; i < nSize; ++i)
+    {
+        IEditorWindow* pWindow = m_oEditorWindows.getElement(i);
+        if (pWindow && pWindow->isActive())
+        {
+            pWindow->update(m_fDeltaTime);
+        }
+    }
+
+    if (ImGui::BeginMainMenuBar())
+    {
+        if (ImGui::BeginMenu("Editor Windows"))
+        {
+            for (int i = 0; i < nSize; ++i)
+            {
+                IEditorWindow* pWindow = m_oEditorWindows.getElement(i);
+                if (pWindow)
+                {
+                    if (ImGui::MenuItem(typeid(*pWindow).name(), NULL, pWindow->isActive()))
+                    {
+                        pWindow->setActive(!pWindow->isActive());
+                    }
+                }
+            }
+
+            ImGui::EndMenu();
+        }
+
+        ImGui::EndMainMenuBar();
+    }
+}
+
 void Window::drawFrame()
 {
     m_nDrawCallCount = 0;
@@ -270,15 +293,7 @@ void Window::drawFrame()
         m_pWorldScene->render();
         m_pRenderProcessQueue->endFrame();
         m_pRenderProcessQueue->startProcessing();
-
-        if (m_bRenderProcessQueueUseSplit)
-        {
-            m_pRenderProcessQueue->renderToScreenSplit();
-        }
-        else
-        {
-            m_pRenderProcessQueue->renderToScreen();
-        }
+        m_pRenderProcessQueue->renderToScreen();
     }
     else
     {

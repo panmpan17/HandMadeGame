@@ -64,6 +64,7 @@ set(SOURCES
     "src/draw/shader.cpp"
     "src/editor/camera_inspector.cpp"
     "src/editor/hierarchy_view.cpp"
+    "src/editor/post_process_inspector.cpp"
 )
 
 if (APPLE)

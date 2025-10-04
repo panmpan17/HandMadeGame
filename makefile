@@ -14,6 +14,7 @@ quick: compile
 build:
 	cmake -S . -B ${BUILD_DIR} -DBUILD_MAC_APP=ON -DCMAKE_BUILD_TYPE=Release
 	cmake --build ${BUILD_DIR} --parallel 8
+	@open $(BUILD_DIR)/bin/
 
 clean:
 	@echo "Cleaning up..."

@@ -18,8 +18,12 @@ public:
 
     virtual void renderProcess() = 0;
 
+    inline bool isActive() const { return m_bActive; }
+    inline void setActive(bool bActive) { m_bActive = bActive; }
+
 protected:
     RenderProcessQueue* m_pProcessQueue = nullptr;
+    bool m_bActive = true;
 
     virtual void initialize() = 0;
 
@@ -31,6 +35,8 @@ protected:
 class RenderProcessQueue
 {
 public:
+    static RenderProcessQueue* ins;
+
     RenderProcessQueue(Window* pWindow);
     ~RenderProcessQueue();
 
@@ -56,6 +62,16 @@ public:
     inline GLuint getFullScreenVertexArray() const { return m_nVertexArray; }
     inline GLuint getFullScreenVertexBuffer() const { return m_nVertexBuffer; }
 
+    inline int getProcessCount() const { return m_oProcessArray.getSize(); }
+    inline IRenderProcess* getProcessAt(int index) const { return m_oProcessArray.getElement(index); }
+    inline int addProcess(IRenderProcess* pProcess) { return m_oProcessArray.addElement(pProcess); }
+
+    inline bool isSplitScreen() const { return m_bSplitScreen; }
+    inline void setSplitScreen(bool bSplit) { m_bSplitScreen = bSplit; }
+
+    inline float getSplitFactor() const { return m_fSplitFactor; }
+    inline void setSplitFactor(float fFactor) { m_fSplitFactor = fFactor; }
+
 private:
     Window* m_pWindow = nullptr;
 
@@ -77,6 +93,9 @@ private:
     GLuint m_nVertexArray = 0;
 
     GLuint m_nFinalRenderTexture = 0;
+
+    bool m_bSplitScreen = false;
+    float m_fSplitFactor = 0.5f;
 
     PointerExpandableArray<IRenderProcess*> m_oProcessArray = PointerExpandableArray<IRenderProcess*>(2);
 

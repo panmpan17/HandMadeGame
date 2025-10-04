@@ -10,6 +10,9 @@
 #include "order_dithering.h"
 #include "difference_of_gaussian.h"
 
+RenderProcessQueue* RenderProcessQueue::ins = nullptr;
+
+
 void IRenderProcess::registerShaderPosAndUV(Shader* pShader)
 {
     GLuint nVPosAttr = pShader->getAttributeLocation("a_vPos");
@@ -46,6 +49,7 @@ void IRenderProcess::initializeRenderTextureAndFBO(GLuint& nFBO, GLuint& nTextur
 
 RenderProcessQueue::RenderProcessQueue(Window* pWindow)
 {
+    ins = this;
     m_pWindow = pWindow;
 
     init(pWindow->GetActualWidth(), pWindow->GetActualHeight());
@@ -137,77 +141,6 @@ void RenderProcessQueue::initializeOriginalFBO()
 
 void RenderProcessQueue::setupProcesses()
 {
-    auto pBloomTest = new BloomTest(this);
-    pBloomTest->initialize();
-    // BloomTest::ins = pBloomTest;
-
-    auto pInput = InputManager::getInstance();
-    pInput->registerKeyPressCallback(KeyCode::KEY_ARROW_UP, [pBloomTest](bool pressed) {
-        if (!pressed) { return; }
-
-        bool bShiftPressed = InputManager::getInstance()->isKeyPressed(KeyCode::KEY_LEFT_SHIFT) ||
-                               InputManager::getInstance()->isKeyPressed(KeyCode::KEY_RIGHT_SHIFT);
-        bool bMetaPressed = InputManager::getInstance()->isKeyPressed(KeyCode::KEY_LEFT_META) ||
-                              InputManager::getInstance()->isKeyPressed(KeyCode::KEY_RIGHT_META);
-
-        if (!bShiftPressed && !bMetaPressed)
-        {
-            float fIntensity = pBloomTest->getIntensity();
-            fIntensity += 0.1f;
-            if (fIntensity > 5.0f) fIntensity = 5.0f;
-            pBloomTest->setIntensity(fIntensity);
-        }
-        else if (bShiftPressed && !bMetaPressed)
-        {
-            float fRadius = pBloomTest->getBlurRadius();
-            fRadius += 1.0f;
-            if (fRadius > 20.0f) fRadius = 20.0f;
-            pBloomTest->setBlurRadius(fRadius);
-        }
-        else if (!bShiftPressed && bMetaPressed)
-        {
-            float fSigma = pBloomTest->getBlurSigma();
-            fSigma += 1.0f;
-            if (fSigma > 20.0f) fSigma = 20.0f;
-            pBloomTest->setBlurSigma(fSigma);
-        }
-    });
-    pInput->registerKeyPressCallback(KeyCode::KEY_ARROW_DOWN, [pBloomTest](bool pressed) {
-        if (!pressed) { return; }
-
-        bool bShiftPressed = InputManager::getInstance()->isKeyPressed(KeyCode::KEY_LEFT_SHIFT) ||
-                               InputManager::getInstance()->isKeyPressed(KeyCode::KEY_RIGHT_SHIFT);
-        bool bMetaPressed = InputManager::getInstance()->isKeyPressed(KeyCode::KEY_LEFT_META) ||
-                              InputManager::getInstance()->isKeyPressed(KeyCode::KEY_RIGHT_META);
-
-        // LOGLN_EX("Shift: {}, Meta: {}", bShiftPressed, bMetaPressed);
-        if (!bShiftPressed && !bMetaPressed)
-        {
-            float fIntensity = pBloomTest->getIntensity();
-            fIntensity -= 0.1f;
-            if (fIntensity < 0.0f) fIntensity = 0.0f;
-            pBloomTest->setIntensity(fIntensity);
-        }
-        else if (bShiftPressed && !bMetaPressed)
-        {
-            float fRadius = pBloomTest->getBlurRadius();
-            fRadius -= 1.0f;
-            if (fRadius < 0.0f) fRadius = 0.0f;
-            pBloomTest->setBlurRadius(fRadius);
-        }
-        else if (!bShiftPressed && bMetaPressed)
-        {
-            float fSigma = pBloomTest->getBlurSigma();
-            fSigma -= 1.0f;
-            if (fSigma < 0.0f) fSigma = 0.0f;
-            pBloomTest->setBlurSigma(fSigma);
-        }
-    });
-
-    // auto pOrderDithering = new OrderDithering(this);
-    // pOrderDithering->initialize();
-    // m_oProcessArray.addElement(pOrderDithering);
-
     auto pDifferenceOfGaussian = new DifferenceOfGaussian(this);
     pDifferenceOfGaussian->initialize();
     m_oProcessArray.addElement(pDifferenceOfGaussian);
@@ -216,6 +149,8 @@ void RenderProcessQueue::setupProcesses()
     pOrderDithering->initialize();
     m_oProcessArray.addElement(pOrderDithering);
 
+    auto pBloomTest = new BloomTest(this);
+    pBloomTest->initialize();
     m_oProcessArray.addElement(pBloomTest);
 }
 
@@ -244,7 +179,7 @@ void RenderProcessQueue::startProcessing()
     for (int i = 0; i < nSize; ++i)
     {
         IRenderProcess* pProcess = m_oProcessArray.getElement(i);
-        if (pProcess)
+        if (pProcess && pProcess->isActive())
         {
             pProcess->renderProcess();
         }
@@ -253,6 +188,12 @@ void RenderProcessQueue::startProcessing()
 
 void RenderProcessQueue::renderToScreen()
 {
+    if (m_bSplitScreen)
+    {
+        renderToScreenSplit();
+        return;
+    }
+
     glViewport(0, 0, m_pWindow->GetActualWidth(), m_pWindow->GetActualHeight());
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -281,7 +222,7 @@ void RenderProcessQueue::renderToScreenSplit()
 
     glUniform1i(m_nFinalTextureUniform_Split, 0);
     glUniform1i(m_nOriginalTextureUniform_Split, 1);
-    glUniform1f(m_nSplitFactorUniform, 0.5f);
+    glUniform1f(m_nSplitFactorUniform, m_fSplitFactor);
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_nRenderTexture_original);

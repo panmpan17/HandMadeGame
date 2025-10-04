@@ -18,7 +18,7 @@ void CameraInspector::update(float fDeltaTime)
 {
     ImGui::Begin("Camera Inspector", &m_bCollapsed);
     ImGui::SetWindowSize(ImVec2(300, 130), ImGuiCond_FirstUseEver);
-    ImGui::SetWindowPos(ImVec2(5, 5), ImGuiCond_FirstUseEver);
+    ImGui::SetWindowPos(ImVec2(5, 25), ImGuiCond_FirstUseEver);
 
     bool bIsOrtho = Camera::main->isUsingOrthoProjection();
     if (ImGui::Checkbox("Ortho", &bIsOrtho))

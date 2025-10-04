@@ -65,11 +65,25 @@ void BloomTest::initializeQuad()
 
 void BloomTest::renderProcess()
 {
+    if (m_nBloomProcessDebugStep <= 0)
+        return;
+
     m_nOriginalRenderTexture = m_pProcessQueue->getFinalRenderTexture();
 
     renderColorHighlight();
+
+    if (m_nBloomProcessDebugStep == 1)
+        return;
+
     renderHorizontalBlur();
+
+    if (m_nBloomProcessDebugStep == 2)
+        return;
+
     renderVerticalBlur();
+
+    if (m_nBloomProcessDebugStep == 3)
+        return;
 
     renderComposite();
 }

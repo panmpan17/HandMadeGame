@@ -10,6 +10,7 @@ public:
     virtual void update(float fDeltaTime) = 0;
 
     inline bool isActive() const { return m_bIsActive; }
+    inline void setActive(bool bActive) { m_bIsActive = bActive; }
 
 protected:
     bool m_bIsActive = true;
