@@ -81,12 +81,19 @@ if (APPLE)
 
         set(EXECUTABLE_PATH ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/GLFWTest.app/Contents/MacOS)
 
+        set(ASSET_BUILD_TARGET_FOLDER ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/GLFWTest.app/Contents/Resources/assets)
+
+        target_compile_options(GLFWTest PRIVATE
+            -DMAC_APP_BUNDLE
+        )
+
     else()
         add_executable(GLFWTest
                        ${SOURCES}
         )
 
         set(EXECUTABLE_PATH ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+        set(ASSET_BUILD_TARGET_FOLDER ${EXECUTABLE_PATH}/assets)
     endif()
 
     # copy library folder to beside executable
@@ -103,6 +110,8 @@ else()
     )
 
     set(EXECUTABLE_PATH ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+    set(ASSET_BUILD_TARGET_FOLDER ${EXECUTABLE_PATH}/assets)
+
     set(DYLIB_DIR ${CMAKE_SOURCE_DIR}/lib/)
     
     # copy library folder to beside executable
@@ -134,7 +143,7 @@ add_custom_command(
     OUTPUT ${CMAKE_BINARY_DIR}/assets.timestamp
     COMMAND ${CMAKE_COMMAND} -E copy_directory
         ${CMAKE_SOURCE_DIR}/assets
-        ${EXECUTABLE_PATH}/assets
+        ${ASSET_BUILD_TARGET_FOLDER}
     COMMAND ${CMAKE_COMMAND} -E touch ${CMAKE_BINARY_DIR}/assets.timestamp
     DEPENDS ${ASSETS}
 )

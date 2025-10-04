@@ -211,7 +211,7 @@ void Window::start()
     m_oEditorWindows.addElement(new CameraInspector());
     m_oEditorWindows.addElement(new HierarchyView());
 
-    // mainLoop();
+    mainLoop();
 }
 
 void Window::mainLoop()

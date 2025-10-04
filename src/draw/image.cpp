@@ -30,8 +30,7 @@ Image::Image(const std::string& strPath)
 
     if (*strPath.begin() != '/')
     {
-        std::string strExecutablePath = FileUtils::getExecutablePath();
-        std::string strFullPath = fs::path(strExecutablePath).parent_path().append(strPath).string();
+        std::string strFullPath = fs::path(FileUtils::getResourcesPath()).append(strPath).string();
 
         m_pData = stbi_load(strFullPath.c_str(), &m_nWidth, &m_nHeight, &m_nChannels, 0);
         if (!m_pData)
@@ -57,8 +56,7 @@ Image::Image(const std::string_view& strPath)
 
     if (*strPath.begin() != '/')
     {
-        std::string strExecutablePath = FileUtils::getExecutablePath();
-        std::string strFullPath = fs::path(strExecutablePath).parent_path().append(strPath).string();
+        std::string strFullPath = fs::path(FileUtils::getResourcesPath()).append(strPath).string();
 
         m_pData = stbi_load(strFullPath.c_str(), &m_nWidth, &m_nHeight, &m_nChannels, 0);
         if (!m_pData)

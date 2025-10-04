@@ -12,6 +12,8 @@ class FileUtils
 public:
     static std::string getExecutablePath();
     static std::string getExecutableDirectory();
+
+    static std::string getResourcesPath();
 };
 
 class FileReader {

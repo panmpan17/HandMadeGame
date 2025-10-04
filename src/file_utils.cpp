@@ -2,6 +2,7 @@
 #include "platform.h"
 #include <filesystem>
 #include <sstream>
+#include <iostream>
 
 #if IS_PLATFORM_MACOS
 #include <mach-o/dyld.h>
@@ -41,6 +42,22 @@ std::string FileUtils::getExecutablePath()
     }
 }
 
+std::string FileUtils::getResourcesPath()
+{
+    char path[1024];
+    uint32_t size = sizeof(path);
+    if (_NSGetExecutablePath(path, &size) == 0) {
+#ifdef MAC_APP_BUNDLE
+        std::string strFullPath = fs::path(path).parent_path().append("../Resources").string();
+#else
+        std::string strFullPath = fs::path(path).parent_path().string();
+#endif
+        return strFullPath;
+    } else {
+        return ""; // Buffer too small
+    }
+}
+
 #elif IS_PLATFORM_LINUX
 std::string FileUtils::getExecutablePath()
 {
@@ -71,8 +88,7 @@ FileReader::FileReader(const std::string& strPath)
 {
     if (*strPath.begin() != '/')
     {
-        std::string executablePath = FileUtils::getExecutablePath();
-        std::string strFullPath = fs::path(executablePath).parent_path().append(strPath).string();
+        std::string strFullPath = fs::path(FileUtils::getResourcesPath()).append(strPath).string();
 
         if (fs::exists(strFullPath))
         {
@@ -100,8 +116,7 @@ FileReader::FileReader(const std::string_view& strPath)
 {
     if (*strPath.begin() != '/')
     {
-        std::string executablePath = FileUtils::getExecutablePath();
-        std::string strFullPath = fs::path(executablePath).parent_path().append(strPath).string();
+        std::string strFullPath = fs::path(FileUtils::getResourcesPath()).append(strPath).string();
 
         if (fs::exists(strFullPath))
         {
@@ -212,8 +227,7 @@ FileWriter::FileWriter(const std::string_view& strPath, bool bAppend)
 
     if (*strPath.begin() != '/')
     {
-        std::string executablePath = FileUtils::getExecutablePath();
-        std::string strFullPath = fs::path(executablePath).parent_path().append(strPath).string();
+        std::string strFullPath = fs::path(FileUtils::getResourcesPath()).append(strPath).string();
         file.open(strFullPath, mode);
     }
     else
