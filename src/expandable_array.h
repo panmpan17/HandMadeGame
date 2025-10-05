@@ -57,6 +57,16 @@ public:
         return m_pArray[index];
     }
 
+    int getElementIndex(T element) const
+    {
+        for (int i = 0; i < m_nSize; ++i)
+        {
+            if (m_pArray[i] == element)
+                return i;
+        }
+        return -1; // Not found
+    }
+
     /// @brief Adds a new element to the array. This will assume ownership of the element.
     /// @param element The element to add.
     /// @return The index at which the element was added.
@@ -147,6 +157,16 @@ public:
         {
             std::cout << "Index " << i << ": " << m_pArray[i] << std::endl;
         }
+    }
+
+    void swap(int index1, int index2)
+    {
+        if (index1 < 0 || index1 >= m_nSize || index2 < 0 || index2 >= m_nSize)
+            throw std::out_of_range("Index out of range");
+
+        T temp = m_pArray[index1];
+        m_pArray[index1] = m_pArray[index2];
+        m_pArray[index2] = temp;
     }
 
 private:

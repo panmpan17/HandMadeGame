@@ -1,5 +1,6 @@
 #include "post_process_inspector.h"
 
+#include <sstream>
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
@@ -70,11 +71,34 @@ void PostProcessInspector::update(float fDeltaTime)
 void PostProcessInspector::updateRenderProcessQueue(IRenderProcess* pProcess)
 {
     const std::string typeName = TypeRegistry::instance().getTitlizedName(typeid(*pProcess));
-    // ImGui::Text("%s", typeName.c_str());
     bool bActive = pProcess->isActive();
     if (ImGui::Checkbox(typeName.c_str(), &bActive))
     {
         pProcess->setActive(bActive);
+    }
+
+    std::ostringstream ss;
+    ss << '^' << "##" << pProcess;
+    ImGui::SameLine();
+    if (ImGui::Button(ss.str().c_str()))
+    {
+        int nIndex = RenderProcessQueue::ins->getProcessIndex(pProcess);
+        if (nIndex > 0)
+        {
+            RenderProcessQueue::ins->swapProcesses(nIndex, nIndex - 1);
+        }
+    }
+    ss.clear();
+    ss.str("");
+    ss << 'v' << "##" << pProcess;
+    ImGui::SameLine();
+    if (ImGui::Button(ss.str().c_str()))
+    {
+        int nIndex = RenderProcessQueue::ins->getProcessIndex(pProcess);
+        if (nIndex >= 0 && nIndex < RenderProcessQueue::ins->getProcessCount() - 1)
+        {
+            RenderProcessQueue::ins->swapProcesses(nIndex, nIndex + 1);
+        }
     }
 
     if (BloomTest* pBloom = dynamic_cast<BloomTest*>(pProcess))

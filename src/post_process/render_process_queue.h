@@ -65,6 +65,8 @@ public:
     inline int getProcessCount() const { return m_oProcessArray.getSize(); }
     inline IRenderProcess* getProcessAt(int index) const { return m_oProcessArray.getElement(index); }
     inline int addProcess(IRenderProcess* pProcess) { return m_oProcessArray.addElement(pProcess); }
+    inline int getProcessIndex(IRenderProcess* pProcess) const { return m_oProcessArray.getElementIndex(pProcess); }
+    inline void swapProcesses(int index1, int index2) { m_oProcessArray.swap(index1, index2); }
 
     inline bool isSplitScreen() const { return m_bSplitScreen; }
     inline void setSplitScreen(bool bSplit) { m_bSplitScreen = bSplit; }
