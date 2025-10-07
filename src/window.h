@@ -54,6 +54,7 @@ private:
     bool m_bResizable = false;
     int m_nDrawCallCount = 0;
 
+    bool m_bShowIMGUI = false;
     PointerExpandableArray<IEditorWindow*> m_oEditorWindows = PointerExpandableArray<IEditorWindow*>(2);
 
     void mainLoop();

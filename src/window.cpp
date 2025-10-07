@@ -60,9 +60,13 @@ Window::~Window()
     ImageLoader::Cleanup();
 
     glfwTerminate();
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplGlfw_Shutdown();
-    ImGui::DestroyContext();
+
+    if (m_bShowIMGUI)
+    {
+        ImGui_ImplOpenGL3_Shutdown();
+        ImGui_ImplGlfw_Shutdown();
+        ImGui::DestroyContext();
+    }
 }
 
 void APIENTRY glDebugOutput(GLenum source, GLenum type, unsigned int id, GLenum severity, GLsizei length, const char* message, const void* userParam)
@@ -171,15 +175,18 @@ void Window::start()
 
 
     // Setup Dear ImGui context
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO();
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+    if (m_bShowIMGUI)
+    {
+        IMGUI_CHECKVERSION();
+        ImGui::CreateContext();
+        ImGuiIO& io = ImGui::GetIO();
+        io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+        io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
 
-    // Setup Platform/Renderer backends
-    ImGui_ImplGlfw_InitForOpenGL(m_pWindow, true);          // Second param install_callback=true will install GLFW callbacks and chain to existing ones.
-    ImGui_ImplOpenGL3_Init();
+        // Setup Platform/Renderer backends
+        ImGui_ImplGlfw_InitForOpenGL(m_pWindow, true);          // Second param install_callback=true will install GLFW callbacks and chain to existing ones.
+        ImGui_ImplOpenGL3_Init();
+    }
 
     ShaderLoader::Initialize();
     
@@ -227,7 +234,11 @@ void Window::mainLoop()
             m_pCamera->setRatio(m_fRatio);
         }
 
-        mainLoop_IMGUI();
+
+        if (m_bShowIMGUI)
+        {
+            mainLoop_IMGUI();
+        }
 
         m_fCurrentDrawTime = glfwGetTime();
         m_fDeltaTime = m_fCurrentDrawTime - m_fLastDrawTime;
@@ -237,8 +248,11 @@ void Window::mainLoop()
 
         drawFrame();
 
-        ImGui::Render();
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+        if (m_bShowIMGUI)
+        {
+            ImGui::Render();
+            ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+        }
 
         glfwSwapBuffers(m_pWindow);
     }
@@ -305,7 +319,10 @@ void Window::drawFrame()
     }
 
 #if IS_DEBUG_VERSION
-    drawFrameInfo();
+    if (m_bShowIMGUI)
+    {
+        drawFrameInfo();
+    }
 #endif
 }
 
