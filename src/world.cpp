@@ -15,6 +15,7 @@
 #include "components/particle/particle_spawn.h"
 #include "components/particle/particle_lifetime_change.h"
 #include "components/mesh_renderer.h"
+#include "components/first_person_free_control_camera.h"
 #include "random.h"
 #include "serialization/serializer.h"
 #include "physics/box.h"
@@ -305,7 +306,7 @@ void WorldScene::bloomTest()
     //     addNode(pNode);
     // }
     Shader* p3DMeshShader = ShaderLoader::getInstance()->getShader("3d_mesh");
-    SimpleObjReader* readerMonkey = new SimpleObjReader("assets/models/monkey.obj");
+    SimpleObjReader* readerMonkey = new SimpleObjReader("assets/models/monkey_smooth.obj");
     SimpleObjReader* readerBox = new SimpleObjReader("assets/models/box.obj");
 
     {
@@ -327,6 +328,12 @@ void WorldScene::bloomTest()
         pMeshRenderer->setShader(p3DMeshShader);
         pNode->addComponent(pMeshRenderer);
 
+        addNode(pNode);
+    }
+
+    {
+        auto pNode = new Node(0.f, -1.f, 0.f, 0.f);
+        pNode->addComponent(new FirstPersonFreeControlCamera());
         addNode(pNode);
     }
 }

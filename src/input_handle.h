@@ -87,6 +87,20 @@ struct Event
 };
 
 
+enum class MouseButton : int
+{
+    BUTTON_LEFT = 0,
+    BUTTON_RIGHT = 1,
+    BUTTON_MIDDLE = 2,
+    BUTTON_3 = 3,
+    BUTTON_4 = 4,
+    BUTTON_5 = 5,
+    BUTTON_6 = 6,
+    BUTTON_7 = 7,
+    MAX_BUTTONS
+};
+
+
 class InputManager
 {
 public:
@@ -129,6 +143,23 @@ public:
         return false;
     }
 
+    inline bool isMouseButtonPressed(MouseButton eButton) const
+    {
+        if (eButton >= MouseButton::BUTTON_LEFT && eButton < MouseButton::MAX_BUTTONS)
+        {
+            return m_arrMouseDown[static_cast<int>(eButton)];
+        }
+        return false;
+    }
+    inline bool isMouseButtonPressed(int nButton) const
+    {
+        if (nButton >= 0 && nButton < MAX_MOUSE_BUTTONS)
+        {
+            return m_arrMouseDown[nButton];
+        }
+        return false;
+    }
+
 private:
     static bool sm_bMouseEntered;
     static float sm_fMouseX, sm_fMouseY;
@@ -141,4 +172,8 @@ private:
     bool m_bKeyPressed[(int)KeyCode::MAX_KEY_CODE]; // Array to track key states, if needed
 
     Event m_KeyPressEvent[(int)KeyCode::MAX_KEY_CODE]; // Event for key press callbacks
+
+    constexpr static int MAX_MOUSE_BUTTONS = 8;
+    bool m_arrMouseDown[MAX_MOUSE_BUTTONS] = { false, false, false, false, false, false, false, false }; // Track mouse button states, if needed
+    Event m_arrMouseButtonEvent[MAX_MOUSE_BUTTONS]; // Events for mouse button callbacks, if needed
 };

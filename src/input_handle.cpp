@@ -48,7 +48,29 @@ void InputManager::onMousePosCallback(GLFWwindow* pWindow, double fPosX, double 
 
 void InputManager::onMouseButtonCallback(GLFWwindow* pWindow, int nButton, int nAction, int nMods)
 {
-    // LOGLN_EX("Mouse button: {}, Action: {}, Mods: {}", nButton, nAction, nMods);
+    LOGLN_EX("Mouse button: {}, Action: {}, Mods: {}", nButton, nAction, nMods);
+    if (!ins)
+    {
+        LOGERRLN("InputManager instance is not initialized.");
+        return;
+    }
+
+    if (nButton >= 0 && nButton < MAX_MOUSE_BUTTONS)
+    {
+        switch (nAction)
+        {
+            case GLFW_PRESS:
+                ins->m_arrMouseDown[nButton] = true;
+                ins->m_arrMouseButtonEvent[nButton].invoke(true);
+                break;
+            case GLFW_RELEASE:
+                ins->m_arrMouseDown[nButton] = false;
+                ins->m_arrMouseButtonEvent[nButton].invoke(false);
+                break;
+            default:
+                break;
+        }
+    }
 }
 
 void InputManager::onKeyCallback(GLFWwindow* pWindow, int nKey, int nScanNode, int nAction, int nMods)

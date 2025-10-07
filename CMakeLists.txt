@@ -57,6 +57,7 @@ set(SOURCES
     "src/components/particle/particle_system.cpp"
     "src/components/particle/simple_particle_system.cpp"
     "src/components/particle/particle_lifetime_change.cpp"
+    "src/components/first_person_free_control_camera.cpp"
     "src/file_utils.cpp"
     "src/world.cpp"
     "src/draw/image.cpp"
