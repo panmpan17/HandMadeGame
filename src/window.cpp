@@ -170,7 +170,7 @@ void Window::start()
 
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
-    glDepthMask(GL_FALSE);
+    // glDepthMask(GL_FALSE);
     glEnable(GL_CULL_FACE);
 
 
