@@ -47,7 +47,7 @@ public:
     inline void move(const Vector2& position) { m_vecPosition += position; }
     inline void move(const Vector3& position) { m_vecPosition += position; }
 
-    inline const Vector3 getPosition() const { return m_vecPosition; }
+    inline const Vector3& getPosition() const { return m_vecPosition; }
     inline float getPositionX() const { return m_vecPosition.x; }
     inline float getPositionY() const { return m_vecPosition.y; }
     inline float getPositionZ() const { return m_vecPosition.z; }

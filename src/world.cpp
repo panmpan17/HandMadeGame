@@ -332,7 +332,7 @@ void WorldScene::bloomTest()
     }
 
     {
-        auto pNode = new Node(0.f, -1.f, 0.f, 0.f);
+        auto pNode = new Node(0.f, 0.f, 2.5f, 0.f);
         pNode->addComponent(new FirstPersonFreeControlCamera());
         addNode(pNode);
     }

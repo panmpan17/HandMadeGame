@@ -41,9 +41,17 @@ void InputManager::onMouseEnterCallback(GLFWwindow* pWindow, int bEntered)
 
 void InputManager::onMousePosCallback(GLFWwindow* pWindow, double fPosX, double fPosY)
 {
-    sm_fMouseX = static_cast<float>(fPosX);
-    sm_fMouseY = static_cast<float>(fPosY);
+    float fMouseX = static_cast<float>(fPosX);
+    float fMouseY = static_cast<float>(fPosY);
     // TODO: fire event or callback if needed
+
+    if (ins)
+    {
+        ins->m_arrMouseMoveEvent.invoke(sm_fMouseX - fMouseX, sm_fMouseY - fMouseY);
+    }
+
+    sm_fMouseX = fMouseX;
+    sm_fMouseY = fMouseY;
 }
 
 void InputManager::onMouseButtonCallback(GLFWwindow* pWindow, int nButton, int nAction, int nMods)

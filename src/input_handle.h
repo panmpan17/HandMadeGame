@@ -73,15 +73,20 @@ enum class KeyCode : int
 
 // typedef void (*KeyPressCallback)(bool bPressed);
 
+template<typename... Args>
 struct Event
 {
-    std::vector<std::function<void(bool)>> listeners;
+    std::vector<std::function<void(Args...)>> listeners;
 
-    void add(std::function<void(bool)> f) { listeners.push_back(f); }
-    void invoke(bool bPressed) {
+    void add(std::function<void(Args...)> f) { listeners.push_back(f); }
+    // void remove(std::function<void(Args...)> f) 
+    // { 
+    //     listeners.erase(std::remove(listeners.begin(), listeners.end(), f), listeners.end()); 
+    // }
+    void invoke(Args... args) {
         for (auto& listener : listeners)
         {
-            listener(bPressed);
+            listener(args...);
         }
     }
 };
@@ -133,6 +138,22 @@ public:
             m_KeyPressEvent[static_cast<int>(key)].add(callback);
         }
     }
+    // void unregisterKeyPressCallback(KeyCode key, std::function<void(bool)> callback)
+    // {
+    //     if (key > KeyCode::KEY_UNKNOWN && key < KeyCode::MAX_KEY_CODE)
+    //     {
+    //         m_KeyPressEvent[static_cast<int>(key)].remove(callback);
+    //     }
+    // }
+
+    void registerMouseMoveCallback(std::function<void(float, float)> callback)
+    {
+        m_arrMouseMoveEvent.add(callback);
+    }
+    // void unregisterMouseMoveCallback(std::function<void(float, float)> callback)
+    // {
+    //     m_arrMouseMoveEvent.remove(callback);
+    // }
 
     inline bool isKeyPressed(KeyCode key) const
     {
@@ -171,9 +192,11 @@ private:
 
     bool m_bKeyPressed[(int)KeyCode::MAX_KEY_CODE]; // Array to track key states, if needed
 
-    Event m_KeyPressEvent[(int)KeyCode::MAX_KEY_CODE]; // Event for key press callbacks
+    Event<bool> m_KeyPressEvent[(int)KeyCode::MAX_KEY_CODE]; // Event for key press callbacks
 
     constexpr static int MAX_MOUSE_BUTTONS = 8;
     bool m_arrMouseDown[MAX_MOUSE_BUTTONS] = { false, false, false, false, false, false, false, false }; // Track mouse button states, if needed
-    Event m_arrMouseButtonEvent[MAX_MOUSE_BUTTONS]; // Events for mouse button callbacks, if needed
+    Event<bool> m_arrMouseButtonEvent[MAX_MOUSE_BUTTONS]; // Events for mouse button callbacks, if needed
+
+    Event<float, float> m_arrMouseMoveEvent;
 };

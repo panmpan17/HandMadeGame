@@ -1,6 +1,7 @@
 #pragma once
 
 #include <linmath.h>
+#include "vector.h"
 
 
 class Camera
@@ -41,6 +42,14 @@ public:
         m_vecPosition[0] = fX;
         m_vecPosition[1] = fY;
         m_vecPosition[2] = fZ;
+        m_bViewMatrixDirty = true;
+        m_bViewProjectionMatrixDirty = true;
+    }
+    inline void setPosition(const Vector3& vec3)
+    {
+        m_vecPosition[0] = vec3.x;
+        m_vecPosition[1] = vec3.y;
+        m_vecPosition[2] = vec3.z;
         m_bViewMatrixDirty = true;
         m_bViewProjectionMatrixDirty = true;
     }

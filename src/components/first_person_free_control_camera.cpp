@@ -5,6 +5,7 @@
 #include "../camera.h"
 
 #define BIND_CALLBACK_1(func) std::bind(&FirstPersonFreeControlCamera::func, this, std::placeholders::_1)
+#define BIND_CALLBACK_2(func) std::bind(&FirstPersonFreeControlCamera::func, this, std::placeholders::_1, std::placeholders::_2)
 
 
 FirstPersonFreeControlCamera::FirstPersonFreeControlCamera()
@@ -15,7 +16,7 @@ FirstPersonFreeControlCamera::FirstPersonFreeControlCamera()
     // pInput->registerKeyPressCallback(KeyCode::KEY_S, BIND_CALLBACK_1(onKeyboardS));
     // pInput->registerKeyPressCallback(KeyCode::KEY_A, BIND_CALLBACK_1(onKeyboardA));
     // pInput->registerKeyPressCallback(KeyCode::KEY_D, BIND_CALLBACK_1(onKeyboardD));
-
+    pInput->registerMouseMoveCallback(BIND_CALLBACK_2(onMouseMove));
 
 }
 
@@ -41,31 +42,46 @@ void FirstPersonFreeControlCamera::update(float fDeltaTime)
 
     float fMoveSpeed = 5.0f; // units per second
 
-    vec3 vecPosition, vecPointAt;
-    Camera::main->getPosition(vecPosition);
-    Camera::main->getPointAt(vecPointAt);
+    int fHorizontal = (pInput->isKeyPressed(KeyCode::KEY_D) ? 1 : 0) + (pInput->isKeyPressed(KeyCode::KEY_A) ? -1 : 0);
+    int fVertical = (pInput->isKeyPressed(KeyCode::KEY_W) ? 1 : 0) + (pInput->isKeyPressed(KeyCode::KEY_S) ? -1 : 0);
 
-    if (pInput->isKeyPressed(KeyCode::KEY_W))
+    if (fHorizontal != 0 || fVertical != 0)
     {
-        vecPosition[1] += fMoveSpeed * fDeltaTime;
-        vecPointAt[1] += fMoveSpeed * fDeltaTime;
-    }
-    if (pInput->isKeyPressed(KeyCode::KEY_S))
-    {
-        vecPosition[1] -= fMoveSpeed * fDeltaTime;
-        vecPointAt[1] -= fMoveSpeed * fDeltaTime;
-    }
-    if (pInput->isKeyPressed(KeyCode::KEY_A))
-    {
-        vecPosition[0] -= fMoveSpeed * fDeltaTime;
-        vecPointAt[0] -= fMoveSpeed * fDeltaTime;
-    }
-    if (pInput->isKeyPressed(KeyCode::KEY_D))
-    {
-        vecPosition[0] += fMoveSpeed * fDeltaTime;
-        vecPointAt[0] += fMoveSpeed * fDeltaTime;
+        m_pNode->move(fHorizontal * fMoveSpeed * fDeltaTime, fVertical * fMoveSpeed * fDeltaTime);
     }
 
-    Camera::main->setPosition(vecPosition[0], vecPosition[1], vecPosition[2]);
-    Camera::main->setPointAt(vecPointAt[0], vecPointAt[1], vecPointAt[2]);
+    if (m_fMouseDeltaX != 0.0f || m_fMouseDeltaY != 0.0f)
+    {
+        m_pNode->rotateQuaternion(Quaternion::fromAxisAngle({m_fMouseDeltaX, m_fMouseDeltaY, 0}, fDeltaTime));
+
+        m_fMouseDeltaX = 0.0f;
+        m_fMouseDeltaY = 0.0f;
+    }
+    
+    updateCameraPositionToNode();
+}
+
+void FirstPersonFreeControlCamera::onMouseMove(float fDeltaX, float fDeltaY)
+{
+    m_fMouseDeltaX = fDeltaX;
+    m_fMouseDeltaY = fDeltaY;
+}
+
+void FirstPersonFreeControlCamera::updateCameraPositionToNode()
+{
+    if (!m_pNode)
+    {
+        return;
+    }
+
+    const Vector3& vecPosition = m_pNode->getPosition();
+    Camera::main->setPosition(vecPosition);
+
+    vec3 vecForward;
+    m_pNode->getRotationQuaternion().getForwardVector(vecForward);
+
+    vecForward[0] += vecPosition.x;
+    vecForward[1] += vecPosition.y;
+    vecForward[2] += vecPosition.z;
+    Camera::main->setPointAt(vecForward[0], vecForward[1], vecForward[2]);
 }

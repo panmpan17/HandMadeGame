@@ -15,9 +15,13 @@ public:
     virtual void draw() override {}
 
 private:
+    float m_fMouseDeltaX = 0.0f;
+    float m_fMouseDeltaY = 0.0f;
     // void onRightMouseButton(bool bPressed);
     // void onKeyboardW(bool bPressed);
     // void onKeyboardS(bool bPressed);
     // void onKeyboardA(bool bPressed);
     // void onKeyboardD(bool bPressed);
+    void onMouseMove(float fDeltaX, float fDeltaY);
+    void updateCameraPositionToNode();
 };
