@@ -136,6 +136,11 @@ void RenderProcessQueue::initializeOriginalFBO()
         LOGERR("Framebuffer is not complete!");
     }
 
+    glGenRenderbuffers(1, &m_nDepthBuffer_original);
+    glBindRenderbuffer(GL_RENDERBUFFER, m_nDepthBuffer_original);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, m_nRenderWidth, m_nRenderHeight);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_nDepthBuffer_original);
+
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
@@ -169,12 +174,12 @@ void RenderProcessQueue::beginFrame()
 void RenderProcessQueue::endFrame()
 {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    m_nFinalRenderTexture = m_nRenderTexture_original;
 }
 
 void RenderProcessQueue::startProcessing()
 {
-    m_nFinalRenderTexture = m_nRenderTexture_original;
-    
     int nSize = m_oProcessArray.getSize();
     for (int i = 0; i < nSize; ++i)
     {
@@ -195,7 +200,7 @@ void RenderProcessQueue::renderToScreen()
     }
 
     glViewport(0, 0, m_pWindow->GetActualWidth(), m_pWindow->GetActualHeight());
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT);
 
     glUseProgram(m_pShader->getProgram());
 
@@ -216,7 +221,7 @@ void RenderProcessQueue::renderToScreen()
 void RenderProcessQueue::renderToScreenSplit()
 {
     glViewport(0, 0, m_pWindow->GetActualWidth(), m_pWindow->GetActualHeight());
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT);
 
     glUseProgram(m_pSplitShader->getProgram());
 

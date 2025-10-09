@@ -77,7 +77,7 @@ void DifferenceOfGaussian::renderBlur1Horizontal()
 
     glBindFramebuffer(GL_FRAMEBUFFER, m_nFBOID_Blur1_Horizontal);
     glViewport(0, 0, m_nRenderWidth * BLUR_TEXTURE_RATIO, m_nRenderHeight * BLUR_TEXTURE_RATIO);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT);
 
     glUseProgram(m_pHorizontalBlurShader->getProgram());
 
@@ -108,7 +108,7 @@ void DifferenceOfGaussian::renderBlur1Vertical()
 
     glBindFramebuffer(GL_FRAMEBUFFER, m_nFBOID_BLur1_Vertical);
     glViewport(0, 0, m_nRenderWidth * BLUR_TEXTURE_RATIO, m_nRenderHeight * BLUR_TEXTURE_RATIO);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT);
 
     glUseProgram(m_pVerticalBlurShader->getProgram());
 
@@ -138,7 +138,7 @@ void DifferenceOfGaussian::renderBlur2Horizontal()
 
     glBindFramebuffer(GL_FRAMEBUFFER, m_nFBOID_Blur2_Horizontal);
     glViewport(0, 0, m_nRenderWidth * BLUR_TEXTURE_RATIO, m_nRenderHeight * BLUR_TEXTURE_RATIO);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT);
 
     glUseProgram(m_pHorizontalBlurShader->getProgram());
 
@@ -168,7 +168,7 @@ void DifferenceOfGaussian::renderBlur2Vertical()
 
     glBindFramebuffer(GL_FRAMEBUFFER, m_nFBOID_BLur2_Vertical);
     glViewport(0, 0, m_nRenderWidth * BLUR_TEXTURE_RATIO, m_nRenderHeight * BLUR_TEXTURE_RATIO);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT);
 
     glUseProgram(m_pVerticalBlurShader->getProgram());
 
@@ -198,7 +198,7 @@ void DifferenceOfGaussian::renderComposite()
 
     glBindFramebuffer(GL_FRAMEBUFFER, m_nFBOID_Final);
     glViewport(0, 0, m_nRenderWidth, m_nRenderHeight);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT);
 
     glUseProgram(m_pCompositeShader->getProgram());
 

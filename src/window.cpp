@@ -32,6 +32,8 @@ Window::Window()
 {
     ins = this;
 
+    m_bShowIMGUI = true;
+
     if (!glfwInit())
     {
         LOGLN("Failed to initialize GLFW");
@@ -301,13 +303,16 @@ void Window::drawFrame()
 {
     m_nDrawCallCount = 0;
 
-    if (true) // Enable post process
+    if (m_bEnablePostProcess) // Enable post process
     {
         m_pRenderProcessQueue->beginFrame();
         m_pWorldScene->render();
         m_pRenderProcessQueue->endFrame();
+
+        glDisable(GL_DEPTH_TEST);
         m_pRenderProcessQueue->startProcessing();
         m_pRenderProcessQueue->renderToScreen();
+        glEnable(GL_DEPTH_TEST);
     }
     else
     {

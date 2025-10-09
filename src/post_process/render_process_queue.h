@@ -82,6 +82,7 @@ private:
 
     GLuint m_nFBOID_original = 0;
     GLuint m_nRenderTexture_original = 0;
+    GLuint m_nDepthBuffer_original = 0;
 
     Shader* m_pShader = nullptr;
     GLuint m_nTextureUniform = 0;

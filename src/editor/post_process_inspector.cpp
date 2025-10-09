@@ -10,6 +10,7 @@
 #include "../post_process/difference_of_gaussian.h"
 #include "../debug_macro.h"
 #include "../serialization/type_registry.h"
+#include "../window.h"
 
 
 PostProcessInspector::PostProcessInspector()
@@ -26,6 +27,15 @@ void PostProcessInspector::update(float fDeltaTime)
     {
         ImGui::SetWindowSize(ImVec2(300, 400), ImGuiCond_FirstUseEver);
         ImGui::SetWindowPos(ImVec2(305, 155), ImGuiCond_FirstUseEver);
+
+        if (Window::ins)
+        {
+            bool bEnablePostProcess = Window::ins->isPostProcessEnabled();
+            if (ImGui::Checkbox("Enable Post Process", &bEnablePostProcess))
+            {
+                Window::ins->setPostProcessEnabled(bEnablePostProcess);
+            }
+        }
 
         if (RenderProcessQueue::ins)
         {

@@ -30,6 +30,9 @@ public:
     inline int GetActualWidth() const { return m_nActualWidth; }
     inline int GetActualHeight() const { return m_nActualHeight; }
 
+    inline bool isPostProcessEnabled() const { return m_bEnablePostProcess; }
+    inline void setPostProcessEnabled(bool enabled) { m_bEnablePostProcess = enabled; }
+
     void configureAndCreateWindow();
     void start();
 
@@ -38,6 +41,7 @@ public:
 private:
     GLFWwindow* m_pWindow = nullptr;
     RenderProcessQueue* m_pRenderProcessQueue = nullptr;
+    bool m_bEnablePostProcess = true;
 
     int m_nWidth = 1920, m_nHeight = 1080;
     int m_nActualWidth = 800, m_nActualHeight = 600;
