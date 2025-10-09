@@ -39,20 +39,29 @@ void FirstPersonFreeControlCamera::update(float fDeltaTime)
         return;
     }
 
-
-    float fMoveSpeed = 5.0f; // units per second
-
     int fHorizontal = (pInput->isKeyPressed(KeyCode::KEY_D) ? 1 : 0) + (pInput->isKeyPressed(KeyCode::KEY_A) ? -1 : 0);
-    int fVertical = (pInput->isKeyPressed(KeyCode::KEY_W) ? 1 : 0) + (pInput->isKeyPressed(KeyCode::KEY_S) ? -1 : 0);
+    int fVertical = (pInput->isKeyPressed(KeyCode::KEY_E) ? 1 : 0) + (pInput->isKeyPressed(KeyCode::KEY_Q) ? -1 : 0);
+    int fForward = (pInput->isKeyPressed(KeyCode::KEY_W) ? 1 : 0) + (pInput->isKeyPressed(KeyCode::KEY_S) ? -1 : 0);
 
-    if (fHorizontal != 0 || fVertical != 0)
+    if (fHorizontal != 0 || fVertical != 0 || fForward != 0)
     {
-        m_pNode->move(fHorizontal * fMoveSpeed * fDeltaTime, fVertical * fMoveSpeed * fDeltaTime);
+        Vector3 vecPos = m_pNode->getPosition();
+
+        vec3 vecForward, vecUp, vecRight;
+        m_pNode->getRotationQuaternion().getForwardVector(vecForward);
+        m_pNode->getRotationQuaternion().getUpVector(vecUp);
+        m_pNode->getRotationQuaternion().getRightVector(vecRight);
+
+        vecPos.x += (vecForward[0] * fForward + vecRight[0] * fHorizontal + vecUp[0] * fVertical) * m_fMoveSpeed * fDeltaTime;
+        vecPos.y += (vecForward[1] * fForward + vecRight[1] * fHorizontal + vecUp[1] * fVertical) * m_fMoveSpeed * fDeltaTime;
+        vecPos.z += (vecForward[2] * fForward + vecRight[2] * fHorizontal + vecUp[2] * fVertical) * m_fMoveSpeed * fDeltaTime;
+
+        m_pNode->setPosition(vecPos);
     }
 
     if (m_fMouseDeltaX != 0.0f || m_fMouseDeltaY != 0.0f)
     {
-        m_pNode->rotateQuaternion(Quaternion::fromAxisAngle({m_fMouseDeltaX, m_fMouseDeltaY, 0}, fDeltaTime));
+        m_pNode->rotateQuaternion(Quaternion::fromAxisAngle({m_fMouseDeltaY, m_fMouseDeltaX, 0}, m_fRotationSpeed * fDeltaTime));
 
         m_fMouseDeltaX = 0.0f;
         m_fMouseDeltaY = 0.0f;

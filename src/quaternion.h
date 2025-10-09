@@ -73,18 +73,25 @@ public:
         M[3][3] = 1.0f;
     }
 
-    void getForwardVector(vec3 out) const
+    inline void getForwardVector(vec3 out) const
     {
         out[0] = -2.0f * (x * z + y * w);
         out[1] = -2.0f * (y * z - x * w);
         out[2] = -(1.0f - 2.0f * (x * x + y * y));
     }
 
-    void getUpVector(vec3 out) const
+    inline void getUpVector(vec3 out) const
     {
         out[0] = 2.0f * (x * y - z * w);
         out[1] = 1.0f - 2.0f * (x * x + z * z);
         out[2] = 2.0f * (y * z + x * w);
+    }
+
+    inline void getRightVector(vec3 out) const
+    {
+        out[0] = 1.0f - 2.0f * (y * y + z * z);
+        out[1] = 2.0f * (x * y + z * w);
+        out[2] = 2.0f * (x * z - y * w);
     }
 };
 

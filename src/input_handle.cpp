@@ -56,7 +56,6 @@ void InputManager::onMousePosCallback(GLFWwindow* pWindow, double fPosX, double 
 
 void InputManager::onMouseButtonCallback(GLFWwindow* pWindow, int nButton, int nAction, int nMods)
 {
-    LOGLN_EX("Mouse button: {}, Action: {}, Mods: {}", nButton, nAction, nMods);
     if (!ins)
     {
         LOGERRLN("InputManager instance is not initialized.");
