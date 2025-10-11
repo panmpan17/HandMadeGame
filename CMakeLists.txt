@@ -15,9 +15,10 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 option(BUILD_MAC_APP "Build as a macOS .app bundle" OFF)
 
 # Default to Release if nothing is specified
-if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+if(NOT DEFINED CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
     set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Build type" FORCE)
 endif()
+set(CMAKE_BUILD_TYPE "${CMAKE_BUILD_TYPE}" CACHE STRING "Build type" FORCE)
 set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release") # "RelWithDebInfo" "MinSizeRel")
 
 
@@ -106,6 +107,11 @@ if (APPLE)
             ${DYLIB_DIR}
             ${EXECUTABLE_PATH}/lib
     )
+
+    target_compile_options(GLFWTest PRIVATE
+        -Wmacro-redefined
+        -Wno-delete-abstract-non-virtual-dtor
+    )
 else()
     add_executable(GLFWTest
                    ${SOURCES}
@@ -122,6 +128,12 @@ else()
             ${DYLIB_DIR}
             ${EXECUTABLE_PATH}
     )
+
+    
+    target_compile_options(GLFWTest PRIVATE
+        -Wbuiltin-macro-redefined
+        # -w
+    )
 endif()
 
 target_include_directories(GLFWTest PRIVATE ${CMAKE_SOURCE_DIR}/include)
@@ -132,10 +144,6 @@ else()
     target_compile_definitions(GLFWTest PRIVATE DEBUG_FLAG=0)
 endif()
 
-target_compile_options(GLFWTest PRIVATE
-    -Wmacro-redefined
-    -Wno-delete-abstract-non-virtual-dtor
-)
 
 
 # Assets files

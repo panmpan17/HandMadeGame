@@ -1,6 +1,9 @@
 #pragma once
 
 #include <functional>
+#include <string>
+#include <vector>
+#include <algorithm>
 
 class ISerializable;
 

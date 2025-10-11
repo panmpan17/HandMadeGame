@@ -72,6 +72,16 @@ std::string FileUtils::getExecutablePath()
     GetModuleFileNameA(NULL, path, MAX_PATH);
     return std::string(path);
 }
+
+
+
+std::string FileUtils::getResourcesPath()
+{
+    char path[MAX_PATH];
+    GetModuleFileNameA(NULL, path, MAX_PATH);
+    std::string strFullPath = fs::path(path).parent_path().string();
+    return strFullPath;
+}
 #endif
 
 std::string FileUtils::getExecutableDirectory()
