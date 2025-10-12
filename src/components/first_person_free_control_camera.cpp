@@ -83,14 +83,30 @@ void FirstPersonFreeControlCamera::updateCameraPositionToNode()
         return;
     }
 
-    const Vector3& vecPosition = m_pNode->getPosition();
-    Camera::main->setPosition(vecPosition);
+    // const Vector3& vecPosition = m_pNode->getPosition();
+    // Camera::main->setPosition(vecPosition);
 
-    vec3 vecForward;
-    m_pNode->getRotationQuaternion().getForwardVector(vecForward);
+    // vec3 vecForward;
+    // m_pNode->getRotationQuaternion().getForwardVector(vecForward);
 
-    vecForward[0] += vecPosition.x;
-    vecForward[1] += vecPosition.y;
-    vecForward[2] += vecPosition.z;
-    Camera::main->setPointAt(vecForward[0], vecForward[1], vecForward[2]);
+    // vecForward[0] += vecPosition.x;
+    // vecForward[1] += vecPosition.y;
+    // vecForward[2] += vecPosition.z;
+    // Camera::main->setPointAt(vecForward[0], vecForward[1], vecForward[2]);
+
+    mat4x4 R;
+    m_pNode->getRotationQuaternion().toMat4x4(R);
+
+    mat4x4 matRotationInverse;
+    mat4x4_transpose(matRotationInverse, R);
+
+    mat4x4 matTranslated;
+    mat4x4_identity(matTranslated);
+    matTranslated[3][0] = -m_pNode->getPositionX();
+    matTranslated[3][1] = -m_pNode->getPositionY();
+    matTranslated[3][2] = -m_pNode->getPositionZ();
+
+    mat4x4_mul(matRotationInverse, matRotationInverse, matTranslated);
+
+    Camera::main->setViewMatrixCache(matRotationInverse);
 }

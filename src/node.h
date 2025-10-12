@@ -63,6 +63,8 @@ public:
     void addComponent(Component* pComponent);
     // inline Component* getComponent() const { return m_pComponent; }
 
+    void onStart();
+
     void update(float deltaTime);
     void draw();
 

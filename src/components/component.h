@@ -20,6 +20,8 @@ public:
     virtual void setNode(Node* pNode) { m_pNode = pNode; }
     virtual Node* getNode() const { return m_pNode; }
 
+    virtual void onStart() {}
+
     virtual void draw() = 0;
     virtual void update(float deltaTime) = 0;
 

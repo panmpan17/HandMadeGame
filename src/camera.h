@@ -2,9 +2,10 @@
 
 #include <linmath.h>
 #include "vector.h"
+#include "components/component.h"
 
 
-class Camera
+class Camera : public Component
 {
 public:
     static Camera* main;
@@ -98,9 +99,24 @@ public:
         m_bViewProjectionMatrixDirty = true;
     }
 
+    void setViewMatrixCache(const mat4x4& matView)
+    {
+        mat4x4_dup(m_matViewCache, matView);
+        m_bViewMatrixDirty = false;
+        m_bViewProjectionMatrixDirty = true;
+    }
     const mat4x4& getViewProjectionMatrix();
     const mat4x4& getViewMatrix();
     const mat4x4& getProjectionMatrix();
+
+
+    virtual bool isIDrawable() const override { return false; }
+    virtual bool isUpdatable() const override { return false; }
+
+    void onStart() override;
+
+    void draw() override {}
+    void update(float deltaTime) override {}
 
 private:
     bool m_bUseOrthoProjection = false;

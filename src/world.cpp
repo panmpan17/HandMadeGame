@@ -288,8 +288,6 @@ void WorldScene::createPinPongGame()
 
 void WorldScene::bloomTest()
 {
-    Camera::main->setWorldSizeScale(3.0f);
-
     Shader* pImageShader = ShaderLoader::getInstance()->getShader("image");
 
     Image* pTestImage = ImageLoader::getInstance()->getImage("cover_test");
@@ -334,6 +332,13 @@ void WorldScene::bloomTest()
     {
         auto pNode = new Node(0.f, 0.f, 2.5f, 0.f);
         pNode->addComponent(new FirstPersonFreeControlCamera());
+
+        Camera* pCamera = new Camera();
+        pCamera->useAsMain();
+        pCamera->setUseOrthoProjection(true);
+        pCamera->setWorldSizeScale(3.0f);
+        pNode->addComponent(pCamera);
+
         addNode(pNode);
     }
 }
@@ -388,6 +393,19 @@ void WorldScene::readFromFiles(const std::string_view& strFilePath)
 void WorldScene::clearAllNodes()
 {
     m_oNodeArray.clear();
+}
+
+void WorldScene::onStart()
+{
+    int nSize = m_oNodeArray.getSize();
+    for (int i = 0; i < nSize; ++i)
+    {
+        Node* pNode = m_oNodeArray.getElement(i);
+        if (pNode && pNode->isActive())
+        {
+            pNode->onStart();
+        }
+    }
 }
 
 void WorldScene::update(float fDeltatime)

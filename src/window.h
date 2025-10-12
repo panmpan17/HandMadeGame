@@ -4,7 +4,7 @@
 #include "expandable_array.h"
 
 typedef struct GLFWwindow GLFWwindow;
-class Camera;
+
 class WorldScene;
 class RenderProcessQueue;
 class IEditorWindow;
@@ -21,10 +21,10 @@ public:
     inline bool isValid() const { return m_pWindow != nullptr; }
 
     inline void setResizable(bool resizable) { m_bResizable = resizable; }
-    inline float getWindowRatio() { return ins->m_fRatio; }
+    inline float getWindowRatio() { return m_fRatio; }
     inline void getWindowSize(int& width, int& height) {
-        width = ins->m_nWidth;
-        height = ins->m_nHeight;
+        width = m_nWidth;
+        height = m_nHeight;
     }
 
     inline int GetActualWidth() const { return m_nActualWidth; }
@@ -51,8 +51,6 @@ private:
     double m_fLastDrawTime = 0.0;
     float m_fDeltaTime = 0.0;
 
-    Camera* m_pCamera = nullptr;
-
     WorldScene* m_pWorldScene = nullptr;
 
     bool m_bResizable = false;
@@ -61,6 +59,7 @@ private:
     bool m_bShowIMGUI = false;
     PointerExpandableArray<IEditorWindow*> m_oEditorWindows = PointerExpandableArray<IEditorWindow*>(2);
 
+    void beforeLoop();
     void mainLoop();
     void mainLoop_IMGUI();
     void drawFrame();

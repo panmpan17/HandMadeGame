@@ -26,26 +26,26 @@ void CameraInspector::update(float fDeltaTime)
         Camera::main->setUseOrthoProjection(bIsOrtho);
     }
 
-    vec3 vecPosition;
-    Camera::main->getPosition(vecPosition);
-    if (ImGui::InputFloat3("Position", vecPosition))
-    {
-        Camera::main->setPosition(vecPosition[0], vecPosition[1], vecPosition[2]);
-    }
+    // vec3 vecPosition;
+    // Camera::main->getPosition(vecPosition);
+    // if (ImGui::InputFloat3("Position", vecPosition))
+    // {
+    //     Camera::main->setPosition(vecPosition[0], vecPosition[1], vecPosition[2]);
+    // }
 
-    vec3 vecPointAt;
-    Camera::main->getPointAt(vecPointAt);
-    if (ImGui::InputFloat3("Point At", vecPointAt))
-    {
-        Camera::main->setPointAt(vecPointAt[0], vecPointAt[1], vecPointAt[2]);
-    }
+    // vec3 vecPointAt;
+    // Camera::main->getPointAt(vecPointAt);
+    // if (ImGui::InputFloat3("Point At", vecPointAt))
+    // {
+    //     Camera::main->setPointAt(vecPointAt[0], vecPointAt[1], vecPointAt[2]);
+    // }
 
-    vec3 vecUp;
-    Camera::main->getVecUp(vecUp);
-    if (ImGui::InputFloat3("Up", vecUp))
-    {
-        Camera::main->setVecUp(vecUp[0], vecUp[1], vecUp[2]);
-    }
+    // vec3 vecUp;
+    // Camera::main->getVecUp(vecUp);
+    // if (ImGui::InputFloat3("Up", vecUp))
+    // {
+    //     Camera::main->setVecUp(vecUp[0], vecUp[1], vecUp[2]);
+    // }
 
     ImGui::End();
 }

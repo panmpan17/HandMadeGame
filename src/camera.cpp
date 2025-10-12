@@ -1,5 +1,6 @@
 #include "camera.h"
 // #include <GLFW/glfw3.h>
+#include "window.h"
 
 Camera* Camera::main = nullptr;
 
@@ -74,4 +75,9 @@ const mat4x4& Camera::getViewProjectionMatrix()
     mat4x4_mul(m_matViewProjectionCache, proj, view);
 
     return m_matViewProjectionCache;
+}
+
+void Camera::onStart()
+{
+    setRatio(Window::ins->getWindowRatio());
 }

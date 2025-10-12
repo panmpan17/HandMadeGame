@@ -10,7 +10,6 @@
 #include <functional>
 
 #include "window.h"
-#include "camera.h"
 #include "input_handle.h"
 #include "draw/image.h"
 #include "draw/shader_loader.h"
@@ -43,11 +42,6 @@ Window::Window()
 
 Window::~Window()
 {
-    if (m_pCamera)
-    {
-        delete m_pCamera;
-        m_pCamera = nullptr;
-    }
     if (m_pWindow)
     {
         glfwDestroyWindow(m_pWindow);
@@ -147,9 +141,6 @@ void Window::start()
 {
     InputManager::Initialize();
     ImageLoader::Initialize();
-    m_pCamera = new Camera();
-    m_pCamera->useAsMain();
-    m_pCamera->setUseOrthoProjection(true);
 
     // InputManager::getInstance()->registerKeyPressCallback(KeyCode::KEY_R, [](bool pressed) {
     //     if (pressed)
@@ -215,7 +206,15 @@ void Window::start()
     m_oEditorWindows.addElement(new HierarchyView());
     m_oEditorWindows.addElement(new PostProcessInspector());
 
+    beforeLoop();
     mainLoop();
+}
+
+void Window::beforeLoop()
+{
+    m_fRatio = m_nActualWidth / (float) m_nActualHeight;
+
+    m_pWorldScene->onStart();
 }
 
 void Window::mainLoop()
@@ -233,7 +232,8 @@ void Window::mainLoop()
         if (m_fRatio != fNewRatio)
         {
             m_fRatio = fNewRatio;
-            m_pCamera->setRatio(m_fRatio);
+            // m_pCamera->setRatio(m_fRatio);
+            // TODO: send event to update all cameras
         }
 
 

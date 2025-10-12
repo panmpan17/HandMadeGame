@@ -63,6 +63,31 @@ void Node::onFinishedDeserialization()
     }
 }
 
+void Node::onStart()
+{
+    int nSize = m_oComponentArray.getSize();
+    for (int i = 0; i < nSize; ++i)
+    {
+        Component* pComponent = m_oComponentArray.getElement(i);
+        if (pComponent)
+        {
+            // try
+            // {
+            pComponent->onStart();
+            // }
+            // catch (const std::runtime_error& e) {
+            //     LOGERRLN_EX("Runtime error in component onStart: {}", e.what());
+            // }
+            // catch (const std::exception& e) {
+            //     LOGERRLN_EX("Standard exception in component onStart: {}", e.what());
+            // }
+            // catch (...) {
+            //     LOGERRLN("Unknown exception in component onStart");
+            // }
+        }
+    }
+}
+
 void Node::update(float deltaTime)
 {
     // Update logic for the node, if any
