@@ -112,6 +112,15 @@ void Node::update(float deltaTime)
             }
         }
     }
+
+    for (int i = 0; i < m_oChildNodeArray.getSize(); ++i)
+    {
+        Node* pChildNode = m_oChildNodeArray.getElement(i);
+        if (pChildNode && pChildNode->isActive())
+        {
+            pChildNode->update(deltaTime);
+        }
+    }
 }
 
 void Node::draw()
@@ -136,6 +145,15 @@ void Node::draw()
             catch (...) {
                 LOGERRLN("Unknown exception in component draw");
             }
+        }
+    }
+
+    for (int i = 0; i < m_oChildNodeArray.getSize(); ++i)
+    {
+        Node* pChildNode = m_oChildNodeArray.getElement(i);
+        if (pChildNode && pChildNode->isActive())
+        {
+            pChildNode->draw();
         }
     }
 }

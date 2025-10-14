@@ -16,11 +16,11 @@ MeshRenderer::MeshRenderer(SimpleObjReader* pMesh)
 
 MeshRenderer::~MeshRenderer()
 {
-    if (m_pMesh)
-    {
-        delete m_pMesh;
-        m_pMesh = nullptr;
-    }
+    // if (m_pMesh)
+    // {
+    //     delete m_pMesh;
+    //     m_pMesh = nullptr;
+    // }
 }
 
 void MeshRenderer::setShader(Shader* pShader)
@@ -79,15 +79,7 @@ void MeshRenderer::draw()
     ASSERT(m_pMesh, "Mesh must be set before drawing the mesh");
 
 
-    mat4x4 mvp, local;
-    mat4x4_identity(local);
-    const Vector3& position = m_pNode->getPosition();
-    mat4x4_translate(local, position.x, position.y, position.z);
-    mat4x4 rotationMatrix;
-    m_pNode->getRotationQuaternion().toMat4x4(rotationMatrix);
-
-    mat4x4_mul(local, local, rotationMatrix);
-    // mat4x4_mul(mvp, Camera::main->getViewProjectionMatrix(), local);
+    const mat4x4& local = m_pNode->getWorldMatrix();
 
     glUseProgram(m_pShader->getProgram());
 

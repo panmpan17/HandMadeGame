@@ -315,6 +315,16 @@ void WorldScene::bloomTest()
         pMeshRenderer->setShader(p3DMeshShader);
         pNode->addComponent(pMeshRenderer);
 
+        {
+            auto pChildNode = new Node(1.f, 0.f, 0.f, 0.f);
+
+            auto pMeshRenderer = new MeshRenderer(readerBox);
+            pMeshRenderer->setShader(p3DMeshShader);
+            pChildNode->addComponent(pMeshRenderer);
+
+            pNode->addChildNode(pChildNode);
+        }
+
         addNode(pNode);
     }
 
