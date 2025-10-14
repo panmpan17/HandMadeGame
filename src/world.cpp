@@ -315,12 +315,15 @@ void WorldScene::bloomTest()
         pMeshRenderer->setShader(p3DMeshShader);
         pNode->addComponent(pMeshRenderer);
 
+        pNode->addComponent(new TwoPointsMovement(vec2{-1, 0}, vec2{1, 0}, 3.f));
+
         {
             auto pChildNode = new Node(1.f, 0.f, 0.f, 0.f);
 
             auto pMeshRenderer = new MeshRenderer(readerBox);
             pMeshRenderer->setShader(p3DMeshShader);
             pChildNode->addComponent(pMeshRenderer);
+            pChildNode->addComponent(new Rotate3D(-15, -25, -35));
 
             pNode->addChildNode(pChildNode);
         }

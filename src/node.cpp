@@ -156,6 +156,8 @@ void Node::draw()
             pChildNode->draw();
         }
     }
+
+    m_bChildMatrixDirty = false;
 }
 
 void Node::addComponent(Component* pComponent)
