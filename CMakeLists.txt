@@ -182,6 +182,11 @@ target_include_directories(imgui PUBLIC
 
 target_link_libraries(GLFWTest PRIVATE imgui)
 
+add_subdirectory(external/soloud/contrib)
+# target_include_directories(soloud PUBLIC
+#     ${CMAKE_CURRENT_SOURCE_DIR}/external/soloud/include
+# )
+
 
 # Platform-specific settings
 if (APPLE)
@@ -223,6 +228,7 @@ target_link_libraries(GLFWTest
     PRIVATE
         glad
         glfw
+        soloud
 )
 
 
