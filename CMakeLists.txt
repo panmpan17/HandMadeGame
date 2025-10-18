@@ -70,8 +70,6 @@ set(SOURCES
 )
 
 if (APPLE)
-    set(DYLIB_DIR ${CMAKE_SOURCE_DIR}/lib/mac)
-
     if (BUILD_MAC_APP)
         add_executable(GLFWTest MACOSX_BUNDLE
                     ${SOURCES}
@@ -90,6 +88,11 @@ if (APPLE)
             -DMAC_APP_BUNDLE
         )
 
+        add_custom_command(TARGET GLFWTest POST_BUILD
+            COMMAND codesign --force --deep --sign "ApplicationCodeSign"
+                    "$<TARGET_BUNDLE_DIR:GLFWTest>"
+        )
+
     else()
         add_executable(GLFWTest
                        ${SOURCES}
@@ -98,15 +101,6 @@ if (APPLE)
         set(EXECUTABLE_PATH ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
         set(ASSET_BUILD_TARGET_FOLDER ${EXECUTABLE_PATH}/assets)
     endif()
-
-    # copy library folder to beside executable
-    add_custom_command(TARGET GLFWTest POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E make_directory
-            ${EXECUTABLE_PATH}/lib
-        COMMAND ${CMAKE_COMMAND} -E copy_directory
-            ${DYLIB_DIR}
-            ${EXECUTABLE_PATH}/lib
-    )
 
     target_compile_options(GLFWTest PRIVATE
         -Wmacro-redefined
@@ -119,16 +113,6 @@ else()
 
     set(EXECUTABLE_PATH ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
     set(ASSET_BUILD_TARGET_FOLDER ${EXECUTABLE_PATH}/assets)
-
-    set(DYLIB_DIR ${CMAKE_SOURCE_DIR}/lib/)
-    
-    # copy library folder to beside executable
-    add_custom_command(TARGET GLFWTest POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_directory
-            ${DYLIB_DIR}
-            ${EXECUTABLE_PATH}
-    )
-
     
     target_compile_options(GLFWTest PRIVATE
         -Wbuiltin-macro-redefined
@@ -162,6 +146,8 @@ add_dependencies(GLFWTest copy_assets)
 
 
 # General Library
+add_subdirectory( external/glfw )
+
 add_library(glad include/glad/glad.c)
 target_include_directories(glad PUBLIC ${CMAKE_SOURCE_DIR}/include)
 
@@ -185,12 +171,6 @@ target_link_libraries(GLFWTest PRIVATE imgui)
 
 # Platform-specific settings
 if (APPLE)
-    # MacOS specific GLFW settings
-    add_library(glfw SHARED IMPORTED)
-    set_target_properties(glfw PROPERTIES
-        IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/lib/mac/libglfw.3.dylib
-    )
-
     # Add mac specific frameworks
     add_library(mac_frameworks INTERFACE)
     target_link_libraries(GLFWTest PRIVATE mac_frameworks)
@@ -202,22 +182,10 @@ if (APPLE)
     )
 
 elseif (WIN32)
-    # MacOS specific GLFW settings
-    add_library(glfw SHARED IMPORTED)
-    set_target_properties(glfw PROPERTIES
-        IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/lib/glfw3.dll
-        IMPORTED_IMPLIB ${CMAKE_SOURCE_DIR}/lib/libglfw3dll.a
-    )
-
-    # target_link_options(GLFWTest PRIVATE -mwindows)
+    target_link_options(GLFWTest PRIVATE -mwindows)
 elseif(UNIX)
 
 endif()
-
-set_target_properties(glfw PROPERTIES
-    INTERFACE_INCLUDE_DIRECTORIES ${CMAKE_SOURCE_DIR}/include
-)
-
 
 target_link_libraries(GLFWTest
     PRIVATE
