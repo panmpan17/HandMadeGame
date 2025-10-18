@@ -5,8 +5,8 @@
             "includePath": [
                 "${workspaceFolder}/**",
                 "${workspaceFolder}/include",
-                "${workspaceFolder}/imgui",
-                "${workspaceFolder}/imgui/backends"
+                "${workspaceFolder}/external/imgui",
+                "${workspaceFolder}/external/imgui/backends"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/g++",
