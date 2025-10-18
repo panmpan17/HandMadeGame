@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(GLFWTest
+project(MichaelHandMadeGame
         VERSION 0.1
         DESCRIPTION "GLFW Test"
         LANGUAGES C CXX
@@ -71,30 +71,30 @@ set(SOURCES
 
 if (APPLE)
     if (BUILD_MAC_APP)
-        add_executable(GLFWTest MACOSX_BUNDLE
+        add_executable(MichaelHandMadeGame MACOSX_BUNDLE
                     ${SOURCES}
-                    ${CMAKE_SOURCE_DIR}/MacAppPack/icon-windowed.icns
+                    ${CMAKE_SOURCE_DIR}/app_packing/icon-windowed.icns
         )
 
         set(MACOSX_BUNDLE_ICON_FILE icon-windowed.icns)
-        set_source_files_properties(${CMAKE_SOURCE_DIR}/MacAppPack/icon-windowed.icns
+        set_source_files_properties(${CMAKE_SOURCE_DIR}/app_packing/icon-windowed.icns
                                     PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
 
-        set(EXECUTABLE_PATH ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/GLFWTest.app/Contents/MacOS)
+        set(EXECUTABLE_PATH ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/MichaelHandMadeGame.app/Contents/MacOS)
 
-        set(ASSET_BUILD_TARGET_FOLDER ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/GLFWTest.app/Contents/Resources/assets)
+        set(ASSET_BUILD_TARGET_FOLDER ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/MichaelHandMadeGame.app/Contents/Resources/assets)
 
-        target_compile_options(GLFWTest PRIVATE
+        target_compile_options(MichaelHandMadeGame PRIVATE
             -DMAC_APP_BUNDLE
         )
 
-        add_custom_command(TARGET GLFWTest POST_BUILD
+        add_custom_command(TARGET MichaelHandMadeGame POST_BUILD
             COMMAND codesign --force --deep --sign "ApplicationCodeSign"
-                    "$<TARGET_BUNDLE_DIR:GLFWTest>"
+                    "$<TARGET_BUNDLE_DIR:MichaelHandMadeGame>"
         )
 
     else()
-        add_executable(GLFWTest
+        add_executable(MichaelHandMadeGame
                        ${SOURCES}
         )
 
@@ -102,30 +102,30 @@ if (APPLE)
         set(ASSET_BUILD_TARGET_FOLDER ${EXECUTABLE_PATH}/assets)
     endif()
 
-    target_compile_options(GLFWTest PRIVATE
+    target_compile_options(MichaelHandMadeGame PRIVATE
         -Wmacro-redefined
         -Wno-delete-abstract-non-virtual-dtor
     )
 else()
-    add_executable(GLFWTest
+    add_executable(MichaelHandMadeGame
                    ${SOURCES}
     )
 
     set(EXECUTABLE_PATH ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
     set(ASSET_BUILD_TARGET_FOLDER ${EXECUTABLE_PATH}/assets)
     
-    target_compile_options(GLFWTest PRIVATE
+    target_compile_options(MichaelHandMadeGame PRIVATE
         -Wbuiltin-macro-redefined
         # -w
     )
 endif()
 
-target_include_directories(GLFWTest PRIVATE ${CMAKE_SOURCE_DIR}/include)
+target_include_directories(MichaelHandMadeGame PRIVATE ${CMAKE_SOURCE_DIR}/include)
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    target_compile_definitions(GLFWTest PRIVATE DEBUG_FLAG=1)
+    target_compile_definitions(MichaelHandMadeGame PRIVATE DEBUG_FLAG=1)
 else()
-    target_compile_definitions(GLFWTest PRIVATE DEBUG_FLAG=0)
+    target_compile_definitions(MichaelHandMadeGame PRIVATE DEBUG_FLAG=0)
 endif()
 
 
@@ -142,7 +142,7 @@ add_custom_command(
     DEPENDS ${ASSETS}
 )
 add_custom_target(copy_assets ALL DEPENDS ${CMAKE_BINARY_DIR}/assets.timestamp)
-add_dependencies(GLFWTest copy_assets)
+add_dependencies(MichaelHandMadeGame copy_assets)
 
 
 # General Library
@@ -166,28 +166,28 @@ target_include_directories(imgui PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/external/imgui/backends
 )
 
-target_link_libraries(GLFWTest PRIVATE imgui)
+target_link_libraries(MichaelHandMadeGame PRIVATE imgui)
 
 
 # Platform-specific settings
 if (APPLE)
     # Add mac specific frameworks
     add_library(mac_frameworks INTERFACE)
-    target_link_libraries(GLFWTest PRIVATE mac_frameworks)
+    target_link_libraries(MichaelHandMadeGame PRIVATE mac_frameworks)
 
     # Properly set rpath for macOS
-    set_target_properties(GLFWTest PROPERTIES
+    set_target_properties(MichaelHandMadeGame PROPERTIES
         BUILD_RPATH "@loader_path/lib"
         INSTALL_RPATH "@loader_path/lib"
     )
 
 elseif (WIN32)
-    target_link_options(GLFWTest PRIVATE -mwindows)
+    target_link_options(MichaelHandMadeGame PRIVATE -mwindows)
 elseif(UNIX)
 
 endif()
 
-target_link_libraries(GLFWTest
+target_link_libraries(MichaelHandMadeGame
     PRIVATE
         glad
         glfw

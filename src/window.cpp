@@ -109,7 +109,7 @@ void Window::configureAndCreateWindow()
     // glfwWindowHint(GLFW_DECORATED, GLFW_FALSE); // This is key for borderless
 
 
-    m_pWindow = glfwCreateWindow(m_nWidth, m_nHeight, "My GLFW Window", NULL, NULL);
+    m_pWindow = glfwCreateWindow(m_nWidth, m_nHeight, "Michael Hand Made Game", NULL, NULL);
     if (!m_pWindow)
     {
         LOGLN("Failed to create GLFW window");

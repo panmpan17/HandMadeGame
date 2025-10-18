@@ -2,7 +2,7 @@
 
 BUILD_DIR := cmake-build
 CMAKE_BIN := ${BUILD_DIR}/bin
-OUTPUT_NAME := GLFWTest
+OUTPUT_NAME := MichaelHandMadeGame
 
 compile:
 	cmake -S . -B ${BUILD_DIR} -DBUILD_MAC_APP=OFF -DCMAKE_BUILD_TYPE=Debug
