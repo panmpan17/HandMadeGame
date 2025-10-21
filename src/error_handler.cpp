@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <vector>
 #include <sstream>
+#include <ctime>
 #include "platform.h"
 #include "file_utils.h"
 
@@ -29,7 +30,20 @@ void printBackTrace()
     const struct mach_header* pMachHeader = _dyld_get_image_header(0);
     uintptr_t nLoadAddr = reinterpret_cast<uintptr_t>(pMachHeader);
 
-    oErrorOutputter << "=== Crash Backtrace ===\nBinary load address: 0x" << std::hex << nLoadAddr << std::dec << "\n" << std::endl;
+    oErrorOutputter << "=== Crash Backtrace ===" << std::endl;
+
+    {
+        std::time_t nNow = std::time(nullptr);
+        oErrorOutputter << "Timestamp(" << nNow << ") ";
+
+        std::tm* pLocalTime = std::localtime(&nNow);
+
+        char buffer[100];
+        std::strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", pLocalTime);
+        oErrorOutputter << "Local Time(" << buffer << ')' << std::endl;
+    }
+
+    oErrorOutputter << "Binary load address: 0x" << std::hex << nLoadAddr << std::dec << "\n" << std::endl;
 
     // 2. Collect backtrace
     constexpr int MAX_FRAMES = 64;

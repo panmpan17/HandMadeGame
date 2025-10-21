@@ -9,7 +9,11 @@ compile:
 	cmake --build ${BUILD_DIR} --parallel 8
 
 quick: compile
-	@./$(CMAKE_BIN)/$(OUTPUT_NAME)
+	@if ./$(CMAKE_BIN)/$(OUTPUT_NAME); then \
+		echo "" -n; \
+	else \
+		python3 utilites/check_error.py ${BUILD_DIR}/bin; \
+	fi
 
 build:
 	cmake -S . -B ${BUILD_DIR} -DBUILD_MAC_APP=ON -DCMAKE_BUILD_TYPE=Release
