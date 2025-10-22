@@ -24,6 +24,8 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 
+#include "camera.h"
+
 
 Window* Window::ins = nullptr;
 
@@ -302,6 +304,8 @@ void Window::mainLoop_IMGUI()
 void Window::drawFrame()
 {
     m_nDrawCallCount = 0;
+
+    Camera::main->updateCameraDataBuffer();
 
     if (m_bEnablePostProcess) // Enable post process
     {

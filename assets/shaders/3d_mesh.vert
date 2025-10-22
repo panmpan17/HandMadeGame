@@ -1,15 +1,11 @@
 #version 330
 
-// layout(std140) uniform CameraData
-// {
-//     mat4 u_View;
-//     mat4 u_Projection;
-// };
+layout(std140) uniform CameraMatrices
+{
+    mat4 u_View;
+    mat4 u_Projection;
+};
 
-// uniform mat4 u_MVP;
-
-uniform mat4 u_View;
-uniform mat4 u_Projection;
 uniform mat4 u_Model;
 
 layout (location = 0) in vec3 a_vPos;

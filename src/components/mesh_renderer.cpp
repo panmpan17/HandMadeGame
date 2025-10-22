@@ -9,6 +9,10 @@
 #include "../camera.h"
 #include "../draw/image.h"
 
+
+inline constexpr std::string_view SHADER_GLOBAL_UNIFORM_CAMERA_MATRICES = "CameraMatrices";
+
+
 MeshRenderer::MeshRenderer(SimpleObjReader* pMesh)
     : m_pMesh(pMesh)
 {
@@ -27,14 +31,18 @@ void MeshRenderer::setShader(Shader* pShader)
 {
     m_pShader = pShader;
 
-    // m_nMVPUniform = m_pShader->getUniformLocation("u_MVP");
-    m_nModelUniform = m_pShader->getUniformLocation("u_Model");
-    m_nViewUniform = m_pShader->getUniformLocation("u_View");
-    m_nProjectionUniform = m_pShader->getUniformLocation("u_Projection");
+    glUseProgram(m_pShader->getProgram());
+
+    const GLuint CAMERA_BINDING_POINT = 0;
+    glBindBufferBase(GL_UNIFORM_BUFFER, CAMERA_BINDING_POINT, Camera::main->getCameraUBO());
+    GLuint viewProjIndex = glGetUniformBlockIndex(m_pShader->getProgram(), SHADER_GLOBAL_UNIFORM_CAMERA_MATRICES.data());
+    glUniformBlockBinding(m_pShader->getProgram(), viewProjIndex, CAMERA_BINDING_POINT);
 
     m_pMainTexture = ImageLoader::getInstance()->getImage("box_uv");
 
     bindVertexArray();
+
+    glUseProgram(0);
 }
 
 void MeshRenderer::bindVertexArray()
@@ -84,8 +92,6 @@ void MeshRenderer::draw()
     glUseProgram(m_pShader->getProgram());
 
     glUniformMatrix4fv(m_nModelUniform, 1, GL_FALSE, (const GLfloat*) local);
-    glUniformMatrix4fv(m_nViewUniform, 1, GL_FALSE, (const GLfloat*) Camera::main->getViewMatrix());
-    glUniformMatrix4fv(m_nProjectionUniform, 1, GL_FALSE, (const GLfloat*) Camera::main->getProjectionMatrix());
 
     if (m_pMainTexture)
     {

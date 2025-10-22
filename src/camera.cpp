@@ -2,10 +2,16 @@
 // #include <GLFW/glfw3.h>
 #include "window.h"
 
+#include <glad/gl.h>
+
 Camera* Camera::main = nullptr;
 
 Camera::Camera()
 {
+    glGenBuffers(1, &m_nCameraUBO);
+    glBindBuffer(GL_UNIFORM_BUFFER, m_nCameraUBO);
+    glBufferData(GL_UNIFORM_BUFFER, sizeof(mat4x4) * 2, nullptr, GL_DYNAMIC_DRAW);
+    glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
 Camera::~Camera()
@@ -80,4 +86,12 @@ const mat4x4& Camera::getViewProjectionMatrix()
 void Camera::onStart()
 {
     setRatio(Window::ins->getWindowRatio());
+}
+
+void Camera::updateCameraDataBuffer()
+{
+    glBindBuffer(GL_UNIFORM_BUFFER, m_nCameraUBO);
+    glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(mat4x4), getViewMatrix());
+    glBufferSubData(GL_UNIFORM_BUFFER, sizeof(mat4x4), sizeof(mat4x4), getProjectionMatrix());
+    glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }

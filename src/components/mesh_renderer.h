@@ -31,8 +31,6 @@ private:
 
     Shader* m_pShader = nullptr;
     GLuint m_nModelUniform = 0;
-    GLuint m_nViewUniform = 0;
-    GLuint m_nProjectionUniform = 0;
 
     GLuint m_nVertexArray = 0;
     GLuint m_nVertexBuffer = 0;

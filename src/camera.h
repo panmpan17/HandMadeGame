@@ -4,6 +4,8 @@
 #include "vector.h"
 #include "components/component.h"
 
+typedef unsigned int GLuint;
+
 
 class Camera : public Component
 {
@@ -118,6 +120,9 @@ public:
     void draw() override {}
     void update(float deltaTime) override {}
 
+    void updateCameraDataBuffer();
+    inline GLuint getCameraUBO() const { return m_nCameraUBO; }
+
 private:
     bool m_bUseOrthoProjection = false;
     bool m_bFitScreenWidth = true;
@@ -139,4 +144,6 @@ private:
 
     bool m_bViewProjectionMatrixDirty = true;
     mat4x4 m_matViewProjectionCache;
+
+    GLuint m_nCameraUBO = 0;
 };

@@ -288,6 +288,19 @@ void WorldScene::createPinPongGame()
 
 void WorldScene::bloomTest()
 {
+    {
+        auto pNode = new Node(0.f, 0.f, 2.5f, 0.f);
+        pNode->addComponent(new FirstPersonFreeControlCamera());
+
+        Camera* pCamera = new Camera();
+        pCamera->useAsMain();
+        pCamera->setUseOrthoProjection(true);
+        pCamera->setWorldSizeScale(3.0f);
+        pNode->addComponent(pCamera);
+
+        addNode(pNode);
+    }
+
     Shader* pImageShader = ShaderLoader::getInstance()->getShader("image");
 
     Image* pTestImage = ImageLoader::getInstance()->getImage("cover_test");
@@ -338,19 +351,6 @@ void WorldScene::bloomTest()
         auto pMeshRenderer = new MeshRenderer(readerBox);
         pMeshRenderer->setShader(p3DMeshShader);
         pNode->addComponent(pMeshRenderer);
-
-        addNode(pNode);
-    }
-
-    {
-        auto pNode = new Node(0.f, 0.f, 2.5f, 0.f);
-        pNode->addComponent(new FirstPersonFreeControlCamera());
-
-        Camera* pCamera = new Camera();
-        pCamera->useAsMain();
-        pCamera->setUseOrthoProjection(true);
-        pCamera->setWorldSizeScale(3.0f);
-        pNode->addComponent(pCamera);
 
         addNode(pNode);
     }
