@@ -7,10 +7,12 @@
 #include "../window.h"
 #include "../node.h"
 #include "../camera.h"
+#include "../light_manager.h"
 #include "../draw/image.h"
 
 
 inline constexpr std::string_view SHADER_GLOBAL_UNIFORM_CAMERA_MATRICES = "CameraMatrices";
+inline constexpr std::string_view SHADER_GLOBAL_UNIFORM_LIGHTING_DATA = "LightData";
 
 
 MeshRenderer::MeshRenderer(SimpleObjReader* pMesh)
@@ -37,6 +39,11 @@ void MeshRenderer::setShader(Shader* pShader)
     glBindBufferBase(GL_UNIFORM_BUFFER, CAMERA_BINDING_POINT, Camera::main->getCameraUBO());
     GLuint viewProjIndex = glGetUniformBlockIndex(m_pShader->getProgram(), SHADER_GLOBAL_UNIFORM_CAMERA_MATRICES.data());
     glUniformBlockBinding(m_pShader->getProgram(), viewProjIndex, CAMERA_BINDING_POINT);
+
+    const GLuint LIGHTING_BINDING_POINT = 1;
+    glBindBufferBase(GL_UNIFORM_BUFFER, LIGHTING_BINDING_POINT, LightManager::getInstance()->getLightingUBO());
+    GLuint lightIndex = glGetUniformBlockIndex(m_pShader->getProgram(), SHADER_GLOBAL_UNIFORM_LIGHTING_DATA.data());
+    glUniformBlockBinding(m_pShader->getProgram(), lightIndex, LIGHTING_BINDING_POINT);
 
     m_pMainTexture = ImageLoader::getInstance()->getImage("box_uv");
 

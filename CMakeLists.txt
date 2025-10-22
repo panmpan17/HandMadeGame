@@ -46,6 +46,7 @@ set(SOURCES
     "src/game/pingpong/paddle_control.cpp"
     "src/input_handle.cpp"
     "src/vector.cpp"
+    "src/light_manager.cpp"
     "src/components/sprite_animation.cpp"
     "src/components/mesh_renderer.cpp"
     "src/components/component.cpp"

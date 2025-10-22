@@ -24,6 +24,7 @@ public:
         m_bUseOrthoProjection = bOrtho; 
         m_bProjectionMatrixDirty = true; 
         m_bViewProjectionMatrixDirty = true;
+        m_bCameraUBODirty = true;
     }
 
     inline void setRatio(float fRatio)
@@ -31,6 +32,7 @@ public:
         m_fRatio = fRatio;
         m_bViewMatrixDirty = true;
         m_bViewProjectionMatrixDirty = true;
+        m_bCameraUBODirty = true;
     }
     inline void getPosition(vec3& outPosition) const { vec3_dup(outPosition, m_vecPosition); }
     inline void setPosition(float fX, float fY)
@@ -39,6 +41,7 @@ public:
         m_vecPosition[1] = fY;
         m_bViewMatrixDirty = true;
         m_bViewProjectionMatrixDirty = true;
+        m_bCameraUBODirty = true;
     }
     inline void setPosition(float fX, float fY, float fZ)
     {
@@ -47,6 +50,7 @@ public:
         m_vecPosition[2] = fZ;
         m_bViewMatrixDirty = true;
         m_bViewProjectionMatrixDirty = true;
+        m_bCameraUBODirty = true;
     }
     inline void setPosition(const Vector3& vec3)
     {
@@ -55,6 +59,7 @@ public:
         m_vecPosition[2] = vec3.z;
         m_bViewMatrixDirty = true;
         m_bViewProjectionMatrixDirty = true;
+        m_bCameraUBODirty = true;
     }
     inline void move(float fX, float fY, float fZ)
     {
@@ -63,6 +68,7 @@ public:
         m_vecPosition[2] += fZ;
         m_bViewMatrixDirty = true;
         m_bViewProjectionMatrixDirty = true;
+        m_bCameraUBODirty = true;
     }
 
     inline void getPointAt(vec3& outPointAt) const { vec3_dup(outPointAt, m_vecPointAt); }
@@ -73,6 +79,7 @@ public:
         m_vecPointAt[2] = fZ;
         m_bViewMatrixDirty = true;
         m_bViewProjectionMatrixDirty = true;
+        m_bCameraUBODirty = true;
     }
 
     inline void getVecUp(vec3& outVecUp) const { vec3_dup(outVecUp, m_vecUp); }
@@ -83,6 +90,7 @@ public:
         m_vecUp[2] = fZ;
         m_bViewMatrixDirty = true;
         m_bViewProjectionMatrixDirty = true;
+        m_bCameraUBODirty = true;
     }
 
     inline void setWorldSizeScale(float fScale)
@@ -90,6 +98,7 @@ public:
         m_fWorldSizeScale = fScale;
         m_bProjectionMatrixDirty = true;
         m_bViewProjectionMatrixDirty = true;
+        m_bCameraUBODirty = true;
     }
     inline float getWorldSizeScale() const { return m_fWorldSizeScale; }
 
@@ -99,6 +108,7 @@ public:
         m_bFitScreenWidth = bFit;
         m_bProjectionMatrixDirty = true;
         m_bViewProjectionMatrixDirty = true;
+        m_bCameraUBODirty = true;
     }
 
     void setViewMatrixCache(const mat4x4& matView)
@@ -106,6 +116,7 @@ public:
         mat4x4_dup(m_matViewCache, matView);
         m_bViewMatrixDirty = false;
         m_bViewProjectionMatrixDirty = true;
+        m_bCameraUBODirty = true;
     }
     const mat4x4& getViewProjectionMatrix();
     const mat4x4& getViewMatrix();
@@ -145,5 +156,6 @@ private:
     bool m_bViewProjectionMatrixDirty = true;
     mat4x4 m_matViewProjectionCache;
 
+    bool m_bCameraUBODirty = true;
     GLuint m_nCameraUBO = 0;
 };

@@ -11,6 +11,7 @@
 
 #include "window.h"
 #include "input_handle.h"
+#include "light_manager.h"
 #include "draw/image.h"
 #include "draw/shader_loader.h"
 #include "world.h"
@@ -56,6 +57,7 @@ Window::~Window()
 
     InputManager::Cleanup();
     ImageLoader::Cleanup();
+    LightManager::Cleanup();
 
     glfwTerminate();
 
@@ -183,6 +185,8 @@ void Window::start()
         ImGui_ImplOpenGL3_Init();
     }
 
+    LightManager::Initialize();
+
     ShaderLoader::Initialize();
     
     ImageLoader::getInstance()->registerImage("test", "assets/images/test.png");
@@ -305,7 +309,10 @@ void Window::drawFrame()
 {
     m_nDrawCallCount = 0;
 
-    Camera::main->updateCameraDataBuffer();
+    if (Camera::main)
+    {
+        Camera::main->updateCameraDataBuffer();
+    }
 
     if (m_bEnablePostProcess) // Enable post process
     {

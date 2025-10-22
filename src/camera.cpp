@@ -90,8 +90,13 @@ void Camera::onStart()
 
 void Camera::updateCameraDataBuffer()
 {
-    glBindBuffer(GL_UNIFORM_BUFFER, m_nCameraUBO);
-    glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(mat4x4), getViewMatrix());
-    glBufferSubData(GL_UNIFORM_BUFFER, sizeof(mat4x4), sizeof(mat4x4), getProjectionMatrix());
-    glBindBuffer(GL_UNIFORM_BUFFER, 0);
+    if (m_bCameraUBODirty)
+    {
+        m_bCameraUBODirty = false;
+
+        glBindBuffer(GL_UNIFORM_BUFFER, m_nCameraUBO);
+        glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(mat4x4), getViewMatrix());
+        glBufferSubData(GL_UNIFORM_BUFFER, sizeof(mat4x4), sizeof(mat4x4), getProjectionMatrix());
+        glBindBuffer(GL_UNIFORM_BUFFER, 0);
+    }
 }
