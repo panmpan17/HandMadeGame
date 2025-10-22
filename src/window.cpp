@@ -313,6 +313,10 @@ void Window::drawFrame()
     {
         Camera::main->updateCameraDataBuffer();
     }
+    if (LightManager::getInstance())
+    {
+        LightManager::getInstance()->updateLightingUBO();
+    }
 
     if (m_bEnablePostProcess) // Enable post process
     {
@@ -329,7 +333,7 @@ void Window::drawFrame()
     {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glViewport(0, 0, m_nActualWidth, m_nActualHeight);
-        glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
+        glClearColor(0.f, 0.f, 0.f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         m_pWorldScene->render();
     }

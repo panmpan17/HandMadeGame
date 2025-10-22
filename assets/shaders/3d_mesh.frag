@@ -6,9 +6,18 @@
 //     mat4 u_Projection;
 // };
 
-layout(std140) uniform LightData
+struct DirectionLight // 32
 {
-    vec3 u_AmbientLightColor;
+    vec3 direction; // 12 + 4
+    vec3 color; // 12 + 4
+};
+
+layout(std140) uniform LightData // 160
+{
+    vec3 u_AmbientLightColor; // 12 + 4
+    
+    DirectionLight u_SunLights[4]; // 32 * 4 = 128
+    int u_NumSunLights; // 4 + 12
 };
 
 uniform sampler2D u_MainTex;
@@ -22,13 +31,15 @@ out vec4 fragment;
 void main()
 {
     vec3 norm = normalize(fragNormal);
-    vec3 lightDir = normalize(vec3(1.0, 1.0, 1.0) - fragPos);
 
-    float diff = max(dot(norm, lightDir), 0.0);
-    vec3 diffuse = diff * vec3(1.0, 1.0, 1.0);
+    vec3 diffuseSum = vec3(0.0);
 
-    // vec4 texColor = texture(u_MainTex, fragUV);
-    // diffuse *= texColor.rgb;
+    for (int i = 0; i < u_NumSunLights; i++)
+    {
+        vec3 lightDir = normalize(-u_SunLights[i].direction);
+        float diff = max(dot(norm, lightDir), 0.0);
+        diffuseSum += diff * u_SunLights[i].color;
+    }
 
-    fragment = vec4(diffuse + u_AmbientLightColor, 1);
+    fragment = vec4(diffuseSum + u_AmbientLightColor, 1);
 }
