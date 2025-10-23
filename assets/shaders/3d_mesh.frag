@@ -4,7 +4,7 @@ layout(std140) uniform CameraMatrices
 {
     mat4 u_View;
     mat4 u_Projection;
-    vec3 u_CamPos;
+    // vec3 u_CamPos;
 };
 
 struct DirectionLight // 32
@@ -44,7 +44,7 @@ void main()
 {
     vec3 norm = normalize(fragNormal);
 
-    vec3 viewDir = normalize(u_CamPos - fragPos);
+    // vec3 viewDir = normalize(u_CamPos - fragPos);
 
     vec3 diffuseSum = vec3(0.0);
     vec3 specularSum = vec3(0.0);
@@ -55,9 +55,9 @@ void main()
         float diff = max(dot(norm, lightDir), 0.0);
         diffuseSum += diff * u_SunLights[i].color;
 
-        vec3 reflectDir = reflect(-lightDir, norm);
-        float spec = pow(max(dot(viewDir, reflectDir), 0.0), u_SpecularParams.y);
-        specularSum += u_SpecularParams.x * spec * u_SunLights[i].color;
+        // vec3 reflectDir = reflect(-lightDir, norm);
+        // float spec = pow(max(dot(viewDir, reflectDir), 0.0), u_SpecularParams.y);
+        // specularSum += u_SpecularParams.x * spec * u_SunLights[i].color;
     }
 
     for (int i = 0; i < u_LightCounts.y; i++)
