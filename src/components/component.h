@@ -13,6 +13,8 @@ class Component : public ISerializable
 public:
     virtual ~Component() = default;
 
+    virtual void onAddToNode() {}
+
     virtual bool isIDrawable() const = 0;
 
     virtual bool isUpdatable() const = 0;

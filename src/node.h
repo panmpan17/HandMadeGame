@@ -5,6 +5,7 @@
 #include "components/component.h"
 #include "vector.h"
 #include "quaternion.h"
+#include "input_handle.h"
 
 
 class Component;
@@ -24,6 +25,7 @@ public:
         m_vecPosition.y = fY;
         m_bWorldMatrixDirty = true;
         m_bChildMatrixDirty = true;
+        m_onPositionChanged.invoke();
     }
     inline void setPosition(float fX, float fY, float fZ)
     {
@@ -32,9 +34,10 @@ public:
         m_vecPosition.z = fZ;
         m_bWorldMatrixDirty = true;
         m_bChildMatrixDirty = true;
+        m_onPositionChanged.invoke();
     }
-    inline void setPosition(const Vector2& position) { m_vecPosition.x = position.x; m_vecPosition.y = position.y; m_bWorldMatrixDirty = true; }
-    inline void setPosition(const Vector3& position) { m_vecPosition.x = position.x; m_vecPosition.y = position.y; m_vecPosition.z = position.z; m_bWorldMatrixDirty = true; }
+    inline void setPosition(const Vector2& position) { m_vecPosition.x = position.x; m_vecPosition.y = position.y; m_bWorldMatrixDirty = true; m_onPositionChanged.invoke(); }
+    inline void setPosition(const Vector3& position) { m_vecPosition.x = position.x; m_vecPosition.y = position.y; m_vecPosition.z = position.z; m_bWorldMatrixDirty = true; m_onPositionChanged.invoke(); }
 
     inline void move(float fX, float fY)
     {
@@ -42,6 +45,7 @@ public:
         m_vecPosition.y += fY;
         m_bWorldMatrixDirty = true;
         m_bChildMatrixDirty = true;
+        m_onPositionChanged.invoke();
     }
     inline void move(float fX, float fY, float fZ)
     {
@@ -50,9 +54,10 @@ public:
         m_vecPosition.z += fZ;
         m_bWorldMatrixDirty = true;
         m_bChildMatrixDirty = true;
+        m_onPositionChanged.invoke();
     }
-    inline void move(const Vector2& position) { m_vecPosition += position; m_bWorldMatrixDirty = true; m_bChildMatrixDirty = true; }
-    inline void move(const Vector3& position) { m_vecPosition += position; m_bWorldMatrixDirty = true; m_bChildMatrixDirty = true; }
+    inline void move(const Vector2& position) { m_vecPosition += position; m_bWorldMatrixDirty = true; m_bChildMatrixDirty = true; m_onPositionChanged.invoke(); }
+    inline void move(const Vector3& position) { m_vecPosition += position; m_bWorldMatrixDirty = true; m_bChildMatrixDirty = true; m_onPositionChanged.invoke(); }
 
     inline const Vector3& getPosition() const { return m_vecPosition; }
     inline float getPositionX() const { return m_vecPosition.x; }
@@ -63,8 +68,8 @@ public:
     inline float getRotation() const { return m_fRotation; }
 
     inline const Quaternion& getRotationQuaternion() const { return m_oRotationQuaternion; }
-    inline void setRotationQuaternion(const Quaternion& quat) { m_oRotationQuaternion = quat; m_bWorldMatrixDirty = true; m_bChildMatrixDirty = true; }
-    inline void rotateQuaternion(const Quaternion& quat) { m_oRotationQuaternion = m_oRotationQuaternion * quat; m_bWorldMatrixDirty = true; m_bChildMatrixDirty = true; }
+    inline void setRotationQuaternion(const Quaternion& quat) { m_oRotationQuaternion = quat; m_bWorldMatrixDirty = true; m_bChildMatrixDirty = true; m_onRotationChanged.invoke(); }
+    inline void rotateQuaternion(const Quaternion& quat) { m_oRotationQuaternion = m_oRotationQuaternion * quat; m_bWorldMatrixDirty = true; m_bChildMatrixDirty = true; m_onRotationChanged.invoke(); }
 
     // inline void setComponent(Component* pComponent) { m_pComponent = pComponent; m_pComponent->setNode(this); }
     void addComponent(Component* pComponent);
@@ -123,10 +128,17 @@ public:
         return os;
     }
 
+    void registerOnPositionChangedListener(const std::function<void()>& listener) { m_onPositionChanged.add(listener); }
+    void registerOnRotationChangedListener(const std::function<void()>& listener) { m_onRotationChanged.add(listener); }
+
 private:
     Vector3 m_vecPosition;
+    VoidEvent m_onPositionChanged;
+
     float m_fRotation = 0;
     Quaternion m_oRotationQuaternion = Quaternion(1, 0, 0, 0);
+    VoidEvent m_onRotationChanged;
+
     bool m_bIsActive = true;
 
     mat4x4 m_oWorldMatrixCache;

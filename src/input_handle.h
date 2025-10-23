@@ -73,6 +73,23 @@ enum class KeyCode : int
 
 // typedef void (*KeyPressCallback)(bool bPressed);
 
+struct VoidEvent
+{
+    std::vector<std::function<void()>> listeners;
+
+    void add(std::function<void()> f) { listeners.push_back(f); }
+    // void remove(std::function<void(Args...)> f) 
+    // { 
+    //     listeners.erase(std::remove(listeners.begin(), listeners.end(), f), listeners.end()); 
+    // }
+    void invoke() {
+        for (auto& listener : listeners)
+        {
+            listener();
+        }
+    }
+};
+
 template<typename... Args>
 struct Event
 {

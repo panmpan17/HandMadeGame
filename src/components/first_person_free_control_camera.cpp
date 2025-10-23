@@ -67,7 +67,7 @@ void FirstPersonFreeControlCamera::update(float fDeltaTime)
         m_fMouseDeltaY = 0.0f;
     }
     
-    updateCameraPositionToNode();
+    // updateCameraPositionToNode();
 }
 
 void FirstPersonFreeControlCamera::onMouseMove(float fDeltaX, float fDeltaY)

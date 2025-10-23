@@ -3,6 +3,8 @@
 #include "window.h"
 #include "node.h"
 
+#include "debug_macro.h"
+
 #include <glad/gl.h>
 
 Camera* Camera::main = nullptr;
@@ -19,6 +21,25 @@ Camera::~Camera()
 {
 }
 
+void Camera::onAddToNode()
+{
+    if (!m_pNode)
+    {
+        return;
+    }
+
+    m_pNode->registerOnPositionChangedListener(std::bind(&Camera::markViewMatrixDirty, this));
+    m_pNode->registerOnRotationChangedListener(std::bind(&Camera::markViewMatrixDirty, this));
+}
+
+void Camera::markViewMatrixDirty()
+{
+    LOGLN("Marks Camera View Matrix Dirty from Node Change");
+    m_bViewMatrixDirty = true;
+    m_bViewProjectionMatrixDirty = true;
+    m_bCameraUBODirty = true;
+}
+
 const mat4x4& Camera::getViewMatrix()
 {
     if (!m_bViewMatrixDirty)
@@ -26,7 +47,15 @@ const mat4x4& Camera::getViewMatrix()
         return m_matViewCache;
     }
 
-    mat4x4_look_at(m_matViewCache, m_vecPosition, m_vecPointAt, m_vecUp);
+    const Vector3& camPos = m_pNode->getPosition();
+    vec3 camForward, camUp;
+    m_pNode->getRotationQuaternion().getForwardVector(camForward);
+    m_pNode->getRotationQuaternion().getUpVector(camUp);
+    camForward[0] += camPos.x;
+    camForward[1] += camPos.y;
+    camForward[2] += camPos.z;
+    mat4x4_look_at(m_matViewCache, vec3 { camPos.x, camPos.y, camPos.z }, camForward, camUp);
+    LOGLN_EX("Recalculate Camera View Matrix: {} {} {}, {} {} {}, {} {} {}", camPos.x, camPos.y, camPos.z, camForward[0], camForward[1], camForward[2], camUp[0], camUp[1], camUp[2]);
 
     m_bViewMatrixDirty = false;
 
@@ -93,6 +122,7 @@ void Camera::updateCameraDataBuffer()
 {
     if (m_bCameraUBODirty)
     {
+        LOGLN("Updating Camera UBO");
         m_bCameraUBODirty = false;
 
         glBindBuffer(GL_UNIFORM_BUFFER, m_nCameraUBO);

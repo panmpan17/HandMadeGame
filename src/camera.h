@@ -15,6 +15,8 @@ public:
     Camera();
     ~Camera();
 
+    void onAddToNode() override;
+
     inline void useAsMain() { main = this; }
     inline bool isMainCamera() const { return main == this; }
     
@@ -30,65 +32,7 @@ public:
     inline void setRatio(float fRatio)
     {
         m_fRatio = fRatio;
-        m_bViewMatrixDirty = true;
-        m_bViewProjectionMatrixDirty = true;
-        m_bCameraUBODirty = true;
-    }
-    inline void getPosition(vec3& outPosition) const { vec3_dup(outPosition, m_vecPosition); }
-    inline void setPosition(float fX, float fY)
-    {
-        m_vecPosition[0] = fX;
-        m_vecPosition[1] = fY;
-        m_bViewMatrixDirty = true;
-        m_bViewProjectionMatrixDirty = true;
-        m_bCameraUBODirty = true;
-    }
-    inline void setPosition(float fX, float fY, float fZ)
-    {
-        m_vecPosition[0] = fX;
-        m_vecPosition[1] = fY;
-        m_vecPosition[2] = fZ;
-        m_bViewMatrixDirty = true;
-        m_bViewProjectionMatrixDirty = true;
-        m_bCameraUBODirty = true;
-    }
-    inline void setPosition(const Vector3& vec3)
-    {
-        m_vecPosition[0] = vec3.x;
-        m_vecPosition[1] = vec3.y;
-        m_vecPosition[2] = vec3.z;
-        m_bViewMatrixDirty = true;
-        m_bViewProjectionMatrixDirty = true;
-        m_bCameraUBODirty = true;
-    }
-    inline void move(float fX, float fY, float fZ)
-    {
-        m_vecPosition[0] += fX;
-        m_vecPosition[1] += fY;
-        m_vecPosition[2] += fZ;
-        m_bViewMatrixDirty = true;
-        m_bViewProjectionMatrixDirty = true;
-        m_bCameraUBODirty = true;
-    }
-
-    inline void getPointAt(vec3& outPointAt) const { vec3_dup(outPointAt, m_vecPointAt); }
-    inline void setPointAt(float fX, float fY, float fZ)
-    {
-        m_vecPointAt[0] = fX;
-        m_vecPointAt[1] = fY;
-        m_vecPointAt[2] = fZ;
-        m_bViewMatrixDirty = true;
-        m_bViewProjectionMatrixDirty = true;
-        m_bCameraUBODirty = true;
-    }
-
-    inline void getVecUp(vec3& outVecUp) const { vec3_dup(outVecUp, m_vecUp); }
-    inline void setVecUp(float fX, float fY, float fZ)
-    {
-        m_vecUp[0] = fX;
-        m_vecUp[1] = fY;
-        m_vecUp[2] = fZ;
-        m_bViewMatrixDirty = true;
+        m_bProjectionMatrixDirty = true;
         m_bViewProjectionMatrixDirty = true;
         m_bCameraUBODirty = true;
     }
@@ -113,10 +57,10 @@ public:
 
     void setViewMatrixCache(const mat4x4& matView)
     {
-        mat4x4_dup(m_matViewCache, matView);
-        m_bViewMatrixDirty = false;
-        m_bViewProjectionMatrixDirty = true;
-        m_bCameraUBODirty = true;
+        // mat4x4_dup(m_matViewCache, matView);
+        // m_bViewMatrixDirty = false;
+        // m_bViewProjectionMatrixDirty = true;
+        // m_bCameraUBODirty = true;
     }
     const mat4x4& getViewProjectionMatrix();
     const mat4x4& getViewMatrix();
@@ -134,6 +78,8 @@ public:
     void updateCameraDataBuffer();
     inline GLuint getCameraUBO() const { return m_nCameraUBO; }
 
+    void markViewMatrixDirty();
+
 private:
     bool m_bUseOrthoProjection = false;
     bool m_bFitScreenWidth = true;
@@ -141,7 +87,6 @@ private:
     float m_fWorldSizeScale = 5;
     float m_fRatio = 5.0f;
 
-    vec3 m_vecPosition = {0.f, 0.f, 2.5f};
     vec3 m_vecPointAt = {0.f, 0.f, 0.f};
     vec3 m_vecUp = {0.f, 1.f, 0.f};
 

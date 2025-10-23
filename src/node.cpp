@@ -165,4 +165,5 @@ void Node::addComponent(Component* pComponent)
     if (pComponent == nullptr) return;
     m_oComponentArray.addElement(pComponent);
     pComponent->setNode(this);
+    pComponent->onAddToNode();
 }

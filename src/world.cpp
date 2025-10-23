@@ -201,7 +201,18 @@ void WorldScene::init()
 
 void WorldScene::createPinPongGame()
 {
-    Camera::main->setWorldSizeScale(5.0f);
+    {
+        auto pNode = new Node(0.f, 0.f, 2.5f, 0.f);
+        pNode->addComponent(new FirstPersonFreeControlCamera());
+
+        Camera* pCamera = new Camera();
+        pCamera->useAsMain();
+        pCamera->setUseOrthoProjection(false);
+        pCamera->setWorldSizeScale(5.0f);
+        pNode->addComponent(pCamera);
+
+        addNode(pNode);
+    }
 
     Shader* pImageShader = ShaderLoader::getInstance()->getShader("image");
     Shader* pParticleShader = ShaderLoader::getInstance()->getShader("particle_instance");
