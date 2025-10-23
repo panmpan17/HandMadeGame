@@ -11,6 +11,13 @@ struct DirectionLight
     vec3 m_vecDirection;
 };
 
+struct PointLight
+{
+    vec3 m_vecColor;
+    vec4 m_vecPositionAndRange;
+};
+
+
 
 class LightManager
 {
@@ -37,4 +44,7 @@ private:
 
     DirectionLight m_vecSunLights[4];
     int m_nNumSunLights = 0;
+
+    PointLight m_vecPointLights[8];
+    int m_nNumPointLights = 0;
 };
