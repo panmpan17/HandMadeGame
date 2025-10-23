@@ -1,6 +1,7 @@
 #include "camera.h"
 // #include <GLFW/glfw3.h>
 #include "window.h"
+#include "node.h"
 
 #include <glad/gl.h>
 
@@ -10,7 +11,7 @@ Camera::Camera()
 {
     glGenBuffers(1, &m_nCameraUBO);
     glBindBuffer(GL_UNIFORM_BUFFER, m_nCameraUBO);
-    glBufferData(GL_UNIFORM_BUFFER, sizeof(mat4x4) * 2, nullptr, GL_DYNAMIC_DRAW);
+    glBufferData(GL_UNIFORM_BUFFER, sizeof(mat4x4) * 2 + sizeof(vec4), nullptr, GL_DYNAMIC_DRAW);
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
@@ -97,6 +98,7 @@ void Camera::updateCameraDataBuffer()
         glBindBuffer(GL_UNIFORM_BUFFER, m_nCameraUBO);
         glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(mat4x4), getViewMatrix());
         glBufferSubData(GL_UNIFORM_BUFFER, sizeof(mat4x4), sizeof(mat4x4), getProjectionMatrix());
+        glBufferSubData(GL_UNIFORM_BUFFER, sizeof(mat4x4) * 2, sizeof(vec3), &m_pNode->getPosition());
         glBindBuffer(GL_UNIFORM_BUFFER, 0);
     }
 }

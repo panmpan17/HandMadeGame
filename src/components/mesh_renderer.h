@@ -36,6 +36,8 @@ private:
     GLuint m_nVertexBuffer = 0;
     GLuint m_nIndexBuffer = 0;
 
+    GLuint m_nSpecularParamUniform = 0;
+
     int m_nVertexCount = 0;
 
     void bindVertexArray();

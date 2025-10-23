@@ -47,6 +47,8 @@ void MeshRenderer::setShader(Shader* pShader)
 
     m_pMainTexture = ImageLoader::getInstance()->getImage("box_uv");
 
+    m_nSpecularParamUniform = m_pShader->getUniformLocation("u_SpecularParams");
+
     bindVertexArray();
 
     glUseProgram(0);
@@ -107,6 +109,8 @@ void MeshRenderer::draw()
         GLuint nMainTexUniform = m_pShader->getUniformLocation("u_MainTex");
         glUniform1i(nMainTexUniform, 0);
     }
+
+    glUniform2f(m_nSpecularParamUniform, 5.0f, 32.0f); // Example values for intensity and power
 
     glBindVertexArray(m_nVertexArray);
     glCullFace(GL_FRONT);
