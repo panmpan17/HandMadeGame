@@ -55,9 +55,9 @@ void main()
         float diff = max(dot(norm, lightDir), 0.0);
         diffuseSum += diff * u_SunLights[i].color;
 
-        // vec3 reflectDir = reflect(-lightDir, norm);
-        // float spec = pow(max(dot(viewDir, reflectDir), 0.0), max(u_SpecularParams.y, 32.0));
-        // specularSum += max(u_SpecularParams.x, 1) * spec * u_SunLights[i].color;
+        vec3 reflectDir = reflect(-lightDir, norm);
+        float spec = pow(max(dot(viewDir, reflectDir), 0.0), max(u_SpecularParams.y, 32.0));
+        specularSum += max(u_SpecularParams.x, 1) * spec * u_SunLights[i].color;
     }
 
     for (int i = 0; i < u_LightCounts.y; i++)

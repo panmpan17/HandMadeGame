@@ -32,13 +32,12 @@ private:
     Image* m_pMainTexture = nullptr;
 
     Shader* m_pShader = nullptr;
-    GLuint m_nModelUniform = 0;
 
     GLuint m_nVertexArray = 0;
     GLuint m_nVertexBuffer = 0;
     GLuint m_nIndexBuffer = 0;
 
-    // const ShaderUniformHandle* m_pModelUniform = nullptr;
+    const ShaderUniformHandle* m_pModelUniform = nullptr;
     const ShaderUniformHandle* m_pSpecularParamUniform = nullptr;
 
     int m_nVertexCount = 0;

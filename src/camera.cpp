@@ -13,7 +13,7 @@ Camera::Camera()
 {
     glGenBuffers(1, &m_nCameraUBO);
     glBindBuffer(GL_UNIFORM_BUFFER, m_nCameraUBO);
-    glBufferData(GL_UNIFORM_BUFFER, sizeof(mat4x4) * 2, nullptr, GL_DYNAMIC_DRAW);
+    glBufferData(GL_UNIFORM_BUFFER, sizeof(mat4x4) * 2 + sizeof(vec4), nullptr, GL_DYNAMIC_DRAW);
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
@@ -34,7 +34,6 @@ void Camera::onAddToNode()
 
 void Camera::markViewMatrixDirty()
 {
-    LOGLN("Marks Camera View Matrix Dirty from Node Change");
     m_bViewMatrixDirty = true;
     m_bViewProjectionMatrixDirty = true;
     m_bCameraUBODirty = true;
@@ -55,7 +54,6 @@ const mat4x4& Camera::getViewMatrix()
     camForward[1] += camPos.y;
     camForward[2] += camPos.z;
     mat4x4_look_at(m_matViewCache, vec3 { camPos.x, camPos.y, camPos.z }, camForward, camUp);
-    LOGLN_EX("Recalculate Camera View Matrix: {} {} {}, {} {} {}, {} {} {}", camPos.x, camPos.y, camPos.z, camForward[0], camForward[1], camForward[2], camUp[0], camUp[1], camUp[2]);
 
     m_bViewMatrixDirty = false;
 
@@ -122,13 +120,12 @@ void Camera::updateCameraDataBuffer()
 {
     if (m_bCameraUBODirty)
     {
-        LOGLN("Updating Camera UBO");
         m_bCameraUBODirty = false;
 
         glBindBuffer(GL_UNIFORM_BUFFER, m_nCameraUBO);
         glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(mat4x4), getViewMatrix());
         glBufferSubData(GL_UNIFORM_BUFFER, sizeof(mat4x4), sizeof(mat4x4), getProjectionMatrix());
-        // glBufferSubData(GL_UNIFORM_BUFFER, sizeof(mat4x4) * 2, sizeof(vec3), &m_vecPosition);
+        glBufferSubData(GL_UNIFORM_BUFFER, sizeof(mat4x4) * 2, sizeof(vec3), &m_pNode->getPosition());
         glBindBuffer(GL_UNIFORM_BUFFER, 0);
     }
 }

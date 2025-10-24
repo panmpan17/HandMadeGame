@@ -119,7 +119,8 @@ const ShaderUniformHandle* Shader::getUniformHandle(const std::string_view& strN
     GLuint nLocation = getUniformLocation(std::string(strName));
     if (nLocation == GL_INVALID_INDEX)
     {
-        throw std::runtime_error("Uniform '" + std::string(strName) + "' not found in shader '" + m_strName + "'");
+        LOGLN_EX("Uniform '{}' not found in shader '{}'", std::string(strName), m_strName);
+        return nullptr;
     }
 
     ShaderUniformHandle* pHandle = &m_arrUniformHandles[m_nUniformHandleCount++];

@@ -44,13 +44,15 @@ void MeshRenderer::setShader(Shader* pShader)
     GLuint lightIndex = glGetUniformBlockIndex(m_pShader->getProgram(), SHADER_GLOBAL_UNIFORM_LIGHTING_DATA.data());
     glUniformBlockBinding(m_pShader->getProgram(), lightIndex, LIGHTING_BINDING_POINT);
 
+    glUseProgram(0);
+
     m_pMainTexture = ImageLoader::getInstance()->getImage("box_uv");
 
-    // m_pSpecularParamUniform = m_pShader->getUniformHandle("u_SpecularParams");
+    m_pModelUniform = m_pShader->getUniformHandle("u_Model");
+    m_pSpecularParamUniform = m_pShader->getUniformHandle("u_SpecularParams");
 
     bindVertexArray();
 
-    glUseProgram(0);
 }
 
 void MeshRenderer::bindVertexArray()
@@ -99,7 +101,8 @@ void MeshRenderer::draw()
 
     glUseProgram(m_pShader->getProgram());
 
-    glUniformMatrix4fv(m_nModelUniform, 1, GL_FALSE, (const GLfloat*) local);
+    glUniformMatrix4fv(m_pModelUniform->m_nLocation, 1, GL_FALSE, (const GLfloat*) local);
+    glUniform2f(m_pSpecularParamUniform->m_nLocation, 10.f, 256.f);
 
     if (m_pMainTexture)
     {
@@ -108,8 +111,6 @@ void MeshRenderer::draw()
         // GLuint nMainTexUniform = m_pShader->getUniformLocation("u_MainTex");
         // glUniform1i(nMainTexUniform, 0);
     }
-
-    // glUniform2f(m_pSpecularParamUniform->m_nLocation, 5.0f, 32.0f); // Example values for intensity and power
 
     glBindVertexArray(m_nVertexArray);
     glCullFace(GL_FRONT);
