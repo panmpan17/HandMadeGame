@@ -5,6 +5,11 @@
 typedef unsigned int GLuint;
 
 
+inline constexpr std::string_view SHADER_UNIFORM_TEXTURE_0 = "u_tex0";
+inline constexpr std::string_view SHADER_UNIFORM_TEXTURE_1 = "u_tex1";
+inline constexpr std::string_view SHADER_UNIFORM_MVP = "u_MVP";
+
+
 struct ShaderUniformHandle
 {
     GLuint m_nLocation;
@@ -29,7 +34,6 @@ public:
 
     const ShaderUniformHandle* getUniformHandle(const std::string_view& strName);
 
-    GLuint getUniformLocation(const std::string& name) const;
     GLuint getAttributeLocation(const std::string& name) const;
 
     void reload();
@@ -47,4 +51,6 @@ protected:
 
     ShaderUniformHandle m_arrUniformHandles[16];
     int m_nUniformHandleCount = 0;
+
+    GLuint getUniformLocation(const std::string& name) const;
 };

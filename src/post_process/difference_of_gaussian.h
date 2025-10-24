@@ -43,21 +43,21 @@ private:
     float m_fBlurSigma2 = 4.0f;
 
     Shader* m_pHorizontalBlurShader = nullptr;
-    GLuint m_nTextureUniform_HorizontalBlur;
-    GLuint m_nTextureWidthUniform_HorizontalBlur;
-    GLuint m_nBlurRadiusUniform_HorizontalBlur;
-    GLuint m_nBlurSigmaUniform_HorizontalBlur;
+    const ShaderUniformHandle* m_pTextureUniform_HorizontalBlur = nullptr;
+    const ShaderUniformHandle* m_pTextureWidthUniform_HorizontalBlur = nullptr;
+    const ShaderUniformHandle* m_pBlurRadiusUniform_HorizontalBlur = nullptr;
+    const ShaderUniformHandle* m_pBlurSigmaUniform_HorizontalBlur = nullptr;
 
     Shader* m_pVerticalBlurShader = nullptr;
-    GLuint m_nTextureUniform_VerticalBlur;
-    GLuint m_nTextureHeightUniform_VerticalBlur;
-    GLuint m_nBlurRadiusUniform_VerticalBlur;
-    GLuint m_nBlurSigmaUniform_VerticalBlur;
+    const ShaderUniformHandle* m_pTextureUniform_VerticalBlur = nullptr;
+    const ShaderUniformHandle* m_pTextureHeightUniform_VerticalBlur = nullptr;
+    const ShaderUniformHandle* m_pBlurRadiusUniform_VerticalBlur = nullptr;
+    const ShaderUniformHandle* m_pBlurSigmaUniform_VerticalBlur = nullptr;
 
     Shader* m_pCompositeShader = nullptr;
-    GLuint m_nOriginalTextureUniform;
-    GLuint m_nBlur1TextureUniform;
-    GLuint m_nBlur2TextureUniform;
+    const ShaderUniformHandle* m_pOriginalTextureUniform = nullptr;
+    const ShaderUniformHandle* m_pBlur1TextureUniform = nullptr;
+    const ShaderUniformHandle* m_pBlur2TextureUniform = nullptr;
 
     void initializeQuad();
 

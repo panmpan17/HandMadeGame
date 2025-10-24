@@ -4,7 +4,6 @@
 #include "../window.h"
 #include "../debug_macro.h"
 #include "../draw/vertex.h"
-#include "../draw/shader.h"
 #include "../draw/shader_loader.h"
 
 
@@ -30,21 +29,21 @@ void DifferenceOfGaussian::initialize()
 void DifferenceOfGaussian::initializeQuad()
 {
     m_pHorizontalBlurShader = ShaderLoader::getInstance()->getShader("horizontal_blur");
-    m_nTextureUniform_HorizontalBlur = m_pHorizontalBlurShader->getUniformLocation("u_tex0");
-    m_nTextureWidthUniform_HorizontalBlur = m_pHorizontalBlurShader->getUniformLocation("u_textureWidth");
-    m_nBlurRadiusUniform_HorizontalBlur = m_pHorizontalBlurShader->getUniformLocation("u_blurRadius");
-    m_nBlurSigmaUniform_HorizontalBlur = m_pHorizontalBlurShader->getUniformLocation("u_blurSigma");
+    m_pTextureUniform_HorizontalBlur = m_pHorizontalBlurShader->getUniformHandle(SHADER_UNIFORM_TEXTURE_0);
+    m_pTextureWidthUniform_HorizontalBlur = m_pHorizontalBlurShader->getUniformHandle("u_textureWidth");
+    m_pBlurRadiusUniform_HorizontalBlur = m_pHorizontalBlurShader->getUniformHandle("u_blurRadius");
+    m_pBlurSigmaUniform_HorizontalBlur = m_pHorizontalBlurShader->getUniformHandle("u_blurSigma");
 
     m_pVerticalBlurShader = ShaderLoader::getInstance()->getShader("vertical_blur");
-    m_nTextureUniform_VerticalBlur = m_pVerticalBlurShader->getUniformLocation("u_tex0");
-    m_nTextureHeightUniform_VerticalBlur = m_pVerticalBlurShader->getUniformLocation("u_textureHeight");
-    m_nBlurRadiusUniform_VerticalBlur = m_pVerticalBlurShader->getUniformLocation("u_blurRadius");
-    m_nBlurSigmaUniform_VerticalBlur = m_pVerticalBlurShader->getUniformLocation("u_blurSigma");
+    m_pTextureUniform_VerticalBlur = m_pVerticalBlurShader->getUniformHandle(SHADER_UNIFORM_TEXTURE_0);
+    m_pTextureHeightUniform_VerticalBlur = m_pVerticalBlurShader->getUniformHandle("u_textureHeight");
+    m_pBlurRadiusUniform_VerticalBlur = m_pVerticalBlurShader->getUniformHandle("u_blurRadius");
+    m_pBlurSigmaUniform_VerticalBlur = m_pVerticalBlurShader->getUniformHandle("u_blurSigma");
 
     m_pCompositeShader = ShaderLoader::getInstance()->getShader("difference_of_gaussian_composite");
-    m_nOriginalTextureUniform = m_pCompositeShader->getUniformLocation("u_originalTexture");
-    m_nBlur1TextureUniform = m_pCompositeShader->getUniformLocation("u_blur1Texture");
-    m_nBlur2TextureUniform = m_pCompositeShader->getUniformLocation("u_blur2Texture");
+    m_pOriginalTextureUniform = m_pCompositeShader->getUniformHandle("u_originalTexture");
+    m_pBlur1TextureUniform = m_pCompositeShader->getUniformHandle("u_blur1Texture");
+    m_pBlur2TextureUniform = m_pCompositeShader->getUniformHandle("u_blur2Texture");
 
     glBindBuffer(GL_ARRAY_BUFFER, m_pProcessQueue->getFullScreenVertexBuffer());
     glBindVertexArray(m_pProcessQueue->getFullScreenVertexArray());
@@ -81,10 +80,10 @@ void DifferenceOfGaussian::renderBlur1Horizontal()
 
     glUseProgram(m_pHorizontalBlurShader->getProgram());
 
-    glUniform1i(m_nTextureUniform_HorizontalBlur, 0); // Texture unit 0
-    glUniform1i(m_nTextureWidthUniform_HorizontalBlur, m_nRenderWidth * BLUR_TEXTURE_RATIO);
-    glUniform1f(m_nBlurRadiusUniform_HorizontalBlur, m_fBlurRadius1);
-    glUniform1f(m_nBlurSigmaUniform_HorizontalBlur, m_fBlurSigma1);
+    glUniform1i(m_pTextureUniform_HorizontalBlur->m_nLocation, 0); // Texture unit 0
+    glUniform1i(m_pTextureWidthUniform_HorizontalBlur->m_nLocation, m_nRenderWidth * BLUR_TEXTURE_RATIO);
+    glUniform1f(m_pBlurRadiusUniform_HorizontalBlur->m_nLocation, m_fBlurRadius1);
+    glUniform1f(m_pBlurSigmaUniform_HorizontalBlur->m_nLocation, m_fBlurSigma1);
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_nOriginalRenderTexture);
@@ -112,10 +111,10 @@ void DifferenceOfGaussian::renderBlur1Vertical()
 
     glUseProgram(m_pVerticalBlurShader->getProgram());
 
-    glUniform1i(m_nTextureUniform_VerticalBlur, 0); // Texture unit 0
-    glUniform1i(m_nTextureHeightUniform_VerticalBlur, m_nRenderHeight * BLUR_TEXTURE_RATIO);
-    glUniform1f(m_nBlurRadiusUniform_VerticalBlur, m_fBlurRadius1);
-    glUniform1f(m_nBlurSigmaUniform_VerticalBlur, m_fBlurSigma1);
+    glUniform1i(m_pTextureUniform_VerticalBlur->m_nLocation, 0); // Texture unit 0
+    glUniform1i(m_pTextureHeightUniform_VerticalBlur->m_nLocation, m_nRenderHeight * BLUR_TEXTURE_RATIO);
+    glUniform1f(m_pBlurRadiusUniform_VerticalBlur->m_nLocation, m_fBlurRadius1);
+    glUniform1f(m_pBlurSigmaUniform_VerticalBlur->m_nLocation, m_fBlurSigma1);
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_nRenderTexture_Blur1_Horizontal);
@@ -142,10 +141,10 @@ void DifferenceOfGaussian::renderBlur2Horizontal()
 
     glUseProgram(m_pHorizontalBlurShader->getProgram());
 
-    glUniform1i(m_nTextureUniform_HorizontalBlur, 0); // Texture unit 0
-    glUniform1i(m_nTextureWidthUniform_HorizontalBlur, m_nRenderWidth * BLUR_TEXTURE_RATIO);
-    glUniform1f(m_nBlurRadiusUniform_HorizontalBlur, m_fBlurRadius2);
-    glUniform1f(m_nBlurSigmaUniform_HorizontalBlur, m_fBlurSigma2);
+    glUniform1i(m_pTextureUniform_HorizontalBlur->m_nLocation, 0); // Texture unit 0
+    glUniform1i(m_pTextureWidthUniform_HorizontalBlur->m_nLocation, m_nRenderWidth * BLUR_TEXTURE_RATIO);
+    glUniform1f(m_pBlurRadiusUniform_HorizontalBlur->m_nLocation, m_fBlurRadius2);
+    glUniform1f(m_pBlurSigmaUniform_HorizontalBlur->m_nLocation, m_fBlurSigma2);
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_nOriginalRenderTexture);
@@ -172,10 +171,10 @@ void DifferenceOfGaussian::renderBlur2Vertical()
 
     glUseProgram(m_pVerticalBlurShader->getProgram());
 
-    glUniform1i(m_nTextureUniform_VerticalBlur, 0); // Texture unit 0
-    glUniform1i(m_nTextureHeightUniform_VerticalBlur, m_nRenderHeight * BLUR_TEXTURE_RATIO);
-    glUniform1f(m_nBlurRadiusUniform_VerticalBlur, m_fBlurRadius2);
-    glUniform1f(m_nBlurSigmaUniform_VerticalBlur, m_fBlurSigma2);
+    glUniform1i(m_pTextureUniform_VerticalBlur->m_nLocation, 0); // Texture unit 0
+    glUniform1i(m_pTextureHeightUniform_VerticalBlur->m_nLocation, m_nRenderHeight * BLUR_TEXTURE_RATIO);
+    glUniform1f(m_pBlurRadiusUniform_VerticalBlur->m_nLocation, m_fBlurRadius2);
+    glUniform1f(m_pBlurSigmaUniform_VerticalBlur->m_nLocation, m_fBlurSigma2);
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_nRenderTexture_Blur2_Horizontal);
@@ -202,9 +201,9 @@ void DifferenceOfGaussian::renderComposite()
 
     glUseProgram(m_pCompositeShader->getProgram());
 
-    glUniform1i(m_nOriginalTextureUniform, 0);
-    glUniform1i(m_nBlur1TextureUniform, 1);
-    glUniform1i(m_nBlur2TextureUniform, 2);
+    glUniform1i(m_pOriginalTextureUniform->m_nLocation, 0);
+    glUniform1i(m_pBlur1TextureUniform->m_nLocation, 1);
+    glUniform1i(m_pBlur2TextureUniform->m_nLocation, 2);
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_nOriginalRenderTexture);

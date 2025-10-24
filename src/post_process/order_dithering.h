@@ -23,7 +23,7 @@ private:
     int m_nRenderWidth, m_nRenderHeight;
 
     Shader* m_pShader = nullptr;
-    GLuint m_nTextureUniform;
+    const ShaderUniformHandle* m_pTextureUniform = nullptr;
 
     void initializeShader();
 

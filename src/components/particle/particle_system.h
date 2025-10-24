@@ -2,6 +2,7 @@
 
 // #include "../component.h"
 #include "../drawable_interface.h"
+#include "../../draw/shader.h"
 #include <linmath.h>
 #include <functional>
 
@@ -141,7 +142,12 @@ private:
     GLuint m_nVertexBuffer = 0;
     GLuint m_nVertexArray = 0;
     GLuint m_nInstanceBuffer = 0;
-    GLuint m_nUseNodeTransformUniform, m_nUseTextureUniform, m_nMVPUniForm, m_nNodeTransformUniform, m_nTextureUniform;
+
+    const ShaderUniformHandle* m_pUseNodeTransformUniform = nullptr;
+    const ShaderUniformHandle* m_pUseTextureUniform = nullptr;
+    const ShaderUniformHandle* m_pMVPUniForm = nullptr;
+    const ShaderUniformHandle* m_pNodeTransformUniform = nullptr;
+    const ShaderUniformHandle* m_pTextureUniform = nullptr;
 
     Shader* m_pShader = nullptr;
 

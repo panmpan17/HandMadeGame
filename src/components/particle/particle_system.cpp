@@ -130,11 +130,11 @@ void ParticleSystem::setShader(Shader* pShader)
 {
     m_pShader = pShader;
 
-    m_nMVPUniForm = pShader->getUniformLocation("u_MVP");
-    m_nNodeTransformUniform = pShader->getUniformLocation("u_nodeTransform");
-    m_nUseNodeTransformUniform = pShader->getUniformLocation("u_useNodeTransform");
-    m_nUseTextureUniform = pShader->getUniformLocation("u_useTexture");
-    m_nTextureUniform = pShader->getUniformLocation("u_tex0");
+    m_pMVPUniForm = pShader->getUniformHandle("u_MVP");
+    m_pNodeTransformUniform = pShader->getUniformHandle("u_nodeTransform");
+    m_pUseNodeTransformUniform = pShader->getUniformHandle("u_useNodeTransform");
+    m_pUseTextureUniform = pShader->getUniformHandle("u_useTexture");
+    m_pTextureUniform = pShader->getUniformHandle(SHADER_UNIFORM_TEXTURE_0);
 }
 
 void ParticleSystem::draw()
@@ -146,14 +146,14 @@ void ParticleSystem::draw()
     glBindVertexArray(m_nVertexArray);
     glUseProgram(m_pShader->getProgram());
 
-    glUniform1i(m_nUseNodeTransformUniform, m_bSimulateInLocal ? 1 : 0);
-    glUniform1i(m_nUseTextureUniform, m_pImage ? 1 : 0);
+    glUniform1i(m_pUseNodeTransformUniform->m_nLocation, m_bSimulateInLocal ? 1 : 0);
+    glUniform1i(m_pUseTextureUniform->m_nLocation, m_pImage ? 1 : 0);
 
-    glUniform1i(m_nTextureUniform, 0);
+    glUniform1i(m_pTextureUniform->m_nLocation, 0);
 
     const mat4x4& cameraViewMatrix = Camera::main->getViewProjectionMatrix();
 
-    glUniformMatrix4fv(m_nMVPUniForm, 1, GL_FALSE, (const GLfloat*) cameraViewMatrix);
+    glUniformMatrix4fv(m_pMVPUniForm->m_nLocation, 1, GL_FALSE, (const GLfloat*) cameraViewMatrix);
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_pImage ? m_pImage->getTextureID() : 0);
@@ -166,7 +166,7 @@ void ParticleSystem::draw()
         const Vector3& nodePosition = getNode()->getPosition();
         mat4x4_translate(nodeTransform, nodePosition.x, nodePosition.y, nodePosition.z);
 
-        glUniformMatrix4fv(m_nNodeTransformUniform, 1, GL_FALSE, (const GLfloat*) nodeTransform);
+        glUniformMatrix4fv(m_pNodeTransformUniform->m_nLocation, 1, GL_FALSE, (const GLfloat*) nodeTransform);
     }
 
     glBindBuffer(GL_ARRAY_BUFFER, m_nInstanceBuffer);

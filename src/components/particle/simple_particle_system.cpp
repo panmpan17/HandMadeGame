@@ -49,8 +49,8 @@ void SimpleParticleSystem::setShader(Shader* pShader)
 {
     m_pShader = pShader;
 
-    m_nMVPUniform = m_pShader->getUniformLocation("u_MVP");
-    m_nColorUniform = m_pShader->getUniformLocation("u_particleColor");
+    m_pMVPUniForm = m_pShader->getUniformHandle(SHADER_UNIFORM_MVP);
+    m_pColorUniform = m_pShader->getUniformHandle("u_particleColor");
 }
 
 void SimpleParticleSystem::registerBuffer()
@@ -105,10 +105,10 @@ void SimpleParticleSystem::draw()
         const mat4x4& cameraViewMatrix = Camera::main->getViewProjectionMatrix();
         mat4x4_mul(mvp, cameraViewMatrix, local);
 
-        glUniformMatrix4fv(m_nMVPUniform, 1, GL_FALSE, (const GLfloat*) mvp);
+        glUniformMatrix4fv(m_pMVPUniForm->m_nLocation, 1, GL_FALSE, (const GLfloat*) mvp);
 
         const vec4& color = m_arrParticles[i].color; // Use the color of the first particle for now
-        glUniform4f(m_nColorUniform, color[0], color[1], color[2], color[3]);
+        glUniform4f(m_pColorUniform->m_nLocation, color[0], color[1], color[2], color[3]);
 
         // glUniform1i(m_pShader->getTextureLocation(), 0); // Texture unit 0
 

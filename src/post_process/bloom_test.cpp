@@ -30,25 +30,25 @@ void BloomTest::initialize()
 void BloomTest::initializeQuad()
 {
     m_pColorHighlightShader = ShaderLoader::getInstance()->getShader("bloom_filter");
-    m_nTextureUniform_ColorHighlight = m_pColorHighlightShader->getUniformLocation("u_tex0");
+    m_pTextureUniform_ColorHighlight = m_pColorHighlightShader->getUniformHandle(SHADER_UNIFORM_TEXTURE_0);
 
     m_pHorizontalBlurShader = ShaderLoader::getInstance()->getShader("horizontal_blur");
-    m_nTextureUniform_HorizontalBlur = m_pHorizontalBlurShader->getUniformLocation("u_tex0");
-    m_nTextureWidthUniform_HorizontalBlur = m_pHorizontalBlurShader->getUniformLocation("u_textureWidth");
-    m_nBlurRadiusUniform_HorizontalBlur = m_pHorizontalBlurShader->getUniformLocation("u_blurRadius");
-    m_nBlurSigmaUniform_HorizontalBlur = m_pHorizontalBlurShader->getUniformLocation("u_blurSigma");
+    m_pTextureUniform_HorizontalBlur = m_pHorizontalBlurShader->getUniformHandle(SHADER_UNIFORM_TEXTURE_0);
+    m_pTextureWidthUniform_HorizontalBlur = m_pHorizontalBlurShader->getUniformHandle("u_textureWidth");
+    m_pBlurRadiusUniform_HorizontalBlur = m_pHorizontalBlurShader->getUniformHandle("u_blurRadius");
+    m_pBlurSigmaUniform_HorizontalBlur = m_pHorizontalBlurShader->getUniformHandle("u_blurSigma");
 
     m_pVerticalBlurShader = ShaderLoader::getInstance()->getShader("vertical_blur");
-    m_nTextureUniform_VerticalBlur = m_pVerticalBlurShader->getUniformLocation("u_tex0");
-    m_nTextureHeightUniform_VerticalBlur = m_pVerticalBlurShader->getUniformLocation("u_textureHeight");
-    m_nBlurRadiusUniform_VerticalBlur = m_pVerticalBlurShader->getUniformLocation("u_blurRadius");
-    m_nBlurSigmaUniform_VerticalBlur = m_pVerticalBlurShader->getUniformLocation("u_blurSigma");
+    m_pTextureUniform_VerticalBlur = m_pVerticalBlurShader->getUniformHandle(SHADER_UNIFORM_TEXTURE_0);
+    m_pTextureHeightUniform_VerticalBlur = m_pVerticalBlurShader->getUniformHandle("u_textureHeight");
+    m_pBlurRadiusUniform_VerticalBlur = m_pVerticalBlurShader->getUniformHandle("u_blurRadius");
+    m_pBlurSigmaUniform_VerticalBlur = m_pVerticalBlurShader->getUniformHandle("u_blurSigma");
 
     m_pCompositeShader = ShaderLoader::getInstance()->getShader("bloom_composite");
-    m_nOriginalTextureUniform = m_pCompositeShader->getUniformLocation("u_originalScreenTexture");
-    m_nBloomTextureUniform = m_pCompositeShader->getUniformLocation("u_bloomTexture");
-    m_nBloomTextureScaleUniform = m_pCompositeShader->getUniformLocation("u_bloomTextureScale");
-    m_nIntensityUniform = m_pCompositeShader->getUniformLocation("u_intensity");
+    m_pOriginalTextureUniform = m_pCompositeShader->getUniformHandle("u_originalScreenTexture");
+    m_pBloomTextureUniform = m_pCompositeShader->getUniformHandle("u_bloomTexture");
+    m_pBloomTextureScaleUniform = m_pCompositeShader->getUniformHandle("u_bloomTextureScale");
+    m_pIntensityUniform = m_pCompositeShader->getUniformHandle("u_intensity");
 
     glBindBuffer(GL_ARRAY_BUFFER, m_pProcessQueue->getFullScreenVertexBuffer());
     glBindVertexArray(m_pProcessQueue->getFullScreenVertexArray());
@@ -99,7 +99,7 @@ void BloomTest::renderColorHighlight()
 
     glUseProgram(m_pColorHighlightShader->getProgram());
 
-    glUniform1i(m_nTextureUniform_ColorHighlight, 0); // Texture unit 0
+    glUniform1i(m_pTextureUniform_ColorHighlight->m_nLocation, 0); // Texture unit 0
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_nOriginalRenderTexture);
@@ -128,10 +128,10 @@ void BloomTest::renderHorizontalBlur()
 
     glUseProgram(m_pHorizontalBlurShader->getProgram());
 
-    glUniform1i(m_nTextureUniform_HorizontalBlur, 0); // Texture unit 0
-    glUniform1i(m_nTextureWidthUniform_HorizontalBlur, m_nRenderWidth * BLUR_TEXTURE_RATIO);
-    glUniform1f(m_nBlurRadiusUniform_HorizontalBlur, m_fBlurRadius);
-    glUniform1f(m_nBlurSigmaUniform_HorizontalBlur, m_fBlurSigma);
+    glUniform1i(m_pTextureUniform_HorizontalBlur->m_nLocation, 0); // Texture unit 0
+    glUniform1i(m_pTextureWidthUniform_HorizontalBlur->m_nLocation, m_nRenderWidth * BLUR_TEXTURE_RATIO);
+    glUniform1f(m_pBlurRadiusUniform_HorizontalBlur->m_nLocation, m_fBlurRadius);
+    glUniform1f(m_pBlurSigmaUniform_HorizontalBlur->m_nLocation, m_fBlurSigma);
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_nRenderTexture_ColorHighlight);
@@ -160,10 +160,10 @@ void BloomTest::renderVerticalBlur()
 
     glUseProgram(m_pVerticalBlurShader->getProgram());
 
-    glUniform1i(m_nTextureUniform_VerticalBlur, 0); // Texture unit 0
-    glUniform1i(m_nTextureHeightUniform_VerticalBlur, m_nRenderHeight * BLUR_TEXTURE_RATIO);
-    glUniform1f(m_nBlurRadiusUniform_VerticalBlur, m_fBlurRadius);
-    glUniform1f(m_nBlurSigmaUniform_VerticalBlur, m_fBlurSigma);
+    glUniform1i(m_pTextureUniform_VerticalBlur->m_nLocation, 0); // Texture unit 0
+    glUniform1i(m_pTextureHeightUniform_VerticalBlur->m_nLocation, m_nRenderHeight * BLUR_TEXTURE_RATIO);
+    glUniform1f(m_pBlurRadiusUniform_VerticalBlur->m_nLocation, m_fBlurRadius);
+    glUniform1f(m_pBlurSigmaUniform_VerticalBlur->m_nLocation, m_fBlurSigma);
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_nRenderTexture_HorizontalBlur);
@@ -192,10 +192,10 @@ void BloomTest::renderComposite()
 
     glUseProgram(m_pCompositeShader->getProgram());
 
-    glUniform1i(m_nOriginalTextureUniform, 0);
-    glUniform1i(m_nBloomTextureUniform, 1);
-    glUniform1f(m_nBloomTextureScaleUniform, 1);
-    glUniform1f(m_nIntensityUniform, m_nIntensity);
+    glUniform1i(m_pOriginalTextureUniform->m_nLocation, 0);
+    glUniform1i(m_pBloomTextureUniform->m_nLocation, 1);
+    glUniform1f(m_pBloomTextureScaleUniform->m_nLocation, 1);
+    glUniform1f(m_pIntensityUniform->m_nLocation, m_nIntensity);
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_nOriginalRenderTexture);

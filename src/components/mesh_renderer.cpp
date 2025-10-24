@@ -2,7 +2,6 @@
 
 #include <glad/gl.h>
 #include "../models/simple_obj_reader.h"
-#include "../draw/shader.h"
 #include "../debug_macro.h"
 #include "../window.h"
 #include "../node.h"
@@ -47,7 +46,7 @@ void MeshRenderer::setShader(Shader* pShader)
 
     m_pMainTexture = ImageLoader::getInstance()->getImage("box_uv");
 
-    m_nSpecularParamUniform = m_pShader->getUniformLocation("u_SpecularParams");
+    // m_pSpecularParamUniform = m_pShader->getUniformHandle("u_SpecularParams");
 
     bindVertexArray();
 
@@ -104,13 +103,13 @@ void MeshRenderer::draw()
 
     if (m_pMainTexture)
     {
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, m_pMainTexture->getTextureID());
-        GLuint nMainTexUniform = m_pShader->getUniformLocation("u_MainTex");
-        glUniform1i(nMainTexUniform, 0);
+        // glActiveTexture(GL_TEXTURE0);
+        // glBindTexture(GL_TEXTURE_2D, m_pMainTexture->getTextureID());
+        // GLuint nMainTexUniform = m_pShader->getUniformLocation("u_MainTex");
+        // glUniform1i(nMainTexUniform, 0);
     }
 
-    glUniform2f(m_nSpecularParamUniform, 5.0f, 32.0f); // Example values for intensity and power
+    // glUniform2f(m_pSpecularParamUniform->m_nLocation, 5.0f, 32.0f); // Example values for intensity and power
 
     glBindVertexArray(m_nVertexArray);
     glCullFace(GL_FRONT);

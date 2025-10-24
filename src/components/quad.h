@@ -32,13 +32,13 @@ protected:
 
     GLuint m_nVertexBuffer, m_nVertexArray;
 
-    const ShaderUniformHandle* m_oMVPHandle = nullptr;
-    const ShaderUniformHandle* m_oColorHandle = nullptr;
-    const ShaderUniformHandle* m_oTextureHandle = nullptr;
-    const ShaderUniformHandle* m_oUseTextureHandle = nullptr;
-    const ShaderUniformHandle* m_oSpriteSheetXCountHandle = nullptr;
-    const ShaderUniformHandle* m_oSpriteSheetYCountHandle = nullptr;
-    const ShaderUniformHandle* m_oUVOffsetHandle = nullptr;
+    const ShaderUniformHandle* m_pMVPHandle = nullptr;
+    const ShaderUniformHandle* m_pColorHandle = nullptr;
+    const ShaderUniformHandle* m_pTextureHandle = nullptr;
+    const ShaderUniformHandle* m_pUseTextureHandle = nullptr;
+    const ShaderUniformHandle* m_pSpriteSheetXCountHandle = nullptr;
+    const ShaderUniformHandle* m_pSpriteSheetYCountHandle = nullptr;
+    const ShaderUniformHandle* m_pUVOffsetHandle = nullptr;
 
     float m_fWidth, m_fHeight;
     vec4 m_color = {1.f, 1.f, 1.f, 1.f};

@@ -10,6 +10,10 @@
 #include "order_dithering.h"
 #include "difference_of_gaussian.h"
 
+
+inline constexpr std::string_view SHADER_UNIFORM_SPLIT_FACTOR = "u_splitFactor";
+
+
 RenderProcessQueue* RenderProcessQueue::ins = nullptr;
 
 
@@ -74,12 +78,12 @@ void RenderProcessQueue::init(int nWidth, int nHeight)
 void RenderProcessQueue::initializeQuad()
 {
     m_pShader = ShaderLoader::getInstance()->getShader("pure_texture");
-    m_nTextureUniform = m_pShader->getUniformLocation("u_tex0");
+    m_pTextureHandle = m_pShader->getUniformHandle(SHADER_UNIFORM_TEXTURE_0);
 
     m_pSplitShader = ShaderLoader::getInstance()->getShader("split_texture");
-    m_nOriginalTextureUniform_Split = m_pSplitShader->getUniformLocation("u_tex0");
-    m_nFinalTextureUniform_Split = m_pSplitShader->getUniformLocation("u_tex1");
-    m_nSplitFactorUniform = m_pSplitShader->getUniformLocation("u_splitFactor");
+    m_pOriginalTextureUniform_Split = m_pSplitShader->getUniformHandle(SHADER_UNIFORM_TEXTURE_0);
+    m_pFinalTextureUniform_Split = m_pSplitShader->getUniformHandle(SHADER_UNIFORM_TEXTURE_1);
+    m_pSplitFactorUniform = m_pSplitShader->getUniformHandle(SHADER_UNIFORM_SPLIT_FACTOR);
 
     glGenBuffers(1, &m_nVertexBuffer);
     glBindBuffer(GL_ARRAY_BUFFER, m_nVertexBuffer);
@@ -204,7 +208,7 @@ void RenderProcessQueue::renderToScreen()
 
     glUseProgram(m_pShader->getProgram());
 
-    glUniform1i(m_nTextureUniform, 0);
+    glUniform1i(m_pTextureHandle->m_nLocation, 0);
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_nFinalRenderTexture);
@@ -225,9 +229,9 @@ void RenderProcessQueue::renderToScreenSplit()
 
     glUseProgram(m_pSplitShader->getProgram());
 
-    glUniform1i(m_nFinalTextureUniform_Split, 0);
-    glUniform1i(m_nOriginalTextureUniform_Split, 1);
-    glUniform1f(m_nSplitFactorUniform, m_fSplitFactor);
+    glUniform1i(m_pOriginalTextureUniform_Split->m_nLocation, 0);
+    glUniform1i(m_pFinalTextureUniform_Split->m_nLocation, 1);
+    glUniform1f(m_pSplitFactorUniform->m_nLocation, m_fSplitFactor);
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_nRenderTexture_original);

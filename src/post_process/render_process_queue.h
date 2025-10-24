@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../draw/shader.h"
 #include "../expandable_array.h"
 #include "../serialization/type_registry.h"
 
@@ -85,12 +86,15 @@ private:
     GLuint m_nDepthBuffer_original = 0;
 
     Shader* m_pShader = nullptr;
-    GLuint m_nTextureUniform = 0;
+    const ShaderUniformHandle* m_pTextureHandle = nullptr;
 
     Shader* m_pSplitShader = nullptr;
-    GLuint m_nOriginalTextureUniform_Split = 0;
-    GLuint m_nFinalTextureUniform_Split = 0;
-    GLuint m_nSplitFactorUniform = 0;
+    // GLuint m_nOriginalTextureUniform_Split = 0;
+    // GLuint m_nFinalTextureUniform_Split = 0;
+    // GLuint m_nSplitFactorUniform = 0;
+    const ShaderUniformHandle* m_pOriginalTextureUniform_Split = 0;
+    const ShaderUniformHandle* m_pFinalTextureUniform_Split = 0;
+    const ShaderUniformHandle* m_pSplitFactorUniform = 0;
 
     GLuint m_nVertexBuffer = 0;
     GLuint m_nVertexArray = 0;

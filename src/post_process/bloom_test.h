@@ -46,25 +46,25 @@ private:
     int m_nRenderWidth, m_nRenderHeight;
 
     Shader* m_pColorHighlightShader = nullptr;
-    GLuint m_nTextureUniform_ColorHighlight;
+    const ShaderUniformHandle* m_pTextureUniform_ColorHighlight = nullptr;
 
     Shader* m_pHorizontalBlurShader = nullptr;
-    GLuint m_nTextureUniform_HorizontalBlur;
-    GLuint m_nTextureWidthUniform_HorizontalBlur;
-    GLuint m_nBlurRadiusUniform_HorizontalBlur;
-    GLuint m_nBlurSigmaUniform_HorizontalBlur;
+    const ShaderUniformHandle* m_pTextureUniform_HorizontalBlur = nullptr;
+    const ShaderUniformHandle* m_pTextureWidthUniform_HorizontalBlur = nullptr;
+    const ShaderUniformHandle* m_pBlurRadiusUniform_HorizontalBlur = nullptr;
+    const ShaderUniformHandle* m_pBlurSigmaUniform_HorizontalBlur = nullptr;
 
     Shader* m_pVerticalBlurShader = nullptr;
-    GLuint m_nTextureUniform_VerticalBlur;
-    GLuint m_nTextureHeightUniform_VerticalBlur;
-    GLuint m_nBlurRadiusUniform_VerticalBlur;
-    GLuint m_nBlurSigmaUniform_VerticalBlur;
+    const ShaderUniformHandle* m_pTextureUniform_VerticalBlur = nullptr;
+    const ShaderUniformHandle* m_pTextureHeightUniform_VerticalBlur = nullptr;
+    const ShaderUniformHandle* m_pBlurRadiusUniform_VerticalBlur = nullptr;
+    const ShaderUniformHandle* m_pBlurSigmaUniform_VerticalBlur = nullptr;
 
     Shader* m_pCompositeShader = nullptr;
-    GLuint m_nOriginalTextureUniform;
-    GLuint m_nBloomTextureUniform;
-    GLuint m_nBloomTextureScaleUniform;
-    GLuint m_nIntensityUniform;
+    const ShaderUniformHandle* m_pOriginalTextureUniform = nullptr;
+    const ShaderUniformHandle* m_pBloomTextureUniform = nullptr;
+    const ShaderUniformHandle* m_pBloomTextureScaleUniform = nullptr;
+    const ShaderUniformHandle* m_pIntensityUniform = nullptr;
 
     float m_nIntensity = 1.0f;
     float m_fBlurRadius = 4.f; // 0 to 20

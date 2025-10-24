@@ -3,7 +3,6 @@
 #include <glad/glad.h>
 #include "../debug_macro.h"
 #include "../window.h"
-#include "../draw/shader.h"
 #include "../draw/shader_loader.h"
 
 
@@ -20,7 +19,7 @@ void OrderDithering::initialize()
 void OrderDithering::initializeShader()
 {
     m_pShader = ShaderLoader::getInstance()->getShader("order_dithering");
-    m_nTextureUniform = m_pShader->getUniformLocation("u_tex0");
+    m_pTextureUniform = m_pShader->getUniformHandle(SHADER_UNIFORM_TEXTURE_0);
 
     glBindBuffer(GL_ARRAY_BUFFER, m_pProcessQueue->getFullScreenVertexBuffer());
     glBindVertexArray(m_pProcessQueue->getFullScreenVertexArray());
@@ -47,7 +46,7 @@ void OrderDithering::render()
 
     glUseProgram(m_pShader->getProgram());
 
-    glUniform1i(m_nTextureUniform, 0); // Texture unit 0
+    glUniform1i(m_pTextureUniform->m_nLocation, 0); // Texture unit 0
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_pProcessQueue->getFinalRenderTexture());

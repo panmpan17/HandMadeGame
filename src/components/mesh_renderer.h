@@ -1,5 +1,7 @@
 #include "component.h"
 
+#include "../draw/shader.h"
+
 class SimpleObjReader;
 class Shader;
 class Image;
@@ -36,7 +38,8 @@ private:
     GLuint m_nVertexBuffer = 0;
     GLuint m_nIndexBuffer = 0;
 
-    GLuint m_nSpecularParamUniform = 0;
+    // const ShaderUniformHandle* m_pModelUniform = nullptr;
+    const ShaderUniformHandle* m_pSpecularParamUniform = nullptr;
 
     int m_nVertexCount = 0;
 

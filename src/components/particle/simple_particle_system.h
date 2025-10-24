@@ -2,6 +2,7 @@
 
 // #include "../component.h"
 #include "../drawable_interface.h"
+#include "../../draw/shader.h"
 #include <linmath.h>
 
 typedef unsigned int GLuint;
@@ -43,7 +44,8 @@ private:
 
     GLuint m_nVertexBuffer = 0;
     GLuint m_nVertexArray = 0;
-    GLuint m_nMVPUniform, m_nColorUniform;
+    const ShaderUniformHandle* m_pMVPUniForm = nullptr;
+    const ShaderUniformHandle* m_pColorUniform = nullptr;
 
     Shader* m_pShader = nullptr;
 

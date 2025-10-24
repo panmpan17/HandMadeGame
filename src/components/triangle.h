@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../draw/vertex.h"
+#include "../draw/shader.h"
 #include "drawable_interface.h"
 
 typedef unsigned int GLuint;
@@ -36,7 +37,8 @@ public:
 private:
     Shader* m_pShader = nullptr;
 
-    GLuint m_nVertexBuffer, m_nVertexArray, m_nMVPUniform;
+    GLuint m_nVertexBuffer, m_nVertexArray;
+    const ShaderUniformHandle* m_pMVPHandle = nullptr;
 
     COMPONENT_REGISTER_SERIALIZABLE(Triangle)
 };

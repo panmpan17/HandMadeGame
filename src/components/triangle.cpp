@@ -23,7 +23,7 @@ Triangle::~Triangle()
 void Triangle::setShader(Shader* pShader)
 {
     m_pShader = pShader;
-    m_nMVPUniform = m_pShader->getUniformLocation("u_MVP");
+    m_pMVPHandle = m_pShader->getUniformHandle(SHADER_UNIFORM_MVP);
 }
 
 void Triangle::registerBuffer()
@@ -68,7 +68,7 @@ void Triangle::draw()
     mat4x4_mul(mvp, cameraViewMatrix, local);
 
     glUseProgram(m_pShader->getProgram());
-    glUniformMatrix4fv(m_nMVPUniform, 1, GL_FALSE, (const GLfloat*) mvp);
+    glUniformMatrix4fv(m_pMVPHandle->m_nLocation, 1, GL_FALSE, (const GLfloat*) mvp);
     glBindVertexArray(m_nVertexArray);
     glDrawArrays(GL_TRIANGLES, 0, 3);
     INCREASE_DRAW_CALL_COUNT();
