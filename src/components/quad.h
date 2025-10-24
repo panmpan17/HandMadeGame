@@ -2,6 +2,7 @@
 
 #include <linmath.h>
 
+#include "../draw/shader.h"
 #include "../draw/vertex.h"
 #include "drawable_interface.h"
 
@@ -30,8 +31,14 @@ protected:
     virtual void predrawSetShaderUniforms();
 
     GLuint m_nVertexBuffer, m_nVertexArray;
-    GLuint m_nSpriteXCountUniform, m_nSpriteYCountUniform, m_nUVOffsetUniform;
-    GLuint m_nMVPUniform, m_nColorUniform, m_nTextureUniform, m_nUseTextureUniform;
+
+    const ShaderUniformHandle* m_oMVPHandle = nullptr;
+    const ShaderUniformHandle* m_oColorHandle = nullptr;
+    const ShaderUniformHandle* m_oTextureHandle = nullptr;
+    const ShaderUniformHandle* m_oUseTextureHandle = nullptr;
+    const ShaderUniformHandle* m_oSpriteSheetXCountHandle = nullptr;
+    const ShaderUniformHandle* m_oSpriteSheetYCountHandle = nullptr;
+    const ShaderUniformHandle* m_oUVOffsetHandle = nullptr;
 
     float m_fWidth, m_fHeight;
     vec4 m_color = {1.f, 1.f, 1.f, 1.f};

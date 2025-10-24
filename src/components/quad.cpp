@@ -15,6 +15,16 @@
 #include "../random.h"
 
 
+inline constexpr std::string_view SHADER_UNIFORM_MVP = "u_MVP";
+inline constexpr std::string_view SHADER_UNIFORM_COLOR = "u_imageColor";
+inline constexpr std::string_view SHADER_UNIFORM_TEXTURE_0 = "u_tex0";
+inline constexpr std::string_view SHADER_UNIFORM_USE_TEXTURE = "u_useTexture";
+
+inline constexpr std::string_view SHADER_UNIFORM_SPRITE_SHEET_X_COUNT = "u_spriteSheetXCount";
+inline constexpr std::string_view SHADER_UNIFORM_SPRITE_SHEET_Y_COUNT = "u_spriteSheetYCount";
+inline constexpr std::string_view SHADER_UNIFORM_UV_OFFSET = "u_uvOffset";
+
+
 Quad::Quad(float fWidth, float fHeight, vec4 color) : m_fWidth(fWidth), m_fHeight(fHeight)
 {
     m_nID = generateRandomUUID();
@@ -31,14 +41,14 @@ void Quad::setShader(Shader* pShader)
 {
     m_pShader = pShader;
 
-    m_nSpriteXCountUniform = m_pShader->getUniformLocation("u_spriteSheetXCount");
-    m_nSpriteYCountUniform = m_pShader->getUniformLocation("u_spriteSheetYCount");
-    m_nUVOffsetUniform = m_pShader->getUniformLocation("u_uvOffset");
+    m_oMVPHandle = m_pShader->getUniformHandle(SHADER_UNIFORM_MVP);
+    m_oColorHandle = m_pShader->getUniformHandle(SHADER_UNIFORM_COLOR);
+    m_oTextureHandle = m_pShader->getUniformHandle(SHADER_UNIFORM_TEXTURE_0);
+    m_oUseTextureHandle = m_pShader->getUniformHandle(SHADER_UNIFORM_USE_TEXTURE);
 
-    m_nMVPUniform = m_pShader->getUniformLocation("u_MVP");
-    m_nColorUniform = m_pShader->getUniformLocation("u_imageColor");
-    m_nTextureUniform = m_pShader->getUniformLocation("u_tex0");
-    m_nUseTextureUniform = m_pShader->getUniformLocation("u_useTexture");
+    m_oSpriteSheetXCountHandle = m_pShader->getUniformHandle(SHADER_UNIFORM_SPRITE_SHEET_X_COUNT);
+    m_oSpriteSheetYCountHandle = m_pShader->getUniformHandle(SHADER_UNIFORM_SPRITE_SHEET_Y_COUNT);
+    m_oUVOffsetHandle = m_pShader->getUniformHandle(SHADER_UNIFORM_UV_OFFSET);
 }
 
 void Quad::registerBuffer()
@@ -87,21 +97,21 @@ void Quad::draw()
     mat4x4_mul(mvp, cameraViewMatrix, local);
 
     glUseProgram(m_pShader->getProgram());
-    glUniformMatrix4fv(m_nMVPUniform, 1, GL_FALSE, (const GLfloat*) mvp);
-    glUniform4f(m_nColorUniform, m_color[0], m_color[1], m_color[2], 1);
+    glUniformMatrix4fv(m_oMVPHandle->m_nLocation, 1, GL_FALSE, (const GLfloat*) mvp);
+    glUniform4f(m_oColorHandle->m_nLocation, m_color[0], m_color[1], m_color[2], 1);
     predrawSetShaderUniforms();
 
     if (m_pImage)
     {
-        glUniform1i(m_nUseTextureUniform, 1);
-        glUniform1i(m_nTextureUniform, 0); // Texture unit 0
+        glUniform1i(m_oUseTextureHandle->m_nLocation, 1);
+        glUniform1i(m_oTextureHandle->m_nLocation, 0); // Texture unit 0
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, m_pImage ? m_pImage->getTextureID() : 0);
     }
     else
     {
-        glUniform1i(m_nUseTextureUniform, 0);
+        glUniform1i(m_oUseTextureHandle->m_nLocation, 0);
     }
 
     glBindVertexArray(m_nVertexArray);
@@ -115,9 +125,9 @@ void Quad::draw()
 
 void Quad::predrawSetShaderUniforms()
 {
-    glUniform1i(m_nSpriteXCountUniform, 1);
-    glUniform1i(m_nSpriteYCountUniform, 1);
-    glUniform2f(m_nUVOffsetUniform, 0.0f, 0.0f);
+    glUniform1i(m_oSpriteSheetXCountHandle->m_nLocation, 1);
+    glUniform1i(m_oSpriteSheetYCountHandle->m_nLocation, 1);
+    glUniform2f(m_oUVOffsetHandle->m_nLocation, 0.0f, 0.0f);
 }
 
 void Quad::serializeToWrapper(DataSerializer& serializer) const
@@ -215,10 +225,10 @@ void Sprite::draw()
 
 void Sprite::predrawSetShaderUniforms()
 {
-    glUniform1i(m_nSpriteXCountUniform, m_nSpriteSheetXCount);
-    glUniform1i(m_nSpriteYCountUniform, m_nSpriteSheetYCount);
+    glUniform1i(m_oSpriteSheetXCountHandle->m_nLocation, m_nSpriteSheetXCount);
+    glUniform1i(m_oSpriteSheetYCountHandle->m_nLocation, m_nSpriteSheetYCount);
 
-    glUniform2f(m_nUVOffsetUniform, m_vecUVOOffset[0], m_vecUVOOffset[1]);
+    glUniform2f(m_oUVOffsetHandle->m_nLocation, m_vecUVOOffset[0], m_vecUVOOffset[1]);
 }
 
 void Sprite::serializeToWrapper(DataSerializer& serializer) const

@@ -99,3 +99,31 @@ GLuint Shader::getAttributeLocation(const std::string& name) const
 void Shader::reload()
 {
 }
+
+const ShaderUniformHandle* Shader::getUniformHandle(const std::string_view& strName)
+{
+    for (int i = 0; i < m_nUniformHandleCount; ++i)
+    {
+        if (m_arrUniformHandles[i].m_strName == strName)
+        {
+            return &m_arrUniformHandles[i];
+        }
+    }
+
+    if (m_nUniformHandleCount >= 16)
+    {
+        LOGLN_EX("Exceeded maximum number of uniform handles in shader '{}'", m_strName);
+        return nullptr;
+    }
+
+    GLuint nLocation = getUniformLocation(std::string(strName));
+    if (nLocation == GL_INVALID_INDEX)
+    {
+        throw std::runtime_error("Uniform '" + std::string(strName) + "' not found in shader '" + m_strName + "'");
+    }
+
+    ShaderUniformHandle* pHandle = &m_arrUniformHandles[m_nUniformHandleCount++];
+    pHandle->m_nLocation = nLocation;
+    pHandle->m_strName = strName;
+    return pHandle;
+}

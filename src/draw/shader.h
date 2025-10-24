@@ -5,6 +5,13 @@
 typedef unsigned int GLuint;
 
 
+struct ShaderUniformHandle
+{
+    GLuint m_nLocation;
+    std::string_view m_strName;
+};
+
+
 class Shader
 {
 public:
@@ -19,6 +26,8 @@ public:
     inline int getId() const { return m_nId; }
 
     inline GLuint getProgram() const { return m_nProgram; }
+
+    const ShaderUniformHandle* getUniformHandle(const std::string_view& strName);
 
     GLuint getUniformLocation(const std::string& name) const;
     GLuint getAttributeLocation(const std::string& name) const;
@@ -35,4 +44,7 @@ protected:
 
     std::string m_strVertexShaderPath;
     std::string m_strFragmentShaderPath;
+
+    ShaderUniformHandle m_arrUniformHandles[16];
+    int m_nUniformHandleCount = 0;
 };
