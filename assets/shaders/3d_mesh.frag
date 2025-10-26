@@ -63,10 +63,11 @@ void main()
     for (int i = 0; i < u_LightCounts.y; i++)
     {
         vec3 lightDir = normalize(u_PointLights[i].positionAndRange.xyz - fragPos);
-        float distance = length(u_PointLights[i].positionAndRange.xyz - fragPos);
-        if (distance < u_PointLights[i].positionAndRange.w)
+        float distance = max(length(u_PointLights[i].positionAndRange.xyz - fragPos), 0.1);
+
+        // if (distance < (u_PointLights[i].positionAndRange.w * u_PointLights[i].positionAndRange.w))
         {
-            float attenuation = 1.0 / (1.0 + 0.09 * distance + 0.032 * (distance * distance)); // Example attenuation
+            float attenuation = 1 / (distance);
             float diff = max(dot(norm, lightDir), 0.0);
             diffuseSum += diff * u_PointLights[i].color * attenuation;
         }

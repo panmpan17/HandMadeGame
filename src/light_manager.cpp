@@ -47,15 +47,15 @@ LightManager::LightManager()
     m_vecSunLights[2].m_vecColor[1] = 1.f;
     m_vecSunLights[2].m_vecColor[2] = 0.f;
 
-    m_nNumSunLights = 1;
+    m_nNumSunLights = 0;
 
     m_vecPointLights[0].m_vecPositionAndRange[0] = 0.f;
-    m_vecPointLights[0].m_vecPositionAndRange[1] = 5.f;
+    m_vecPointLights[0].m_vecPositionAndRange[1] = 0.f;
     m_vecPointLights[0].m_vecPositionAndRange[2] = 0.f;
-    m_vecPointLights[0].m_vecPositionAndRange[3] = 5.f;
-    m_vecPointLights[0].m_vecColor[0] = 1.f;
+    m_vecPointLights[0].m_vecPositionAndRange[3] = 1.f;
+    m_vecPointLights[0].m_vecColor[0] = 0.f;
     m_vecPointLights[0].m_vecColor[1] = 0.f;
-    m_vecPointLights[0].m_vecColor[2] = 0.f;
+    m_vecPointLights[0].m_vecColor[2] = 1.f;
 
     m_vecPointLights[1].m_vecPositionAndRange[0] = 5.f;
     m_vecPointLights[1].m_vecPositionAndRange[1] = 0.f;
@@ -74,7 +74,7 @@ LightManager::LightManager()
     m_vecPointLights[2].m_vecColor[1] = 0.f;
     m_vecPointLights[2].m_vecColor[2] = 1.f;
 
-    m_nNumPointLights = 0;
+    m_nNumPointLights = 2;
 
     glGenBuffers(1, &m_nLightingUBO);
     glBindBuffer(GL_UNIFORM_BUFFER, m_nLightingUBO);
