@@ -26,10 +26,14 @@ public:
 
     void setShader(Shader* pShader);
 
+    inline void setMainTexture(Image* pImage) { m_pMainTexture = pImage; }
+    inline void setSpecularMap(Image* pImage) { m_pSpecularMap = pImage; }
+
 private:
     SimpleObjReader* m_pMesh = nullptr;
 
     Image* m_pMainTexture = nullptr;
+    Image* m_pSpecularMap = nullptr;
 
     Shader* m_pShader = nullptr;
 
@@ -39,6 +43,10 @@ private:
 
     const ShaderUniformHandle* m_pModelUniform = nullptr;
     const ShaderUniformHandle* m_pSpecularParamUniform = nullptr;
+    const ShaderUniformHandle* m_pMainTexUniform = nullptr;
+    const ShaderUniformHandle* m_pSpecularMapUniform = nullptr;
+    const ShaderUniformHandle* m_pTextureEnabledUniform = nullptr;
+
 
     int m_nVertexCount = 0;
 

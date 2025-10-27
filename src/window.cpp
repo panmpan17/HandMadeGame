@@ -194,6 +194,8 @@ void Window::start()
     ImageLoader::getInstance()->registerImage("character", "assets/images/character_animation.png");
     ImageLoader::getInstance()->registerImage("cover_test", "assets/images/cover_test_3.jpg");
     ImageLoader::getInstance()->registerImage("box_uv", "assets/images/box_test_uv.jpg");
+    ImageLoader::getInstance()->registerImage("container", "assets/images/container.png");
+    ImageLoader::getInstance()->registerImage("container_specular", "assets/images/container_specular.png");
 
     m_pRenderProcessQueue = new RenderProcessQueue(this);
     m_pRenderProcessQueue->setupProcesses();

@@ -361,6 +361,8 @@ void WorldScene::bloomTest()
 
         auto pMeshRenderer = new MeshRenderer(readerBox);
         pMeshRenderer->setShader(p3DMeshShader);
+        pMeshRenderer->setMainTexture(ImageLoader::getInstance()->getImage("container"));
+        pMeshRenderer->setSpecularMap(ImageLoader::getInstance()->getImage("container_specular"));
         pNode->addComponent(pMeshRenderer);
 
         addNode(pNode);

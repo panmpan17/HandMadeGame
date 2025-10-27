@@ -119,6 +119,12 @@ void PostProcessInspector::updateRenderProcessQueue(IRenderProcess* pProcess)
             pBloom->setBloomProcessDebugStep(nStep);
         }
 
+        float threshold = pBloom->getHighlightThreshold();
+        if (ImGui::DragFloat("Highlight Threshold", &threshold, 0.01f, 0.0f, 1.0f))
+        {
+            pBloom->setHighlightThreshold(threshold);
+        }
+
         float intensity = pBloom->getIntensity();
         if (ImGui::DragFloat("Intensity", &intensity, 0.1f, 0.0f, 10.0f))
         {

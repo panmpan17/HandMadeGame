@@ -16,6 +16,9 @@ public:
 
     void renderProcess() override;
 
+    inline void setHighlightThreshold(float threshold) { m_fHighlightThreshold = threshold; }
+    inline float getHighlightThreshold() const { return m_fHighlightThreshold; }
+
     inline void setIntensity(float intensity) { m_nIntensity = intensity; }
     inline float getIntensity() const { return m_nIntensity; }
 
@@ -47,6 +50,7 @@ private:
 
     Shader* m_pColorHighlightShader = nullptr;
     const ShaderUniformHandle* m_pTextureUniform_ColorHighlight = nullptr;
+    const ShaderUniformHandle* m_pThresholdUniform_ColorHighlight = nullptr;
 
     Shader* m_pHorizontalBlurShader = nullptr;
     const ShaderUniformHandle* m_pTextureUniform_HorizontalBlur = nullptr;
@@ -66,6 +70,7 @@ private:
     const ShaderUniformHandle* m_pBloomTextureScaleUniform = nullptr;
     const ShaderUniformHandle* m_pIntensityUniform = nullptr;
 
+    float m_fHighlightThreshold = 0.8f;
     float m_nIntensity = 1.0f;
     float m_fBlurRadius = 4.f; // 0 to 20
     float m_fBlurSigma = 4.f;  // 0 to 20

@@ -31,6 +31,7 @@ void BloomTest::initializeQuad()
 {
     m_pColorHighlightShader = ShaderLoader::getInstance()->getShader("bloom_filter");
     m_pTextureUniform_ColorHighlight = m_pColorHighlightShader->getUniformHandle(SHADER_UNIFORM_TEXTURE_0);
+    m_pThresholdUniform_ColorHighlight = m_pColorHighlightShader->getUniformHandle("u_threshold");
 
     m_pHorizontalBlurShader = ShaderLoader::getInstance()->getShader("horizontal_blur");
     m_pTextureUniform_HorizontalBlur = m_pHorizontalBlurShader->getUniformHandle(SHADER_UNIFORM_TEXTURE_0);
@@ -100,6 +101,7 @@ void BloomTest::renderColorHighlight()
     glUseProgram(m_pColorHighlightShader->getProgram());
 
     glUniform1i(m_pTextureUniform_ColorHighlight->m_nLocation, 0); // Texture unit 0
+    glUniform1f(m_pThresholdUniform_ColorHighlight->m_nLocation, m_fHighlightThreshold);
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_nOriginalRenderTexture);

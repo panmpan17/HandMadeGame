@@ -31,7 +31,9 @@ layout(std140) uniform LightData // 544
     ivec2 u_LightCounts; // 16 + 16
 };
 
-uniform sampler2D u_MainTex;
+uniform sampler2D u_tex0; // main texture
+uniform sampler2D u_tex1; // specular map
+uniform int u_textureEnabled; // bitmask for texture usage, 1: main texture, 2: specular map, 3: both
 
 uniform vec2 u_SpecularParams; // x: intensity, y: power
 
@@ -79,5 +81,29 @@ void main()
         }
     }
 
-    fragment = vec4(diffuseSum + specularSum + u_AmbientLightColor, 1);
+    vec4 color = vec4(0);
+
+    if ((u_textureEnabled & 1) != 0)
+    {
+        vec4 texColor = texture(u_tex0, fragUV);
+        color.xyz += texColor.xyz * (u_AmbientLightColor + diffuseSum);
+        color.w = texColor.w; // preserve alpha from texture
+    }
+    else
+    {
+        color.xyz += u_AmbientLightColor + diffuseSum;
+        color.w = 1.0;
+    }
+
+    if ((u_textureEnabled & 2) != 0)
+    {
+        vec4 specularMapColor = texture(u_tex1, fragUV);
+        color.xyz += specularSum * specularMapColor.xyz;
+    }
+    else
+    {
+        color.xyz += specularSum;
+    }
+
+    fragment = color;
 }

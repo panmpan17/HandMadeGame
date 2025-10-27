@@ -46,10 +46,11 @@ void MeshRenderer::setShader(Shader* pShader)
 
     glUseProgram(0);
 
-    m_pMainTexture = ImageLoader::getInstance()->getImage("box_uv");
-
     m_pModelUniform = m_pShader->getUniformHandle("u_Model");
     m_pSpecularParamUniform = m_pShader->getUniformHandle("u_SpecularParams");
+    m_pMainTexUniform = m_pShader->getUniformHandle(SHADER_UNIFORM_TEXTURE_0);
+    m_pSpecularMapUniform = m_pShader->getUniformHandle(SHADER_UNIFORM_TEXTURE_1);
+    m_pTextureEnabledUniform = m_pShader->getUniformHandle("u_textureEnabled");
 
     bindVertexArray();
 
@@ -104,13 +105,27 @@ void MeshRenderer::draw()
     glUniformMatrix4fv(m_pModelUniform->m_nLocation, 1, GL_FALSE, (const GLfloat*) local);
     glUniform2f(m_pSpecularParamUniform->m_nLocation, 1.f, 32.f);
 
+    int ntextureBitmask = 0;
+
     if (m_pMainTexture)
     {
-        // glActiveTexture(GL_TEXTURE0);
-        // glBindTexture(GL_TEXTURE_2D, m_pMainTexture->getTextureID());
-        // GLuint nMainTexUniform = m_pShader->getUniformLocation("u_MainTex");
-        // glUniform1i(nMainTexUniform, 0);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, m_pMainTexture->getTextureID());
+        glUniform1i(m_pMainTexUniform->m_nLocation, 0);
+
+        ntextureBitmask |= 1; // Enable main texture
     }
+
+    if (m_pSpecularMap && m_pSpecularMapUniform)
+    {
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, m_pSpecularMap->getTextureID());
+        glUniform1i(m_pSpecularMapUniform->m_nLocation, 1);
+
+        ntextureBitmask |= 2; // Enable specular map
+    }
+
+    glUniform1i(m_pTextureEnabledUniform->m_nLocation, ntextureBitmask);
 
     glBindVertexArray(m_nVertexArray);
     glCullFace(GL_FRONT);
