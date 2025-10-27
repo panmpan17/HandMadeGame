@@ -95,24 +95,14 @@ void LightManager::updateLightingUBO()
 
         glBindBuffer(GL_UNIFORM_BUFFER, m_nLightingUBO);
         unsigned long nOffset = 0;
-        glBufferSubData(GL_UNIFORM_BUFFER, nOffset, sizeof(vec3), &m_colorAmbientLight);
 
+        glBufferSubData(GL_UNIFORM_BUFFER, nOffset, sizeof(vec3), &m_colorAmbientLight);
         nOffset += sizeof(vec4); // vec3 + padding
 
-        for (int i = 0; i < m_nNumSunLights; ++i)
-        {
-            glBufferSubData(GL_UNIFORM_BUFFER, nOffset + (i * DIRECTION_LIGHT_SIZE), sizeof(vec3), &m_vecSunLights[i].m_vecDirection);
-            glBufferSubData(GL_UNIFORM_BUFFER, nOffset + (i * DIRECTION_LIGHT_SIZE) + sizeof(vec4), sizeof(vec3), &m_vecSunLights[i].m_vecColor);
-        }
-
+        glBufferSubData(GL_UNIFORM_BUFFER, nOffset, MAX_SUN_LIGHTS * DIRECTION_LIGHT_SIZE, &m_vecSunLights); 
         nOffset += (MAX_SUN_LIGHTS * DIRECTION_LIGHT_SIZE);
 
-        for (int i = 0; i < m_nNumPointLights; ++i)
-        {
-            glBufferSubData(GL_UNIFORM_BUFFER, nOffset + (i * POINT_LIGHT_SIZE), sizeof(vec4), &m_vecPointLights[i].m_vecPositionAndRange);
-            glBufferSubData(GL_UNIFORM_BUFFER, nOffset + (i * POINT_LIGHT_SIZE) + sizeof(vec4), sizeof(vec3), &m_vecPointLights[i].m_vecColor);
-        }
-
+        glBufferSubData(GL_UNIFORM_BUFFER, nOffset, MAX_POINT_LIGHTS * POINT_LIGHT_SIZE, &m_vecPointLights);
         nOffset += (MAX_POINT_LIGHTS * POINT_LIGHT_SIZE);
 
         glBufferSubData(GL_UNIFORM_BUFFER, nOffset, sizeof(int), &m_nNumSunLights);

@@ -9,21 +9,21 @@ layout(std140) uniform CameraMatrices
 
 struct DirectionLight // 32
 {
-    vec3 direction; // 12 + 4
-    vec3 color; // 12 + 4
+    vec4 direction; // 12 + 4
+    vec4 color; // 12 + 4
 };
 
 struct PointLight // 32
 {
     vec4 positionAndRange; // 16
-    vec3 color; // 12 + 4
+    vec4 color; // 12 + 4
 };
 
 layout(std140) uniform LightData // 408
 {
     vec3 u_AmbientLightColor; // 12 + 4
     
-    DirectionLight u_SunLights[4]; // 32 * 4 = 128
+    DirectionLight u_DirectionLights[4]; // 32 * 4 = 128
 
     PointLight u_PointLights[8]; // 32 * 8 = 256
 
@@ -51,13 +51,13 @@ void main()
 
     for (int i = 0; i < u_LightCounts.x; i++)
     {
-        vec3 lightDir = normalize(-u_SunLights[i].direction);
+        vec3 lightDir = normalize(-u_DirectionLights[i].direction.xyz);
         float diff = max(dot(norm, lightDir), 0.0);
-        diffuseSum += diff * u_SunLights[i].color;
+        diffuseSum += diff * u_DirectionLights[i].color.xyz;
 
         vec3 reflectDir = reflect(-lightDir, norm);
         float spec = pow(max(dot(viewDir, reflectDir), 0.0), max(u_SpecularParams.y, 32.0));
-        specularSum += max(u_SpecularParams.x, 1) * spec * u_SunLights[i].color;
+        specularSum += max(u_SpecularParams.x, 1) * spec * u_DirectionLights[i].color.xyz;
     }
 
     for (int i = 0; i < u_LightCounts.y; i++)
@@ -69,7 +69,11 @@ void main()
         {
             float attenuation = 1 / (distance);
             float diff = max(dot(norm, lightDir), 0.0);
-            diffuseSum += diff * u_PointLights[i].color * attenuation;
+            diffuseSum += diff * u_PointLights[i].color.xyz * attenuation;
+
+            vec3 reflectDir = reflect(-lightDir, norm);
+            float spec = pow(max(dot(viewDir, reflectDir), 0.0), max(u_SpecularParams.y, 32.0));
+            specularSum += max(u_SpecularParams.x, 1) * spec * u_PointLights[i].color.xyz;
         }
     }
 

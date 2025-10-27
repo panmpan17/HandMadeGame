@@ -7,14 +7,14 @@ typedef unsigned int GLuint;
 
 struct DirectionLight
 {
-    vec3 m_vecColor;
-    vec3 m_vecDirection;
+    vec4 m_vecDirection; // vec3 + padding
+    vec4 m_vecColor; // vec3 + padding
 };
 
 struct PointLight
 {
-    vec3 m_vecColor;
     vec4 m_vecPositionAndRange;
+    vec4 m_vecColor;
 };
 
 
