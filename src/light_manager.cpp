@@ -5,7 +5,7 @@ constexpr int AMBIENT_LIGHT_SIZE = 16; // vec3 + padding
 constexpr int MAX_SUN_LIGHTS = 4;
 constexpr int DIRECTION_LIGHT_SIZE = 32; // vec3 + padding + vec3 + padding
 constexpr int MAX_POINT_LIGHTS = 8;
-constexpr int POINT_LIGHT_SIZE = 32; // vec4 + vec3 + padding
+constexpr int POINT_LIGHT_SIZE = 48; // vec4 + (vec3 + padding) + (vec3 + padding)
 
 constexpr int NUM_SUN_LIGHTS_SIZE = 16; // vec2 + padding
 
@@ -56,6 +56,9 @@ LightManager::LightManager()
     m_vecPointLights[0].m_vecColor[0] = 0.f;
     m_vecPointLights[0].m_vecColor[1] = 0.f;
     m_vecPointLights[0].m_vecColor[2] = 1.f;
+    m_vecPointLights[0].m_vecAttenuationParams[0] = 1.f; // constant
+    m_vecPointLights[0].m_vecAttenuationParams[1] = 0.7f; // linear
+    m_vecPointLights[0].m_vecAttenuationParams[2] = 1.f; // quadratic
 
     m_vecPointLights[1].m_vecPositionAndRange[0] = 5.f;
     m_vecPointLights[1].m_vecPositionAndRange[1] = 0.f;
@@ -64,6 +67,9 @@ LightManager::LightManager()
     m_vecPointLights[1].m_vecColor[0] = 0.f;
     m_vecPointLights[1].m_vecColor[1] = 1.f;
     m_vecPointLights[1].m_vecColor[2] = 0.f;
+    m_vecPointLights[1].m_vecAttenuationParams[0] = 1.f; // constant
+    m_vecPointLights[1].m_vecAttenuationParams[1] = 0.7f; // linear
+    m_vecPointLights[1].m_vecAttenuationParams[2] = 1.8f; // quadratic
 
 
     m_vecPointLights[2].m_vecPositionAndRange[0] = -5.f;
@@ -73,6 +79,9 @@ LightManager::LightManager()
     m_vecPointLights[2].m_vecColor[0] = 0.f;
     m_vecPointLights[2].m_vecColor[1] = 0.f;
     m_vecPointLights[2].m_vecColor[2] = 1.f;
+    m_vecPointLights[2].m_vecAttenuationParams[0] = 1.f; // constant
+    m_vecPointLights[2].m_vecAttenuationParams[1] = 0.7f; // linear
+    m_vecPointLights[2].m_vecAttenuationParams[2] = 1.8f; // quadratic
 
     m_nNumPointLights = 2;
 

@@ -102,7 +102,7 @@ void MeshRenderer::draw()
     glUseProgram(m_pShader->getProgram());
 
     glUniformMatrix4fv(m_pModelUniform->m_nLocation, 1, GL_FALSE, (const GLfloat*) local);
-    glUniform2f(m_pSpecularParamUniform->m_nLocation, 10.f, 256.f);
+    glUniform2f(m_pSpecularParamUniform->m_nLocation, 1.f, 32.f);
 
     if (m_pMainTexture)
     {

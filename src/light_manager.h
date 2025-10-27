@@ -14,7 +14,8 @@ struct DirectionLight
 struct PointLight
 {
     vec4 m_vecPositionAndRange;
-    vec4 m_vecColor;
+    vec4 m_vecColor; // vec3 + padding
+    vec4 m_vecAttenuationParams; // vec3 + padding
 };
 
 

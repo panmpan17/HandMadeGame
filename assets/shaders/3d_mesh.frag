@@ -13,21 +13,22 @@ struct DirectionLight // 32
     vec4 color; // 12 + 4
 };
 
-struct PointLight // 32
+struct PointLight // 48
 {
     vec4 positionAndRange; // 16
     vec4 color; // 12 + 4
+    vec4 attenuationParams; // 12 + 4
 };
 
-layout(std140) uniform LightData // 408
+layout(std140) uniform LightData // 544
 {
     vec3 u_AmbientLightColor; // 12 + 4
     
     DirectionLight u_DirectionLights[4]; // 32 * 4 = 128
 
-    PointLight u_PointLights[8]; // 32 * 8 = 256
+    PointLight u_PointLights[8]; // 48 * 8 = 384
 
-    ivec2 u_LightCounts; // 8 + 8
+    ivec2 u_LightCounts; // 16 + 16
 };
 
 uniform sampler2D u_MainTex;
@@ -67,13 +68,14 @@ void main()
 
         // if (distance < (u_PointLights[i].positionAndRange.w * u_PointLights[i].positionAndRange.w))
         {
-            float attenuation = 1 / (distance);
+            float attenuation = 1 / (u_PointLights[i].attenuationParams.x + (u_PointLights[i].attenuationParams.y * distance) + (u_PointLights[i].attenuationParams.z * distance * distance));
+
             float diff = max(dot(norm, lightDir), 0.0);
-            diffuseSum += diff * u_PointLights[i].color.xyz * attenuation;
+            diffuseSum += diff * u_PointLights[i].color.xyz * attenuation * u_PointLights[i].positionAndRange.w;
 
             vec3 reflectDir = reflect(-lightDir, norm);
             float spec = pow(max(dot(viewDir, reflectDir), 0.0), max(u_SpecularParams.y, 32.0));
-            specularSum += max(u_SpecularParams.x, 1) * spec * u_PointLights[i].color.xyz;
+            specularSum += max(u_SpecularParams.x, 1) * spec * u_PointLights[i].color.xyz * attenuation * u_PointLights[i].positionAndRange.w;
         }
     }
 
