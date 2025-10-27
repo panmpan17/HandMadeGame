@@ -20,7 +20,11 @@ void main()
     int _max = max(MAX_RADIUS, u_blurRadius);
     for (int i = _min; i <= _max; i++) {
         float w = exp(-0.5 * (i * i) / (u_blurSigma * u_blurSigma));
-        sum += texture(u_tex0, uv + float(i) * texelSize) * w;
+        vec2 newUV = uv + float(i) * texelSize;
+        if (newUV.y < 0.0 || newUV.y > 1.0) {
+            continue;
+        }
+        sum += texture(u_tex0, newUV) * w;
         weightSum += w;
     }
 
