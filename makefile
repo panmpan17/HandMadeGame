@@ -10,7 +10,7 @@ compile:
 
 quick: compile
 	@if ./$(CMAKE_BIN)/$(OUTPUT_NAME); then \
-		echo "" -n; \
+		echo ""; \
 	else \
 		python3 utilites/check_error.py ${BUILD_DIR}/bin; \
 	fi

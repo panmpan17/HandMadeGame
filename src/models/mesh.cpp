@@ -16,3 +16,18 @@ void loadMeshToGPU(Mesh& mesh)
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
+
+void loadMeshToGPU(const std::shared_ptr<Mesh>& pMesh)
+{
+    glGenBuffers(1, &pMesh->m_nVertexBuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, pMesh->m_nVertexBuffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(VertexWUVNormal) * pMesh->m_nVertexCount, pMesh->m_arrVertices, GL_STATIC_DRAW);
+
+    glGenBuffers(1, &pMesh->m_nIndexBuffer);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, pMesh->m_nIndexBuffer);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * pMesh->m_nIndiceCount, pMesh->m_arrIndices, GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+}
+

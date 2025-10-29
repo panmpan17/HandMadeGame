@@ -10,28 +10,12 @@
 #include "../utils/string_handle.h"
 
 
-SimpleObjReader::SimpleObjReader(const std::string_view& strFilename)
+SimpleObjReader::SimpleObjReader()
 {
-    m_pFileReader = new FileReader(strFilename);
-    if (!m_pFileReader->isOpen())
-    {
-        delete m_pFileReader;
-        m_pFileReader = nullptr;
-        LOGLN_EX("Failed to open file: {}", strFilename);
-        return;
-    }
-
-    parse();
-    // loadToGPU();
 }
 
 SimpleObjReader::~SimpleObjReader()
 {
-    if (m_pFileReader)
-    {
-        delete m_pFileReader;
-        m_pFileReader = nullptr;
-    }
 }
 
 int SimpleObjReader::parseFaceVertex(std::vector<TriangleFaceVertex>& vecUniqueVertices, const std::string& strToken)
@@ -66,10 +50,14 @@ int SimpleObjReader::parseFaceVertex(std::vector<TriangleFaceVertex>& vecUniqueV
     return static_cast<int>(vecUniqueVertices.size()) - 1;
 }
 
-void SimpleObjReader::parse()
+std::shared_ptr<Mesh> SimpleObjReader::loadWavefrontFile(const std::string_view& strFilename)
 {
-    if (!m_pFileReader)
-        return;
+    auto oFileReader = FileReader(strFilename);
+    if (!oFileReader.isOpen())
+    {
+        LOGLN_EX("Failed to open file: {}", strFilename);
+        return nullptr;
+    }
 
     std::vector<Vector3> vecVertices;
     std::vector<Vector2> vecTexCoords;
@@ -85,7 +73,7 @@ void SimpleObjReader::parse()
     vecFaces.reserve(64);
 
     std::string strLine;
-    while (m_pFileReader->readLine(strLine))
+    while (oFileReader.readLine(strLine))
     {
         if (strLine.empty())// || strLine[0] == '#')
         {
@@ -158,11 +146,13 @@ void SimpleObjReader::parse()
         }
     }
 
-    m_oMesh.m_nVertexCount = vecUniqueVertices.size();
-    m_oMesh.m_arrVertices = new VertexWUVNormal[m_oMesh.m_nVertexCount];
-    for (int i = 0; i < m_oMesh.m_nVertexCount; ++i)
+    std::shared_ptr<Mesh> pMesh = std::make_shared<Mesh>();
+
+    pMesh->m_nVertexCount = vecUniqueVertices.size();
+    pMesh->m_arrVertices = new VertexWUVNormal[pMesh->m_nVertexCount];
+    for (int i = 0; i < pMesh->m_nVertexCount; ++i)
     {
-        VertexWUVNormal& oVertex = m_oMesh.m_arrVertices[i];
+        VertexWUVNormal& oVertex = pMesh->m_arrVertices[i];
         const TriangleFaceVertex& triVert = vecUniqueVertices[i];
         if (triVert.m_nVertexIndex >= 0 && triVert.m_nVertexIndex < vecVertices.size())
         {
@@ -183,11 +173,13 @@ void SimpleObjReader::parse()
         }
     }
 
-    m_oMesh.m_nIndiceCount = vecFaces.size() * 3;
-    m_oMesh.m_arrIndices = new unsigned int[m_oMesh.m_nIndiceCount];
-    memcpy(m_oMesh.m_arrIndices, vecFaces.data(), sizeof(unsigned int) * m_oMesh.m_nIndiceCount);
+    pMesh->m_nIndiceCount = vecFaces.size() * 3;
+    pMesh->m_arrIndices = new unsigned int[pMesh->m_nIndiceCount];
+    memcpy(pMesh->m_arrIndices, vecFaces.data(), sizeof(unsigned int) * pMesh->m_nIndiceCount);
 
-    loadMeshToGPU(m_oMesh);
+    loadMeshToGPU(pMesh);
 
     LOGLN_EX("OBJ parsed: {} vertices, {} tex coords, {} normals, {} unique vertices, {} faces", vecVertices.size(), vecTexCoords.size(), vecNormals.size(), vecUniqueVertices.size(), vecFaces.size());
+
+    return pMesh;
 }

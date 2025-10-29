@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../draw/vertex.h"
+#include <memory>
 
 typedef unsigned int GLuint;
 
@@ -18,4 +19,5 @@ struct Mesh
 };
 
 void loadMeshToGPU(Mesh& mesh);
+void loadMeshToGPU(const std::shared_ptr<Mesh>& pMesh);
 // void freeMeshFromGPU(Mesh& mesh);

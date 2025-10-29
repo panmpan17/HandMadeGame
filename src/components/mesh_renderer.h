@@ -1,10 +1,12 @@
 #include "component.h"
 
+#include <memory>
 #include "../draw/shader.h"
 
 class SimpleObjReader;
 class Shader;
 class Image;
+class Mesh;
 
 
 typedef unsigned int GLuint;
@@ -13,8 +15,7 @@ typedef unsigned int GLuint;
 class MeshRenderer : public Component
 {
 public:
-    // Character2d() {};
-    MeshRenderer(SimpleObjReader* pMesh);
+    MeshRenderer();
     ~MeshRenderer();
 
     virtual bool isIDrawable() const override { return true; }
@@ -26,11 +27,12 @@ public:
 
     void setShader(Shader* pShader);
 
+    inline void setMesh(const std::shared_ptr<Mesh>& pMesh) { m_pMesh = pMesh; }
     inline void setMainTexture(Image* pImage) { m_pMainTexture = pImage; }
     inline void setSpecularMap(Image* pImage) { m_pSpecularMap = pImage; }
 
 private:
-    SimpleObjReader* m_pMesh = nullptr;
+    std::shared_ptr<Mesh> m_pMesh = nullptr;
 
     Image* m_pMainTexture = nullptr;
     Image* m_pSpecularMap = nullptr;

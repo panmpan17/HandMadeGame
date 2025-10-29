@@ -26,16 +26,11 @@ struct TriangleFace
 class SimpleObjReader
 {
 public:
-    SimpleObjReader(const std::string_view& strFilename);
+    SimpleObjReader();
     ~SimpleObjReader();
 
-    inline const Mesh& getMesh() const { return m_oMesh; }
+    std::shared_ptr<Mesh> loadWavefrontFile(const std::string_view& strFilename);
 
 private:
-    FileReader* m_pFileReader = nullptr;
-
-    Mesh m_oMesh;
-
-    void parse();
     int parseFaceVertex(std::vector<TriangleFaceVertex>& vecUniqueVertices, const std::string& strToken);
 };

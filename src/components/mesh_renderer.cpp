@@ -14,18 +14,12 @@ inline constexpr std::string_view SHADER_GLOBAL_UNIFORM_CAMERA_MATRICES = "Camer
 inline constexpr std::string_view SHADER_GLOBAL_UNIFORM_LIGHTING_DATA = "LightData";
 
 
-MeshRenderer::MeshRenderer(SimpleObjReader* pMesh)
-    : m_pMesh(pMesh)
+MeshRenderer::MeshRenderer()
 {
 }
 
 MeshRenderer::~MeshRenderer()
 {
-    // if (m_pMesh)
-    // {
-    //     delete m_pMesh;
-    //     m_pMesh = nullptr;
-    // }
 }
 
 void MeshRenderer::setShader(Shader* pShader)
@@ -58,14 +52,13 @@ void MeshRenderer::setShader(Shader* pShader)
 
 void MeshRenderer::bindVertexArray()
 {
-    const Mesh& mesh = m_pMesh->getMesh();
-    m_nIndiceCount = mesh.m_nIndiceCount;
+    m_nIndiceCount = m_pMesh->m_nIndiceCount;
     
     glGenVertexArrays(1, &m_nVertexArray);
     glBindVertexArray(m_nVertexArray);
     
-    glBindBuffer(GL_ARRAY_BUFFER, mesh.m_nVertexBuffer);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.m_nIndexBuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, m_pMesh->m_nVertexBuffer);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_pMesh->m_nIndexBuffer);
 
     // Get the attribute locations from the shader
     GLuint nVPosAttr = m_pShader->getAttributeLocation("a_vPos");
