@@ -48,7 +48,7 @@ private:
     const ShaderUniformHandle* m_pTextureEnabledUniform = nullptr;
 
 
-    int m_nVertexCount = 0;
+    int m_nIndiceCount = 0;
 
     void bindVertexArray();
 

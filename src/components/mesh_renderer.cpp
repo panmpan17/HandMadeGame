@@ -60,16 +60,17 @@ void MeshRenderer::bindVertexArray()
 {
     glGenVertexArrays(1, &m_nVertexArray);
     glBindVertexArray(m_nVertexArray);
-    
+
+    const Mesh& mesh = m_pMesh->getMesh();
+
     glGenBuffers(1, &m_nVertexBuffer);
     glBindBuffer(GL_ARRAY_BUFFER, m_nVertexBuffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(VertexWUVNormal) * m_pMesh->getVertexCount(), m_pMesh->getVertices(), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(VertexWUVNormal) * mesh.m_nVertexCount, mesh.m_arrVertices, GL_STATIC_DRAW);
 
-    int nFaceCount = static_cast<int>(m_pMesh->getFaces().size());
-    m_nVertexCount = nFaceCount * 3;
+    m_nIndiceCount = mesh.m_nIndiceCount;
     glGenBuffers(1, &m_nIndexBuffer);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_nIndexBuffer);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(TriangleFace) * nFaceCount, m_pMesh->getFaces().data(), GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * mesh.m_nIndiceCount, mesh.m_arrIndices, GL_STATIC_DRAW);
 
     // Get the attribute locations from the shader
     GLuint nVPosAttr = m_pShader->getAttributeLocation("a_vPos");
@@ -130,7 +131,7 @@ void MeshRenderer::draw()
     glBindVertexArray(m_nVertexArray);
     glCullFace(GL_FRONT);
     glFrontFace(GL_CW);
-    glDrawElements(GL_TRIANGLES, m_nVertexCount, GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, m_nIndiceCount, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 
     INCREASE_DRAW_CALL_COUNT();
