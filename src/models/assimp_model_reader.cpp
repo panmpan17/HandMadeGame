@@ -10,6 +10,15 @@
 // #include "../draw/shader.h"
 
 
+void extractPositionFromMatrix(const aiMatrix4x4& matrix, float& x, float& y, float& z)
+{
+    x = matrix.a4;
+    y = matrix.b4;
+    z = matrix.c4;
+}
+
+
+
 Node* loadModel(const std::string_view& strPath, Shader* pShader)
 {
     Assimp::Importer importer;
@@ -30,6 +39,8 @@ Node* loadModel(const std::string_view& strPath, Shader* pShader)
 
 Node* processNode(const aiNode* pAiNode, const aiScene* pScene, Shader* pShader)
 {
+    // float posX, posY, posZ;
+    // extractPositionFromMatrix(pAiNode->mTransformation, posX, posY, posZ);
     Node* pNode = new Node(0, 0, 0, 0);
 
     // process all the node's meshes (if any)

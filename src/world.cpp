@@ -313,11 +313,16 @@ void WorldScene::bloomTest()
         addNode(pNode);
     }
 
-    loadModel("assets/models/monkey.obj");
-    loadModel("assets/models/back_pack.fbx");
-    
-    /*
     Shader* p3DMeshShader = ShaderLoader::getInstance()->getShader("3d_mesh");
+    Node* pMonkey = loadModel("assets/models/monkey.obj", p3DMeshShader);
+    pMonkey->setPosition(-1.f, 0.f, 0.f);
+    addNode(pMonkey);
+    
+    Node* pBackPack = loadModel("assets/models/back_pack.fbx", p3DMeshShader);
+    pBackPack->setPosition(1.f, 0.f, 0.f);
+    addNode(pBackPack);
+
+    /*
 
     SimpleObjReader oSimpleObjectReader;
     std::shared_ptr<Mesh> readerMonkey = oSimpleObjectReader.loadWavefrontFile("assets/models/monkey_smooth.obj");
