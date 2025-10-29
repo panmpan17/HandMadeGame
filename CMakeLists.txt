@@ -42,6 +42,7 @@ set(SOURCES
     "src/serialization/type_registry.cpp"
     "src/node.cpp"
     "src/models/simple_obj_reader.cpp"
+    "src/models/assimp_model_reader.cpp"
     "src/game/pingpong/pong.cpp"
     "src/game/pingpong/paddle_control.cpp"
     "src/input_handle.cpp"
