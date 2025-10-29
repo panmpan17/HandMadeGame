@@ -41,6 +41,7 @@ set(SOURCES
     "src/serialization/serializer.cpp"
     "src/serialization/type_registry.cpp"
     "src/node.cpp"
+    "src/models/mesh.cpp"
     "src/models/simple_obj_reader.cpp"
     "src/models/assimp_model_reader.cpp"
     "src/game/pingpong/pong.cpp"

@@ -47,7 +47,7 @@ def pretty_print_crash_trace(trace: str):
             print(f"{Terminal.GREY}{line}{Terminal.END}")
             continue
 
-        first_space_index = line.find(" ")
+        first_space_index = line.find(" (")
         function_part = line[:first_space_index]
 
         second_space_index = line.find(") (", first_space_index + 1)

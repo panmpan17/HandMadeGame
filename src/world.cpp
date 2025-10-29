@@ -318,14 +318,17 @@ void WorldScene::bloomTest()
     
     /*
     Shader* p3DMeshShader = ShaderLoader::getInstance()->getShader("3d_mesh");
-    SimpleObjReader* readerMonkey = new SimpleObjReader("assets/models/monkey_smooth.obj");
-    SimpleObjReader* readerBox = new SimpleObjReader("assets/models/box.obj");
+
+    SimpleObjReader oSimpleObjectReader;
+    std::shared_ptr<Mesh> readerMonkey = oSimpleObjectReader.loadWavefrontFile("assets/models/monkey_smooth.obj");
+    std::shared_ptr<Mesh> readerBox = oSimpleObjectReader.loadWavefrontFile("assets/models/box.obj");
 
     {
         auto pNode = new Node(0.f, 0.f, 0.f, 0.f);
         pNode->addComponent(new Rotate3D(5, 10, 15));
 
-        auto pMeshRenderer = new MeshRenderer(readerMonkey);
+        auto pMeshRenderer = new MeshRenderer();
+        pMeshRenderer->setMesh(readerMonkey);
         pMeshRenderer->setShader(p3DMeshShader);
         pNode->addComponent(pMeshRenderer);
 
@@ -334,7 +337,8 @@ void WorldScene::bloomTest()
         {
             auto pChildNode = new Node(2.5f, 0.f, 0.f, 0.f);
 
-            auto pMeshRenderer = new MeshRenderer(readerBox);
+            auto pMeshRenderer = new MeshRenderer();
+            pMeshRenderer->setMesh(readerBox);
             pMeshRenderer->setShader(p3DMeshShader);
             pChildNode->addComponent(pMeshRenderer);
             pChildNode->addComponent(new Rotate3D(-15, -25, -35));
@@ -349,7 +353,8 @@ void WorldScene::bloomTest()
         auto pNode = new Node(1.f, 0.f, 0.f, 0.f);
         pNode->addComponent(new Rotate3D(15, 25, 35));
 
-        auto pMeshRenderer = new MeshRenderer(readerBox);
+        auto pMeshRenderer = new MeshRenderer();
+        pMeshRenderer->setMesh(readerBox);
         pMeshRenderer->setShader(p3DMeshShader);
         pMeshRenderer->setMainTexture(ImageLoader::getInstance()->getImage("container"));
         pMeshRenderer->setSpecularMap(ImageLoader::getInstance()->getImage("container_specular"));
