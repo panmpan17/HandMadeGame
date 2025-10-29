@@ -58,19 +58,14 @@ void MeshRenderer::setShader(Shader* pShader)
 
 void MeshRenderer::bindVertexArray()
 {
+    const Mesh& mesh = m_pMesh->getMesh();
+    m_nIndiceCount = mesh.m_nIndiceCount;
+    
     glGenVertexArrays(1, &m_nVertexArray);
     glBindVertexArray(m_nVertexArray);
-
-    const Mesh& mesh = m_pMesh->getMesh();
-
-    glGenBuffers(1, &m_nVertexBuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, m_nVertexBuffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(VertexWUVNormal) * mesh.m_nVertexCount, mesh.m_arrVertices, GL_STATIC_DRAW);
-
-    m_nIndiceCount = mesh.m_nIndiceCount;
-    glGenBuffers(1, &m_nIndexBuffer);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_nIndexBuffer);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * mesh.m_nIndiceCount, mesh.m_arrIndices, GL_STATIC_DRAW);
+    
+    glBindBuffer(GL_ARRAY_BUFFER, mesh.m_nVertexBuffer);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.m_nIndexBuffer);
 
     // Get the attribute locations from the shader
     GLuint nVPosAttr = m_pShader->getAttributeLocation("a_vPos");
@@ -86,7 +81,6 @@ void MeshRenderer::bindVertexArray()
 
     glEnableVertexAttribArray(nVNormalAttr);
     glVertexAttribPointer(nVNormalAttr, 3, GL_FLOAT, GL_FALSE, sizeof(VertexWUVNormal), (void*)offsetof(VertexWUVNormal, normal));
-
 
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);

@@ -187,5 +187,7 @@ void SimpleObjReader::parse()
     m_oMesh.m_arrIndices = new unsigned int[m_oMesh.m_nIndiceCount];
     memcpy(m_oMesh.m_arrIndices, vecFaces.data(), sizeof(unsigned int) * m_oMesh.m_nIndiceCount);
 
+    loadMeshToGPU(m_oMesh);
+
     LOGLN_EX("OBJ parsed: {} vertices, {} tex coords, {} normals, {} unique vertices, {} faces", vecVertices.size(), vecTexCoords.size(), vecNormals.size(), vecUniqueVertices.size(), vecFaces.size());
 }
