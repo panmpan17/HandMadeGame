@@ -20,6 +20,7 @@
 #include "serialization/serializer.h"
 #include "physics/box.h"
 #include "models/simple_obj_reader.h"
+#include "models/assimp_model_reader.h"
 
 #include "game/pingpong/paddle_control.h"
 #include "game/pingpong/pong.h"
@@ -312,22 +313,16 @@ void WorldScene::bloomTest()
         addNode(pNode);
     }
 
-    Shader* pImageShader = ShaderLoader::getInstance()->getShader("image");
-
-    Image* pTestImage = ImageLoader::getInstance()->getImage("cover_test");
-
-    // { // Quad
-    //     auto pNode = new Node(0.f, 0.f, 0.f, 0.f);
-
-    //     auto pQuad = new Quad(1.280f * 1.6f, .720f * 1.6f, vec4 { 1.f, 1.f, 1.f, 1.f });
-    //     pQuad->setShader(pImageShader);
-    //     pQuad->setImage(pTestImage);
-    //     pQuad->registerBuffer();
-    //     pNode->addComponent(pQuad);
-
-    //     addNode(pNode);
-    // }
     Shader* p3DMeshShader = ShaderLoader::getInstance()->getShader("3d_mesh");
+    Node* pMonkey = loadModel("assets/models/monkey.obj", p3DMeshShader);
+    pMonkey->setPosition(-1.f, 0.f, 0.f);
+    addNode(pMonkey);
+    
+    Node* pBackPack = loadModel("assets/models/back_pack.fbx", p3DMeshShader);
+    pBackPack->setPosition(1.f, 0.f, 0.f);
+    addNode(pBackPack);
+
+    /*
 
     SimpleObjReader oSimpleObjectReader;
     std::shared_ptr<Mesh> readerMonkey = oSimpleObjectReader.loadWavefrontFile("assets/models/monkey_smooth.obj");
@@ -372,6 +367,7 @@ void WorldScene::bloomTest()
 
         addNode(pNode);
     }
+    */
 }
 
 void WorldScene::readFromFiles(const std::string_view& strFilePath)
