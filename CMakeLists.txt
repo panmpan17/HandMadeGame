@@ -149,6 +149,8 @@ add_dependencies(MichaelHandMadeGame copy_assets)
 # General Library
 add_subdirectory( external/glfw )
 
+add_subdirectory( external/assimp )
+
 add_library(glad include/glad/glad.c)
 target_include_directories(glad PUBLIC ${CMAKE_SOURCE_DIR}/include)
 
@@ -192,6 +194,7 @@ target_link_libraries(MichaelHandMadeGame
     PRIVATE
         glad
         glfw
+        assimp
 )
 
 
