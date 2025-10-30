@@ -15,12 +15,16 @@ public:
     virtual void draw() override {}
 
 private:
+    const float DEFAULT_MOVE_SPEED = 5.f;
+    const float BOOSTED_MOVE_SPEED = 15.f;
+    const float DEFAULT_ROTATION_SPEED = 15.f;
+
     float m_fMouseDeltaX = 0.0f;
     float m_fMouseDeltaY = 0.0f;
 
-    float m_fMoveSpeed = 5.f;
+    float m_fMoveSpeed = DEFAULT_MOVE_SPEED;
 
-    float m_fRotationSpeed = 15.f;
+    float m_fRotationSpeed = DEFAULT_ROTATION_SPEED;
 
     // void onRightMouseButton(bool bPressed);
     // void onKeyboardW(bool bPressed);
@@ -28,5 +32,7 @@ private:
     // void onKeyboardA(bool bPressed);
     // void onKeyboardD(bool bPressed);
     void onMouseMove(float fDeltaX, float fDeltaY);
+    void onResetRotationKeyDown(bool bPressed);
+    void onSpeedModifierKeyDown(bool bPressed);
     void updateCameraPositionToNode();
 };

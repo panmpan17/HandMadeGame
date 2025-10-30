@@ -17,6 +17,8 @@ FirstPersonFreeControlCamera::FirstPersonFreeControlCamera()
     // pInput->registerKeyPressCallback(KeyCode::KEY_A, BIND_CALLBACK_1(onKeyboardA));
     // pInput->registerKeyPressCallback(KeyCode::KEY_D, BIND_CALLBACK_1(onKeyboardD));
     pInput->registerMouseMoveCallback(BIND_CALLBACK_2(onMouseMove));
+    pInput->registerKeyPressCallback(KeyCode::KEY_R, BIND_CALLBACK_1(onResetRotationKeyDown));
+    pInput->registerKeyPressCallback(KeyCode::KEY_LEFT_SHIFT, BIND_CALLBACK_1(onSpeedModifierKeyDown));
 
 }
 
@@ -74,6 +76,29 @@ void FirstPersonFreeControlCamera::onMouseMove(float fDeltaX, float fDeltaY)
 {
     m_fMouseDeltaX = fDeltaX;
     m_fMouseDeltaY = fDeltaY;
+}
+
+void FirstPersonFreeControlCamera::onResetRotationKeyDown(bool bPressed)
+{
+    if (bPressed && InputManager::getInstance()->isMouseButtonPressed(MouseButton::BUTTON_RIGHT))
+    {
+        if (m_pNode)
+        {
+            m_pNode->setRotationQuaternion(Quaternion());
+        }
+    }
+}
+
+void FirstPersonFreeControlCamera::onSpeedModifierKeyDown(bool bPressed)
+{
+    if (bPressed)
+    {
+        m_fMoveSpeed = BOOSTED_MOVE_SPEED;
+    }
+    else
+    {
+        m_fMoveSpeed = DEFAULT_MOVE_SPEED;
+    }
 }
 
 void FirstPersonFreeControlCamera::updateCameraPositionToNode()
