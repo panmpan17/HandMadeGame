@@ -39,7 +39,18 @@ WorldScene::~WorldScene()
 
 void WorldScene::init()
 {
-    Camera::main->setWorldSizeScale(1.0f);
+    {
+        auto pNode = new Node(0.f, 0.f, 2.5f);
+        pNode->addComponent(new FirstPersonFreeControlCamera());
+
+        Camera* pCamera = new Camera();
+        pCamera->useAsMain();
+        pCamera->setUseOrthoProjection(false);
+        pCamera->setWorldSizeScale(1.0f);
+        pNode->addComponent(pCamera);
+
+        addNode(pNode);
+    }
 
     // TODO: remove this
     DataSerializer oSerializer("assets/level.txt");
@@ -59,7 +70,7 @@ void WorldScene::init()
         pTriangle->registerBuffer();
         pNode->addComponent(pTriangle);
 
-        pNode->addComponent(new Rotate3D(0, 0, -1.0f));
+        pNode->addComponent(new Rotate3D(0, 0, -10.0f));
 
         pNode->addComponent(new Movement(1.0f)); // Add movement component with speed 1.0f
 

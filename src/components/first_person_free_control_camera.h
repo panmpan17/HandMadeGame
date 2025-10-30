@@ -34,5 +34,4 @@ private:
     void onMouseMove(float fDeltaX, float fDeltaY);
     void onResetRotationKeyDown(bool bPressed);
     void onSpeedModifierKeyDown(bool bPressed);
-    void updateCameraPositionToNode();
 };
