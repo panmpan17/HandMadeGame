@@ -11,3 +11,4 @@ build/
 cmake-build/
 *.ini
 __pycache__/
+xcode_proj/

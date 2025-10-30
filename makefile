@@ -29,6 +29,9 @@ build:
 	cmake --build ${BUILD_DIR} --parallel 8
 	@open $(BUILD_DIR)/bin/
 
+port-xcode:
+	cmake -S . -B xcode_proj -G Xcode -DBUILD_MAC_APP=ON -DCMAKE_BUILD_TYPE=Release
+
 clean:
 	@echo "Cleaning up..."
 	rm -rf $(BUILD_DIR)
