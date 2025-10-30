@@ -41,7 +41,7 @@ Node* processNode(const aiNode* pAiNode, const aiScene* pScene, Shader* pShader)
 {
     // float posX, posY, posZ;
     // extractPositionFromMatrix(pAiNode->mTransformation, posX, posY, posZ);
-    Node* pNode = new Node(0, 0, 0, 0);
+    Node* pNode = new Node(0, 0, 0);
 
     // process all the node's meshes (if any)
     for (unsigned int i = 0; i < pAiNode->mNumMeshes; i++)

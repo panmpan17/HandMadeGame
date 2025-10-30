@@ -15,8 +15,8 @@ class DataDeserializer;
 class Node : public ISerializable
 {
 public:
-    Node() {}
-    Node(float fX, float fY, float fZ, float fRotationZ);
+    Node() { m_vecPosition.x = 0; m_vecPosition.y = 0; m_vecPosition.z = 0; }
+    Node(float fX, float fY, float fZ);
     ~Node();
 
     inline void setPosition(float fX, float fY)
@@ -63,9 +63,6 @@ public:
     inline float getPositionX() const { return m_vecPosition.x; }
     inline float getPositionY() const { return m_vecPosition.y; }
     inline float getPositionZ() const { return m_vecPosition.z; }
-
-    inline void setRotation(float fRotation) { m_fRotation = fRotation; }
-    inline float getRotation() const { return m_fRotation; }
 
     inline const Quaternion& getRotationQuaternion() const { return m_oRotationQuaternion; }
     inline void setRotationQuaternion(const Quaternion& quat) { m_oRotationQuaternion = quat; m_bWorldMatrixDirty = true; m_bChildMatrixDirty = true; m_onRotationChanged.invoke(); }
@@ -122,7 +119,6 @@ public:
     friend std::ostream& operator<<(std::ostream& os, const Node& node)
     {
         os << "Node(pos=" <<  node.m_vecPosition.x << "," <<  node.m_vecPosition.y << "," <<  node.m_vecPosition.z << "; "
-           << "rotation=" << node.m_fRotation << "; "
            << "active=" << node.m_bIsActive
            << " )";
         return os;
@@ -135,7 +131,6 @@ private:
     Vector3 m_vecPosition;
     VoidEvent m_onPositionChanged;
 
-    float m_fRotation = 0;
     Quaternion m_oRotationQuaternion = Quaternion(1, 0, 0, 0);
     VoidEvent m_onRotationChanged;
 

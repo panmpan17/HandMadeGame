@@ -52,14 +52,14 @@ void WorldScene::init()
     Image* pDustImage = ImageLoader::getInstance()->getImage("dust");
 
     { // Triangle
-        auto pNode = new Node(-0.5f, 0.f, 0.f, 0.f);
+        auto pNode = new Node(-0.5f, 0.f, 0.f);
 
         auto pTriangle = new Triangle();
         pTriangle->setShader(pTestShader);
         pTriangle->registerBuffer();
         pNode->addComponent(pTriangle);
 
-        pNode->addComponent(new Rotate(-1.0f));
+        pNode->addComponent(new Rotate3D(0, 0, -1.0f));
 
         pNode->addComponent(new Movement(1.0f)); // Add movement component with speed 1.0f
 
@@ -69,7 +69,7 @@ void WorldScene::init()
     }
 
     {
-        auto pNode = new Node(-0.4f, 0.f, 0.f, 0.f);
+        auto pNode = new Node(-0.4f, 0.f, 0.f);
 
         auto pTriangle = new Triangle();
         pTriangle->setShader(pTestShader);
@@ -83,7 +83,7 @@ void WorldScene::init()
 
     // Quads 1
     
-    auto pNode2 = new Node(0.5f, 0.5f, 0.f, 0.f);
+    auto pNode2 = new Node(0.5f, 0.5f, 0.f);
 
     vec4 red = {1.f, 0.f, 0.f, 1.f}; // Red color for the quad
     auto pQuad = new Quad(0.5f, 0.5f, red);
@@ -92,14 +92,14 @@ void WorldScene::init()
     pQuad->registerBuffer();
     pNode2->addComponent(pQuad);
 
-    pNode2->addComponent(new Rotate(1.0f));
+    pNode2->addComponent(new Rotate3D(0, 0, 1.0f));
 
     addNode(pNode2);
 
     oSerializer << pNode2;
 
     // Quads 2
-    auto pNode3 = new Node(0.5f, 0.5f, 0.f, 0.f);
+    auto pNode3 = new Node(0.5f, 0.5f, 0.f);
 
     vec4 color = {0.5f, 0.5f, 1.f, 1.f}; // Blue color for the second quad
     auto pQuad2 = new Quad(0.3f, 0.3f, color);
@@ -120,7 +120,7 @@ void WorldScene::init()
     // pNode4->addComponent(particle);
     // addNode(pNode4);
 
-    auto pNode5 = new Node(0, 0, 0, 0);
+    auto pNode5 = new Node(0, 0, 0);
     auto particle2 = new ParticleSystem(100, false);
     particle2->setImage(pDustImage);
     particle2->setShader(pParticleShader);
@@ -145,7 +145,7 @@ void WorldScene::init()
     oSerializer << pNode5;
 
 
-    auto pNode6 = new Node(0.5f, 0, 0, 0);
+    auto pNode6 = new Node(0.5f, 0, 0);
     auto particle3 = new ParticleSystem(100);
     particle3->setShader(pParticleShader);
     particle3->registerBuffer();
@@ -161,7 +161,7 @@ void WorldScene::init()
     oSerializer << pNode6;
 
 
-    auto pNode7 = new Node(-0.5f, 0, 0, 0);
+    auto pNode7 = new Node(-0.5f, 0, 0);
     auto particle4 = new ParticleSystem(100);
     particle4->setShader(pParticleShader);
     particle4->registerBuffer();
@@ -179,7 +179,7 @@ void WorldScene::init()
     {
         Image* pCharacter = ImageLoader::getInstance()->getImage("character");
 
-        auto pPlayer = new Node(0.f, 0.f, 0.f, 0.f);
+        auto pPlayer = new Node(0.f, 0.f, 0.f);
         auto pSprite = new Sprite(pCharacter, 4, 4);
         pSprite->setShader(pImageShader);
         pSprite->registerBuffer();
@@ -203,7 +203,7 @@ void WorldScene::init()
 void WorldScene::createPinPongGame()
 {
     {
-        auto pNode = new Node(0.f, 0.f, 2.5f, 0.f);
+        auto pNode = new Node(0.f, 0.f, 2.5f);
         pNode->addComponent(new FirstPersonFreeControlCamera());
 
         Camera* pCamera = new Camera();
@@ -301,7 +301,7 @@ void WorldScene::createPinPongGame()
 void WorldScene::bloomTest()
 {
     {
-        auto pNode = new Node(0.f, 0.f, 2.5f, 0.f);
+        auto pNode = new Node(0.f, 0.f, 2.5f);
         pNode->addComponent(new FirstPersonFreeControlCamera());
 
         Camera* pCamera = new Camera();

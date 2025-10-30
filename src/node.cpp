@@ -7,7 +7,7 @@
 #include "random.h"
 
 
-Node::Node(float fX, float fY, float fZ, float fRotationZ) : m_fRotation(fRotationZ)
+Node::Node(float fX, float fY, float fZ)
 {
     m_vecPosition.x = fX;
     m_vecPosition.y = fY;
@@ -26,7 +26,6 @@ void Node::serializedTo(DataSerializer& serializer) const
     serializer.startClassHeader("Node");
     serializer.ADD_ATTRIBUTES(m_nID);
     serializer.ADD_ATTRIBUTES(m_vecPosition);
-    serializer.ADD_ATTRIBUTES(m_fRotation);
     serializer.ADD_ATTRIBUTES(m_bIsActive);
     serializer.endClassHeader();
 
@@ -44,7 +43,6 @@ bool Node::deserializeField(DataDeserializer& deserializer, const std::string_vi
 {
     DESERIALIZE_FIELD(m_nID);
     DESERIALIZE_FIELD(m_vecPosition);
-    DESERIALIZE_FIELD(m_fRotation);
     DESERIALIZE_FIELD(m_bIsActive);
 
     return false;
