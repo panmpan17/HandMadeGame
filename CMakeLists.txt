@@ -148,30 +148,50 @@ add_custom_target(copy_assets ALL DEPENDS ${CMAKE_BINARY_DIR}/assets.timestamp)
 add_dependencies(MichaelHandMadeGame copy_assets)
 
 
-# General Library
+### General Library
 add_subdirectory( external/glfw )
 
-add_subdirectory( external/assimp )
 
-add_library(glad include/glad/glad.c)
-target_include_directories(glad PUBLIC ${CMAKE_SOURCE_DIR}/include)
+# Glad Library
+if (TRUE)
+    add_library(glad include/glad/glad.c)
+    target_include_directories(glad PUBLIC ${CMAKE_SOURCE_DIR}/include)
+    target_link_libraries(MichaelHandMadeGame PRIVATE glad)
+endif()
 
-add_library(imgui STATIC
-    "external/imgui/imgui.cpp"
-    "external/imgui/imgui_demo.cpp"
-    "external/imgui/imgui_draw.cpp"
-    "external/imgui/imgui_tables.cpp"
-    "external/imgui/imgui_widgets.cpp"
-    "external/imgui/backends/imgui_impl_glfw.cpp"
-    "external/imgui/backends/imgui_impl_opengl3.cpp"
-)
+# Assimp Library
+if (TRUE)
+    set(ASSIMP_BUILD_ALL_IMPORTERS_BY_DEFAULT OFF CACHE BOOL "" FORCE)
+    set(ASSIMP_BUILD_FBX_IMPORTER ON CACHE BOOL "" FORCE)
+    set(ASSIMP_BUILD_OBJ_IMPORTER ON CACHE BOOL "" FORCE)
+    set(ASSIMP_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 
-target_include_directories(imgui PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}/external/imgui
-    ${CMAKE_CURRENT_SOURCE_DIR}/external/imgui/backends
-)
+    set(ASSIMP_NO_EXPORT ON CACHE BOOL "" FORCE)
 
-target_link_libraries(MichaelHandMadeGame PRIVATE imgui)
+    add_subdirectory( external/assimp )
+
+    target_link_libraries(MichaelHandMadeGame PRIVATE assimp)
+endif()
+
+# ImGui Library
+if (TRUE)
+    add_library(imgui STATIC
+        "external/imgui/imgui.cpp"
+        "external/imgui/imgui_demo.cpp"
+        "external/imgui/imgui_draw.cpp"
+        "external/imgui/imgui_tables.cpp"
+        "external/imgui/imgui_widgets.cpp"
+        "external/imgui/backends/imgui_impl_glfw.cpp"
+        "external/imgui/backends/imgui_impl_opengl3.cpp"
+    )
+
+    target_include_directories(imgui PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}/external/imgui
+        ${CMAKE_CURRENT_SOURCE_DIR}/external/imgui/backends
+    )
+
+    target_link_libraries(MichaelHandMadeGame PRIVATE imgui)
+endif()
 
 
 # Platform-specific settings
@@ -192,16 +212,6 @@ elseif(UNIX)
 
 endif()
 
-target_link_libraries(MichaelHandMadeGame
-    PRIVATE
-        glad
-        glfw
-        assimp
-)
-
-
-target_link_libraries(imgui
-    PRIVATE
-        glfw
-)
+target_link_libraries(MichaelHandMadeGame PRIVATE glfw )
+target_link_libraries(imgui PRIVATE glfw)
 
