@@ -2,6 +2,10 @@
 
 
 #include <cmath>
+#include <format>
+
+
+#define LERP(START, END, T) ((START) + ((END) - (START)) * (T))
 
 // struct Vector3
 // {
@@ -44,6 +48,14 @@ public:
 
     Vector2 operator/(float fMultiplier) const { return Vector2(x / fMultiplier, y / fMultiplier); }
     Vector2& operator/=(float fMultiplier) { x /= fMultiplier; y /= fMultiplier; return *this; }
+
+    static Vector2 lerp(const Vector2& vecStart, const Vector2& vecEnd, float fT)
+    {
+        return Vector2(
+            LERP(vecStart.x, vecEnd.x, fT),
+            LERP(vecStart.y, vecEnd.y, fT)
+        );
+    }
 };
 
 struct Vector3
@@ -89,4 +101,31 @@ public:
 
     Vector3 operator/(float fMultiplier) const { return Vector3(x / fMultiplier, y / fMultiplier, z / fMultiplier); }
     Vector3& operator/=(float fMultiplier) { x /= fMultiplier; y /= fMultiplier; z /= fMultiplier; return *this; }
+
+    static Vector3 lerp(const Vector3& vecStart, const Vector3& vecEnd, float fT)
+    {
+        return Vector3(
+            LERP(vecStart.x, vecEnd.x, fT),
+            LERP(vecStart.y, vecEnd.y, fT),
+            LERP(vecStart.z, vecEnd.z, fT)
+        );
+    }
+};
+
+
+// Formatter specialization
+template <>
+struct std::formatter<Vector2> : std::formatter<std::string> {
+    auto format(const Vector2& v, std::format_context& ctx) const {
+        // Produce formatted text; use ctx.out() to write to output iterator
+        return std::format_to(ctx.out(), "({}, {})", v.x, v.y);
+    }
+};
+
+template <>
+struct std::formatter<Vector3> : std::formatter<std::string> {
+    auto format(const Vector3& v, std::format_context& ctx) const {
+        // Produce formatted text; use ctx.out() to write to output iterator
+        return std::format_to(ctx.out(), "({}, {}, {})", v.x, v.y, v.z);
+    }
 };

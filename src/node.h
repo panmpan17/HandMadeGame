@@ -91,8 +91,30 @@ public:
     inline void setRotationQuaternion(const Quaternion& quat) { m_oRotationQuaternion = quat; m_bWorldMatrixDirty = true; m_bChildMatrixDirty = true; m_onRotationChanged.invoke(); }
     inline void rotateQuaternion(const Quaternion& quat) { m_oRotationQuaternion = m_oRotationQuaternion * quat; m_bWorldMatrixDirty = true; m_bChildMatrixDirty = true; m_onRotationChanged.invoke(); }
 
+
+    inline const Vector3& getScale() const { return m_vecScale; }
+    inline void setScale(float fScaleX, float fScaleY, float fScaleZ)
+    {
+        m_vecScale.x = fScaleX;
+        m_vecScale.y = fScaleY;
+        m_vecScale.z = fScaleZ;
+        m_bWorldMatrixDirty = true;
+        m_bChildMatrixDirty = true;
+        m_onScaleChanged.invoke();
+    }
+    inline void setScale(const Vector3& scale)
+    {
+        m_vecScale.x = scale.x;
+        m_vecScale.y = scale.y;
+        m_vecScale.z = scale.z;
+        m_bWorldMatrixDirty = true;
+        m_bChildMatrixDirty = true;
+        m_onScaleChanged.invoke();
+    }
+
     void registerOnPositionChangedListener(const std::function<void()>& listener) { m_onPositionChanged.add(listener); }
     void registerOnRotationChangedListener(const std::function<void()>& listener) { m_onRotationChanged.add(listener); }
+    void registerOnScaleChangedListener(const std::function<void()>& listener) { m_onScaleChanged.add(listener); }
 
 
     inline const mat4x4& getWorldMatrix()
@@ -109,8 +131,16 @@ public:
                 mat4x4_translate(m_oWorldMatrixCache, m_vecPosition.x, m_vecPosition.y, m_vecPosition.z);
             }
 
+            mat4x4 scaleMatrix;
+            mat4x4_identity(scaleMatrix);
+            mat4x4_scale_aniso(scaleMatrix, scaleMatrix, m_vecScale.x, m_vecScale.y, m_vecScale.z);
+
             mat4x4 rotationMatrix;
             m_oRotationQuaternion.toMat4x4(rotationMatrix);
+
+            mat4x4_mul(rotationMatrix, rotationMatrix, scaleMatrix);
+
+
             mat4x4_mul(m_oWorldMatrixCache, m_oWorldMatrixCache, rotationMatrix);
 
             m_bWorldMatrixDirty = false;

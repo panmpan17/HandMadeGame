@@ -8,6 +8,7 @@
 #include "components/triangle.h"
 #include "components/rotate.h"
 #include "components/movement.h"
+#include "components/scaling.h"
 #include "components/sprite_animation.h"
 #include "components/character2d.h"
 #include "components/particle/simple_particle_system.h"
@@ -326,7 +327,9 @@ void WorldScene::bloomTest()
 
     Shader* p3DMeshShader = ShaderLoader::getInstance()->getShader("3d_mesh");
     Node* pMonkey = loadModel("assets/models/monkey.obj", p3DMeshShader);
-    pMonkey->setPosition(-1.f, 0.f, 0.f);
+    pMonkey->addComponent(new Rotate3D(10, 30.f, 20.f));
+    pMonkey->addComponent(new TwoPointsMovement(vec2{-1, 0}, vec2{1, 0}, 2.0f));
+    pMonkey->addComponent(new TwoPointScaling(Vector3{0.5f, 0.5f, 0.5f}, Vector3{1.5f, 1.5f, 1.5f}, 2.0f));
     addNode(pMonkey);
     
     Node* pBackPack = loadModel("assets/models/back_pack.fbx", p3DMeshShader);
