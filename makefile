@@ -1,14 +1,23 @@
-.PHONY: compile clean build
+.PHONY: config-debug compile-debug compile clean build
 
 BUILD_DIR := cmake-build
 CMAKE_BIN := ${BUILD_DIR}/bin
 OUTPUT_NAME := MichaelHandMadeGame
 
-compile:
+config-debug:
 	cmake -S . -B ${BUILD_DIR} -DBUILD_MAC_APP=OFF -DCMAKE_BUILD_TYPE=Debug
+
+compile-debug:
 	cmake --build ${BUILD_DIR} --parallel 8
 
-quick: compile
+ccquick: config-debug compile-debug
+	@if ./$(CMAKE_BIN)/$(OUTPUT_NAME); then \
+		echo ""; \
+	else \
+		python3 utilites/check_error.py ${BUILD_DIR}/bin; \
+	fi
+
+quick: compile-debug
 	@if ./$(CMAKE_BIN)/$(OUTPUT_NAME); then \
 		echo ""; \
 	else \

@@ -24,5 +24,16 @@
         "utility": "cpp",
         "variant": "cpp",
         "vector": "cpp"
+    },
+    "search.exclude": {
+        "external/assimp/tools/**": true,
+        "external/assimp/contrib/**": true,
+        "external/assimp/test/**": true,
+        "external/assimp/doc/**": true,
+        "external/assimp/samples/**": true,
+
+        "external/glfw/deps/**": true,
+        "external/glfw/examples/**": true,
+        "external/glfw/tests/**": true,
     }
 }

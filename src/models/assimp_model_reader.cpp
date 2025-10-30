@@ -17,6 +17,13 @@ void extractPositionFromMatrix(const aiMatrix4x4& matrix, float& x, float& y, fl
     z = matrix.c4;
 }
 
+void convertMat4x4(const aiMatrix4x4& aiMat, mat4x4& outMat)
+{
+    outMat[0][0] = aiMat.a1; outMat[0][1] = aiMat.b1; outMat[0][2] = aiMat.c1; outMat[0][3] = aiMat.d1;
+    outMat[1][0] = aiMat.a2; outMat[1][1] = aiMat.b2; outMat[1][2] = aiMat.c2; outMat[1][3] = aiMat.d2;
+    outMat[2][0] = aiMat.a3; outMat[2][1] = aiMat.b3; outMat[2][2] = aiMat.c3; outMat[2][3] = aiMat.d3;
+    outMat[3][0] = aiMat.a4; outMat[3][1] = aiMat.b4; outMat[3][2] = aiMat.c4; outMat[3][3] = aiMat.d4;
+}
 
 
 Node* loadModel(const std::string_view& strPath, Shader* pShader)
@@ -42,6 +49,10 @@ Node* processNode(const aiNode* pAiNode, const aiScene* pScene, Shader* pShader)
     // float posX, posY, posZ;
     // extractPositionFromMatrix(pAiNode->mTransformation, posX, posY, posZ);
     Node* pNode = new Node(0, 0, 0);
+
+    // mat4x4 nodeMatrix;
+    // convertMat4x4(pAiNode->mTransformation, nodeMatrix);
+    // pNode->setChildMatrix(nodeMatrix);
 
     // process all the node's meshes (if any)
     for (unsigned int i = 0; i < pAiNode->mNumMeshes; i++)
