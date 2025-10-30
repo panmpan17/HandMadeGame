@@ -11,6 +11,9 @@
 #include "../serialization/type_registry.h"
 
 
+constexpr int INDENT_SIZE = 10;
+
+
 HierarchyView::HierarchyView()
 {
 }
@@ -36,17 +39,7 @@ void HierarchyView::update(float fDeltaTime)
                 Node* pNode = WorldScene::current->getNode(i);
                 if (pNode)
                 {
-                    ImGui::Text("Node %d", i);
-
-                    int nComponentCount = pNode->getComponentCount();
-                    for (int j = 0; j < nComponentCount; ++j)
-                    {
-                        Component* pComponent = pNode->getComponent(j);
-                        if (pComponent)
-                        {
-                            ImGui::Text("  %s", typeRegistry.getTitlizedName(typeid(*pComponent)).c_str());
-                        }
-                    }
+                    drawNodeRecursive(i, pNode);
                 }
             }
         }
@@ -57,4 +50,31 @@ void HierarchyView::update(float fDeltaTime)
     }
 
     ImGui::End();
+}
+
+void HierarchyView::drawNodeRecursive(int nIndex, Node* pNode)
+{
+    ImGui::Text("Node %d", nIndex);
+
+    ImGui::Indent(INDENT_SIZE);
+    int nComponentCount = pNode->getComponentCount();
+    for (int j = 0; j < nComponentCount; ++j)
+    {
+        Component* pComponent = pNode->getComponent(j);
+        if (pComponent)
+        {
+            ImGui::Text("[%s]", TypeRegistry::instance().getTitlizedName(typeid(*pComponent)).c_str());
+        }
+    }
+
+    int nChildCount = pNode->getChildNodeCount();
+    for (int k = 0; k < nChildCount; ++k)
+    {
+        Node* pChildNode = pNode->getChildNode(k);
+        if (pChildNode)
+        {
+            drawNodeRecursive(k, pChildNode);
+        }
+    }
+    ImGui::Unindent(INDENT_SIZE);
 }

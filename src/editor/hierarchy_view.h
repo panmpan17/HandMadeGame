@@ -4,6 +4,9 @@
 #include "editor_window.h"
 
 
+class Node;
+
+
 class HierarchyView : public IEditorWindow
 {
 public:
@@ -14,4 +17,6 @@ public:
 
 private:
     bool m_bCollapsed = false;
+
+    void drawNodeRecursive(int nIndex, Node* pNode);
 };
