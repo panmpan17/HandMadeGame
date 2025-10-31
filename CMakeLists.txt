@@ -92,7 +92,7 @@ if (APPLE)
         )
 
         add_custom_command(TARGET MichaelHandMadeGame POST_BUILD
-            COMMAND codesign --force --deep --sign "ApplicationCodeSign"
+            COMMAND codesign --force --deep --verify --verbose --sign -
                     "$<TARGET_BUNDLE_DIR:MichaelHandMadeGame>"
         )
 
