@@ -113,6 +113,14 @@ if (APPLE)
 
         target_sources(MichaelHandMadeGame PRIVATE ${ASSET_SOURCES})
 
+        # In future can modify the xcode project file directly to add a folder reference
+        # to the assets folder, so that changes to assets are automatically reflected
+        # isa = PBXFileReference;
+        # lastKnownFileType = folder;
+        # name = Resources;
+        # path = assets;
+        # sourceTree = "<group>";
+
     elseif (BUILD_MAC_APP)
         add_executable(MichaelHandMadeGame MACOSX_BUNDLE
                     ${SOURCES}
