@@ -2,6 +2,7 @@
 
 #include <cmath>
 #include <linmath.h>
+#include "vector.h"
 
 
 struct Quaternion
@@ -93,8 +94,37 @@ public:
         out[1] = 2.0f * (x * y + z * w);
         out[2] = 2.0f * (x * z - y * w);
     }
+
+    inline void toEulerAngles(Vector3& outEuler) const
+    {
+        // roll (x-axis rotation)
+        float sinr_cosp = 2.0f * (w * x + y * z);
+        float cosr_cosp = 1.0f - 2.0f * (x * x + y * y);
+        outEuler.x = atan2f(sinr_cosp, cosr_cosp);
+
+        // pitch (y-axis rotation)
+        float sinp = 2.0f * (w * y - z * x);
+        if (fabs(sinp) >= 1)
+            outEuler.y = copysignf(M_PI / 2, sinp); // use 90 degrees if out of range
+        else
+            outEuler.y = asinf(sinp);
+
+        // yaw (z-axis rotation)
+        float siny_cosp = 2.0f * (w * z + x * y);
+        float cosy_cosp = 1.0f - 2.0f * (y * y + z * z);
+        outEuler.z = atan2f(siny_cosp, cosy_cosp);
+    }
 };
 
+
+// Formatter specialization
+template <>
+struct std::formatter<Quaternion> : std::formatter<std::string> {
+    auto format(const Quaternion& q, std::format_context& ctx) const {
+        // Produce formatted text; use ctx.out() to write to output iterator
+        return std::format_to(ctx.out(), "({}, {}, {}, {})", q.w, q.x, q.y, q.z);
+    }
+};
 
 #ifndef QUATERNION_H_IMPLEMENTATION
 #define QUATERNION_H_IMPLEMENTATION

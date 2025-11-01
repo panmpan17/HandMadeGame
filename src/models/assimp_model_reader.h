@@ -19,11 +19,11 @@ struct Quaternion;
 struct Vector3;
 
 
-void extractPositionFromMatrix(const mat4x4& matrix, float& x, float& y, float& z);
-void extractScaleFromMatrix(const mat4x4& matrix, Vector3& outScale);
+// void extractPositionFromMatrix(const mat4x4& matrix, Vector3& outPosition, bool bSwapYZ = false);
+// void extractScaleFromMatrix(const mat4x4& matrix, Vector3& outScale);
 
-void rotationMatrixToQuaternion(const mat4x4& rotationMatrix, Quaternion& outQuat);
-void extractRotationMatrixFromMatrix(const mat4x4& matrix, const Vector3& scale, mat4x4& rotationMatrix);
+// void rotationMatrixToQuaternion(const mat4x4& rotationMatrix, Quaternion& outQuat);
+// void extractRotationMatrixFromMatrix(const mat4x4& matrix, const Vector3& scale, mat4x4& rotationMatrix);
 
 Node* loadModel(const std::string_view& strPath, Shader* pShader);
 

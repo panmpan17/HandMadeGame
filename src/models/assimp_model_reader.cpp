@@ -3,13 +3,14 @@
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
+#include <assimp/cimport.h>
 
 #include "../debug_macro.h"
 #include "../node.h"
 #include "../components/mesh_renderer.h"
 #include "../vector.h"
 
-
+/*
 void convertMat4x4(const aiMatrix4x4& aiMat, mat4x4& outMat)
 {
     outMat[0][0] = aiMat.a1; outMat[0][1] = aiMat.b1; outMat[0][2] = aiMat.c1; outMat[0][3] = aiMat.d1;
@@ -18,11 +19,19 @@ void convertMat4x4(const aiMatrix4x4& aiMat, mat4x4& outMat)
     outMat[3][0] = aiMat.a4; outMat[3][1] = aiMat.b4; outMat[3][2] = aiMat.c4; outMat[3][3] = aiMat.d4;
 }
 
-void extractPositionFromMatrix(const mat4x4& matrix, float& x, float& y, float& z)
+void extractPositionFromMatrix(const mat4x4& matrix, Vector3& outPosition, bool bSwapYZ/* = false*)
 {
-    x = matrix[3][0];
-    y = matrix[3][1];
-    z = matrix[3][2];
+    outPosition.x = matrix[3][0];
+    if (bSwapYZ)
+    {
+        outPosition.y = matrix[3][2];
+        outPosition.z = matrix[3][1];
+    }
+    else
+    {
+        outPosition.y = matrix[3][1];
+        outPosition.z = matrix[3][2];
+    }
 }
 
 void extractScaleFromMatrix(const mat4x4& matrix, Vector3& outScale)
@@ -59,35 +68,40 @@ void extractRotationMatrixFromMatrix(const mat4x4& matrix, const Vector3& scale,
 void rotationMatrixToQuaternion(const mat4x4& rotationMatrix, Quaternion& outQuat)
 {
     float trace = rotationMatrix[0][0] + rotationMatrix[1][1] + rotationMatrix[2][2];
-    if (trace > 0.0f) {
+    if (trace > 0.0f)
+    {
         float s = sqrtf(trace + 1.0f) * 2.0f; // S=4*qw
         outQuat.w = 0.25f * s;
         outQuat.x = (rotationMatrix[2][1] - rotationMatrix[1][2]) / s;
         outQuat.y = (rotationMatrix[0][2] - rotationMatrix[2][0]) / s;
         outQuat.z = (rotationMatrix[1][0] - rotationMatrix[0][1]) / s;
-    } else {
-        if (rotationMatrix[0][0] > rotationMatrix[1][1] && rotationMatrix[0][0] > rotationMatrix[2][2]) {
-            float s = sqrtf(1.0f + rotationMatrix[0][0] - rotationMatrix[1][1] - rotationMatrix[2][2]) * 2.0f; // S=4*qx
-            outQuat.w = (rotationMatrix[2][1] - rotationMatrix[1][2]) / s;
-            outQuat.x = 0.25f * s;
-            outQuat.y = (rotationMatrix[0][1] + rotationMatrix[1][0]) / s;
-            outQuat.z = (rotationMatrix[0][2] + rotationMatrix[2][0]) / s;
-        } else if (rotationMatrix[1][1] > rotationMatrix[2][2]) {
-            float s = sqrtf(1.0f + rotationMatrix[1][1] - rotationMatrix[0][0] - rotationMatrix[2][2]) * 2.0f; // S=4*qy
-            outQuat.w = (rotationMatrix[0][2] - rotationMatrix[2][0]) / s;
-            outQuat.x = (rotationMatrix[0][1] + rotationMatrix[1][0]) / s;
-            outQuat.y = 0.25f * s;
-            outQuat.z = (rotationMatrix[1][2] + rotationMatrix[2][1]) / s;
-        } else {
-            float s = sqrtf(1.0f + rotationMatrix[2][2] - rotationMatrix[0][0] - rotationMatrix[1][1]) * 2.0f; // S=4*qz
-            outQuat.w = (rotationMatrix[1][0] - rotationMatrix[0][1]) / s;
-            outQuat.x = (rotationMatrix[0][2] + rotationMatrix[2][0]) / s;
-            outQuat.y = (rotationMatrix[1][2] + rotationMatrix[2][ 1]) / s;
-            outQuat.z = 0.25f * s;
-        }
+    }
+    else if (rotationMatrix[0][0] > rotationMatrix[1][1] && rotationMatrix[0][0] > rotationMatrix[2][2])
+    {
+        float s = sqrtf(1.0f + rotationMatrix[0][0] - rotationMatrix[1][1] - rotationMatrix[2][2]) * 2.0f; // S=4*qx
+        outQuat.w = (rotationMatrix[2][1] - rotationMatrix[1][2]) / s;
+        outQuat.x = 0.25f * s;
+        outQuat.y = (rotationMatrix[0][1] + rotationMatrix[1][0]) / s;
+        outQuat.z = (rotationMatrix[0][2] + rotationMatrix[2][0]) / s;
+    }
+    else if (rotationMatrix[1][1] > rotationMatrix[2][2])
+    {
+        float s = sqrtf(1.0f + rotationMatrix[1][1] - rotationMatrix[0][0] - rotationMatrix[2][2]) * 2.0f; // S=4*qy
+        outQuat.w = (rotationMatrix[0][2] - rotationMatrix[2][0]) / s;
+        outQuat.x = (rotationMatrix[0][1] + rotationMatrix[1][0]) / s;
+        outQuat.y = 0.25f * s;
+        outQuat.z = (rotationMatrix[1][2] + rotationMatrix[2][1]) / s;
+    }
+    else
+    {
+        float s = sqrtf(1.0f + rotationMatrix[2][2] - rotationMatrix[0][0] - rotationMatrix[1][1]) * 2.0f; // S=4*qz
+        outQuat.w = (rotationMatrix[1][0] - rotationMatrix[0][1]) / s;
+        outQuat.x = (rotationMatrix[0][2] + rotationMatrix[2][0]) / s;
+        outQuat.y = (rotationMatrix[1][2] + rotationMatrix[2][1]) / s;
+        outQuat.z = 0.25f * s;
     }
 }
-
+*/
 
 Node* loadModel(const std::string_view& strPath, Shader* pShader)
 {
@@ -109,26 +123,17 @@ Node* loadModel(const std::string_view& strPath, Shader* pShader)
 
 Node* processNode(const aiNode* pAiNode, const aiScene* pScene, Shader* pShader)
 {
-    mat4x4 nodeMatrix;
-    convertMat4x4(pAiNode->mTransformation, nodeMatrix);
+    aiVector3D scale;
+    aiVector3D position;
+    aiQuaternion rotationQuatAi;
+    // This should extract scale first, then rotation, then position
+    pAiNode->mTransformation.Decompose(scale, rotationQuatAi, position);
 
-    float posX, posY, posZ;
-    extractPositionFromMatrix(nodeMatrix, posX, posY, posZ);
-
-    Vector3 scale;
-    extractScaleFromMatrix(nodeMatrix, scale);
-
-    mat4x4 rotationMatrix; Quaternion rotationQuat;
-    extractRotationMatrixFromMatrix(nodeMatrix, scale, rotationMatrix);
-    rotationMatrixToQuaternion(rotationMatrix, rotationQuat);
-
-    Node* pNode = new Node(posX, posY, posZ);
-    pNode->setRotationQuaternion(rotationQuat);
+    Node* pNode = new Node();
+    pNode->setPosition(position.x, position.y, position.z);
     pNode->setScale(scale.x, scale.y, scale.z);
-
-    // mat4x4 nodeMatrix;
-    // convertMat4x4(pAiNode->mTransformation, nodeMatrix);
-    // pNode->setChildMatrix(nodeMatrix);
+    Quaternion rotationQuat(rotationQuatAi.w, rotationQuatAi.x, rotationQuatAi.y, rotationQuatAi.z);
+    pNode->setRotationQuaternion(rotationQuat);
 
     // process all the node's meshes (if any)
     for (unsigned int i = 0; i < pAiNode->mNumMeshes; i++)

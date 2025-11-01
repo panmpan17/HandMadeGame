@@ -93,6 +93,11 @@ public:
 
 
     inline const Vector3& getScale() const { return m_vecScale; }
+    inline void setScale(float fScale)
+    {
+        m_vecScale.x = m_vecScale.y = m_vecScale.z = fScale;
+        m_bWorldMatrixDirty = true; m_bChildMatrixDirty = true; m_onScaleChanged.invoke();
+    }
     inline void setScale(float fScaleX, float fScaleY, float fScaleZ)
     {
         m_vecScale.x = fScaleX;
