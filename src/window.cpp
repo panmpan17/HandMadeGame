@@ -11,7 +11,6 @@
 
 #include "window.h"
 #include "input_handle.h"
-#include "light_manager.h"
 #include "draw/image.h"
 #include "draw/shader_loader.h"
 #include "world.h"
@@ -20,6 +19,7 @@
 #include "editor/camera_inspector.h"
 #include "editor/hierarchy_view.h"
 #include "editor/post_process_inspector.h"
+#include "lighting/light_manager.h"
 
 #include "imgui.h"
 #include "imgui_impl_glfw.h"

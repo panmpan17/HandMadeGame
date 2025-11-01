@@ -22,6 +22,8 @@
 #include "physics/box.h"
 #include "models/simple_obj_reader.h"
 #include "models/assimp_model_reader.h"
+#include "lighting/point_light.h"
+#include "lighting/direction_light.h"
 
 #include "game/pingpong/paddle_control.h"
 #include "game/pingpong/pong.h"
@@ -337,6 +339,48 @@ void WorldScene::bloomTest()
     pBackPackFbx->setScale(0.01f);
     pBackPackFbx->setPosition(2.f, 0.f, 0.f);
     addNode(pBackPackFbx);
+
+    {
+        Node* pPointLightNode = new Node();
+        pPointLightNode->setRotationQuaternion(Quaternion::fromAxisAngle({1.f, 0.f, 0.f}, 45.f));
+
+        DirectionLightComponent* pPointLightComp = new DirectionLightComponent();
+        pPointLightComp->setColor({1.f, 0.f, 0.f});
+        pPointLightComp->setIntensity(5.f);
+        pPointLightNode->addComponent(pPointLightComp);
+
+        pPointLightNode->addComponent(new TwoPointsMovement(vec2{0.f, -3.f}, vec2{0.f, 3.f}, 3.f));
+
+        addNode(pPointLightNode);
+    }
+
+    // {
+    //     Node* pPointLightNode = new Node();
+
+    //     PointLightComponent* pPointLightComp = new PointLightComponent();
+    //     pPointLightComp->setColor({1.f, 0.f, 0.f});
+    //     pPointLightComp->setIntensity(5.f);
+    //     pPointLightComp->setRange(10.f);
+    //     pPointLightNode->addComponent(pPointLightComp);
+
+    //     pPointLightNode->addComponent(new TwoPointsMovement(vec2{0.f, -3.f}, vec2{0.f, 3.f}, 3.f));
+
+    //     addNode(pPointLightNode);
+    // }
+
+    // {
+    //     Node* pPointLightNode = new Node();
+
+    //     PointLightComponent* pPointLightComp = new PointLightComponent();
+    //     pPointLightComp->setColor({0.f, 1.f, 0.f});
+    //     pPointLightComp->setIntensity(5.f);
+    //     pPointLightComp->setRange(10.f);
+    //     pPointLightNode->addComponent(pPointLightComp);
+
+    //     pPointLightNode->addComponent(new TwoPointsMovement(vec2{3.f, 0.f}, vec2{3.f, 0.f}, 3.f));
+
+    //     addNode(pPointLightNode);
+    // }
 
     /*
 

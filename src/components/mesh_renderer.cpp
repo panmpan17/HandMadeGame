@@ -6,7 +6,7 @@
 #include "../window.h"
 #include "../node.h"
 #include "../camera.h"
-#include "../light_manager.h"
+#include "../lighting/light_manager.h"
 #include "../draw/image.h"
 
 

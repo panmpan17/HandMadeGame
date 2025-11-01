@@ -29,7 +29,6 @@ endif()
 
 # Source files
 set(SOURCES
-    "src/main.cpp"
     "src/post_process/render_process_queue.cpp"
     "src/post_process/order_dithering.cpp"
     "src/post_process/bloom_test.cpp"
@@ -38,8 +37,8 @@ set(SOURCES
     "src/error_handler.cpp"
     "src/window.cpp"
     "src/random.cpp"
-    "src/serialization/serializer.cpp"
     "src/serialization/type_registry.cpp"
+    "src/serialization/serializer.cpp"
     "src/node.cpp"
     "src/models/mesh.cpp"
     "src/models/simple_obj_reader.cpp"
@@ -48,12 +47,12 @@ set(SOURCES
     "src/game/pingpong/paddle_control.cpp"
     "src/input_handle.cpp"
     "src/vector.cpp"
-    "src/light_manager.cpp"
     "src/components/sprite_animation.cpp"
     "src/components/mesh_renderer.cpp"
     "src/components/component.cpp"
     "src/components/quad.cpp"
     "src/components/character2d.cpp"
+    "src/components/first_person_free_control_camera.cpp"
     "src/components/movement.cpp"
     "src/components/rotate.cpp"
     "src/components/triangle.cpp"
@@ -61,15 +60,18 @@ set(SOURCES
     "src/components/particle/particle_system.cpp"
     "src/components/particle/simple_particle_system.cpp"
     "src/components/particle/particle_lifetime_change.cpp"
-    "src/components/first_person_free_control_camera.cpp"
+    "src/lighting/light_manager.cpp"
+    "src/lighting/point_light.cpp"
+    "src/lighting/direction_light.cpp"
     "src/file_utils.cpp"
     "src/world.cpp"
     "src/draw/image.cpp"
     "src/draw/shader_loader.cpp"
     "src/draw/shader.cpp"
-    "src/editor/camera_inspector.cpp"
+    "src/main.cpp"
     "src/editor/hierarchy_view.cpp"
     "src/editor/post_process_inspector.cpp"
+    "src/editor/camera_inspector.cpp"
 )
 
 if (APPLE)

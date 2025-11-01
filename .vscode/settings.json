@@ -44,5 +44,6 @@
         "external/glfw/deps/**": true,
         "external/glfw/examples/**": true,
         "external/glfw/tests/**": true,
+        "cmake-build/**": true
     }
 }
