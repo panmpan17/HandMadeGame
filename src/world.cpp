@@ -319,7 +319,7 @@ void WorldScene::bloomTest()
         Camera* pCamera = new Camera();
         pCamera->useAsMain();
         pCamera->setUseOrthoProjection(false);
-        pCamera->setWorldSizeScale(3.0f);
+        pCamera->setWorldSizeScale(10.0f);
         pNode->addComponent(pCamera);
 
         addNode(pNode);
@@ -334,6 +334,7 @@ void WorldScene::bloomTest()
     
     Node* pBackPack = loadModel("assets/models/back_pack.fbx", p3DMeshShader);
     pBackPack->setPosition(1.f, 0.f, 0.f);
+    pBackPack->setScale(0.01f, 0.01f, 0.01f);
     addNode(pBackPack);
 
     /*
