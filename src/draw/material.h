@@ -19,9 +19,13 @@ public:
     inline void setNormalMap(Image* pNormalMap) { m_pNormalMap = pNormalMap; }
     inline Image* getNormalMap() const { return m_pNormalMap; }
 
+    inline void setSpecularMap(Image* pSpecularMap) { m_pSpecularMap = pSpecularMap; }
+    inline Image* getSpecularMap() const { return m_pSpecularMap; }
+
 private:
     Shader* m_pShader = nullptr;
 
     Image* m_pAlbedoMap = nullptr;
     Image* m_pNormalMap = nullptr;
+    Image* m_pSpecularMap = nullptr;
 };

@@ -33,6 +33,7 @@ layout(std140) uniform LightData // 544
 
 uniform sampler2D u_tex0; // main texture
 uniform sampler2D u_tex1; // specular map
+uniform sampler2D u_tex2; // normal map
 uniform int u_textureEnabled; // bitmask for texture usage, 1: main texture, 2: specular map, 3: both
 
 uniform vec2 u_SpecularParams; // x: intensity, y: power
@@ -45,7 +46,17 @@ out vec4 fragment;
 
 void main()
 {
-    vec3 norm = normalize(fragNormal);
+    vec3 norm;
+
+    if ((u_textureEnabled & 4) != 0)
+    {
+        vec4 texColor = texture(u_tex2, fragUV);
+        norm = normalize(texColor.xyz);
+    }
+    else
+    {
+        norm = normalize(fragNormal);
+    }
 
     vec3 viewDir = normalize(u_CamPos - fragPos);
 

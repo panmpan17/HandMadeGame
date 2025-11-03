@@ -56,6 +56,7 @@ void MeshRenderer::initShader(Shader* const pShader)
     m_pSpecularParamUniform = pShader->getUniformHandle("u_SpecularParams");
     m_pMainTexUniform = pShader->getUniformHandle(SHADER_UNIFORM_TEXTURE_0);
     m_pSpecularMapUniform = pShader->getUniformHandle(SHADER_UNIFORM_TEXTURE_1);
+    m_pNormalMapUniform = pShader->getUniformHandle(SHADER_UNIFORM_TEXTURE_2);
     m_pTextureEnabledUniform = pShader->getUniformHandle("u_textureEnabled");
 
     bindVertexArray(pShader);
@@ -147,13 +148,25 @@ void MeshRenderer::draw()
 
             ntextureBitmask |= 2; // Enable specular map
         }
-        else if (m_pMaterial && m_pMaterial->getNormalMap())
+        else if (m_pMaterial && m_pMaterial->getSpecularMap())
         {
             glActiveTexture(GL_TEXTURE1);
-            glBindTexture(GL_TEXTURE_2D, m_pMaterial->getNormalMap()->getTextureID());
+            glBindTexture(GL_TEXTURE_2D, m_pMaterial->getSpecularMap()->getTextureID());
             glUniform1i(m_pSpecularMapUniform->m_nLocation, 1);
 
             ntextureBitmask |= 2; // Enable specular map
+        }
+    }
+
+    if (m_pNormalMapUniform)
+    {
+        if (m_pMaterial && m_pMaterial->getNormalMap())
+        {
+            glActiveTexture(GL_TEXTURE2);
+            glBindTexture(GL_TEXTURE_2D, m_pMaterial->getNormalMap()->getTextureID());
+            glUniform1i(m_pNormalMapUniform->m_nLocation, 2);
+
+            ntextureBitmask |= 4; // Enable normal map
         }
     }
 

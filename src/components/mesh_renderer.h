@@ -53,6 +53,7 @@ private:
     const ShaderUniformHandle* m_pSpecularParamUniform = nullptr;
     const ShaderUniformHandle* m_pMainTexUniform = nullptr;
     const ShaderUniformHandle* m_pSpecularMapUniform = nullptr;
+    const ShaderUniformHandle* m_pNormalMapUniform = nullptr;
     const ShaderUniformHandle* m_pTextureEnabledUniform = nullptr;
 
 
