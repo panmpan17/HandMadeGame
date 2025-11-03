@@ -50,3 +50,7 @@
   name: 3d_mesh
   vertex: assets/shaders/3d_mesh.vert
   fragment: assets/shaders/3d_mesh.frag
+14:
+  name: point_light
+  vertex: assets/shaders/point_light.vert
+  fragment: assets/shaders/point_light.frag

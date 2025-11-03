@@ -331,7 +331,7 @@ void WorldScene::bloomTest()
 
     Node* pMonkey = loadModel("assets/models/monkey.obj", p3DMeshShader);
     pMonkey->addComponent(new Rotate3D(10, 30.f, 20.f));
-    pMonkey->addComponent(new TwoPointsMovement(vec2{-1, 0}, vec2{1, 0}, 2.0f));
+    // pMonkey->addComponent(new TwoPointsMovement(vec2{-1, 0}, vec2{1, 0}, 2.0f));
     pMonkey->addComponent(new TwoPointScaling(Vector3{0.5f, 0.5f, 0.5f}, Vector3{1.5f, 1.5f, 1.5f}, 2.0f));
     addNode(pMonkey);
     
@@ -340,33 +340,34 @@ void WorldScene::bloomTest()
     pBackPackFbx->setPosition(2.f, 0.f, 0.f);
     addNode(pBackPackFbx);
 
-    {
-        Node* pPointLightNode = new Node();
-        pPointLightNode->setRotationQuaternion(Quaternion::fromAxisAngle({1.f, 0.f, 0.f}, 45.f));
-
-        DirectionLightComponent* pPointLightComp = new DirectionLightComponent();
-        pPointLightComp->setColor({1.f, 0.f, 0.f});
-        pPointLightComp->setIntensity(5.f);
-        pPointLightNode->addComponent(pPointLightComp);
-
-        pPointLightNode->addComponent(new TwoPointsMovement(vec2{0.f, -3.f}, vec2{0.f, 3.f}, 3.f));
-
-        addNode(pPointLightNode);
-    }
-
     // {
     //     Node* pPointLightNode = new Node();
+    //     pPointLightNode->setRotationQuaternion(Quaternion::fromAxisAngle({1.f, 0.f, 0.f}, 45.f));
 
-    //     PointLightComponent* pPointLightComp = new PointLightComponent();
+    //     DirectionLightComponent* pPointLightComp = new DirectionLightComponent();
     //     pPointLightComp->setColor({1.f, 0.f, 0.f});
     //     pPointLightComp->setIntensity(5.f);
-    //     pPointLightComp->setRange(10.f);
     //     pPointLightNode->addComponent(pPointLightComp);
 
     //     pPointLightNode->addComponent(new TwoPointsMovement(vec2{0.f, -3.f}, vec2{0.f, 3.f}, 3.f));
 
     //     addNode(pPointLightNode);
     // }
+
+    {
+        Node* pPointLightNode = new Node();
+        pPointLightNode->setPosition(0.f, 3.f, 0.f);
+
+        PointLightComponent* pPointLightComp = new PointLightComponent();
+        pPointLightComp->setColor({1.f, 1.f, 1.f});
+        pPointLightComp->setIntensity(5.f);
+        pPointLightComp->setRange(10.f);
+        pPointLightNode->addComponent(pPointLightComp);
+
+        pPointLightNode->addComponent(new TwoPointsMovement(vec2{0.f, -3.f}, vec2{0.f, 3.f}, 3.f));
+
+        addNode(pPointLightNode);
+    }
 
     // {
     //     Node* pPointLightNode = new Node();
