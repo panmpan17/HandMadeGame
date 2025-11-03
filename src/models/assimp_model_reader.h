@@ -17,6 +17,8 @@ class Node;
 class Shader;
 struct Quaternion;
 struct Vector3;
+class Image;
+class Material;
 
 
 // void extractPositionFromMatrix(const mat4x4& matrix, Vector3& outPosition, bool bSwapYZ = false);
@@ -25,9 +27,9 @@ struct Vector3;
 // void rotationMatrixToQuaternion(const mat4x4& rotationMatrix, Quaternion& outQuat);
 // void extractRotationMatrixFromMatrix(const mat4x4& matrix, const Vector3& scale, mat4x4& rotationMatrix);
 
-Node* loadModel(const std::string_view& strPath, Shader* pShader);
+Node* loadModel(const std::string_view& strPath, std::shared_ptr<Material>& pMaterial);
 
-Node* processNode(const aiNode* pAiNode, const aiScene* pScene, Shader* pShader);
+Node* processNode(const aiNode* pAiNode, const aiScene* pScene, std::shared_ptr<Material>& pMaterial);
 
-std::shared_ptr<Mesh> processMesh(const aiMesh* pMesh);
+std::shared_ptr<Mesh> processMesh(const aiMesh* pMesh, const aiScene* pScene);
 

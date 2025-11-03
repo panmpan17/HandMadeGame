@@ -185,5 +185,14 @@ Image* ImageLoader::getImageByPath(const std::string_view& strPath)
             return pair.second;
         }
     }
+
+    auto pImage = new Image(strPath);
+    if (pImage->isCPULoaded())
+    {
+        pImage->loadTextureToGL();
+        pImage->freeCPUData();
+        m_mapLoadedImages[strPath] = pImage;
+        return pImage;
+    }
     return nullptr;
 }

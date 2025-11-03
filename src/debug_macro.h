@@ -22,8 +22,8 @@
 #define LOG(msg) std::print(msg)
 #define LOG_EX(msg, ...) std::print(msg, __VA_ARGS__)
 
-#define LOGLN(msg) std::println(msg)
-#define LOGLN_EX(msg, ...) std::println(msg, __VA_ARGS__)
+#define LOGLN(msg, ...) std::println(msg __VA_OPT__(,) __VA_ARGS__)
+#define LOGLN_EX(msg, ...) std::println(msg __VA_OPT__(,) __VA_ARGS__)
 
 #define LOGERR(msg) std::println("\033[91m{}\033[0m", msg)
 #define LOGERR_EX(msg, ...) std::cout << "\033[91m" << std::format(msg, __VA_ARGS__) << "\033[0m";

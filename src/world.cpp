@@ -4,6 +4,7 @@
 #include "draw/image.h"
 #include "draw/shader.h"
 #include "draw/shader_loader.h"
+#include "draw/material.h"
 #include "components/quad.h"
 #include "components/triangle.h"
 #include "components/rotate.h"
@@ -329,13 +330,20 @@ void WorldScene::bloomTest()
 
     Shader* p3DMeshShader = ShaderLoader::getInstance()->getShader("3d_mesh");
 
-    Node* pMonkey = loadModel("assets/models/monkey.obj", p3DMeshShader);
-    pMonkey->addComponent(new Rotate3D(10, 30.f, 20.f));
-    // pMonkey->addComponent(new TwoPointsMovement(vec2{-1, 0}, vec2{1, 0}, 2.0f));
-    pMonkey->addComponent(new TwoPointScaling(Vector3{0.5f, 0.5f, 0.5f}, Vector3{1.5f, 1.5f, 1.5f}, 2.0f));
-    addNode(pMonkey);
-    
-    Node* pBackPackFbx = loadModel("assets/models/back_pack.fbx", p3DMeshShader);
+    // Node* pMonkey = loadModel("assets/models/monkey.obj", p3DMeshShader);
+    // pMonkey->addComponent(new Rotate3D(10, 30.f, 20.f));
+    // // pMonkey->addComponent(new TwoPointsMovement(vec2{-1, 0}, vec2{1, 0}, 2.0f));
+    // pMonkey->addComponent(new TwoPointScaling(Vector3{0.5f, 0.5f, 0.5f}, Vector3{1.5f, 1.5f, 1.5f}, 2.0f));
+    // addNode(pMonkey);
+
+    auto pMainImage = ImageLoader::getInstance()->getImageByPath("assets/models/1001_albedo.jpg");
+    auto pNormalImage = ImageLoader::getInstance()->getImageByPath("assets/models/1001_normal.png");
+
+    std::shared_ptr<Material> pMaterial = std::make_shared<Material>(p3DMeshShader);
+    pMaterial->setAlbedoMap(pMainImage);
+    pMaterial->setNormalMap(pNormalImage);
+
+    Node* pBackPackFbx = loadModel("assets/models/back_pack.fbx", pMaterial);
     pBackPackFbx->setScale(0.01f);
     pBackPackFbx->setPosition(2.f, 0.f, 0.f);
     addNode(pBackPackFbx);

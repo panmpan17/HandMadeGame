@@ -9,6 +9,8 @@
 #include "../node.h"
 #include "../components/mesh_renderer.h"
 #include "../vector.h"
+#include "../draw/image.h"
+#include "../draw/material.h"
 
 /*
 void convertMat4x4(const aiMatrix4x4& aiMat, mat4x4& outMat)
@@ -103,7 +105,7 @@ void rotationMatrixToQuaternion(const mat4x4& rotationMatrix, Quaternion& outQua
 }
 */
 
-Node* loadModel(const std::string_view& strPath, Shader* pShader)
+Node* loadModel(const std::string_view& strPath, std::shared_ptr<Material>& pMaterial)
 {
     Assimp::Importer importer;
 
@@ -118,10 +120,54 @@ Node* loadModel(const std::string_view& strPath, Shader* pShader)
 
     LOGLN_EX( "Model {} loaded successfully with {} meshes.", strPath, pScene->mNumMeshes);
 
-    return processNode(pScene->mRootNode, pScene, pShader);
+    // for (unsigned int i = 0; i < pScene->mNumMaterials; i++)
+    // {
+    //     const aiMaterial* const pMaterial = pScene->mMaterials[i];
+    //     int nDiffuseTexCount = pMaterial->GetTextureCount(aiTextureType_DIFFUSE);
+    //     LOGLN_EX("Material {} has {} DIFFUSE, {} SPECULAR, {} AMBIENT, {} EMISSIVE, {} HEIGHT, {} NORMALS, {} SHININESS, {} OPACITY, {} DISPLACEMENT, {} LIGHTMAP, {} REFLECTION, {} BASE_COLOR, {} NORMAL_CAMERA, {} EMISSION_COLOR, {} METALNESS, {} DIFFUSE_ROUGHNESS, {} AMBIENT_OCCLUSION, {} UNKNOWN, {} SHEEN, {} CLEARCOAT, {} TRANSMISSION, {} MAYA_BASE, {} MAYA_SPECULAR, {} MAYA_SPECULAR_COLOR, {} MAYA_SPECULAR_ROUGHNESS, {} ANISOTROPY, {} GLTF_METALLIC_ROUGHNES",
+    //         pMaterial->GetName().C_Str(),
+    //         pMaterial->GetTextureCount(aiTextureType_DIFFUSE),
+    //         pMaterial->GetTextureCount(aiTextureType_SPECULAR),
+    //         pMaterial->GetTextureCount(aiTextureType_AMBIENT),
+    //         pMaterial->GetTextureCount(aiTextureType_EMISSIVE),
+    //         pMaterial->GetTextureCount(aiTextureType_HEIGHT),
+    //         pMaterial->GetTextureCount(aiTextureType_NORMALS),
+    //         pMaterial->GetTextureCount(aiTextureType_SHININESS),
+    //         pMaterial->GetTextureCount(aiTextureType_OPACITY),
+    //         pMaterial->GetTextureCount(aiTextureType_DISPLACEMENT),
+    //         pMaterial->GetTextureCount(aiTextureType_LIGHTMAP),
+    //         pMaterial->GetTextureCount(aiTextureType_REFLECTION),
+    //         pMaterial->GetTextureCount(aiTextureType_BASE_COLOR),
+    //         pMaterial->GetTextureCount(aiTextureType_NORMAL_CAMERA),
+    //         pMaterial->GetTextureCount(aiTextureType_EMISSION_COLOR),
+    //         pMaterial->GetTextureCount(aiTextureType_METALNESS),
+    //         pMaterial->GetTextureCount(aiTextureType_DIFFUSE_ROUGHNESS),
+    //         pMaterial->GetTextureCount(aiTextureType_AMBIENT_OCCLUSION),
+    //         pMaterial->GetTextureCount(aiTextureType_UNKNOWN),
+    //         pMaterial->GetTextureCount(aiTextureType_SHEEN),
+    //         pMaterial->GetTextureCount(aiTextureType_CLEARCOAT),
+    //         pMaterial->GetTextureCount(aiTextureType_TRANSMISSION),
+    //         pMaterial->GetTextureCount(aiTextureType_MAYA_BASE),
+    //         pMaterial->GetTextureCount(aiTextureType_MAYA_SPECULAR),
+    //         pMaterial->GetTextureCount(aiTextureType_MAYA_SPECULAR_COLOR),
+    //         pMaterial->GetTextureCount(aiTextureType_MAYA_SPECULAR_ROUGHNESS),
+    //         pMaterial->GetTextureCount(aiTextureType_ANISOTROPY),
+    //         pMaterial->GetTextureCount(aiTextureType_GLTF_METALLIC_ROUGHNESS)
+    //         );
+    //     for (unsigned int j = 0; j < nDiffuseTexCount; ++j)
+    //     {
+    //         aiString strTexturePath;
+    //         if (pMaterial->GetTexture(aiTextureType_DIFFUSE, j, &strTexturePath) == AI_SUCCESS)
+    //         {
+    //             LOGLN("Material {} has diffuse texture: {}", i, strTexturePath.C_Str());
+    //         }
+    //     }
+    // }
+
+    return processNode(pScene->mRootNode, pScene, pMaterial);
 }
 
-Node* processNode(const aiNode* pAiNode, const aiScene* pScene, Shader* pShader)
+Node* processNode(const aiNode* pAiNode, const aiScene* pScene, std::shared_ptr<Material>& pMaterial)
 {
     aiVector3D scale;
     aiVector3D position;
@@ -139,22 +185,22 @@ Node* processNode(const aiNode* pAiNode, const aiScene* pScene, Shader* pShader)
     for (unsigned int i = 0; i < pAiNode->mNumMeshes; i++)
     {
         auto pMeshRenderer = new MeshRenderer();
-        pMeshRenderer->setMesh(processMesh(pScene->mMeshes[pAiNode->mMeshes[i]]));
-        pMeshRenderer->setShader(pShader);
+        pMeshRenderer->setMesh(processMesh(pScene->mMeshes[pAiNode->mMeshes[i]], pScene));
+        pMeshRenderer->setMaterial(pMaterial);
         pNode->addComponent(pMeshRenderer);
     }
 
     // then do the same for each of its children
     for (unsigned int i = 0; i < pAiNode->mNumChildren; i++)
     {
-        Node* pChildNod = processNode(pAiNode->mChildren[i], pScene, pShader);
+        Node* pChildNod = processNode(pAiNode->mChildren[i], pScene, pMaterial);
         pNode->addChildNode(pChildNod);
     }
 
     return pNode;
 }
 
-std::shared_ptr<Mesh> processMesh(const aiMesh* pAiMesh)
+std::shared_ptr<Mesh> processMesh(const aiMesh* pAiMesh, const aiScene* pScene)
 {
     std::shared_ptr<Mesh> pMesh = std::make_shared<Mesh>();
 

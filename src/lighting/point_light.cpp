@@ -9,6 +9,9 @@
 #include "../window.h"
 
 
+constexpr float POINT_LIGHT_SIZE = 0.3f;
+
+
 PointLightComponent::PointLightComponent()
 {
     LightManager::getInstance()->registerPointLightComponent(this);
@@ -43,24 +46,21 @@ void PointLightComponent::registerBuffer()
     glGenBuffers(1, &m_nVertexBuffer);
     glBindBuffer(GL_ARRAY_BUFFER, m_nVertexBuffer);
 
-    float fStartX = -1 / 2.0f;
-    float fStartY = -1 / 2.0f;
+    float fStartX = -POINT_LIGHT_SIZE / 2.0f;
+    float fStartY = -POINT_LIGHT_SIZE / 2.0f;
     VertexWUV arrVertices[4];
-    arrVertices[0] = { { fStartX, fStartY }, { 0.0f, 0.0f } }; // Bottom left
-    arrVertices[1] = { { fStartX + 1, fStartY }, { 1.0f, 0.0f } }; // Bottom right
-    arrVertices[2] = { { fStartX, fStartY + 1 }, { 0.0f, 1.0f } }; // Top right
-    arrVertices[3] = { { fStartX + 1, fStartY + 1 }, { 1.0f, 1.0f } }; // Top left
+    arrVertices[0] = { { fStartX, fStartY } }; // Bottom left
+    arrVertices[1] = { { fStartX + POINT_LIGHT_SIZE, fStartY } }; // Bottom right
+    arrVertices[2] = { { fStartX, fStartY + POINT_LIGHT_SIZE } }; // Top right
+    arrVertices[3] = { { fStartX + POINT_LIGHT_SIZE, fStartY + POINT_LIGHT_SIZE } }; // Top left
     glBufferData(GL_ARRAY_BUFFER, sizeof(arrVertices), arrVertices, GL_STATIC_DRAW);
 
     GLuint nVPosAttr = m_pShader->getAttributeLocation("a_vPos");
-    GLuint nVUVAttr = m_pShader->getAttributeLocation("a_vUV");
 
     glGenVertexArrays(1, &m_nVertexArray);
     glBindVertexArray(m_nVertexArray);
     glEnableVertexAttribArray(nVPosAttr);
     glVertexAttribPointer(nVPosAttr, 2, GL_FLOAT, GL_FALSE, sizeof(VertexWUV), (void*)offsetof(VertexWUV, pos));
-    glEnableVertexAttribArray(nVUVAttr);
-    glVertexAttribPointer(nVUVAttr, 2, GL_FLOAT, GL_FALSE, sizeof(VertexWUV), (void*)offsetof(VertexWUV, uv));
 
     // Unbind
     glBindVertexArray(0);
@@ -83,7 +83,7 @@ void PointLightComponent::draw()
     }
     if (m_pLightColorUniformHandle)
     {
-        glUniform4f(m_pLightColorUniformHandle->m_nLocation, m_color[0], m_color[1], m_color[2], 1);
+        glUniform4f(m_pLightColorUniformHandle->m_nLocation, m_color[0] * m_intensity, m_color[1] * m_intensity, m_color[2] * m_intensity, 1);
     }
 
     glBindVertexArray(m_nVertexArray);

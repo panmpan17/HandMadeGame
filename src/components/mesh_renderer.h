@@ -7,6 +7,7 @@ class SimpleObjReader;
 class Shader;
 class Image;
 class Mesh;
+class Material;
 
 
 typedef unsigned int GLuint;
@@ -27,12 +28,17 @@ public:
 
     void setShader(Shader* pShader);
 
+    void setMaterial(std::shared_ptr<Material>& pMaterial);
     inline void setMesh(const std::shared_ptr<Mesh>& pMesh) { m_pMesh = pMesh; }
     inline void setMainTexture(Image* pImage) { m_pMainTexture = pImage; }
     inline void setSpecularMap(Image* pImage) { m_pSpecularMap = pImage; }
 
+    void initShader(Shader* const pShader);
+
 private:
     std::shared_ptr<Mesh> m_pMesh = nullptr;
+
+    std::shared_ptr<Material> m_pMaterial = nullptr;
 
     Image* m_pMainTexture = nullptr;
     Image* m_pSpecularMap = nullptr;
@@ -52,7 +58,7 @@ private:
 
     int m_nIndiceCount = 0;
 
-    void bindVertexArray();
+    void bindVertexArray(Shader* const pShader);
 
     // int m_nIdleAnimationIndex = -1;
     // int m_nWalkAnimationIndex = -1;
