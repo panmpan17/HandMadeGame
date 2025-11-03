@@ -336,31 +336,46 @@ void WorldScene::bloomTest()
     // pMonkey->addComponent(new TwoPointScaling(Vector3{0.5f, 0.5f, 0.5f}, Vector3{1.5f, 1.5f, 1.5f}, 2.0f));
     // addNode(pMonkey);
 
-    auto pMainImage = ImageLoader::getInstance()->getImageByPath("assets/models/1001_albedo.jpg");
-    auto pNormalImage = ImageLoader::getInstance()->getImageByPath("assets/models/1001_normal.png");
+    {
+        Image* const pMainImage = ImageLoader::getInstance()->getImageByPath("assets/images/container.png");
+        Image* const pMetallicImage = ImageLoader::getInstance()->getImageByPath("assets/images/container_specular.png");
 
-    std::shared_ptr<Material> pMaterial = std::make_shared<Material>(p3DMeshShader);
-    pMaterial->setAlbedoMap(pMainImage);
-    pMaterial->setNormalMap(pNormalImage);
+        std::shared_ptr<Material> pMaterial = std::make_shared<Material>(p3DMeshShader);
+        pMaterial->setAlbedoMap(pMainImage);
+        pMaterial->setSpecularMap(pMetallicImage);
 
-    Node* pBackPackFbx = loadModel("assets/models/back_pack.fbx", pMaterial);
-    pBackPackFbx->setScale(0.01f);
-    pBackPackFbx->setPosition(2.f, 0.f, 0.f);
-    addNode(pBackPackFbx);
+        Node* pBackPackObj = loadModel("assets/models/box.obj", pMaterial);
+        pBackPackObj->setPosition(-2.f, 0.f, 0.f);
+        addNode(pBackPackObj);
+    }
 
-    // {
-    //     Node* pPointLightNode = new Node();
-    //     pPointLightNode->setRotationQuaternion(Quaternion::fromAxisAngle({1.f, 0.f, 0.f}, 45.f));
+    {
+        Image* const pMainImage = ImageLoader::getInstance()->getImageByPath("assets/models/1001_albedo.jpg");
+        Image* const pNormalImage = ImageLoader::getInstance()->getImageByPath("assets/models/1001_normal.png");
+        Image* const pMetallicImage = ImageLoader::getInstance()->getImageByPath("assets/models/1001_metallic.jpg");
 
-    //     DirectionLightComponent* pPointLightComp = new DirectionLightComponent();
-    //     pPointLightComp->setColor({1.f, 0.f, 0.f});
-    //     pPointLightComp->setIntensity(5.f);
-    //     pPointLightNode->addComponent(pPointLightComp);
+        std::shared_ptr<Material> pMaterial = std::make_shared<Material>(p3DMeshShader);
+        pMaterial->setAlbedoMap(pMainImage);
+        pMaterial->setNormalMap(pNormalImage);
+        pMaterial->setSpecularMap(pMetallicImage);
 
-    //     pPointLightNode->addComponent(new TwoPointsMovement(vec2{0.f, -3.f}, vec2{0.f, 3.f}, 3.f));
+        Node* pBackPackFbx = loadModel("assets/models/back_pack.fbx", pMaterial);
+        pBackPackFbx->setScale(0.01f);
+        pBackPackFbx->setPosition(2.f, 0.f, 0.f);
+        addNode(pBackPackFbx);
+    }
 
-    //     addNode(pPointLightNode);
-    // }
+    {
+        Node* pPointLightNode = new Node();
+        pPointLightNode->setRotationQuaternion(Quaternion::fromAxisAngle({1.f, 0.f, 0.f}, 45.f));
+
+        DirectionLightComponent* pPointLightComp = new DirectionLightComponent();
+        pPointLightComp->setColor({1.f, 1.f, 0.f});
+        pPointLightComp->setIntensity(.4f);
+        pPointLightNode->addComponent(pPointLightComp);
+
+        addNode(pPointLightNode);
+    }
 
     {
         Node* pPointLightNode = new Node();
@@ -368,11 +383,11 @@ void WorldScene::bloomTest()
 
         PointLightComponent* pPointLightComp = new PointLightComponent();
         pPointLightComp->setColor({1.f, 1.f, 1.f});
-        pPointLightComp->setIntensity(5.f);
-        pPointLightComp->setRange(10.f);
+        pPointLightComp->setIntensity(1.f);
+        pPointLightComp->setRange(1.f);
         pPointLightNode->addComponent(pPointLightComp);
 
-        pPointLightNode->addComponent(new TwoPointsMovement(vec2{0.f, -3.f}, vec2{0.f, 3.f}, 3.f));
+        pPointLightNode->addComponent(new TwoPointsMovement(vec3{-6.f, 0, 2.f}, vec3{6.f, 0, 2.f}, 8.f));
 
         addNode(pPointLightNode);
     }

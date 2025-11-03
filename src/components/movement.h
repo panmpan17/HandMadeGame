@@ -42,11 +42,11 @@ public:
         m_vecEnd[1] = 0;
         m_fDuration = 1.0f;
     }
-    TwoPointsMovement(const vec2& vecStart, const vec2& vecEnd, float duration)
+    TwoPointsMovement(const vec3& vecStart, const vec3& vecEnd, float duration)
         : m_fDuration(duration)
     {
-        vec2_dup(m_vecStart, vecStart);
-        vec2_dup(m_vecEnd, vecEnd);
+        vec3_dup(m_vecStart, vecStart);
+        vec3_dup(m_vecEnd, vecEnd);
     }
 
     virtual ~TwoPointsMovement() {}
@@ -59,8 +59,8 @@ public:
     virtual void draw() override {}
 
 protected:
-    vec2 m_vecStart;
-    vec2 m_vecEnd;
+    vec3 m_vecStart;
+    vec3 m_vecEnd;
     float m_fDuration;
     float m_fTimer = 0;
 

@@ -230,7 +230,7 @@ std::shared_ptr<Mesh> processMesh(const aiMesh* pAiMesh, const aiScene* pScene)
         {
             const aiVector3D& aiTexCoord = pAiMesh->mTextureCoords[0][i];
             oVertex.uv[0] = aiTexCoord.x;
-            oVertex.uv[1] = aiTexCoord.y;
+            oVertex.uv[1] = 1.0f - aiTexCoord.y;
         }
         else
         {

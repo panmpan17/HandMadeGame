@@ -115,8 +115,9 @@ void TwoPointsMovement::update(float fDeltaTime)
     float fProgress = m_fTimer / m_fDuration;
     float fX = lerp(m_vecStart[0], m_vecEnd[0], fProgress);
     float fY = lerp(m_vecStart[1], m_vecEnd[1], fProgress);
+    float fZ = lerp(m_vecStart[2], m_vecEnd[2], fProgress);
 
-    pNode->setPosition(fX, fY);
+    pNode->setPosition(fX, fY, fZ);
 }
 
 void TwoPointsMovement::serializeToWrapper(DataSerializer& serializer) const
