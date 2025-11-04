@@ -1,9 +1,9 @@
 #include "order_dithering.h"
 
 #include <glad/glad.h>
-#include "../debug_macro.h"
-#include "../window.h"
-#include "../draw/shader_loader.h"
+#include "../shader_loader.h"
+#include "../../core/debug_macro.h"
+#include "../../core/window.h"
 
 
 void OrderDithering::initialize()

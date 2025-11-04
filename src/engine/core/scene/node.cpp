@@ -1,10 +1,10 @@
 #include "node.h"
-#include "components/component.h"
-#include "components/drawable_interface.h"
 #include <iostream>
-#include "debug_macro.h"
-#include "serialization/serializer.h"
-#include "random.h"
+#include "../debug_macro.h"
+#include "../serialization/serializer.h"
+#include "../math/random.h"
+#include "../../components/component.h"
+#include "../../components/drawable_interface.h"
 
 
 Node::Node(float fX, float fY, float fZ)

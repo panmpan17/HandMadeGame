@@ -1,8 +1,8 @@
 #include "first_person_free_control_camera.h"
 
-#include "../node.h"
-#include "../input_handle.h"
-#include "../camera.h"
+#include "../../core/camera.h"
+#include "../../core/scene/node.h"
+#include "../../core/input/input_handle.h"
 
 #define BIND_CALLBACK_1(func) std::bind(&FirstPersonFreeControlCamera::func, this, std::placeholders::_1)
 #define BIND_CALLBACK_2(func) std::bind(&FirstPersonFreeControlCamera::func, this, std::placeholders::_1, std::placeholders::_2)

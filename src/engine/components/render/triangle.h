@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../draw/vertex.h"
-#include "../draw/shader.h"
-#include "drawable_interface.h"
+#include "../drawable_interface.h"
+#include "../../render/vertex.h"
+#include "../../render/shader.h"
 
 typedef unsigned int GLuint;
 

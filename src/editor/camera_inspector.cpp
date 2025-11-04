@@ -3,7 +3,7 @@
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
-#include "../camera.h"
+#include "../engine/core/camera.h"
 
 
 CameraInspector::CameraInspector()

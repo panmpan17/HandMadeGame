@@ -4,13 +4,13 @@
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
-#include "../post_process/render_process_queue.h"
-#include "../post_process/bloom_test.h"
-#include "../post_process/order_dithering.h"
-#include "../post_process/difference_of_gaussian.h"
-#include "../debug_macro.h"
-#include "../serialization/type_registry.h"
-#include "../window.h"
+#include "../engine/render/post_process/render_process_queue.h"
+#include "../engine/render/post_process/bloom_test.h"
+#include "../engine/render/post_process/order_dithering.h"
+#include "../engine/render/post_process/difference_of_gaussian.h"
+#include "../engine/core/debug_macro.h"
+#include "../engine/core/serialization/type_registry.h"
+#include "../engine/core/window.h"
 
 
 PostProcessInspector::PostProcessInspector()

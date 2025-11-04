@@ -1,5 +1,5 @@
 #include "component.h"
-#include "../serialization/serializer.h"
+#include "../core/serialization/serializer.h"
 
 void Component::serializedTo(DataSerializer& serializer) const
 {

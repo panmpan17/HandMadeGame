@@ -1,11 +1,11 @@
 #include "skybox.h"
 
 #include <glad/gl.h>
-#include "camera.h"
-#include "draw/image.h"
-#include "draw/shader.h"
-#include "draw/shader_loader.h"
-#include "window.h"
+#include "image.h"
+#include "shader.h"
+#include "shader_loader.h"
+#include "../core/camera.h"
+#include "../core/window.h"
 
 
 Skybox::Skybox()

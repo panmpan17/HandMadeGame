@@ -6,8 +6,8 @@
 #include <iostream>
 #include <vector>
 #include <functional>
-#include "../vector.h"
-#include "../platform.h"
+#include "../math/vector.h"
+#include "../../../utils/platform.h"
 
 
 #define CHECK_FILE_IS_OPEN if (!m_oOutputFile.is_open()) { std::cerr << "Error: File not open\n"; return; }

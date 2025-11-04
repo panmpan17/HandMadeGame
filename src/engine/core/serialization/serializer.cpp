@@ -1,7 +1,7 @@
 #include "serializer.h"
 #include "iserializable.h"
 #include "../debug_macro.h"
-#include "../node.h"
+#include "../scene/node.h"
 
 void DataSerializer::addAttributes(const std::string_view& strAttributeNames, ISerializable* pValue)
 {

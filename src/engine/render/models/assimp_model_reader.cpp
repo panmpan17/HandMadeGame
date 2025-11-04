@@ -5,12 +5,12 @@
 #include <assimp/postprocess.h>
 #include <assimp/cimport.h>
 
-#include "../debug_macro.h"
-#include "../node.h"
-#include "../components/mesh_renderer.h"
-#include "../vector.h"
-#include "../draw/image.h"
-#include "../draw/material.h"
+#include "../image.h"
+#include "../material.h"
+#include "../../core/debug_macro.h"
+#include "../../core/scene/node.h"
+#include "../../core/math/vector.h"
+#include "../../components/render/mesh_renderer.h"
 
 /*
 void convertMat4x4(const aiMatrix4x4& aiMat, mat4x4& outMat)

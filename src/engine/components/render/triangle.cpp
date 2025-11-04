@@ -2,14 +2,13 @@
 #include <GLFW/glfw3.h>
 
 #include "triangle.h"
-#include "../draw/shader.h"
-#include "../draw/shader_loader.h"
-#include "../camera.h"
-#include "../node.h"
-#include "../window.h"
-#include "../serialization/serializer.h"
-
-#include "../debug_macro.h"
+#include "../../render/shader.h"
+#include "../../render/shader_loader.h"
+#include "../../core/camera.h"
+#include "../../core/window.h"
+#include "../../core/debug_macro.h"
+#include "../../core/scene/node.h"
+#include "../../core/serialization/serializer.h"
 
 
 Triangle::Triangle()

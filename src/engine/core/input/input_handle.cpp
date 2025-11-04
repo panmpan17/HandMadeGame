@@ -1,6 +1,6 @@
 #include "input_handle.h"
-#include "window.h"
-#include "debug_macro.h"
+#include "../window.h"
+#include "../debug_macro.h"
 
 
 #define GLFW_RELEASE 0

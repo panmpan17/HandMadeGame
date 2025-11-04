@@ -1,7 +1,6 @@
-#include "component.h"
-
 #include <memory>
-#include "../draw/shader.h"
+#include "../component.h"
+#include "../../render/shader.h"
 
 class SimpleObjReader;
 class Shader;

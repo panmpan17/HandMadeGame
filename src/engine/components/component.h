@@ -1,8 +1,8 @@
 #pragma once
 
 #include <typeinfo>
-#include "../serialization/iserializable.h"
-#include "../serialization/type_registry.h"
+#include "../core/serialization/iserializable.h"
+#include "../core/serialization/type_registry.h"
 
 
 class Node;

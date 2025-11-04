@@ -1,11 +1,11 @@
 #pragma once
 
-#include "component.h"
-#include "../node.h"
-#include "../expandable_array.h"
-#include "../components/quad.h"
-#include "../debug_macro.h"
-#include "../platform.h"
+#include "quad.h"
+#include "../component.h"
+#include "../../core/debug_macro.h"
+#include "../../core/scene/node.h"
+#include "../../../utils/expandable_array.h"
+#include "../../../utils/platform.h"
 
 #if IS_PLATFORM_MACOS
 #define USHORT ushort

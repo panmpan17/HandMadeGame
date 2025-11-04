@@ -10,22 +10,20 @@
 #include <functional>
 
 #include "window.h"
-#include "input_handle.h"
-#include "draw/image.h"
-#include "draw/shader_loader.h"
-#include "world.h"
-#include "post_process/render_process_queue.h"
-#include "models/simple_obj_reader.h"
-#include "editor/camera_inspector.h"
-#include "editor/hierarchy_view.h"
-#include "editor/post_process_inspector.h"
-#include "lighting/light_manager.h"
+#include "camera.h"
+#include "input/input_handle.h"
+#include "scene/world.h"
+#include "../render/image.h"
+#include "../render/shader_loader.h"
+#include "../render/post_process/render_process_queue.h"
+#include "../render/lighting/light_manager.h"
+#include "../../editor/camera_inspector.h"
+#include "../../editor/hierarchy_view.h"
+#include "../../editor/post_process_inspector.h"
 
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
-
-#include "camera.h"
 
 
 Window* Window::ins = nullptr;

@@ -2,10 +2,10 @@
 
 
 #include "light_data.h"
-#include "../components/component.h"
-#include "../vector.h"
-#include "../node.h"
-#include "../draw/shader.h"
+#include "../shader.h"
+#include "../../components/component.h"
+#include "../../core/math/vector.h"
+#include "../../core/scene/node.h"
 
 typedef unsigned int GLuint;
 

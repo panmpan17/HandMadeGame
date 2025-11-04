@@ -1,7 +1,7 @@
 #include "sprite_animation.h"
-#include "../serialization/serializer.h"
-#include "../file_utils.h"
-#include "../random.h"
+#include "../../core/serialization/serializer.h"
+#include "../../core/math/random.h"
+#include "../../../utils/file_utils.h"
 
 
 SpriteAnimation::SpriteAnimation(Sprite* pSprite) : m_pSprite(pSprite)

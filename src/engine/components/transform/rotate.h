@@ -1,8 +1,8 @@
 #pragma once
 
-#include "component.h"
-#include "../node.h"
-#include "../serialization/type_registry.h"
+#include "../component.h"
+#include "../../core/scene/node.h"
+#include "../../core/serialization/type_registry.h"
 
 
 // class Rotate : public Component

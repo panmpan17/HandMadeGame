@@ -1,11 +1,11 @@
 #include "bloom_test.h"
 
 #include <glad/gl.h>
-#include "../window.h"
-#include "../debug_macro.h"
-#include "../draw/vertex.h"
-#include "../draw/shader.h"
-#include "../draw/shader_loader.h"
+#include "../vertex.h"
+#include "../shader.h"
+#include "../shader_loader.h"
+#include "../../core/window.h"
+#include "../../core/debug_macro.h"
 
 #define BLUR_TEXTURE_RATIO .25f
 

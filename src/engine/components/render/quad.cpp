@@ -4,15 +4,15 @@
 #include <GLFW/glfw3.h>
 
 #include "quad.h"
-#include "../draw/image.h"
-#include "../camera.h"
-#include "../debug_macro.h"
-#include "../node.h"
-#include "../window.h"
-#include "../serialization/serializer.h"
-#include "../draw/shader.h"
-#include "../draw/shader_loader.h"
-#include "../random.h"
+#include "../../render/image.h"
+#include "../../core/camera.h"
+#include "../../core/debug_macro.h"
+#include "../../core/window.h"
+#include "../../core/scene/node.h"
+#include "../../core/serialization/serializer.h"
+#include "../../core/math/random.h"
+#include "../../render/shader.h"
+#include "../../render/shader_loader.h"
 
 
 inline constexpr std::string_view SHADER_UNIFORM_COLOR = "u_imageColor";

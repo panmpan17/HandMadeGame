@@ -1,8 +1,8 @@
 #pragma once
 
 #include <linmath.h>
-#include "vector.h"
-#include "components/component.h"
+#include "math/vector.h"
+#include "../components/component.h"
 
 typedef unsigned int GLuint;
 

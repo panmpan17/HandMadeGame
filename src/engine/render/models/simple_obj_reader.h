@@ -2,7 +2,7 @@
 
 #include <string>
 #include <vector>
-#include "../draw/vertex.h"
+#include "../vertex.h"
 #include "mesh.h"
 
 typedef unsigned int GLuint;

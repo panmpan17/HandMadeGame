@@ -3,7 +3,7 @@
 #include "light_data.h"
 
 #include <linmath.h>
-#include "../expandable_array.h"
+#include "../../../utils/expandable_array.h"
 
 typedef unsigned int GLuint;
 class PointLightComponent;

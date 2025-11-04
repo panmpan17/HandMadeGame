@@ -1,6 +1,6 @@
 #pragma once
 
-#include "expandable_array.h"
+#include "../../../utils/expandable_array.h"
 #include "node.h"
 
 class Node;

@@ -3,7 +3,7 @@
 
 #include "point_light.h"
 #include "direction_light.h"
-#include "../debug_macro.h"
+#include "../../core/debug_macro.h"
 
 
 constexpr int AMBIENT_LIGHT_SIZE = 16; // vec3 + padding

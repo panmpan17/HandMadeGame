@@ -1,8 +1,8 @@
 #include "shader_loader.h"
 #include "shader.h"
-#include "../file_utils.h"
-#include "../debug_macro.h"
-#include "../platform.h"
+#include "../core/debug_macro.h"
+#include "../../utils/file_utils.h"
+#include "../../utils/platform.h"
 
 #if IS_PLATFORM_MACOS
 #elif IS_PLATFORM_WINDOWS

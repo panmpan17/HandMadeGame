@@ -2,9 +2,9 @@
 
 
 #include "light_data.h"
-#include "../components/component.h"
-#include "../vector.h"
-#include "../node.h"
+#include "../../components/component.h"
+#include "../../core/math/vector.h"
+#include "../../core/scene/node.h"
 
 
 class DirectionLightComponent : public Component

@@ -1,9 +1,9 @@
 #pragma once
 
-#include "component.h"
-#include "../node.h"
-#include "../vector.h"
-#include "../debug_macro.h"
+#include "../component.h"
+#include "../../core/math/vector.h"
+#include "../../core/scene/node.h"
+#include "../../core/debug_macro.h"
 // #include "../serialization/type_registry.h"
 
 

@@ -2,8 +2,8 @@
 
 #include <bitset>
 #include <functional>
-#include "component.h"
-#include "../node.h"
+#include "../component.h"
+#include "../../core/scene/node.h"
 
 
 class Movement : public Component

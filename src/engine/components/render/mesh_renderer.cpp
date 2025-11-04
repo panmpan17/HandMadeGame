@@ -1,15 +1,15 @@
 #include "mesh_renderer.h"
 
 #include <glad/gl.h>
-#include "../models/simple_obj_reader.h"
-#include "../debug_macro.h"
-#include "../window.h"
-#include "../node.h"
-#include "../camera.h"
-#include "../lighting/light_manager.h"
-#include "../draw/image.h"
-#include "../draw/shader.h"
-#include "../draw/material.h"
+#include "../../core/debug_macro.h"
+#include "../../core/window.h"
+#include "../../core/camera.h"
+#include "../../core/scene/node.h"
+#include "../../render/image.h"
+#include "../../render/shader.h"
+#include "../../render/material.h"
+#include "../../render/lighting/light_manager.h"
+#include "../../render/models/simple_obj_reader.h"
 
 
 MeshRenderer::MeshRenderer()

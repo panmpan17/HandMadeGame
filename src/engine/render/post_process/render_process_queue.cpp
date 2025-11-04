@@ -1,14 +1,12 @@
 #include "render_process_queue.h"
 
 #include <glad/gl.h>
-#include "../window.h"
-#include "../draw/vertex.h"
-#include "../draw/shader.h"
-#include "../draw/shader_loader.h"
-#include "../input_handle.h"
 #include "bloom_test.h"
 #include "order_dithering.h"
 #include "difference_of_gaussian.h"
+#include "../vertex.h"
+#include "../shader_loader.h"
+#include "../../core/window.h"
 
 
 inline constexpr std::string_view SHADER_UNIFORM_SPLIT_FACTOR = "u_splitFactor";

@@ -5,8 +5,7 @@
 #include <vector>
 #include <sstream>
 #include <ctime>
-#include "platform.h"
-#include "file_utils.h"
+#include "../../utils/platform.h"
 
 #if IS_PLATFORM_MACOS
 

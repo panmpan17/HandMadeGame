@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../draw/vertex.h"
+#include "../vertex.h"
 #include <memory>
 
 typedef unsigned int GLuint;

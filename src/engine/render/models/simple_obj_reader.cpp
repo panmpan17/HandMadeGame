@@ -4,10 +4,10 @@
 #include <glad/gl.h>
 // #include <GLFW/glfw3.h>
 
-#include "../file_utils.h"
-#include "../debug_macro.h"
-#include "../vector.h"
-#include "../utils/string_handle.h"
+#include "../../core/debug_macro.h"
+#include "../../core/math/vector.h"
+#include "../../../utils/string_handle.h"
+#include "../../../utils/file_utils.h"
 
 
 SimpleObjReader::SimpleObjReader()

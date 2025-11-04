@@ -1,7 +1,7 @@
 #pragma once
 
 #include "box.h"
-#include "../debug_macro.h"
+#include "../core/debug_macro.h"
 
 
 class AABB

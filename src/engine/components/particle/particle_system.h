@@ -2,7 +2,7 @@
 
 // #include "../component.h"
 #include "../drawable_interface.h"
-#include "../../draw/shader.h"
+#include "../../render/shader.h"
 #include <linmath.h>
 #include <functional>
 

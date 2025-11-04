@@ -1,7 +1,6 @@
 #include "sprite_animation.h"
-#include "component.h"
-#include "../input_handle.h"
-#include "../debug_macro.h"
+#include "../component.h"
+#include "../../core/debug_macro.h"
 
 class Character2d : public Component
 {

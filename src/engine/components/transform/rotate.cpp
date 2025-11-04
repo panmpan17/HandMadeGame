@@ -1,5 +1,5 @@
 #include "rotate.h"
-#include "../serialization/serializer.h"
+#include "../../core/serialization/serializer.h"
 
 // bool Rotate::deserializeField(DataDeserializer& deserializer, const std::string_view& strFieldName, const std::string_view& strFieldValue)
 // {

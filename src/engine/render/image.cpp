@@ -4,8 +4,8 @@
 #include <glad/gl.h>
 #include <GLFW/glfw3.h>
 
-#include "../file_utils.h"
-#include "../debug_macro.h"
+#include "../../utils/file_utils.h"
+#include "../core/debug_macro.h"
 
 #ifndef __has_include
   static_assert(false, "__has_include not supported");

@@ -1,17 +1,17 @@
 #include "particle_system.h"
 
 #include <glad/gl.h>
-#include "../../draw/shader.h"
-#include "../../draw/vertex.h"
-#include "../../draw/shader_loader.h"
-#include "../../draw/image.h"
-#include "../../debug_macro.h"
-#include "../../node.h"
-#include "../../camera.h"
-#include "../../window.h"
-#include "../../random.h"
-#include "../../platform.h"
-#include "../../serialization/serializer.h"
+#include "../../render/shader.h"
+#include "../../render/vertex.h"
+#include "../../render/shader_loader.h"
+#include "../../render/image.h"
+#include "../../core/debug_macro.h"
+#include "../../core/scene/node.h"
+#include "../../core/camera.h"
+#include "../../core/window.h"
+#include "../../core/math/random.h"
+#include "../../core/serialization/serializer.h"
+#include "../../../utils/platform.h"
 
 
 #define SWAP_PARTICLE_POSITION(i, j) \

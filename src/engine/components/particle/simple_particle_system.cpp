@@ -2,14 +2,14 @@
 
 #include <glad/gl.h>
 #include <random>
-#include "../../draw/shader.h"
-#include "../../draw/vertex.h"
-#include "../../debug_macro.h"
-#include "../../node.h"
-#include "../../camera.h"
-#include "../../window.h"
-#include "../../random.h"
-#include "../../platform.h"
+#include "../../render/shader.h"
+#include "../../render/vertex.h"
+#include "../../core/debug_macro.h"
+#include "../../core/camera.h"
+#include "../../core/window.h"
+#include "../../core/scene/node.h"
+#include "../../core/math/random.h"
+#include "../../../utils/platform.h"
 
 
 void printMatx4x4(mat4x4 mat)

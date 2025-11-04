@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../vector.h"
 #include <format>
+#include "../core/math/vector.h"
 
 
 struct Box

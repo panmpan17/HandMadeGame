@@ -1,11 +1,11 @@
 #pragma once
 
 #include <linmath.h>
-#include "expandable_array.h"
-#include "components/component.h"
-#include "vector.h"
-#include "quaternion.h"
-#include "input_handle.h"
+#include "../math/vector.h"
+#include "../math/quaternion.h"
+#include "../input/input_handle.h"
+#include "../../components/component.h"
+#include "../../../utils/expandable_array.h"
 
 
 class Component;

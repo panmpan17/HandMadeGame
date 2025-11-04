@@ -2,9 +2,9 @@
 
 #include <linmath.h>
 
-#include "../draw/shader.h"
-#include "../draw/vertex.h"
-#include "drawable_interface.h"
+#include "../drawable_interface.h"
+#include "../../render/shader.h"
+#include "../../render/vertex.h"
 
 typedef unsigned int GLuint;
 

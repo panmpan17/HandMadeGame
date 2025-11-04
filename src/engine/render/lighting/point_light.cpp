@@ -2,11 +2,11 @@
 
 #include <glad/gl.h>
 #include "light_manager.h"
-#include "../debug_macro.h"
-#include "../draw/shader_loader.h"
-#include "../camera.h"
-#include "../draw/vertex.h"
-#include "../window.h"
+#include "../shader_loader.h"
+#include "../vertex.h"
+#include "../../core/window.h"
+#include "../../core/camera.h"
+#include "../../core/debug_macro.h"
 
 
 constexpr float POINT_LIGHT_SIZE = 0.3f;

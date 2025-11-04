@@ -1,7 +1,7 @@
 #pragma once
 
 #include "debug_macro.h"
-#include "expandable_array.h"
+#include "../../utils/expandable_array.h"
 
 typedef struct GLFWwindow GLFWwindow;
 

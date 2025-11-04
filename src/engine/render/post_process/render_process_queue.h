@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../draw/shader.h"
-#include "../expandable_array.h"
-#include "../serialization/type_registry.h"
+#include "../shader.h"
+#include "../../core/serialization/type_registry.h"
+#include "../../../utils/expandable_array.h"
 
 typedef unsigned int GLuint;
 
