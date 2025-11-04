@@ -34,7 +34,7 @@ set(SOURCES
     src/game/pingpong/paddle_control.cpp
     src/engine/core/camera.cpp
     src/engine/core/error_handler.cpp
-    src/engine/core/input/input_handle.cpp
+    src/engine/core/input/input_manager.cpp
     src/engine/core/window.cpp
     src/engine/core/serialization/type_registry.cpp
     src/engine/core/serialization/serializer.cpp

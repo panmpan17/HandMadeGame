@@ -1,5 +1,5 @@
 #include "paddle_control.h"
-#include "../../engine/core/input/input_handle.h"
+#include "../../engine/core/input/input_manager.h"
 #include "../../engine/core/scene/node.h"
 #include "../../engine/components/render/quad.h"
 #include "../../engine/render/shader_loader.h"
