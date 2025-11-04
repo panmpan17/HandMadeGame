@@ -46,16 +46,17 @@ const mat4x4& Camera::getViewMatrix()
         return m_matViewCache;
     }
 
-    const Vector3& camPos = m_pNode->getPosition();
+    const Vector3& camPos = m_pNode->getPositionInWorld();
     vec3 camForward, camUp;
-    m_pNode->getRotationQuaternion().getForwardVector(camForward);
-    m_pNode->getRotationQuaternion().getUpVector(camUp);
+    Quaternion rotation = m_pNode->getWorldRotationQuaternion();
+    rotation.getForwardVector(camForward);
+    rotation.getUpVector(camUp);
     camForward[0] += camPos.x;
     camForward[1] += camPos.y;
     camForward[2] += camPos.z;
-    mat4x4_look_at(m_matViewCache, vec3 { camPos.x, camPos.y, camPos.z }, camForward, camUp);
+    mat4x4_look_at(m_matViewCache, reinterpret_cast<const vec3&>(camPos), camForward, camUp);
 
-    m_bViewMatrixDirty = false;
+    // m_bViewMatrixDirty = false;
 
     return m_matViewCache;
 }
@@ -91,7 +92,7 @@ const mat4x4& Camera::getProjectionMatrix()
         mat4x4_perspective(m_matProjectionCache, 1.57f, m_fRatio, 0.1f, 1000.0f);
     }
 
-    m_bProjectionMatrixDirty = false;
+    // m_bProjectionMatrixDirty = false;
 
     return m_matProjectionCache;
 }
@@ -108,6 +109,8 @@ const mat4x4& Camera::getViewProjectionMatrix()
 
     mat4x4_mul(m_matViewProjectionCache, proj, view);
 
+    // m_bViewProjectionMatrixDirty = false;
+
     return m_matViewProjectionCache;
 }
 
@@ -120,12 +123,13 @@ void Camera::updateCameraDataBuffer()
 {
     if (m_bCameraUBODirty)
     {
-        m_bCameraUBODirty = false;
+        // m_bCameraUBODirty = false;
 
         glBindBuffer(GL_UNIFORM_BUFFER, m_nCameraUBO);
         glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(mat4x4), getViewMatrix());
         glBufferSubData(GL_UNIFORM_BUFFER, sizeof(mat4x4), sizeof(mat4x4), getProjectionMatrix());
-        glBufferSubData(GL_UNIFORM_BUFFER, sizeof(mat4x4) * 2, sizeof(vec3), &m_pNode->getPosition());
+        Vector3 camPos = m_pNode->getPositionInWorld();
+        glBufferSubData(GL_UNIFORM_BUFFER, sizeof(mat4x4) * 2, sizeof(vec3), &camPos);
         glBindBuffer(GL_UNIFORM_BUFFER, 0);
     }
 }

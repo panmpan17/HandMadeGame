@@ -18,6 +18,43 @@ public:
         return Quaternion(cos(halfAngle), axis[0] * s, axis[1] * s, axis[2] * s);
     }
 
+    static Quaternion fromEulerAngles(const Vector3& eulerAngles)
+    {
+        float cy = cos(eulerAngles.z * 0.5f);
+        float sy = sin(eulerAngles.z * 0.5f);
+        float cp = cos(eulerAngles.y * 0.5f);
+        float sp = sin(eulerAngles.y * 0.5f);
+        float cr = cos(eulerAngles.x * 0.5f);
+        float sr = sin(eulerAngles.x * 0.5f);
+
+        Quaternion q;
+        q.w = cr * cp * cy + sr * sp * sy;
+        q.x = sr * cp * cy - cr * sp * sy;
+        q.y = cr * sp * cy + sr * cp * sy;
+        q.z = cr * cp * sy - sr * sp * cy;
+
+        q.normalize();
+        return q;
+    }
+    static Quaternion fromEulerAngles(float x, float y, float z)
+    {
+        float cy = cos(z * 0.5f);
+        float sy = sin(z * 0.5f);
+        float cp = cos(y * 0.5f);
+        float sp = sin(y * 0.5f);
+        float cr = cos(x * 0.5f);
+        float sr = sin(x * 0.5f);
+
+        Quaternion q;
+        q.w = cr * cp * cy + sr * sp * sy;
+        q.x = sr * cp * cy - cr * sp * sy;
+        q.y = cr * sp * cy + sr * cp * sy;
+        q.z = cr * cp * sy - sr * sp * cy;
+
+        q.normalize();
+        return q;
+    }
+
     float w, x, y, z;
 
     Quaternion() : w(1), x(0), y(0), z(0) {}
@@ -35,6 +72,12 @@ public:
         oNew.normalize();
 
         return oNew;
+    }
+
+    Quaternion& operator*=(const Quaternion& q)
+    {
+        *this = *this * q;
+        return *this;
     }
 
     void normalize()

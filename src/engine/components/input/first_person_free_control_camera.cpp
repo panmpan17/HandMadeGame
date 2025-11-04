@@ -8,7 +8,8 @@
 #define BIND_CALLBACK_2(func) std::bind(&FirstPersonFreeControlCamera::func, this, std::placeholders::_1, std::placeholders::_2)
 
 
-FirstPersonFreeControlCamera::FirstPersonFreeControlCamera()
+FirstPersonFreeControlCamera::FirstPersonFreeControlCamera(Node* pCameraNode /*= nullptr*/)
+    : m_pCameraNode(pCameraNode)
 {
     InputManager* pInput = InputManager::getInstance();
 
@@ -63,7 +64,16 @@ void FirstPersonFreeControlCamera::update(float fDeltaTime)
 
     if (m_fMouseDeltaX != 0.0f || m_fMouseDeltaY != 0.0f)
     {
-        m_pNode->rotateQuaternion(Quaternion::fromAxisAngle({m_fMouseDeltaY, m_fMouseDeltaX, 0}, m_fRotationSpeed * fDeltaTime));
+        // Quaternion rotation = m_pNode->getRotationQuaternion();
+        // rotation *= Quaternion::fromEulerAngles(0, m_fMouseDeltaX * m_fRotationSpeed * fDeltaTime, 0);
+        // rotation *= Quaternion::fromEulerAngles(m_fMouseDeltaY * m_fRotationSpeed * fDeltaTime, 0, 0);
+        // rotation *= Quaternion(m_fMouseDeltaX * m_fRotationSpeed * fDeltaTime, 0, 0, 0);
+        // rotation *= Quaternion(0, m_fMouseDeltaX * m_fRotationSpeed * fDeltaTime, 0, 0);
+        // rotation *= Quaternion(0, 0, m_fMouseDeltaX * m_fRotationSpeed * fDeltaTime, 0);
+        // rotation *= Quaternion(0, 0, 0, m_fMouseDeltaX * m_fRotationSpeed * fDeltaTime,);
+        // m_pNode->setRotationQuaternion(rotation);
+        m_pNode->rotateQuaternion(Quaternion::fromEulerAngles(0, m_fMouseDeltaX * m_fRotationSpeed * fDeltaTime, 0));
+        m_pCameraNode->rotateQuaternion(Quaternion::fromEulerAngles(m_fMouseDeltaY * m_fRotationSpeed * fDeltaTime, 0, 0));
 
         m_fMouseDeltaX = 0.0f;
         m_fMouseDeltaY = 0.0f;

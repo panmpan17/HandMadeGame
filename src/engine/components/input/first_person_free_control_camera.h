@@ -4,7 +4,7 @@
 class FirstPersonFreeControlCamera : public Component
 {
 public:
-    FirstPersonFreeControlCamera();
+    FirstPersonFreeControlCamera(Node* pCameraNode = nullptr);
     ~FirstPersonFreeControlCamera();
 
     virtual bool isIDrawable() const override { return false; }
@@ -17,7 +17,7 @@ public:
 private:
     const float DEFAULT_MOVE_SPEED = 5.f;
     const float BOOSTED_MOVE_SPEED = 15.f;
-    const float DEFAULT_ROTATION_SPEED = 15.f;
+    const float DEFAULT_ROTATION_SPEED = .5f;
 
     float m_fMouseDeltaX = 0.0f;
     float m_fMouseDeltaY = 0.0f;
@@ -25,6 +25,8 @@ private:
     float m_fMoveSpeed = DEFAULT_MOVE_SPEED;
 
     float m_fRotationSpeed = DEFAULT_ROTATION_SPEED;
+
+    Node* m_pCameraNode = nullptr;
 
     // void onRightMouseButton(bool bPressed);
     // void onKeyboardW(bool bPressed);

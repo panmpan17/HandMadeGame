@@ -46,13 +46,16 @@ void WorldScene::init()
 {
     {
         auto pNode = new Node(0.f, 0.f, 2.5f);
-        pNode->addComponent(new FirstPersonFreeControlCamera());
 
+        auto pCameraNode = new Node(0.f, 0.f, 0.f);
         Camera* pCamera = new Camera();
         pCamera->useAsMain();
         pCamera->setUseOrthoProjection(false);
         pCamera->setWorldSizeScale(1.0f);
-        pNode->addComponent(pCamera);
+        pCameraNode->addComponent(pCamera);
+        pNode->addChildNode(pCameraNode);
+
+        pNode->addComponent(new FirstPersonFreeControlCamera(pCameraNode));
 
         addNode(pNode);
     }
@@ -318,13 +321,16 @@ void WorldScene::bloomTest()
 {
     {
         auto pNode = new Node(0.f, 0.f, 2.5f);
-        pNode->addComponent(new FirstPersonFreeControlCamera());
 
+        auto pCameraNode = new Node(0.f, 0.f, 0.f);
         Camera* pCamera = new Camera();
         pCamera->useAsMain();
         pCamera->setUseOrthoProjection(false);
-        pCamera->setWorldSizeScale(10.0f);
-        pNode->addComponent(pCamera);
+        pCamera->setWorldSizeScale(1.0f);
+        pCameraNode->addComponent(pCamera);
+        pNode->addChildNode(pCameraNode);
+
+        pNode->addComponent(new FirstPersonFreeControlCamera(pCameraNode));
 
         addNode(pNode);
     }

@@ -55,13 +55,6 @@ public:
         m_bCameraUBODirty = true;
     }
 
-    void setViewMatrixCache(const mat4x4& matView)
-    {
-        // mat4x4_dup(m_matViewCache, matView);
-        // m_bViewMatrixDirty = false;
-        // m_bViewProjectionMatrixDirty = true;
-        // m_bCameraUBODirty = true;
-    }
     const mat4x4& getViewProjectionMatrix();
     const mat4x4& getViewMatrix();
     const mat4x4& getProjectionMatrix();

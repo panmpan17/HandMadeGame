@@ -64,8 +64,32 @@ public:
         m_bChildMatrixDirty = true;
         m_onPositionChanged.invoke();
     }
-    inline void setPosition(const Vector2& position) { m_vecPosition.x = position.x; m_vecPosition.y = position.y; m_bWorldMatrixDirty = true; m_onPositionChanged.invoke(); }
-    inline void setPosition(const Vector3& position) { m_vecPosition.x = position.x; m_vecPosition.y = position.y; m_vecPosition.z = position.z; m_bWorldMatrixDirty = true; m_onPositionChanged.invoke(); }
+    inline void setPosition(const Vector2& position) { m_vecPosition.x = position.x; m_vecPosition.y = position.y; m_bWorldMatrixDirty = true; m_bChildMatrixDirty = true; m_onPositionChanged.invoke(); }
+    inline void setPosition(const Vector3& position) { m_vecPosition.x = position.x; m_vecPosition.y = position.y; m_vecPosition.z = position.z; m_bWorldMatrixDirty = true; m_bChildMatrixDirty = true; m_onPositionChanged.invoke(); }
+
+    inline Vector3 getPositionInWorld() 
+    {
+        const mat4x4& worldMatrix = getWorldMatrix();
+        return Vector3(worldMatrix[3][0], worldMatrix[3][1], worldMatrix[3][2]);
+    }
+    inline void setPositionInWorld(const Vector3& worldPosition)
+    {
+        if (m_pParentNode)
+        {
+            const mat4x4& parentWorldMatrix = m_pParentNode->getWorldMatrix();
+            mat4x4 parentInverse;
+            mat4x4_invert(parentInverse, parentWorldMatrix);
+
+            vec4 inPoint = { worldPosition.x, worldPosition.y, worldPosition.z, 1.0f };
+            vec4 outPoint;
+            mat4x4_mul_vec4(outPoint, parentInverse, inPoint);
+            setPosition(Vector3(outPoint[0], outPoint[1], outPoint[2]));
+        }
+        else
+        {
+            setPosition(worldPosition);
+        }
+    }
 
     inline void move(float fX, float fY)
     {
@@ -89,8 +113,9 @@ public:
 
     inline const Quaternion& getRotationQuaternion() const { return m_oRotationQuaternion; }
     inline void setRotationQuaternion(const Quaternion& quat) { m_oRotationQuaternion = quat; m_bWorldMatrixDirty = true; m_bChildMatrixDirty = true; m_onRotationChanged.invoke(); }
-    inline void rotateQuaternion(const Quaternion& quat) { m_oRotationQuaternion = m_oRotationQuaternion * quat; m_bWorldMatrixDirty = true; m_bChildMatrixDirty = true; m_onRotationChanged.invoke(); }
+    inline void rotateQuaternion(const Quaternion& quat) { m_oRotationQuaternion *= quat; m_bWorldMatrixDirty = true; m_bChildMatrixDirty = true; m_onRotationChanged.invoke(); }
 
+    inline Quaternion getWorldRotationQuaternion() { return m_pParentNode ? m_pParentNode->getWorldRotationQuaternion() * m_oRotationQuaternion : m_oRotationQuaternion; }
 
     inline const Vector3& getScale() const { return m_vecScale; }
     inline void setScale(float fScale)
@@ -159,6 +184,15 @@ public:
         m_bChildMatrixDirty = false;
     }
     inline bool isChildMatrixDirty() const { return m_bChildMatrixDirty; }
+
+    inline Vector3 transformPoint(const Vector3& point)
+    {
+        const mat4x4& worldMatrix = getWorldMatrix();
+        vec4 inPoint = { point.x, point.y, point.z, 1.0f };
+        vec4 outPoint;
+        mat4x4_mul_vec4(outPoint, worldMatrix, inPoint);
+        return Vector3(outPoint[0], outPoint[1], outPoint[2]);
+    }
 
 private:
     Vector3 m_vecPosition;
