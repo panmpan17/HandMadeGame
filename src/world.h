@@ -29,6 +29,8 @@ public:
     inline int getNodeCount() const { return m_oNodeArray.getSize(); }
     inline Node* getNode(int nIndex) const { return m_oNodeArray.getElement(nIndex); }
 
+    Skybox* getSkybox() const { return m_pSkybox; }
+
 private:
     PointerExpandableArray<Node*> m_oNodeArray = PointerExpandableArray<Node*>(10);
 

@@ -383,7 +383,7 @@ void WorldScene::bloomTest()
         pPointLightNode->setPosition(0.f, 3.f, 0.f);
 
         PointLightComponent* pPointLightComp = new PointLightComponent();
-        pPointLightComp->setColor({1.f, 1.f, 1.f});
+        pPointLightComp->setColor({1.f, 1.f, 0.f});
         pPointLightComp->setIntensity(1.f);
         pPointLightComp->setRange(1.f);
         pPointLightNode->addComponent(pPointLightComp);
@@ -546,8 +546,6 @@ void WorldScene::update(float fDeltatime)
 
 void WorldScene::render()
 {
-    m_pSkybox->draw();
-
     int nSize = m_oNodeArray.getSize();
     for (int i = 0; i < nSize; ++i)
     {
@@ -557,6 +555,8 @@ void WorldScene::render()
             pNode->draw();
         }
     }
+
+    m_pSkybox->draw();
 }
 
 void WorldScene::addNode(Node* pNode)

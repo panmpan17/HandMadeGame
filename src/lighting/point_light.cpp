@@ -83,7 +83,7 @@ void PointLightComponent::draw()
     }
     if (m_pLightColorUniformHandle)
     {
-        glUniform4f(m_pLightColorUniformHandle->m_nLocation, m_color[0] * m_intensity, m_color[1] * m_intensity, m_color[2] * m_intensity, 1);
+        glUniform3f(m_pLightColorUniformHandle->m_nLocation, m_color[0] * m_intensity, m_color[1] * m_intensity, m_color[2] * m_intensity);
     }
 
     glBindVertexArray(m_nVertexArray);

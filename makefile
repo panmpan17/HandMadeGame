@@ -11,6 +11,7 @@ compile-debug:
 	cmake --build ${BUILD_DIR} --parallel 8
 
 ccquick: config-debug compile-debug
+	@echo "Running Debug Build...\n"
 	@if ./$(CMAKE_BIN)/$(OUTPUT_NAME); then \
 		echo ""; \
 	else \
@@ -18,6 +19,7 @@ ccquick: config-debug compile-debug
 	fi
 
 quick: compile-debug
+	@echo "Running Debug Build...\n"
 	@if ./$(CMAKE_BIN)/$(OUTPUT_NAME); then \
 		echo ""; \
 	else \

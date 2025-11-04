@@ -16,5 +16,6 @@ void main()
 {
     TexCoords = aPos;
     mat4 view = mat4(mat3(u_View)); // remove translation from the view matrix
-    gl_Position = u_Projection * view * vec4(aPos, 1.0);
+    vec4 pos = u_Projection * view * vec4(aPos, 1.0);
+    gl_Position = pos.xyww;
 }
