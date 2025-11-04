@@ -68,6 +68,7 @@ set(SOURCES
     "src/draw/image.cpp"
     "src/draw/shader_loader.cpp"
     "src/draw/shader.cpp"
+    "src/skybox.cpp"
     "src/main.cpp"
     "src/editor/hierarchy_view.cpp"
     "src/editor/post_process_inspector.cpp"

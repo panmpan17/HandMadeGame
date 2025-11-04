@@ -8,8 +8,8 @@ typedef unsigned int GLuint;
 class Image
 {
 public:
-    Image(const std::string& strPath);
-    Image(const std::string_view& strPath);
+    Image(const std::string& strPath, bool flipVertically = true);
+    Image(const std::string_view& strPath, bool flipVertically = true);
     ~Image();
 
     inline int getWidth() const { return m_nWidth; }

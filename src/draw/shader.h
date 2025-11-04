@@ -10,6 +10,9 @@ inline constexpr std::string_view SHADER_UNIFORM_TEXTURE_1 = "u_tex1";
 inline constexpr std::string_view SHADER_UNIFORM_TEXTURE_2 = "u_tex2";
 inline constexpr std::string_view SHADER_UNIFORM_MVP = "u_MVP";
 
+inline constexpr std::string_view SHADER_GLOBAL_UNIFORM_CAMERA_MATRICES = "CameraMatrices";
+inline constexpr std::string_view SHADER_GLOBAL_UNIFORM_LIGHTING_DATA = "LightData";
+
 
 struct ShaderUniformHandle
 {

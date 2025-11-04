@@ -1,6 +1,7 @@
 #include "world.h"
 #include "node.h"
 #include "camera.h"
+#include "skybox.h"
 #include "draw/image.h"
 #include "draw/shader.h"
 #include "draw/shader_loader.h"
@@ -509,6 +510,16 @@ void WorldScene::clearAllNodes()
 
 void WorldScene::onStart()
 {
+    m_pSkybox = new Skybox();
+    m_pSkybox->loadSkyboxCubmaps(
+        "assets/images/skybox/right.jpg",
+        "assets/images/skybox/left.jpg",
+        "assets/images/skybox/top.jpg",
+        "assets/images/skybox/bottom.jpg",
+        "assets/images/skybox/front.jpg",
+        "assets/images/skybox/back.jpg"
+    );
+
     int nSize = m_oNodeArray.getSize();
     for (int i = 0; i < nSize; ++i)
     {
@@ -535,6 +546,8 @@ void WorldScene::update(float fDeltatime)
 
 void WorldScene::render()
 {
+    m_pSkybox->draw();
+
     int nSize = m_oNodeArray.getSize();
     for (int i = 0; i < nSize; ++i)
     {

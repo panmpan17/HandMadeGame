@@ -4,6 +4,7 @@
 #include "node.h"
 
 class Node;
+class Skybox;
 
 class WorldScene {
 public:
@@ -30,4 +31,6 @@ public:
 
 private:
     PointerExpandableArray<Node*> m_oNodeArray = PointerExpandableArray<Node*>(10);
+
+    Skybox* m_pSkybox = nullptr;
 };

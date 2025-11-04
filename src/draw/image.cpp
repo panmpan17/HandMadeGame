@@ -22,9 +22,9 @@
 #  endif
 #endif
 
-Image::Image(const std::string& strPath)
+Image::Image(const std::string& strPath, bool flipVertically/* = true */)
 {
-    stbi_set_flip_vertically_on_load(true);
+    stbi_set_flip_vertically_on_load(flipVertically);
 
     m_strPath = strPath;
 
@@ -48,9 +48,9 @@ Image::Image(const std::string& strPath)
     }
 }
 
-Image::Image(const std::string_view& strPath)
+Image::Image(const std::string_view& strPath, bool flipVertically/* = true */)
 {
-    stbi_set_flip_vertically_on_load(true);
+    stbi_set_flip_vertically_on_load(flipVertically);
 
     m_strPath = strPath;
 

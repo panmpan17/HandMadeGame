@@ -54,3 +54,7 @@
   name: point_light
   vertex: assets/shaders/point_light.vert
   fragment: assets/shaders/point_light.frag
+15:
+  name: skybox
+  vertex: assets/shaders/cubemap.vert
+  fragment: assets/shaders/cubemap.frag

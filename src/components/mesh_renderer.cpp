@@ -12,10 +12,6 @@
 #include "../draw/material.h"
 
 
-inline constexpr std::string_view SHADER_GLOBAL_UNIFORM_CAMERA_MATRICES = "CameraMatrices";
-inline constexpr std::string_view SHADER_GLOBAL_UNIFORM_LIGHTING_DATA = "LightData";
-
-
 MeshRenderer::MeshRenderer()
 {
 }
