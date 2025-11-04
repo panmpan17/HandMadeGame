@@ -1,9 +1,9 @@
 #include "paddle_control.h"
-#include "../../input_handle.h"
-#include "../../node.h"
-#include "../../components/quad.h"
-#include "../../draw/shader_loader.h"
-#include "../../debug_macro.h"
+#include "../../engine/core/input/input_manager.h"
+#include "../../engine/core/scene/node.h"
+#include "../../engine/components/render/quad.h"
+#include "../../engine/render/shader_loader.h"
+#include "../../engine/core/debug_macro.h"
 
 #define BIND_CALLBACK_1(func) std::bind(&PaddleControl::func, this, std::placeholders::_1)
 

@@ -4,11 +4,11 @@
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
-#include "../world.h"
-#include "../node.h"
-#include "../components/component.h"
-#include "../debug_macro.h"
-#include "../serialization/type_registry.h"
+#include "../engine/components/component.h"
+#include "../engine/core/scene/world.h"
+#include "../engine/core/scene/node.h"
+#include "../engine/core/debug_macro.h"
+#include "../engine/core/serialization/type_registry.h"
 
 
 constexpr int INDENT_SIZE = 10;

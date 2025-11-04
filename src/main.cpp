@@ -1,5 +1,5 @@
-#include "window.h"
-#include "error_handler.h"
+#include "engine/core/window.h"
+#include "engine/core/error_handler.h"
 
 int main() {
     registerSignalHandlers();

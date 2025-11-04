@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../../components/component.h"
-#include "../../physics/box.h"
+#include "../../engine/components/component.h"
+#include "../../engine/physics/box.h"
 
 enum class PaddleControlType
 {
