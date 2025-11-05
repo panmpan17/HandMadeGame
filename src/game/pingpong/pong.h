@@ -1,5 +1,6 @@
 #pragma once
 
+#include <linmath.h>
 #include "../../engine/components/component.h"
 #include "../../engine/core/math/vector.h"
 #include "../../engine/physics/box.h"

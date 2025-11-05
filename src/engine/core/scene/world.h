@@ -15,7 +15,6 @@ public:
 
     void init();
     void createPinPongGame();
-    void bloomTest();
     void readFromFiles(const std::string_view& strFilePath);
 
     void addNode(Node* pNode);
@@ -29,7 +28,8 @@ public:
     inline int getNodeCount() const { return m_oNodeArray.getSize(); }
     inline Node* getNode(int nIndex) const { return m_oNodeArray.getElement(nIndex); }
 
-    Skybox* getSkybox() const { return m_pSkybox; }
+    inline Skybox* getSkybox() const { return m_pSkybox; }
+    inline void setSkybox(Skybox* pSkybox) { m_pSkybox = pSkybox; }
 
 private:
     PointerExpandableArray<Node*> m_oNodeArray = PointerExpandableArray<Node*>(10);

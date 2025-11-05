@@ -30,8 +30,10 @@ endif()
 # Source files
 set(SOURCES
     src/utils/file_utils.cpp
+    src/game/pingpong/game.cpp
     src/game/pingpong/pong.cpp
     src/game/pingpong/paddle_control.cpp
+    src/game/testing/test.cpp
     src/engine/core/camera.cpp
     src/engine/core/error_handler.cpp
     src/engine/core/input/input_manager.cpp

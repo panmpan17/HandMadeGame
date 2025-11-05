@@ -34,7 +34,9 @@ public:
     inline void setPostProcessEnabled(bool enabled) { m_bEnablePostProcess = enabled; }
 
     void configureAndCreateWindow();
-    void start();
+    void setupManagers();
+
+    void mainLoop();
 
     void increaseDrawCallCount();
 
@@ -60,7 +62,6 @@ private:
     PointerExpandableArray<IEditorWindow*> m_oEditorWindows = PointerExpandableArray<IEditorWindow*>(2);
 
     void beforeLoop();
-    void mainLoop();
     void mainLoop_IMGUI();
     void drawFrame();
     void drawFrameInfo();

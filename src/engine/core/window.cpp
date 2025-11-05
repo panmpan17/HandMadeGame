@@ -139,7 +139,7 @@ void Window::configureAndCreateWindow()
 #endif
 }
 
-void Window::start()
+void Window::setupManagers()
 {
     InputManager::Initialize();
     ImageLoader::Initialize();
@@ -199,11 +199,7 @@ void Window::start()
     m_pRenderProcessQueue->setupProcesses();
 
     m_pWorldScene = new WorldScene();
-    m_pWorldScene->bloomTest();
-    // m_pWorldScene->createPinPongGame();
-    // m_pWorldScene->init();
-    // m_pWorldScene->clearAllNodes();
-    // m_pWorldScene->readFromFiles("assets/level.txt");
+    m_pWorldScene->init();
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -211,9 +207,6 @@ void Window::start()
     m_oEditorWindows.addElement(new CameraInspector());
     m_oEditorWindows.addElement(new HierarchyView());
     m_oEditorWindows.addElement(new PostProcessInspector());
-
-    beforeLoop();
-    mainLoop();
 }
 
 void Window::beforeLoop()
@@ -225,6 +218,8 @@ void Window::beforeLoop()
 
 void Window::mainLoop()
 {
+    beforeLoop();
+
     m_fLastDrawTime = glfwGetTime();
 
     while (!glfwWindowShouldClose(m_pWindow))

@@ -1,6 +1,9 @@
 #include "engine/core/window.h"
 #include "engine/core/error_handler.h"
 
+#include "game/testing/test.h"
+#include "game/pingpong/game.h"
+
 int main() {
     registerSignalHandlers();
 
@@ -16,7 +19,13 @@ int main() {
             return -1; // Initialization failed
         }
 
-        window.start();
+        window.setupManagers();
+
+        // createDemo1();
+        createVisualEffectDemo();
+        // createPingPongGame();
+
+        window.mainLoop();
     }
     catch (const std::exception& e)
     {
