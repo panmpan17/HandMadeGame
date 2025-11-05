@@ -16,6 +16,18 @@ public:
 
     void renderProcess() override;
 
+    inline float getBlurRadius1() const { return m_fBlurRadius1; }
+    inline void setBlurRadius1(float fRadius) { m_fBlurRadius1 = fRadius; }
+
+    inline float getBlurSigma1() const { return m_fBlurSigma1; }
+    inline void setBlurSigma1(float fSigma) { m_fBlurSigma1 = fSigma; }
+
+    inline float getBlurRadius2() const { return m_fBlurRadius2; }
+    inline void setBlurRadius2(float fRadius) { m_fBlurRadius2 = fRadius; }
+
+    inline float getBlurSigma2() const { return m_fBlurSigma2; }
+    inline void setBlurSigma2(float fSigma) { m_fBlurSigma2 = fSigma; }
+
 private:
     GLuint m_nOriginalRenderTexture = 0;
 

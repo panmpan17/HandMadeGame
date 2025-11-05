@@ -4,6 +4,7 @@
 #include "bloom_test.h"
 #include "order_dithering.h"
 #include "difference_of_gaussian.h"
+#include "gamma_correction.h"
 #include "../vertex.h"
 #include "../shader_loader.h"
 #include "../../core/window.h"
@@ -152,6 +153,10 @@ void RenderProcessQueue::initializeOriginalFBO()
 
 void RenderProcessQueue::setupProcesses()
 {
+    auto pGammaCorrection = new GammaCorrection(this);
+    pGammaCorrection->initialize();
+    m_oProcessArray.addElement(pGammaCorrection);
+
     auto pDifferenceOfGaussian = new DifferenceOfGaussian(this);
     pDifferenceOfGaussian->initialize();
     m_oProcessArray.addElement(pDifferenceOfGaussian);

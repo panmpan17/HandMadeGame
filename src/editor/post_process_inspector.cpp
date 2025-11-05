@@ -8,6 +8,7 @@
 #include "../engine/render/post_process/bloom_test.h"
 #include "../engine/render/post_process/order_dithering.h"
 #include "../engine/render/post_process/difference_of_gaussian.h"
+#include "../engine/render/post_process/gamma_correction.h"
 #include "../engine/core/debug_macro.h"
 #include "../engine/core/serialization/type_registry.h"
 #include "../engine/core/window.h"
@@ -153,23 +154,37 @@ void PostProcessInspector::updateRenderProcessQueue(IRenderProcess* pProcess)
     }
     else if (DifferenceOfGaussian* pDoG = dynamic_cast<DifferenceOfGaussian*>(pProcess))
     {
-        // float fSigma1 = pDoG->getSigma1();
-        // if (ImGui::DragFloat("Sigma 1", &fSigma1, 0.1f, 0.1f, 20.0f))
-        // {
-        //     pDoG->setSigma1(fSigma1);
-        // }
+        float fRadius1 = pDoG->getBlurRadius1();
+        if (ImGui::DragFloat("Blur Radius 1", &fRadius1, 0.1f, 0.1f, 20.0f))
+        {
+            pDoG->setBlurRadius1(fRadius1);
+        }
 
-        // float fSigma2 = pDoG->getSigma2();
-        // if (ImGui::DragFloat("Sigma 2", &fSigma2, 0.1f, 0.1f, 20.0f))
-        // {
-        //     pDoG->setSigma2(fSigma2);
-        // }
+        float fSigma1 = pDoG->getBlurSigma1();
+        if (ImGui::DragFloat("Blur Sigma 1", &fSigma1, 0.1f, 0.1f, 20.0f))
+        {
+            pDoG->setBlurSigma1(fSigma1);
+        }
 
-        // float fThreshold = pDoG->getThreshold();
-        // if (ImGui::DragFloat("Threshold", &fThreshold, 0.01f, 0.0f, 1.0f))
-        // {
-        //     pDoG->setThreshold(fThreshold);
-        // }
+        float fRadius2 = pDoG->getBlurRadius2();
+        if (ImGui::DragFloat("Blur Radius 2", &fRadius2, 0.1f, 0.1f, 20.0f))
+        {
+            pDoG->setBlurRadius2(fRadius2);
+        }
+
+        float fSigma2 = pDoG->getBlurSigma2();
+        if (ImGui::DragFloat("Blur Sigma 2", &fSigma2, 0.1f, 0.1f, 20.0f))
+        {
+            pDoG->setBlurSigma2(fSigma2);
+        }
+    }
+    else if (GammaCorrection* pGamma = dynamic_cast<GammaCorrection*>(pProcess))
+    {
+        float fGamma = pGamma->getGamma();
+        if (ImGui::DragFloat("Gamma", &fGamma, 0.1f, 0.1f, 5.0f))
+        {
+            pGamma->setGamma(fGamma);
+        }
     }
 
     ImGui::Separator();

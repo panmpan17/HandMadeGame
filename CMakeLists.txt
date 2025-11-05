@@ -48,6 +48,7 @@ set(SOURCES
     src/engine/render/post_process/order_dithering.cpp
     src/engine/render/post_process/bloom_test.cpp
     src/engine/render/post_process/difference_of_gaussian.cpp
+    src/engine/render/post_process/gamma_correction.cpp
     src/engine/render/image.cpp
     src/engine/render/shader_loader.cpp
     src/engine/render/models/mesh.cpp
