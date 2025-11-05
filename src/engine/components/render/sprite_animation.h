@@ -55,18 +55,18 @@ public:
     {
         if (nIndex < 0 || nIndex >= m_pAnimationInfoArray.getSize())
         {
-            // LOGLN_EX("Index wrong: {}", nIndex);
+            // LOGLN("Index wrong: {}", nIndex);
             return;
         }
 
         SpriteAnimationInfo* pInfo = m_pAnimationInfoArray.getElement(nIndex);
         if (pInfo == nullptr)
         {
-            // LOGLN_EX("No info: {}", nIndex);
+            // LOGLN("No info: {}", nIndex);
             return;
         }
 
-        // LOGLN_EX("Playing animation: {}", nIndex);
+        // LOGLN("Playing animation: {}", nIndex);
 
         m_pAnimationInfo = pInfo;
         m_nActiveAnimationIndex = nIndex;

@@ -21,7 +21,7 @@ void Shader::checkShaderCompilResult(const std::string_view& strShaderPath, GLui
         // The maxLength includes the NULL character
         std::vector<GLchar> errorLog(maxLength);
         glGetShaderInfoLog(nShader, maxLength, &maxLength, &errorLog[0]);
-        LOGERRLN_EX("Shader '{}' compilation failed: {}", strShaderPath, std::string(errorLog.data()));
+        LOGERR("Shader '{}' compilation failed: {}", strShaderPath, std::string(errorLog.data()));
     }
 }
 
@@ -112,14 +112,14 @@ const ShaderUniformHandle* Shader::getUniformHandle(const std::string_view& strN
 
     if (m_nUniformHandleCount >= 16)
     {
-        LOGLN_EX("Exceeded maximum number of uniform handles in shader '{}'", m_strName);
+        LOGLN("Exceeded maximum number of uniform handles in shader '{}'", m_strName);
         return nullptr;
     }
 
     GLuint nLocation = getUniformLocation(std::string(strName));
     if (nLocation == GL_INVALID_INDEX)
     {
-        LOGLN_EX("Uniform '{}' not found in shader '{}'", std::string(strName), m_strName);
+        LOGLN("Uniform '{}' not found in shader '{}'", std::string(strName), m_strName);
         return nullptr;
     }
 

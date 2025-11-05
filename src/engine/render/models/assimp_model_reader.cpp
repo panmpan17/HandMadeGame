@@ -114,17 +114,17 @@ Node* loadModel(const std::string_view& strPath, std::shared_ptr<Material>& pMat
 
     if (!pScene || pScene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !pScene->mRootNode) 
     {
-        LOGLN_EX( "Error loading model: {}", importer.GetErrorString() );
+        LOGLN( "Error loading model: {}", importer.GetErrorString() );
         return nullptr;
     }
 
-    LOGLN_EX( "Model {} loaded successfully with {} meshes.", strPath, pScene->mNumMeshes);
+    LOGLN( "Model {} loaded successfully with {} meshes.", strPath, pScene->mNumMeshes);
 
     // for (unsigned int i = 0; i < pScene->mNumMaterials; i++)
     // {
     //     const aiMaterial* const pMaterial = pScene->mMaterials[i];
     //     int nDiffuseTexCount = pMaterial->GetTextureCount(aiTextureType_DIFFUSE);
-    //     LOGLN_EX("Material {} has {} DIFFUSE, {} SPECULAR, {} AMBIENT, {} EMISSIVE, {} HEIGHT, {} NORMALS, {} SHININESS, {} OPACITY, {} DISPLACEMENT, {} LIGHTMAP, {} REFLECTION, {} BASE_COLOR, {} NORMAL_CAMERA, {} EMISSION_COLOR, {} METALNESS, {} DIFFUSE_ROUGHNESS, {} AMBIENT_OCCLUSION, {} UNKNOWN, {} SHEEN, {} CLEARCOAT, {} TRANSMISSION, {} MAYA_BASE, {} MAYA_SPECULAR, {} MAYA_SPECULAR_COLOR, {} MAYA_SPECULAR_ROUGHNESS, {} ANISOTROPY, {} GLTF_METALLIC_ROUGHNES",
+    //     LOGLN("Material {} has {} DIFFUSE, {} SPECULAR, {} AMBIENT, {} EMISSIVE, {} HEIGHT, {} NORMALS, {} SHININESS, {} OPACITY, {} DISPLACEMENT, {} LIGHTMAP, {} REFLECTION, {} BASE_COLOR, {} NORMAL_CAMERA, {} EMISSION_COLOR, {} METALNESS, {} DIFFUSE_ROUGHNESS, {} AMBIENT_OCCLUSION, {} UNKNOWN, {} SHEEN, {} CLEARCOAT, {} TRANSMISSION, {} MAYA_BASE, {} MAYA_SPECULAR, {} MAYA_SPECULAR_COLOR, {} MAYA_SPECULAR_ROUGHNESS, {} ANISOTROPY, {} GLTF_METALLIC_ROUGHNES",
     //         pMaterial->GetName().C_Str(),
     //         pMaterial->GetTextureCount(aiTextureType_DIFFUSE),
     //         pMaterial->GetTextureCount(aiTextureType_SPECULAR),

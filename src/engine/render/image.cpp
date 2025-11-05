@@ -35,7 +35,7 @@ Image::Image(const std::string& strPath, bool flipVertically/* = true */)
         m_pData = stbi_load(strFullPath.c_str(), &m_nWidth, &m_nHeight, &m_nChannels, 0);
         if (!m_pData)
         {
-            LOGERR_EX("Failed to load image: {}", strFullPath);
+            LOGERR("Failed to load image: {}", strFullPath);
         }
     }
     else
@@ -43,7 +43,7 @@ Image::Image(const std::string& strPath, bool flipVertically/* = true */)
         m_pData = stbi_load(strPath.c_str(), &m_nWidth, &m_nHeight, &m_nChannels, 0);
         if (!m_pData)
         {
-            LOGERR_EX("Failed to load image: {}", strPath);
+            LOGERR("Failed to load image: {}", strPath);
         }
     }
 }
@@ -61,7 +61,7 @@ Image::Image(const std::string_view& strPath, bool flipVertically/* = true */)
         m_pData = stbi_load(strFullPath.c_str(), &m_nWidth, &m_nHeight, &m_nChannels, 0);
         if (!m_pData)
         {
-            LOGERR_EX("Failed to load image: {}", strFullPath);
+            LOGERR("Failed to load image: {}", strFullPath);
         }
     }
     else
@@ -69,7 +69,7 @@ Image::Image(const std::string_view& strPath, bool flipVertically/* = true */)
         m_pData = stbi_load(strPath.data(), &m_nWidth, &m_nHeight, &m_nChannels, 0);
         if (!m_pData)
         {
-            LOGERR_EX("Failed to load image: {}", strPath);
+            LOGERR("Failed to load image: {}", strPath);
         }
     }
 

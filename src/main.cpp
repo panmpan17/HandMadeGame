@@ -12,9 +12,7 @@ int main() {
     try
     {
         window.setResizable(true);
-        window.configureAndCreateWindow();
-
-        if (!window.isValid())
+        if (!window.configureAndCreateWindow())
         {
             return -1; // Initialization failed
         }
@@ -29,7 +27,7 @@ int main() {
     }
     catch (const std::exception& e)
     {
-        std::cerr << 20 << e.what() << '\n';
+        std::cerr << "main.cpp catch exception: " << e.what() << '\n';
         return -1;
     }
 

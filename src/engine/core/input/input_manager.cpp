@@ -58,7 +58,7 @@ void InputManager::onMouseButtonCallback(GLFWwindow* pWindow, int nButton, int n
 {
     if (!ins)
     {
-        LOGERRLN("InputManager instance is not initialized.");
+        LOGERR("InputManager instance is not initialized.");
         return;
     }
 
@@ -84,7 +84,7 @@ void InputManager::onKeyCallback(GLFWwindow* pWindow, int nKey, int nScanNode, i
 {
     if (!ins)
     {
-        LOGERRLN("InputManager instance is not initialized.");
+        LOGERR("InputManager instance is not initialized.");
         return;
     }
 

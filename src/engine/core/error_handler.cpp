@@ -20,7 +20,7 @@
 #endif
 
 
-void printBackTrace()
+void printBackTrace(const std::string_view& strCrashType)
 {
     ErrorOutputter oErrorOutputter;
 
@@ -29,7 +29,7 @@ void printBackTrace()
     const struct mach_header* pMachHeader = _dyld_get_image_header(0);
     uintptr_t nLoadAddr = reinterpret_cast<uintptr_t>(pMachHeader);
 
-    oErrorOutputter << "=== Crash Backtrace ===" << std::endl;
+    oErrorOutputter << "=== Crash Backtrace (" << strCrashType << ") ===" << std::endl;
 
     {
         std::time_t nNow = std::time(nullptr);
@@ -76,49 +76,49 @@ void printBackTrace()
 void segmentationFaultHandler(int nSignalCode)
 {
     std::cerr << "Segmentation fault (signal " << nSignalCode << ")\n";
-    printBackTrace();
+    printBackTrace("Segmentation Fault");
     exit(EXIT_FAILURE); // Exit the program
 }
 
 void abortHandler(int nSignalCode)
 {
     std::cerr << "Aborted (signal " << nSignalCode << ")\n";
-    printBackTrace();
+    printBackTrace("Abort");
     exit(EXIT_FAILURE);
 }
 
 void floatingPointExceptionHandler(int nSignalCode)
 {
     std::cerr << "Floating point exception (signal " << nSignalCode << ")\n";
-    printBackTrace();
+    printBackTrace("Floating Point Exception");
     exit(EXIT_FAILURE);
 }
 
 void illegalInstructionHandler(int nSignalCode)
 {
     std::cerr << "Illegal instruction (signal " << nSignalCode << ")\n";
-    printBackTrace();
+    printBackTrace("Illegal Instruction");
     exit(EXIT_FAILURE);
 }
 
 void busErrorHandler(int nSignalCode)
 {
     std::cerr << "Bus error (signal " << nSignalCode << ")\n";
-    printBackTrace();
+    printBackTrace("Bus Error");
     exit(EXIT_FAILURE);
 }
 
 void badSystemCallHandler(int nSignalCode)
 {
     std::cerr << "Illegal instruction (signal " << nSignalCode << ")\n";
-    printBackTrace();
+    printBackTrace("Bad System Call");
     exit(EXIT_FAILURE);
 }
 
 void trapHandler(int nSignalCode)
 {
     std::cerr << "Trap (signal " << nSignalCode << ")\n";
-    printBackTrace();
+    printBackTrace("Trap");
     exit(EXIT_FAILURE);
 }
 

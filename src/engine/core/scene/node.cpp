@@ -74,13 +74,13 @@ void Node::onStart()
             pComponent->onStart();
             // }
             // catch (const std::runtime_error& e) {
-            //     LOGERRLN_EX("Runtime error in component onStart: {}", e.what());
+            //     LOGERR("Runtime error in component onStart: {}", e.what());
             // }
             // catch (const std::exception& e) {
-            //     LOGERRLN_EX("Standard exception in component onStart: {}", e.what());
+            //     LOGERR("Standard exception in component onStart: {}", e.what());
             // }
             // catch (...) {
-            //     LOGERRLN("Unknown exception in component onStart");
+            //     LOGERR("Unknown exception in component onStart");
             // }
         }
     }
@@ -109,13 +109,13 @@ void Node::update(float deltaTime)
                 pComponent->update(deltaTime);
             }
             catch (const std::runtime_error& e) {
-                LOGERRLN_EX("Runtime error in component update: {}", e.what());
+                LOGERR("Runtime error in component update: {}", e.what());
             }
             catch (const std::exception& e) {
-                LOGERRLN_EX("Standard exception in component update: {}", e.what());
+                LOGERR("Standard exception in component update: {}", e.what());
             }
             catch (...) {
-                LOGERRLN("Unknown exception in component update");
+                LOGERR("Unknown exception in component update");
             }
         }
     }
@@ -144,13 +144,13 @@ void Node::draw()
                 static_cast<IDrawable*>(pComponent)->draw();
             }
             catch (const std::runtime_error& e) {
-                LOGERRLN_EX("Runtime error in component draw: {}", e.what());
+                LOGERR("Runtime error in component draw: {}", e.what());
             }
             catch (const std::exception& e) {
-                LOGERRLN_EX("Standard exception in component draw: {}", e.what());
+                LOGERR("Standard exception in component draw: {}", e.what());
             }
             catch (...) {
-                LOGERRLN("Unknown exception in component draw");
+                LOGERR("Unknown exception in component draw");
             }
         }
     }

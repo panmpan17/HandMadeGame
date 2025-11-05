@@ -44,7 +44,7 @@ void DataDeserializer::read()
                 m_pCurrentDeserializingObject = TypeRegistry::instance().create(std::string(m_strClassName));
                 if (!m_pCurrentDeserializingObject)
                 {
-                    LOGERRLN_EX("Failed to create object of type: {}", m_strClassName);
+                    LOGERR("Failed to create object of type: {}", m_strClassName);
                 }
             }
 
@@ -58,7 +58,7 @@ void DataDeserializer::read()
 
 
                 size_t nId = m_pCurrentDeserializingObject->getID();
-                // LOGLN_EX("Deserialized object of type: {}, ID {}", typeid(*m_pCurrentDeserializingObject).name(), nId);
+                // LOGLN("Deserialized object of type: {}, ID {}", typeid(*m_pCurrentDeserializingObject).name(), nId);
                 if (nId != 0)
                 {
                     m_mapIDToObject[nId] = m_pCurrentDeserializingObject;
@@ -96,7 +96,7 @@ void DataDeserializer::getSerializableFromId(size_t nId, std::function<void(ISer
     auto iterSerializable = m_mapIDToObject.find(nId);
     if (iterSerializable != m_mapIDToObject.end())
     {
-        // LOGLN_EX("Deserialized object of type: {}", nId);
+        // LOGLN("Deserialized object of type: {}", nId);
         outSerializable(iterSerializable->second);
         return;
     }
@@ -104,12 +104,12 @@ void DataDeserializer::getSerializableFromId(size_t nId, std::function<void(ISer
     auto iterPending = m_vecPendingCallbacks.find(nId);
     if (iterPending != m_vecPendingCallbacks.end())
     {
-        // LOGLN_EX("Deserialized object of type: {}, add to pending callbacks", nId);
+        // LOGLN("Deserialized object of type: {}, add to pending callbacks", nId);
         iterPending->second.push_back(outSerializable);
     }
     else
     {
-        // LOGLN_EX("Deserialized object of type: {}, add to pending callbacks, new list", nId);
+        // LOGLN("Deserialized object of type: {}, add to pending callbacks, new list", nId);
         m_vecPendingCallbacks[nId] = { outSerializable };
     }
 }

@@ -444,7 +444,7 @@ bool ParticleSystem::deserializeField(DataDeserializer& deserializer, const std:
 
         ISerializable* pModule = TypeRegistry::instance().create(std::string(strModuleType));
 
-        LOGLN_EX("Deserializing module: {}, value: {}, {}", strModuleType, strModuleValue, pModule == nullptr ? "failed" : "succeeded");
+        LOGLN("Deserializing module: {}, value: {}, {}", strModuleType, strModuleValue, pModule == nullptr ? "failed" : "succeeded");
         if (!pModule) { return true;}
 
         IParticleModule* pParticleModule = dynamic_cast<IParticleModule*>(pModule);

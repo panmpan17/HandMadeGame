@@ -18,8 +18,6 @@ public:
     Window();
     ~Window();
 
-    inline bool isValid() const { return m_pWindow != nullptr; }
-
     inline void setResizable(bool resizable) { m_bResizable = resizable; }
     inline float getWindowRatio() { return m_fRatio; }
     inline void getWindowSize(int& width, int& height) {
@@ -33,12 +31,12 @@ public:
     inline bool isPostProcessEnabled() const { return m_bEnablePostProcess; }
     inline void setPostProcessEnabled(bool enabled) { m_bEnablePostProcess = enabled; }
 
-    void configureAndCreateWindow();
+    bool configureAndCreateWindow();
     void setupManagers();
 
     void mainLoop();
 
-    void increaseDrawCallCount();
+    inline void increaseDrawCallCount() { ++m_nDrawCallCount; }
 
 private:
     GLFWwindow* m_pWindow = nullptr;

@@ -55,7 +55,7 @@ std::shared_ptr<Mesh> SimpleObjReader::loadWavefrontFile(const std::string_view&
     auto oFileReader = FileReader(strFilename);
     if (!oFileReader.isOpen())
     {
-        LOGLN_EX("Failed to open file: {}", strFilename);
+        LOGLN("Failed to open file: {}", strFilename);
         return nullptr;
     }
 
@@ -179,7 +179,7 @@ std::shared_ptr<Mesh> SimpleObjReader::loadWavefrontFile(const std::string_view&
 
     loadMeshToGPU(pMesh);
 
-    LOGLN_EX("OBJ parsed: {} vertices, {} tex coords, {} normals, {} unique vertices, {} faces", vecVertices.size(), vecTexCoords.size(), vecNormals.size(), vecUniqueVertices.size(), vecFaces.size());
+    LOGLN("OBJ parsed: {} vertices, {} tex coords, {} normals, {} unique vertices, {} faces", vecVertices.size(), vecTexCoords.size(), vecNormals.size(), vecUniqueVertices.size(), vecFaces.size());
 
     return pMesh;
 }

@@ -72,10 +72,10 @@ void APIENTRY glDebugOutput(GLenum source, GLenum type, unsigned int id, GLenum 
     // ignore non-significant error/warnings
     if (id == 131169 || id == 131185 || id == 131218 || id == 131204) return;
 
-    LOGLN_EX("Debug message ({}) at {}:{}: {}", id, __FILE__, __LINE__, message);
+    LOGLN("Debug message ({}) at {}:{}: {}", id, __FILE__, __LINE__, message);
 }
 
-void Window::configureAndCreateWindow()
+bool Window::configureAndCreateWindow()
 {
     // Configure GL version
 #if __APPLE__
@@ -116,7 +116,7 @@ void Window::configureAndCreateWindow()
     {
         LOGLN("Failed to create GLFW window");
         glfwTerminate();
-        return;
+        return false;
     }
 
     glfwSetWindowAspectRatio(m_pWindow, m_nWidth, m_nHeight);
@@ -137,6 +137,8 @@ void Window::configureAndCreateWindow()
     //     glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
     // }
 #endif
+
+    return true;
 }
 
 void Window::setupManagers()
@@ -352,9 +354,4 @@ void Window::drawFrameInfo()
     ImGui::Text("%.1f FPS (%.3f ms)", ImGui::GetIO().Framerate, 1000.0f / ImGui::GetIO().Framerate);
     ImGui::Text("Draw Call Count: %d", m_nDrawCallCount);
     ImGui::End();
-}
-
-void Window::increaseDrawCallCount()
-{
-    ++m_nDrawCallCount;
 }
