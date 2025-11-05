@@ -84,6 +84,15 @@ void Node::onStart()
             // }
         }
     }
+
+    for (int i = 0; i < m_oChildNodeArray.getSize(); ++i)
+    {
+        Node* pChildNode = m_oChildNodeArray.getElement(i);
+        if (pChildNode)
+        {
+            pChildNode->onStart();
+        }
+    }
 }
 
 void Node::update(float deltaTime)
