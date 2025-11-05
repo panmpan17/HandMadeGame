@@ -51,7 +51,7 @@ void main()
     if ((u_textureEnabled & 4) != 0)
     {
         vec4 texColor = texture(u_tex2, fragUV);
-        norm = normalize(texColor.xyz);
+        norm = normalize(texColor.xyz * 2.0 - 1.0);
     }
     else
     {
