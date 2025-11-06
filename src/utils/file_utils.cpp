@@ -104,20 +104,12 @@ FileReader::FileReader(const std::string& strPath)
         {
             file.open(strFullPath);
         }
-        else
-        {
-            throw std::runtime_error("File does not exist: " + strFullPath);
-        }
     }
     else
     {
         if (fs::exists(strPath))
         {
             file.open(strPath);
-        }
-        else
-        {
-            throw std::runtime_error("File does not exist: " + strPath);
         }
     }
 }

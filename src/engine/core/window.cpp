@@ -17,6 +17,7 @@
 #include "../render/shader_loader.h"
 #include "../render/post_process/render_process_queue.h"
 #include "../render/lighting/light_manager.h"
+#include "../misc/preference.h"
 #include "../../editor/camera_inspector.h"
 #include "../../editor/hierarchy_view.h"
 #include "../../editor/post_process_inspector.h"
@@ -32,7 +33,8 @@ Window::Window()
 {
     ins = this;
 
-    m_bShowIMGUI = true;
+    m_bShowIMGUI = Preference::getEnableIMGUI();
+    m_bEnablePostProcess = Preference::getEnablePostProcess();
 
     if (!glfwInit())
     {
@@ -57,14 +59,13 @@ Window::~Window()
     ImageLoader::Cleanup();
     LightManager::Cleanup();
 
+    Preference::savePreferences();
+
     glfwTerminate();
 
-    if (m_bShowIMGUI)
-    {
-        ImGui_ImplOpenGL3_Shutdown();
-        ImGui_ImplGlfw_Shutdown();
-        ImGui::DestroyContext();
-    }
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
 }
 
 void APIENTRY glDebugOutput(GLenum source, GLenum type, unsigned int id, GLenum severity, GLsizei length, const char* message, const void* userParam)
@@ -146,13 +147,13 @@ void Window::setupManagers()
     InputManager::Initialize();
     ImageLoader::Initialize();
 
-    // InputManager::getInstance()->registerKeyPressCallback(KeyCode::KEY_R, [](bool pressed) {
-    //     if (pressed)
-    //     {
-    //         LOGLN("Reloading all shaders...");
-    //         ShaderLoader::getInstance()->reloadAllShaders();
-    //     }
-    // });
+    InputManager::getInstance()->registerKeyPressCallback(KeyCode::KEY_FUNCTION_3, [](bool pressed) {
+        if (pressed)
+        {
+            Window::ins->m_bShowIMGUI = !Window::ins->m_bShowIMGUI;
+            Preference::setEnableIMGUI(Window::ins->m_bShowIMGUI);
+        }
+    });
 
     glfwSetKeyCallback(m_pWindow, &InputManager::onKeyCallback);
     glfwSetCursorEnterCallback(m_pWindow, &InputManager::onMouseEnterCallback);
@@ -172,7 +173,6 @@ void Window::setupManagers()
 
 
     // Setup Dear ImGui context
-    if (m_bShowIMGUI)
     {
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();

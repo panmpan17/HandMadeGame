@@ -12,6 +12,7 @@
 #include "../engine/core/debug_macro.h"
 #include "../engine/core/serialization/type_registry.h"
 #include "../engine/core/window.h"
+#include "../engine/misc/preference.h"
 
 
 PostProcessInspector::PostProcessInspector()
@@ -35,6 +36,7 @@ void PostProcessInspector::update(float fDeltaTime)
             if (ImGui::Checkbox("Enable Post Process", &bEnablePostProcess))
             {
                 Window::ins->setPostProcessEnabled(bEnablePostProcess);
+                Preference::setEnablePostProcess(bEnablePostProcess);
             }
         }
 
