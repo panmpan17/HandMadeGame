@@ -49,6 +49,11 @@ Window::~Window()
 {
     if (m_pWindow)
     {
+        int nWindowX, nWindowY;
+        glfwGetWindowPos(m_pWindow, &nWindowX, &nWindowY);
+        Preference::setWindowPositionX(nWindowX);
+        Preference::setWindowPositionY(nWindowY);
+
         glfwDestroyWindow(m_pWindow);
     }
     if (m_pWorldScene)
@@ -122,7 +127,12 @@ bool Window::configureAndCreateWindow()
         return false;
     }
 
-    // glfwSetWindowAspectRatio(m_pWindow, m_nWidth, m_nHeight);
+    glfwSetWindowPos(m_pWindow, Preference::getWindowPositionX(), Preference::getWindowPositionY());
+
+    if (m_bKeepRatio)
+    {
+        glfwSetWindowAspectRatio(m_pWindow, m_oWindowSize.x, m_oWindowSize.y);
+    }
 
     glfwGetFramebufferSize(m_pWindow, &m_oActualSize.x, &m_oActualSize.y);
     // m_fRatio = m_oActualSize.x / (float)m_oActualSize.y;

@@ -20,7 +20,8 @@ int main() {
         window.setupManagers();
 
         // createDemo1();
-        createVisualEffectDemo();
+        // createVisualEffectDemo();
+        createLightingShadowDemo();
         // createPingPongGame();
 
         window.mainLoop();

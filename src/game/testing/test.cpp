@@ -328,3 +328,59 @@ void createVisualEffectDemo()
     }
     */
 }
+
+void createLightingShadowDemo()
+{
+    WorldScene* const pWorldScene = WorldScene::current;
+
+    Shader* p3DMeshShader = ShaderLoader::getInstance()->getShader("3d_mesh");
+
+    {
+        std::shared_ptr<Material> pMaterial = std::make_shared<Material>(p3DMeshShader);
+        Node* pGround = loadModel("assets/models/box.obj", pMaterial);
+        pGround->setPosition(0.f, -3.f, 0.f);
+        pGround->setScale(10.f, 0.5f, 10.f);
+        pWorldScene->addNode(pGround);
+    }
+
+    {
+        Image* const pMainImage = ImageLoader::getInstance()->getImageByPath("assets/images/container.png");
+        Image* const pMetallicImage = ImageLoader::getInstance()->getImageByPath("assets/images/container_specular.png");
+
+        std::shared_ptr<Material> pMaterial = std::make_shared<Material>(p3DMeshShader);
+        pMaterial->setAlbedoMap(pMainImage);
+        pMaterial->setSpecularMap(pMetallicImage);
+
+        Node* pBackPackObj = loadModel("assets/models/box.obj", pMaterial);
+        pBackPackObj->setPosition(-2.f, 0.f, 0.f);
+        pWorldScene->addNode(pBackPackObj);
+    }
+
+    {
+        Image* const pMainImage = ImageLoader::getInstance()->getImageByPath("assets/models/1001_albedo.jpg");
+        Image* const pNormalImage = ImageLoader::getInstance()->getImageByPath("assets/models/1001_normal.png");
+        Image* const pMetallicImage = ImageLoader::getInstance()->getImageByPath("assets/models/1001_metallic.jpg");
+
+        std::shared_ptr<Material> pMaterial = std::make_shared<Material>(p3DMeshShader);
+        pMaterial->setAlbedoMap(pMainImage);
+        pMaterial->setNormalMap(pNormalImage);
+        pMaterial->setSpecularMap(pMetallicImage);
+
+        Node* pBackPackFbx = loadModel("assets/models/back_pack.fbx", pMaterial);
+        pBackPackFbx->setScale(0.01f);
+        pBackPackFbx->setPosition(2.f, 0.f, 0.f);
+        pWorldScene->addNode(pBackPackFbx);
+    }
+
+    {
+        Node* pDirectionLightNode = new Node(0, 10.f, 0.f);
+        pDirectionLightNode->setRotationQuaternion(Quaternion::fromEulerAngles({-45.f, 45.f, 0.f}));
+
+        DirectionLightComponent* pPointLightComp = new DirectionLightComponent();
+        pPointLightComp->setColor({1.f, 1.f, .5f});
+        pPointLightComp->setIntensity(2.f);
+        pDirectionLightNode->addComponent(pPointLightComp);
+
+        pWorldScene->addNode(pDirectionLightNode);
+    }
+}

@@ -21,6 +21,7 @@ public:
     ~Window();
 
     inline void setResizable(bool resizable) { m_bResizable = resizable; }
+    inline void setKeepRatio(bool keepRatio) { m_bKeepRatio = keepRatio; }
     inline float getWindowRatio() { return m_fRatio; }
 
     inline Vector2i& getActualSize() { return m_oActualSize; }
@@ -58,6 +59,7 @@ private:
     WorldScene* m_pWorldScene = nullptr;
 
     bool m_bResizable = false;
+    bool m_bKeepRatio = false;
     int m_nDrawCallCount = 0;
 
     bool m_bShowIMGUI = false;

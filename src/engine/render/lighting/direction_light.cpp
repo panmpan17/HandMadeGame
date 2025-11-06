@@ -1,6 +1,16 @@
 #include "direction_light.h"
 
+#include <glad/gl.h>
 #include "light_manager.h"
+#include "../vertex.h"
+#include "../shader.h"
+#include "../shader_loader.h"
+#include "../../core/window.h"
+#include "../../core/camera.h"
+#include "../../core/debug_macro.h"
+
+
+constexpr float LIGHT_SIZE = 10.f;
 
 
 DirectionLightComponent::DirectionLightComponent()
@@ -21,5 +31,65 @@ void DirectionLightComponent::onAddToNode()
     }
 
     m_pNode->registerOnPositionChangedListener(std::bind(&DirectionLightComponent::markLightDataDirty, this));
+
+    m_pShader = ShaderLoader::getInstance()->getShader("point_light");
+    m_pMVPUniformHandle = m_pShader->getUniformHandle("u_MVP");
+    m_pLightColorUniformHandle = m_pShader->getUniformHandle("u_lightColor");
+
+    registerBuffer();
+}
+
+void DirectionLightComponent::registerBuffer()
+{
+    glGenBuffers(1, &m_nVertexBuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, m_nVertexBuffer);
+
+    float fStartX = -LIGHT_SIZE / 2.0f;
+    float fStartY = -LIGHT_SIZE / 2.0f;
+    VertexWUV arrVertices[4];
+    arrVertices[0] = { { fStartX, fStartY } }; // Bottom left
+    arrVertices[1] = { { fStartX, fStartY + LIGHT_SIZE } }; // Top right
+    arrVertices[2] = { { fStartX + LIGHT_SIZE, fStartY } }; // Bottom right
+    arrVertices[3] = { { fStartX + LIGHT_SIZE, fStartY + LIGHT_SIZE } }; // Top left
+    glBufferData(GL_ARRAY_BUFFER, sizeof(arrVertices), arrVertices, GL_STATIC_DRAW);
+
+    GLuint nVPosAttr = m_pShader->getAttributeLocation("a_vPos");
+
+    glGenVertexArrays(1, &m_nVertexArray);
+    glBindVertexArray(m_nVertexArray);
+    glEnableVertexAttribArray(nVPosAttr);
+    glVertexAttribPointer(nVPosAttr, 2, GL_FLOAT, GL_FALSE, sizeof(VertexWUV), (void*)offsetof(VertexWUV, pos));
+
+    // Unbind
+    glBindVertexArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+void DirectionLightComponent::draw()
+{
+    ASSERT(m_pShader, "Shader must be set before drawing the quad");
+
+    mat4x4 mvp;
+    const mat4x4& matModel = m_pNode->getWorldMatrix();
+    const mat4x4& cameraViewMatrix = Camera::main->getViewProjectionMatrix();
+    mat4x4_mul(mvp, cameraViewMatrix, matModel);
+
+    glUseProgram(m_pShader->getProgram());
+    if (m_pMVPUniformHandle)
+    {
+        glUniformMatrix4fv(m_pMVPUniformHandle->m_nLocation, 1, GL_FALSE, (const GLfloat*) mvp);
+    }
+    if (m_pLightColorUniformHandle)
+    {
+        glUniform3f(m_pLightColorUniformHandle->m_nLocation, m_color[0] * m_intensity, m_color[1] * m_intensity, m_color[2] * m_intensity);
+    }
+
+    glBindVertexArray(m_nVertexArray);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4); // Draw the quad using triangle strip
+    INCREASE_DRAW_CALL_COUNT();
+
+    glBindTexture(GL_TEXTURE_2D, 0); // Unbind the texture
+    glBindVertexArray(0); // Unbind the vertex array
+    glUseProgram(0);
 }
 

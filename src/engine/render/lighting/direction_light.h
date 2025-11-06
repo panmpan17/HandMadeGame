@@ -7,6 +7,12 @@
 #include "../../core/scene/node.h"
 
 
+typedef unsigned int GLuint;
+
+class Shader;
+class ShaderUniformHandle;
+
+
 class DirectionLightComponent : public Component
 {
 public:
@@ -40,10 +46,10 @@ public:
 
     void onAddToNode() override;
     // void onStart() override {}
-    void draw() override {}
+    void draw() override;
     void update(float deltaTime) override {}
 
-    bool isIDrawable() const override { return false; }
+    bool isIDrawable() const override { return true; }
     bool isUpdatable() const override { return false; }
 
 
@@ -52,4 +58,16 @@ private:
     float m_intensity;
 
     bool m_bLightDataDirty = true;
+
+
+    Shader* m_pShader = nullptr;
+    const ShaderUniformHandle* m_pMVPUniformHandle = nullptr;
+    const ShaderUniformHandle* m_pLightColorUniformHandle = nullptr;
+
+    GLuint m_nPointLightVAO = 0;
+    GLuint m_nPointLightVBO = 0;
+
+    GLuint m_nVertexBuffer = 0;
+    GLuint m_nVertexArray = 0;
+    void registerBuffer();
 };
