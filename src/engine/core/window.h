@@ -1,6 +1,8 @@
 #pragma once
 
 #include "debug_macro.h"
+#include "input/event.h"
+#include "math/vector.h"
 #include "../../utils/expandable_array.h"
 
 typedef struct GLFWwindow GLFWwindow;
@@ -20,13 +22,10 @@ public:
 
     inline void setResizable(bool resizable) { m_bResizable = resizable; }
     inline float getWindowRatio() { return m_fRatio; }
-    inline void getWindowSize(int& width, int& height) {
-        width = m_nWidth;
-        height = m_nHeight;
-    }
 
-    inline int GetActualWidth() const { return m_nActualWidth; }
-    inline int GetActualHeight() const { return m_nActualHeight; }
+    inline Vector2i& getActualSize() { return m_oActualSize; }
+    inline int GetActualWidth() const { return m_oActualSize.x; }
+    inline int GetActualHeight() const { return m_oActualSize.y; }
 
     inline bool isPostProcessEnabled() const { return m_bEnablePostProcess; }
     inline void setPostProcessEnabled(bool enabled) { m_bEnablePostProcess = enabled; }
@@ -38,13 +37,18 @@ public:
 
     inline void increaseDrawCallCount() { ++m_nDrawCallCount; }
 
+    inline void registerResizeListener(std::function<void(Vector2i)> funcListener) 
+    { 
+        m_onWindowResize.add(funcListener); 
+    }
+
 private:
     GLFWwindow* m_pWindow = nullptr;
     RenderProcessQueue* m_pRenderProcessQueue = nullptr;
     bool m_bEnablePostProcess = true;
 
     int m_nWidth = 1920, m_nHeight = 1080;
-    int m_nActualWidth = 800, m_nActualHeight = 600;
+    Vector2i m_oActualSize;
     float m_fRatio = 1.0f;
 
     double m_fCurrentDrawTime = 0.0;
@@ -58,6 +62,8 @@ private:
 
     bool m_bShowIMGUI = false;
     PointerExpandableArray<IEditorWindow*> m_oEditorWindows = PointerExpandableArray<IEditorWindow*>(2);
+
+    Event<Vector2i> m_onWindowResize;
 
     void beforeLoop();
     void mainLoop_IMGUI();

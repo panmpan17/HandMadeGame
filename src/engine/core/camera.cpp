@@ -11,6 +11,14 @@ Camera* Camera::main = nullptr;
 
 Camera::Camera()
 {
+    Window::ins->registerResizeListener([this](const Vector2i& newSize)
+    {
+        setRatio(newSize.x / (float)newSize.y);
+        m_bProjectionMatrixDirty = true;
+        m_bViewProjectionMatrixDirty = true;
+        m_bCameraUBODirty = true;
+    });
+
     glGenBuffers(1, &m_nCameraUBO);
     glBindBuffer(GL_UNIFORM_BUFFER, m_nCameraUBO);
     glBufferData(GL_UNIFORM_BUFFER, sizeof(mat4x4) * 2 + sizeof(vec4), nullptr, GL_DYNAMIC_DRAW);

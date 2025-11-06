@@ -113,6 +113,12 @@ public:
 };
 
 
+struct Vector2i
+{
+public:
+    int x, y;
+};
+
 // Formatter specialization
 template <>
 struct std::formatter<Vector2> : std::formatter<std::string> {

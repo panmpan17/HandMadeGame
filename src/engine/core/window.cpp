@@ -119,10 +119,10 @@ bool Window::configureAndCreateWindow()
         return false;
     }
 
-    glfwSetWindowAspectRatio(m_pWindow, m_nWidth, m_nHeight);
+    // glfwSetWindowAspectRatio(m_pWindow, m_nWidth, m_nHeight);
 
-    glfwGetFramebufferSize(m_pWindow, &m_nActualWidth, &m_nActualHeight);
-    // m_fRatio = m_nActualWidth / (float)m_nActualHeight;
+    glfwGetFramebufferSize(m_pWindow, &m_oActualSize.x, &m_oActualSize.y);
+    // m_fRatio = m_oActualSize.x / (float)m_oActualSize.y;
 
     // glfwSetWindowMonitor(m_pWindow, pPrimaryMonitor, 0, 0, pVideoMode->width, pVideoMode->height, pVideoMode->refreshRate);
 
@@ -213,7 +213,7 @@ void Window::setupManagers()
 
 void Window::beforeLoop()
 {
-    m_fRatio = m_nActualWidth / (float) m_nActualHeight;
+    m_fRatio = m_oActualSize.x / (float) m_oActualSize.y;
 
     m_pWorldScene->onStart();
 }
@@ -230,13 +230,12 @@ void Window::mainLoop()
 
         // Because mac's retina display has a different pixel ratio (and moving to different monitors)
         // need to adjust the viewport to match the actual framebuffer size.
-        glfwGetFramebufferSize(m_pWindow, &m_nActualWidth, &m_nActualHeight);
-        float fNewRatio = m_nActualWidth / (float) m_nActualHeight;
+        glfwGetFramebufferSize(m_pWindow, &m_oActualSize.x, &m_oActualSize.y);
+        float fNewRatio = m_oActualSize.x / (float) m_oActualSize.y;
         if (m_fRatio != fNewRatio)
         {
             m_fRatio = fNewRatio;
-            // m_pCamera->setRatio(m_fRatio);
-            // TODO: send event to update all cameras
+            m_onWindowResize.invoke(Vector2i(m_oActualSize.x, m_oActualSize.y));
         }
 
 
@@ -329,7 +328,7 @@ void Window::drawFrame()
     else
     {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        glViewport(0, 0, m_nActualWidth, m_nActualHeight);
+        glViewport(0, 0, m_oActualSize.x, m_oActualSize.y);
         glClearColor(0.f, 0.f, 0.f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         m_pWorldScene->render();

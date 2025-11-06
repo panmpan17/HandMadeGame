@@ -16,22 +16,16 @@ InputManager* InputManager::ins = nullptr;
 
 void InputManager::windowPositionToGLPosition(float windowX, float windowY, float& glX, float& glY)
 {
-    int width, height;
-    Window::ins->getWindowSize(width, height);
-
     // Convert window coordinates to OpenGL coordinates
-    glX = (windowX / width) * 2.0f - 1.0f; // Normalize to [-1, 1]
-    glY = 1.0f - (windowY / height) * 2.0f; // Invert Y
+    glX = (windowX / Window::ins->GetActualWidth()) * 2.0f - 1.0f; // Normalize to [-1, 1]
+    glY = 1.0f - (windowY / Window::ins->GetActualHeight()) * 2.0f; // Invert Y
 }
 
 void InputManager::GLPositionToWindowPosition(float glX, float glY, float& windowX, float& windowY)
 {
-    int width, height;
-    Window::ins->getWindowSize(width, height);
-
     // Convert OpenGL coordinates back to window coordinates
-    windowX = (glX + 1.0f) / 2.0f * width; // Normalize to [0, width]
-    windowY = (1.0f - glY) / 2.0f * height; // Invert Y and normalize to [0, height]
+    windowX = (glX + 1.0f) / 2.0f * Window::ins->GetActualWidth(); // Normalize to [0, width]
+    windowY = (1.0f - glY) / 2.0f * Window::ins->GetActualHeight(); // Invert Y and normalize to [0, height]
 }
 
 void InputManager::onMouseEnterCallback(GLFWwindow* pWindow, int bEntered)
