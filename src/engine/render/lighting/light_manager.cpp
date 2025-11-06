@@ -50,6 +50,7 @@ void LightManager::registerLightingUBO()
 void LightManager::registerShadowDepthMap()
 {
     glGenFramebuffers(1, &m_nShadowDepthMapFBO);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_nShadowDepthMapFBO);
 
     glGenTextures(1, &m_nShadowDepthMapTexture);
     glBindTexture(GL_TEXTURE_2D, m_nShadowDepthMapTexture);
@@ -60,7 +61,6 @@ void LightManager::registerShadowDepthMap()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 
-    glBindFramebuffer(GL_FRAMEBUFFER, m_nShadowDepthMapFBO);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_nShadowDepthMapTexture, 0);
     glDrawBuffer(GL_NONE);
     glReadBuffer(GL_NONE);

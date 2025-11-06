@@ -167,6 +167,43 @@ void Node::draw()
     m_bChildMatrixDirty = false;
 }
 
+void Node::drawDepth()
+{
+    // Draw logic for the node, if any
+    int nSize = m_oComponentArray.getSize();
+    for (int i = 0; i < nSize; ++i)
+    {
+        Component* pComponent = m_oComponentArray.getElement(i);
+        if (pComponent && pComponent->isIDrawable())
+        {
+            try
+            {
+                static_cast<IDrawable*>(pComponent)->drawDepth();
+            }
+            catch (const std::runtime_error& e) {
+                LOGERR("Runtime error in component draw: {}", e.what());
+            }
+            catch (const std::exception& e) {
+                LOGERR("Standard exception in component draw: {}", e.what());
+            }
+            catch (...) {
+                LOGERR("Unknown exception in component draw");
+            }
+        }
+    }
+
+    for (int i = 0; i < m_oChildNodeArray.getSize(); ++i)
+    {
+        Node* pChildNode = m_oChildNodeArray.getElement(i);
+        if (pChildNode && pChildNode->isActive())
+        {
+            pChildNode->drawDepth();
+        }
+    }
+
+    m_bChildMatrixDirty = false;
+}
+
 void Node::addComponent(Component* pComponent)
 {
     if (pComponent == nullptr) return;

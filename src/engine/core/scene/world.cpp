@@ -135,6 +135,19 @@ void WorldScene::render()
     }
 }
 
+void WorldScene::renderDepth()
+{
+    int nSize = m_oNodeArray.getSize();
+    for (int i = 0; i < nSize; ++i)
+    {
+        Node* pNode = m_oNodeArray.getElement(i);
+        if (pNode && pNode->isActive())
+        {
+            pNode->drawDepth();
+        }
+    }
+}
+
 void WorldScene::addNode(Node* pNode)
 {
     if (pNode == nullptr)

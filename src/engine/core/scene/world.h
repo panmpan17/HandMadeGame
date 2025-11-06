@@ -24,6 +24,7 @@ public:
 
     void update(float fDeltatime);
     void render();
+    void renderDepth();
 
     inline int getNodeCount() const { return m_oNodeArray.getSize(); }
     inline Node* getNode(int nIndex) const { return m_oNodeArray.getElement(nIndex); }

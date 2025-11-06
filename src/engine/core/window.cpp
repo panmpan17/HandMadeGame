@@ -377,7 +377,7 @@ void Window::drawFrame()
         glViewport(0, 0, LightManager::SHADOW_MAP_WIDTH, LightManager::SHADOW_MAP_HEIGHT);
         glBindFramebuffer(GL_FRAMEBUFFER, LightManager::getInstance()->getShadowDepthMapFBO());
         glClear(GL_DEPTH_BUFFER_BIT);
-        m_pWorldScene->render();
+        m_pWorldScene->renderDepth();
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
         glViewport(0, 0, m_oActualSize.x, m_oActualSize.y);

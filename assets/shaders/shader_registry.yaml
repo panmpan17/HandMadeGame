@@ -62,3 +62,7 @@
   name: gamma_correction
   vertex: assets/shaders/screen_pos.vert
   fragment: assets/shaders/gamma_correction.frag
+17:
+  name: 3d_depth
+  vertex: assets/shaders/3d_depth.vert
+  fragment: assets/shaders/3d_depth.frag

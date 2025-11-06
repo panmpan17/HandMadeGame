@@ -28,6 +28,7 @@ public:
 
     void update(float deltaTime);
     void draw();
+    void drawDepth();
 
     inline void setActive(bool isActive) { m_bIsActive = isActive; }
     inline bool isActive() const { return m_bIsActive; }
