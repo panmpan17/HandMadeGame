@@ -35,6 +35,8 @@ Window::Window()
 
     m_bShowIMGUI = Preference::getEnableIMGUI();
     m_bEnablePostProcess = Preference::getEnablePostProcess();
+    m_oWindowSize.x = Preference::getWindowWidth();
+    m_oWindowSize.y = Preference::getWindowHeight();
 
     if (!glfwInit())
     {
@@ -112,7 +114,7 @@ bool Window::configureAndCreateWindow()
     // glfwWindowHint(GLFW_DECORATED, GLFW_FALSE); // This is key for borderless
 
 
-    m_pWindow = glfwCreateWindow(m_nWidth, m_nHeight, "Michael Hand Made Game", NULL, NULL);
+    m_pWindow = glfwCreateWindow(m_oWindowSize.x, m_oWindowSize.y, "Michael Hand Made Game", NULL, NULL);
     if (!m_pWindow)
     {
         LOGLN("Failed to create GLFW window");
@@ -236,6 +238,10 @@ void Window::mainLoop()
         {
             m_fRatio = fNewRatio;
             m_onWindowResize.invoke(Vector2i(m_oActualSize.x, m_oActualSize.y));
+
+            glfwGetWindowSize(m_pWindow, &m_oWindowSize.x, &m_oWindowSize.y);
+            Preference::setWindowWidth(m_oWindowSize.x);
+            Preference::setWindowHeight(m_oWindowSize.y);
         }
 
 

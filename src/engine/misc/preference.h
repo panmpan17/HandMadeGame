@@ -15,6 +15,12 @@ public:
 
     inline static void savePreferences() { getPlayerPreferenceInstance().writeToFile(); }
 
+    inline static int getWindowWidth() { return getPlayerPreferenceInstance().getInt("WindowWidth", 1280); }
+    inline static void setWindowWidth(int width) { getPlayerPreferenceInstance().setInt("WindowWidth", width); }
+
+    inline static int getWindowHeight() { return getPlayerPreferenceInstance().getInt("WindowHeight", 720); }
+    inline static void setWindowHeight(int height) { getPlayerPreferenceInstance().setInt("WindowHeight", height); }
+
 private:
     static PlayerPreference& getPlayerPreferenceInstance()
     {

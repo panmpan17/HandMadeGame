@@ -47,7 +47,7 @@ private:
     RenderProcessQueue* m_pRenderProcessQueue = nullptr;
     bool m_bEnablePostProcess = true;
 
-    int m_nWidth = 1920, m_nHeight = 1080;
+    Vector2i m_oWindowSize;
     Vector2i m_oActualSize;
     float m_fRatio = 1.0f;
 

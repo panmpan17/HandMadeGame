@@ -1,5 +1,6 @@
 #include "player_preference.h"
 #include "file_utils.h"
+#include "string_handle.h"
 
 
 PlayerPreference::PlayerPreference(const std::string& strFilename)
@@ -23,30 +24,26 @@ void PlayerPreference::readFromFile()
     std::string strLine;
     while (reader.readLine(strLine))
     {
-        size_t nDelimiterPos = strLine.find('=');
-        if (nDelimiterPos == std::string::npos)
+        std::vector<std::string> vetKeyValue = splitString(strLine, ',');
+        if (vetKeyValue.size() != 3)
         {
             continue;
         }
 
-        std::string strKey = strLine.substr(0, nDelimiterPos);
-        std::string strValue = strLine.substr(nDelimiterPos + 1);
+        const std::string& strKey = vetKeyValue[0];
+        PreferenceType eType = static_cast<PreferenceType>(atoi(vetKeyValue[1].c_str()));
+        const std::string& strValue = vetKeyValue[2];
 
-        if (strValue == "true" || strValue == "false")
+        switch (eType)
         {
-            m_mapBoolPreferences[strKey] = (strValue == "true");
-        }
-        else
-        {
-            try
-            {
-                int nIntValue = std::stoi(std::string(strValue));
-                m_mapIntPreferences[strKey] = nIntValue;
-            }
-            catch (const std::exception&)
-            {
-                // Ignore invalid int values
-            }
+            case PreferenceType::Bool:
+                m_mapBoolPreferences[strKey] = strValue == "1";
+                break;
+            case PreferenceType::Int:
+                m_mapIntPreferences[strKey] = atoi(strValue.c_str());
+                break;
+            default:
+                break;
         }
     }
 }
@@ -61,11 +58,11 @@ void PlayerPreference::writeToFile()
 
     for (const auto& pair : m_mapBoolPreferences)
     {
-        writer << pair.first << "=" << (pair.second ? "true" : "false") << "\n";
+        writer << pair.first << ',' << static_cast<int>(PreferenceType::Bool) << ',' << (pair.second ? '1' : '0') << "\n";
     }
 
     for (const auto& pair : m_mapIntPreferences)
     {
-        writer << pair.first << "=" << pair.second << "\n";
+        writer << pair.first << ',' << static_cast<int>(PreferenceType::Int) << ',' << pair.second << "\n";
     }
 }

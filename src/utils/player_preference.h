@@ -28,7 +28,7 @@ public:
     }
     inline void setBool(const std::string& strKey, bool value) { m_mapBoolPreferences[strKey] = value; }
 
-    inline bool getInt(const std::string& strKey, int defaultValue)
+    inline int getInt(const std::string& strKey, int defaultValue)
     {
         auto it = m_mapIntPreferences.find(strKey);
         if (it != m_mapIntPreferences.end())
