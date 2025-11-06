@@ -1,4 +1,6 @@
 #include "world.h"
+
+#include <glad/gl.h>
 #include "node.h"
 #include "../camera.h"
 #include "../math/random.h"
@@ -137,6 +139,8 @@ void WorldScene::render()
 
 void WorldScene::renderDepth()
 {
+    glCullFace(GL_FRONT);
+
     int nSize = m_oNodeArray.getSize();
     for (int i = 0; i < nSize; ++i)
     {
@@ -146,6 +150,8 @@ void WorldScene::renderDepth()
             pNode->drawDepth();
         }
     }
+
+    glCullFace(GL_BACK);
 }
 
 void WorldScene::addNode(Node* pNode)

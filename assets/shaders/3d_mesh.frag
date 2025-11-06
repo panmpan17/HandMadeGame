@@ -46,7 +46,7 @@ in vec4 fragLightSpacePos;
 
 out vec4 fragment;
 
-float shadowCalculation(vec4 lightSpacePos)
+float shadowCalculation(vec4 lightSpacePos, vec3 normal, vec3 lightDir)
 {
     vec3 projCoords = lightSpacePos.xyz / lightSpacePos.w;
     projCoords = projCoords * 0.5 + 0.5;
@@ -54,8 +54,8 @@ float shadowCalculation(vec4 lightSpacePos)
     float closestDepth = texture(u_tex3, projCoords.xy).r;
     float currentDepth = projCoords.z;
 
-    float bias = 0.005;
-    // float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);  
+    // float bias = 0.005;
+    float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);  
     float shadow = currentDepth - bias > closestDepth ? 1.0 : 0.0;
 
     return shadow;
@@ -123,7 +123,7 @@ void main()
         specularSum *= specularMapColor.xyz;
     }
 
-    float shadow = shadowCalculation(fragLightSpacePos);
+    float shadow = shadowCalculation(fragLightSpacePos, norm, normalize(-u_DirectionLights[0].direction.xyz));
     lighting = (((diffuseSum + specularSum) * (1 - shadow)) + u_AmbientLightColor) * texColor.xyz;
 
     fragment = vec4(lighting, texColor.w);
