@@ -383,23 +383,22 @@ void Window::drawFrame()
         glViewport(0, 0, m_oActualSize.x, m_oActualSize.y);
         glClearColor(0.f, 0.f, 0.f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        // glBindTexture(GL_TEXTURE_2D, LightManager::getInstance()->getShadowDepthMapTexture());
-        // m_pWorldScene->render();
-        {
-            glUseProgram(pShader->getProgram());
+        m_pWorldScene->render();
+        // {
+        //     glUseProgram(pShader->getProgram());
 
-            glUniform1i(pTextureHandle->m_nLocation, 0);
+        //     glUniform1i(pTextureHandle->m_nLocation, 0);
 
-            glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, LightManager::getInstance()->getShadowDepthMapTexture());
+        //     glActiveTexture(GL_TEXTURE0);
+        //     glBindTexture(GL_TEXTURE_2D, LightManager::getInstance()->getShadowDepthMapTexture());
 
-            glBindVertexArray(nVertexArray);
-            glDrawArrays(GL_TRIANGLE_STRIP, 0, 4); // Draw the quad using triangle strip
+        //     glBindVertexArray(nVertexArray);
+        //     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4); // Draw the quad using triangle strip
 
-            glBindTexture(GL_TEXTURE_2D, 0); // Unbind the texture
-            glBindVertexArray(0); // Unbind the vertex array
-            glUseProgram(0);
-        }
+        //     glBindTexture(GL_TEXTURE_2D, 0); // Unbind the texture
+        //     glBindVertexArray(0); // Unbind the vertex array
+        //     glUseProgram(0);
+        // }
     }
 
 #if IS_DEBUG_VERSION

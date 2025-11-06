@@ -62,9 +62,18 @@ public:
             --m_nNumDirectionLights;
         }
     }
+    inline DirectionLightComponent* getMainDirectionLightComponent()
+    {
+        if (m_nNumDirectionLights > 0)
+        {
+            return m_arrDirectionLightsComponents.getElement(0);
+        }
+        return nullptr;
+    }
 
     inline GLuint getShadowDepthMapFBO() const { return m_nShadowDepthMapFBO; }
     inline GLuint getShadowDepthMapTexture() const { return m_nShadowDepthMapTexture; }
+
 
 private:
     static LightManager* ins;

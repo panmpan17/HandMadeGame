@@ -41,8 +41,10 @@ public:
         m_bLightDataDirty = false;
     }
 
+    const mat4x4& getLightCastingMatrix();
+
     bool isLightDataDirty() const { return m_bLightDataDirty; }
-    void markLightDataDirty() { m_bLightDataDirty = true; }
+    void markLightDataDirty() { m_bLightDataDirty = true; m_bLightCastingMatrixDirty = true; }
 
     void onAddToNode() override;
     // void onStart() override {}
@@ -59,6 +61,8 @@ private:
 
     bool m_bLightDataDirty = true;
 
+    mat4x4 m_matLightCastingMatrix;
+    bool m_bLightCastingMatrixDirty = true;
 
     Shader* m_pShader = nullptr;
     const ShaderUniformHandle* m_pMVPUniformHandle = nullptr;

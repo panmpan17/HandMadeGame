@@ -356,21 +356,21 @@ void createLightingShadowDemo()
         pWorldScene->addNode(pBackPackObj);
     }
 
-    // {
-    //     Image* const pMainImage = ImageLoader::getInstance()->getImageByPath("assets/models/1001_albedo.jpg");
-    //     Image* const pNormalImage = ImageLoader::getInstance()->getImageByPath("assets/models/1001_normal.png");
-    //     Image* const pMetallicImage = ImageLoader::getInstance()->getImageByPath("assets/models/1001_metallic.jpg");
+    {
+        Image* const pMainImage = ImageLoader::getInstance()->getImageByPath("assets/models/1001_albedo.jpg");
+        Image* const pNormalImage = ImageLoader::getInstance()->getImageByPath("assets/models/1001_normal.png");
+        Image* const pMetallicImage = ImageLoader::getInstance()->getImageByPath("assets/models/1001_metallic.jpg");
 
-    //     std::shared_ptr<Material> pMaterial = std::make_shared<Material>(p3DMeshShader);
-    //     pMaterial->setAlbedoMap(pMainImage);
-    //     pMaterial->setNormalMap(pNormalImage);
-    //     pMaterial->setSpecularMap(pMetallicImage);
+        std::shared_ptr<Material> pMaterial = std::make_shared<Material>(p3DMeshShader);
+        pMaterial->setAlbedoMap(pMainImage);
+        pMaterial->setNormalMap(pNormalImage);
+        pMaterial->setSpecularMap(pMetallicImage);
 
-    //     Node* pBackPackFbx = loadModel("assets/models/back_pack.fbx", pMaterial);
-    //     pBackPackFbx->setScale(0.01f);
-    //     pBackPackFbx->setPosition(2.f, 0.f, 0.f);
-    //     pWorldScene->addNode(pBackPackFbx);
-    // }
+        Node* pBackPackFbx = loadModel("assets/models/back_pack.fbx", pMaterial);
+        pBackPackFbx->setScale(0.01f);
+        pBackPackFbx->setPosition(2.f, 0.f, 0.f);
+        pWorldScene->addNode(pBackPackFbx);
+    }
 
     {
         Node* pDirectionLightNode = new Node(0, 10.f, 0.f);
