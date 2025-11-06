@@ -17,6 +17,9 @@ constexpr int MAX_POINT_LIGHTS = 8;
 class LightManager
 {
 public:
+    static constexpr int SHADOW_MAP_WIDTH = 2048;
+    static constexpr int SHADOW_MAP_HEIGHT = 2048;
+
     inline static LightManager* getInstance() { return ins; }
 
     static void Initialize();
@@ -60,6 +63,9 @@ public:
         }
     }
 
+    inline GLuint getShadowDepthMapFBO() const { return m_nShadowDepthMapFBO; }
+    inline GLuint getShadowDepthMapTexture() const { return m_nShadowDepthMapTexture; }
+
 private:
     static LightManager* ins;
 
@@ -78,4 +84,10 @@ private:
     PointLightGPUData m_vecPointLights[MAX_POINT_LIGHTS];
     int m_nNumPointLights = 0;
     PointerExpandableArray<PointLightComponent*> m_arrPointLightsComponents{ MAX_POINT_LIGHTS };
+
+    GLuint m_nShadowDepthMapFBO = 0;
+    GLuint m_nShadowDepthMapTexture = 0;
+
+    void registerLightingUBO();
+    void registerShadowDepthMap();
 };

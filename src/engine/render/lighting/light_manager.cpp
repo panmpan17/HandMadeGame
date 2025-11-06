@@ -27,15 +27,46 @@ void LightManager::Initialize()
 
 LightManager::LightManager()
 {
+    registerLightingUBO();
+    registerShadowDepthMap();
+}
+
+LightManager::~LightManager()
+{
+    glDeleteBuffers(1, &m_nLightingUBO);
+
+    glDeleteFramebuffers(1, &m_nShadowDepthMapFBO);
+    glDeleteTextures(1, &m_nShadowDepthMapTexture);
+}
+
+void LightManager::registerLightingUBO()
+{
     glGenBuffers(1, &m_nLightingUBO);
     glBindBuffer(GL_UNIFORM_BUFFER, m_nLightingUBO);
     glBufferData(GL_UNIFORM_BUFFER, LIGHTING_UBO_SIZE, nullptr, GL_STATIC_DRAW);
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
-LightManager::~LightManager()
+void LightManager::registerShadowDepthMap()
 {
-    glDeleteBuffers(1, &m_nLightingUBO);
+    glGenFramebuffers(1, &m_nShadowDepthMapFBO);
+
+    glGenTextures(1, &m_nShadowDepthMapTexture);
+    glBindTexture(GL_TEXTURE_2D, m_nShadowDepthMapTexture);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_MAP_WIDTH, SHADOW_MAP_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, m_nShadowDepthMapFBO);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_nShadowDepthMapTexture, 0);
+    glDrawBuffer(GL_NONE);
+    glReadBuffer(GL_NONE);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void LightManager::updateLightingUBO()
