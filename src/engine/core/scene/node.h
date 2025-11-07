@@ -215,13 +215,13 @@ private:
 
 #pragma region Child and Component
 public:
-    inline int getChildNodeCount() const { return m_oChildNodeArray.getSize(); }
+    inline int getChildNodeCount() const { return m_oChildNodeArray.getCount(); }
     inline Node* getChildNode(int nIndex) const { return m_oChildNodeArray.getElement(nIndex); }
     inline void addChildNode(Node* pNode) { m_oChildNodeArray.addElement(pNode); pNode->m_pParentNode = this; }
     // inline void removeChildNode(int nIndex) { m_oChildNodeArray.removeElement(nIndex); }
 
 
-    inline int getComponentCount() const { return m_oComponentArray.getSize(); }
+    inline int getComponentCount() const { return m_oComponentArray.getCount(); }
     inline Component* getComponent(int nIndex) const { return m_oComponentArray.getElement(nIndex); }
 
     // inline void setComponent(Component* pComponent) { m_pComponent = pComponent; m_pComponent->setNode(this); }

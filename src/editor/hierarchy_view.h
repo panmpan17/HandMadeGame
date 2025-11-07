@@ -2,6 +2,8 @@
 
 
 #include "editor_window.h"
+#include <string>
+#include <vector>
 
 
 class Node;
@@ -18,5 +20,7 @@ public:
 private:
     bool m_bCollapsed = false;
 
-    void drawNodeRecursive(int nIndex, Node* pNode);
+    std::vector<Node*> m_vecHideChildrenNodes;
+
+    void drawNodeRecursive(int nIndex, Node* pNode, const std::string& strId = "");
 };

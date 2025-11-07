@@ -77,6 +77,7 @@ public:
             if (m_pArray[i] == nullptr)
             {
                 m_pArray[i] = element;
+                ++m_nCount;
                 return i;
             }
         }
@@ -90,6 +91,7 @@ public:
         }
         m_pArray[nIndex] = element; // Add to the first new slot
 
+        ++m_nCount;
         return nIndex;
     }
 
@@ -103,6 +105,7 @@ public:
 
         T pElement = m_pArray[nIndex];
         m_pArray[nIndex] = nullptr;
+        --m_nCount;
         return pElement;
     }
 
@@ -114,6 +117,7 @@ public:
             {
                 T pElement = m_pArray[i];
                 m_pArray[i] = nullptr;
+                --m_nCount;
                 return pElement;
             }
         }
@@ -147,9 +151,12 @@ public:
             delete m_pArray[i];
             m_pArray[i] = nullptr;
         }
+
+        m_nCount = 0;
     }
 
     int getSize() const { return m_nSize; }
+    inline int getCount() const { return m_nCount; }
 
     void printAll() const
     {
@@ -171,5 +178,6 @@ public:
 
 private:
     int m_nSize;
+    int m_nCount = 0;
     T* m_pArray = nullptr;
 };
