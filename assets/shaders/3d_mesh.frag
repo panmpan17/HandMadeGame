@@ -34,6 +34,7 @@ layout(std140) uniform LightData // 544
 uniform sampler2D u_tex0; // main texture
 uniform sampler2D u_tex1; // specular map
 uniform sampler2D u_tex2; // normal map
+uniform sampler2D u_tex3; // depth map
 uniform int u_textureEnabled; // bitmask for texture usage, 1: main texture, 2: specular map, 3: both
 
 uniform vec2 u_SpecularParams; // x: intensity, y: power
@@ -41,8 +42,24 @@ uniform vec2 u_SpecularParams; // x: intensity, y: power
 in vec2 fragUV;
 in vec3 fragPos;
 in vec3 fragNormal;
+in vec4 fragLightSpacePos;
 
 out vec4 fragment;
+
+float shadowCalculation(vec4 lightSpacePos, vec3 normal, vec3 lightDir)
+{
+    vec3 projCoords = lightSpacePos.xyz / lightSpacePos.w;
+    projCoords = projCoords * 0.5 + 0.5;
+
+    float closestDepth = texture(u_tex3, projCoords.xy).r;
+    float currentDepth = projCoords.z;
+
+    // float bias = 0.005;
+    float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);  
+    float shadow = currentDepth - bias > closestDepth ? 1.0 : 0.0;
+
+    return shadow;
+}
 
 void main()
 {
@@ -92,6 +109,26 @@ void main()
         }
     }
 
+    vec3 lighting = vec3(1);
+
+    vec4 texColor = vec4(1);
+    if ((u_textureEnabled & 1) != 0)
+    {
+        texColor = texture(u_tex0, fragUV);
+    }
+
+    if ((u_textureEnabled & 2) != 0)
+    {
+        vec4 specularMapColor = texture(u_tex1, fragUV);
+        specularSum *= specularMapColor.xyz;
+    }
+
+    float shadow = shadowCalculation(fragLightSpacePos, norm, normalize(-u_DirectionLights[0].direction.xyz));
+    lighting = (((diffuseSum + specularSum) * (1 - shadow)) + u_AmbientLightColor) * texColor.xyz;
+
+    fragment = vec4(lighting, texColor.w);
+
+    /*
     vec4 color = vec4(0);
 
     if ((u_textureEnabled & 1) != 0)
@@ -117,4 +154,5 @@ void main()
     }
 
     fragment = color;
+    */
 }

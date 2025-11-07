@@ -25,6 +25,7 @@ public:
     virtual void onStart() {}
 
     virtual void draw() = 0;
+    virtual void drawDepth() {}
     virtual void update(float deltaTime) = 0;
 
     virtual std::string getTypeName() const { return typeid(*this).name(); };

@@ -93,3 +93,35 @@ void DirectionLightComponent::draw()
     glUseProgram(0);
 }
 
+const mat4x4& DirectionLightComponent::getLightCastingMatrix()
+{
+    if (m_bLightCastingMatrixDirty)
+    {
+        // For directional light, we can create an orthographic projection matrix
+        float orthoSize = 15.0f; // Size of the orthographic box
+        float nearPlane = -10.0f;
+        float farPlane = 30.0f;
+
+        mat4x4 matOrtho;
+        mat4x4_ortho(matOrtho, -orthoSize, orthoSize, -orthoSize, orthoSize, nearPlane, farPlane);
+
+        mat4x4 matView;
+
+        const Vector3& vecPos = m_pNode->getPositionInWorld();
+        vec3 camForward, camUp;
+        Quaternion rotation = m_pNode->getWorldRotationQuaternion();
+        rotation.getForwardVector(camForward);
+        rotation.getUpVector(camUp);
+        camForward[0] += vecPos.x;
+        camForward[1] += vecPos.y;
+        camForward[2] += vecPos.z;
+        mat4x4_look_at(matView, reinterpret_cast<const vec3&>(vecPos), camForward, camUp);
+
+        // Combine to get the light casting matrix
+        mat4x4_mul(m_matLightCastingMatrix, matOrtho, matView);
+
+        m_bLightCastingMatrixDirty = false;
+    }
+
+    return m_matLightCastingMatrix;
+}

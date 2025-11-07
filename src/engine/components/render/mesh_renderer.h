@@ -24,6 +24,7 @@ public:
     virtual void update(float fDeltaTime) override {}
 
     virtual void draw() override;
+    virtual void drawDepth() override;
 
     void setShader(Shader* pShader);
 
@@ -55,10 +56,18 @@ private:
     const ShaderUniformHandle* m_pNormalMapUniform = nullptr;
     const ShaderUniformHandle* m_pTextureEnabledUniform = nullptr;
 
+    const ShaderUniformHandle* m_pDepthTextureUniform = nullptr;
+    const ShaderUniformHandle* m_pLightMatrixUniform1 = nullptr;
+
+    Shader* m_pDepthShader = nullptr;
+    const ShaderUniformHandle* m_pDepthModelUniform = nullptr;
+    const ShaderUniformHandle* m_pLightMatrixUniform2 = nullptr;
+
 
     int m_nIndiceCount = 0;
 
     void bindVertexArray(Shader* const pShader);
+    void bindDepthVertexArray();
 
     // int m_nIdleAnimationIndex = -1;
     // int m_nWalkAnimationIndex = -1;
