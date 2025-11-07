@@ -18,7 +18,7 @@
 #include "../render/post_process/render_process_queue.h"
 #include "../render/lighting/light_manager.h"
 #include "../misc/preference.h"
-#include "../../editor/camera_inspector.h"
+#include "../../editor/node_inspector.h"
 #include "../../editor/hierarchy_view.h"
 #include "../../editor/post_process_inspector.h"
 
@@ -220,7 +220,7 @@ void Window::setupManagers()
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    m_oEditorWindows.addElement(new CameraInspector());
+    m_oEditorWindows.addElement(new NodeInspector());
     m_oEditorWindows.addElement(new HierarchyView());
     m_oEditorWindows.addElement(new PostProcessInspector());
 }

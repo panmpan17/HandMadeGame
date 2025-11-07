@@ -11,12 +11,5 @@ public:
     inline static void setSelectedNode(Node* pNode) { m_pSelectedNode = pNode; }
 
 private:
-    static Node* m_pSelectedNode;
+    static inline Node* m_pSelectedNode = nullptr;
 };
-
-#ifndef EDITOR_H
-#define EDITOR_H
-
-Node* Editor::m_pSelectedNode = nullptr;
-
-#endif // EDITOR_H
