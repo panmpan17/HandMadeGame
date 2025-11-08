@@ -17,7 +17,7 @@ public:
 
     void onAddToNode() override;
 
-    inline void useAsMain() { main = this; }
+    void useAsMain();
     inline bool isMainCamera() const { return main == this; }
     
     inline bool getUsingOrthoProjection() const { return m_bUseOrthoProjection; }

@@ -126,6 +126,15 @@ void NodeInspector::updateComponent(Node* pNode, Component* pComponent)
     }
     else if (Camera* const pCamera = dynamic_cast<Camera*>(pComponent))
     {
+        bool bIsMainCamera = (pCamera == Camera::main);
+        if (ImGui::Checkbox("Is Main", &bIsMainCamera))
+        {
+            if (bIsMainCamera)
+            {
+                pCamera->useAsMain();
+            }
+        }
+
         bool bIsOrtho = pCamera->getUsingOrthoProjection();
         if (ImGui::Checkbox("Ortho", &bIsOrtho))
         {

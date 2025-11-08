@@ -3,7 +3,7 @@
 #include <string>
 
 typedef unsigned int GLuint;
-
+#define GL_INVALID_INDEX 0xFFFFFFFF
 
 inline constexpr std::string_view SHADER_UNIFORM_TEXTURE_0 = "u_tex0";
 inline constexpr std::string_view SHADER_UNIFORM_TEXTURE_1 = "u_tex1";
@@ -44,10 +44,18 @@ public:
 
     void reload();
 
+    void setCameraUBOBindingPoint(GLuint nBindingPoint);
+    void reloadCameraUBOBinding();
+
+    void setLightUBOBindingPoint(GLuint nBindingPoint);
+
 protected:
     GLuint m_nProgram;
     GLuint m_nVertexShader;
     GLuint m_nFragmentShader;
+
+    GLuint m_nCameraUBOBindingPoint = GL_INVALID_INDEX;
+    GLuint m_nLightUBOBindingPoint = GL_INVALID_INDEX;
 
     int m_nId;
     std::string m_strName;

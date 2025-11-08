@@ -8,8 +8,12 @@
 #elif IS_PLATFORM_WINDOWS
 #include <cstring>
 #endif
+#include <functional>
 
 constexpr std::string_view SHADER_REGISTRY_FILE = "assets/shaders/shader_registry.yaml";
+
+
+#define GL_INVALID_INDEX 0xFFFFFFFF
 
 
 ShaderLoader* ShaderLoader::ins = nullptr;
@@ -39,7 +43,25 @@ void ShaderLoader::readRegistryFromFile()
     }
 
     int nCurrentShaderId = -1;
+    GLuint nCameraUBOIndex = GL_INVALID_INDEX;
+    GLuint nLightUBOIndex = GL_INVALID_INDEX;
     std::string strCurrentShaderName, strCurrentVertexPath, strCurrentFragmentPath;
+
+    std::function funcCreateShader = [this, &nCurrentShaderId, &nCameraUBOIndex, &nLightUBOIndex, &strCurrentShaderName, &strCurrentVertexPath, &strCurrentFragmentPath]()
+    {
+        auto pShader = new Shader(nCurrentShaderId, strCurrentShaderName, strCurrentVertexPath, strCurrentFragmentPath);
+        if (nCameraUBOIndex != GL_INVALID_INDEX)
+        {
+            pShader->setCameraUBOBindingPoint(nCameraUBOIndex);
+            LOGLN("Shader ID {} assigned to Camera UBO binding point {}", nCurrentShaderId, nCameraUBOIndex);
+        }
+        if (nLightUBOIndex != GL_INVALID_INDEX)
+        {
+            pShader->setLightUBOBindingPoint(nLightUBOIndex);
+            LOGLN("Shader ID {} assigned to Light UBO binding point {}", nCurrentShaderId, nLightUBOIndex);
+        }
+        m_mapShaders[nCurrentShaderId] = pShader;
+    };
 
     // Read shader paths from the registry file
     std::string strLine;
@@ -54,11 +76,12 @@ void ShaderLoader::readRegistryFromFile()
         {
             if (nCurrentShaderId != -1 && !strCurrentShaderName.empty() && !strCurrentVertexPath.empty() && !strCurrentFragmentPath.empty())
             {
-                auto pShader = new Shader(nCurrentShaderId, strCurrentShaderName, strCurrentVertexPath, strCurrentFragmentPath);
-                m_mapShaders[nCurrentShaderId] = pShader;
+                funcCreateShader();
                 strCurrentShaderName = "";
                 strCurrentVertexPath = "";
                 strCurrentFragmentPath = "";
+                nCameraUBOIndex = -1;
+                nLightUBOIndex = -1;
             }
 
             // Id of the shader
@@ -76,11 +99,19 @@ void ShaderLoader::readRegistryFromFile()
         {
             strCurrentFragmentPath = strLine.substr(2 + 10);
         }
+        else if (memcmp(strLine.data() + 2, "cameraUBO", 9) == 0)
+        {
+            nCameraUBOIndex = std::stoi(strLine.substr(2 + 11));
+        }
+        else if (memcmp(strLine.data() + 2, "lightUBO", 8) == 0)
+        {
+            nLightUBOIndex = std::stoi(strLine.substr(2 + 10));
+        }
     }
 
     if (nCurrentShaderId != -1)
     {
-        m_mapShaders[nCurrentShaderId] = new Shader(nCurrentShaderId, strCurrentShaderName, strCurrentVertexPath, strCurrentFragmentPath);
+        funcCreateShader();
     }
 }
 
@@ -111,5 +142,13 @@ void ShaderLoader::reloadAllShaders()
     for (auto& pair : m_mapShaders)
     {
         pair.second->reload();
+    }
+}
+
+void ShaderLoader::onMainCameraChanged()
+{
+    for (auto& pair : m_mapShaders)
+    {
+        pair.second->reloadCameraUBOBinding();
     }
 }

@@ -1,5 +1,6 @@
 #include "test.h"
 
+#include "../../engine/core/camera.h"
 #include "../../engine/core/serialization/serializer.h"
 #include "../../engine/core/scene/node.h"
 #include "../../engine/core/scene/world.h"
@@ -332,6 +333,18 @@ void createVisualEffectDemo()
 void createLightingShadowDemo()
 {
     WorldScene* const pWorldScene = WorldScene::current;
+
+    {
+        auto pCameraNode = new Node(0.f, 2.f, 6.f);
+        pCameraNode->setRotationQuaternion(Quaternion::fromEulerAngles({-.5f, 0.f, 0.f}));
+        pCameraNode->setName("Camera");
+        Camera* pCamera = new Camera();
+        pCamera->setUseOrthoProjection(false);
+        pCamera->setWorldSizeScale(1.0f);
+        pCameraNode->addComponent(pCamera);
+
+        pWorldScene->addNode(pCameraNode);
+    }
 
     {
         Skybox* pSkybox = new Skybox();

@@ -36,20 +36,7 @@ void MeshRenderer::setShader(Shader* pShader)
 
 void MeshRenderer::initShader(Shader* const pShader)
 {
-    glUseProgram(pShader->getProgram());
-
-    const GLuint CAMERA_BINDING_POINT = 0;
-    glBindBufferBase(GL_UNIFORM_BUFFER, CAMERA_BINDING_POINT, Camera::main->getCameraUBO());
-    GLuint viewProjIndex = glGetUniformBlockIndex(pShader->getProgram(), SHADER_GLOBAL_UNIFORM_CAMERA_MATRICES.data());
-    glUniformBlockBinding(pShader->getProgram(), viewProjIndex, CAMERA_BINDING_POINT);
-
-    const GLuint LIGHTING_BINDING_POINT = 1;
-    glBindBufferBase(GL_UNIFORM_BUFFER, LIGHTING_BINDING_POINT, LightManager::getInstance()->getLightingUBO());
-    GLuint lightIndex = glGetUniformBlockIndex(pShader->getProgram(), SHADER_GLOBAL_UNIFORM_LIGHTING_DATA.data());
-    glUniformBlockBinding(pShader->getProgram(), lightIndex, LIGHTING_BINDING_POINT);
-
-    glUseProgram(0);
-
+    // Main 3d shader uniforms
     m_pModelUniform = pShader->getUniformHandle("u_Model");
     m_pSpecularParamUniform = pShader->getUniformHandle("u_SpecularParams");
     m_pMainTexUniform = pShader->getUniformHandle(SHADER_UNIFORM_TEXTURE_0);
@@ -57,6 +44,7 @@ void MeshRenderer::initShader(Shader* const pShader)
     m_pNormalMapUniform = pShader->getUniformHandle(SHADER_UNIFORM_TEXTURE_2);
     m_pTextureEnabledUniform = pShader->getUniformHandle("u_textureEnabled");
 
+    // Depth shader uniforms
     m_pDepthTextureUniform = pShader->getUniformHandle(SHADER_UNIFORM_TEXTURE_3);
     m_pLightMatrixUniform1 = pShader->getUniformHandle("u_LightMatrix");
     m_pShadowColorUniform = pShader->getUniformHandle("u_shadowColor");

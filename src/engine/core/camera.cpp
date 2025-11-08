@@ -1,11 +1,11 @@
 #include "camera.h"
-// #include <GLFW/glfw3.h>
-#include "window.h"
-#include "scene/node.h"
-
-#include "debug_macro.h"
 
 #include <glad/gl.h>
+#include "window.h"
+#include "debug_macro.h"
+#include "scene/node.h"
+#include "../render/shader_loader.h"
+
 
 Camera* Camera::main = nullptr;
 
@@ -27,6 +27,17 @@ Camera::Camera()
 
 Camera::~Camera()
 {
+}
+
+void Camera::useAsMain()
+{
+    main = this;
+
+    ShaderLoader* pShaderLoader = ShaderLoader::getInstance();
+    if (pShaderLoader)
+    {
+        pShaderLoader->onMainCameraChanged();
+    }
 }
 
 void Camera::onAddToNode()

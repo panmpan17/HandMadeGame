@@ -50,6 +50,8 @@
   name: 3d_mesh
   vertex: assets/shaders/3d_mesh.vert
   fragment: assets/shaders/3d_mesh.frag
+  cameraUBO: 0
+  lightUBO: 1
 14:
   name: point_light
   vertex: assets/shaders/point_light.vert
@@ -58,6 +60,7 @@
   name: skybox
   vertex: assets/shaders/cubemap.vert
   fragment: assets/shaders/cubemap.frag
+  cameraUBO: 0
 16:
   name: gamma_correction
   vertex: assets/shaders/screen_pos.vert

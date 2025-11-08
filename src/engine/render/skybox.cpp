@@ -20,16 +20,7 @@ Skybox::~Skybox()
 
 void Skybox::initShader(Shader* const pShader)
 {
-    glUseProgram(pShader->getProgram());
-
-    const GLuint CAMERA_BINDING_POINT = 0;
-    glBindBufferBase(GL_UNIFORM_BUFFER, CAMERA_BINDING_POINT, Camera::main->getCameraUBO());
-    GLuint viewProjIndex = glGetUniformBlockIndex(pShader->getProgram(), SHADER_GLOBAL_UNIFORM_CAMERA_MATRICES.data());
-    glUniformBlockBinding(pShader->getProgram(), viewProjIndex, CAMERA_BINDING_POINT);
-
     bindVertexArray();
-
-    glUseProgram(0);
 }
 
 void Skybox::bindVertexArray()

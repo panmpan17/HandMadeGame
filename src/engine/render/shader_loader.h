@@ -20,6 +20,8 @@ public:
 
     void reloadAllShaders();
 
+    void onMainCameraChanged();
+
 private:
     static ShaderLoader* ins;
 
