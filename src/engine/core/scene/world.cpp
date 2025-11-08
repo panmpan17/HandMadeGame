@@ -26,8 +26,10 @@ void WorldScene::init()
 {
     {
         auto pNode = new Node(0.f, 0.f, 2.5f);
+        pNode->setName("Editor Camera");
 
         auto pCameraNode = new Node(0.f, 0.f, 0.f);
+        pCameraNode->setName("Camera");
         Camera* pCamera = new Camera();
         pCamera->useAsMain();
         pCamera->setUseOrthoProjection(false);

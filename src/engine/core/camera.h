@@ -20,7 +20,7 @@ public:
     inline void useAsMain() { main = this; }
     inline bool isMainCamera() const { return main == this; }
     
-    inline bool isUsingOrthoProjection() const { return m_bUseOrthoProjection; }
+    inline bool getUsingOrthoProjection() const { return m_bUseOrthoProjection; }
     inline void setUseOrthoProjection(bool bOrtho) 
     { 
         m_bUseOrthoProjection = bOrtho; 

@@ -30,7 +30,7 @@ void DirectionLightComponent::onAddToNode()
         return;
     }
 
-    m_pNode->registerOnPositionChangedListener(std::bind(&DirectionLightComponent::markLightDataDirty, this));
+    m_pNode->registerOnRotationChangedListener(std::bind(&DirectionLightComponent::markLightDataDirty, this));
 
     m_pShader = ShaderLoader::getInstance()->getShader("point_light");
     m_pMVPUniformHandle = m_pShader->getUniformHandle("u_MVP");
@@ -81,7 +81,7 @@ void DirectionLightComponent::draw()
     }
     if (m_pLightColorUniformHandle)
     {
-        glUniform3f(m_pLightColorUniformHandle->m_nLocation, m_color[0] * m_intensity, m_color[1] * m_intensity, m_color[2] * m_intensity);
+        glUniform3f(m_pLightColorUniformHandle->m_nLocation, m_color.x * m_intensity, m_color.y * m_intensity, m_color.z * m_intensity);
     }
 
     glBindVertexArray(m_nVertexArray);

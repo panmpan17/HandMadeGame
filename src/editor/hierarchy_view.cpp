@@ -137,7 +137,10 @@ void HierarchyView::drawNodeRecursive(int nIndex, Node* pNode, const std::string
         ImGui::PushStyleColor(ImGuiCol_ButtonHovered, SELECTED_BUTTON_HOVERED);
         ImGui::PushStyleColor(ImGuiCol_ButtonActive, SELECTED_BUTTON_ACTIVE);
     }
-    if (ImGui::Button((std::format("Node {}##{}", nIndex, strId)).c_str()))
+
+    const std::string& strName = pNode->getName();
+    std::string strDisplayName = strName.empty() ? std::format("Node {}##{}", nIndex, strId) : (strName + "##" + strId);
+    if (ImGui::Button(strDisplayName.c_str()))
     {
         Editor::setSelectedNode(bIsSelected ? nullptr : pNode);
     }

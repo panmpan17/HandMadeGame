@@ -19,8 +19,8 @@ public:
     DirectionLightComponent();
     ~DirectionLightComponent();
 
-    inline const vec3& getColor() const { return m_color; }
-    inline void setColor(const vec3& color) { m_color[0] = color[0]; m_color[1] = color[1]; m_color[2] = color[2]; m_bLightDataDirty = true; }
+    inline const Vector3& getColor() const { return m_color; }
+    inline void setColor(const Vector3& color) { m_color.x = color.x; m_color.y = color.y; m_color.z = color.z; m_bLightDataDirty = true; }
 
     inline float getIntensity() const { return m_intensity; }
     inline void setIntensity(float intensity) { m_intensity = intensity; m_bLightDataDirty = true; }
@@ -34,9 +34,9 @@ public:
         pOutLightData->m_vecDirection[1] = vecForward[1];
         pOutLightData->m_vecDirection[2] = vecForward[2];
 
-        pOutLightData->m_vecColor[0] = m_color[0] * m_intensity;
-        pOutLightData->m_vecColor[1] = m_color[1] * m_intensity;
-        pOutLightData->m_vecColor[2] = m_color[2] * m_intensity;
+        pOutLightData->m_vecColor[0] = m_color.x * m_intensity;
+        pOutLightData->m_vecColor[1] = m_color.y * m_intensity;
+        pOutLightData->m_vecColor[2] = m_color.z * m_intensity;
 
         m_bLightDataDirty = false;
     }
@@ -56,7 +56,7 @@ public:
 
 
 private:
-    vec3 m_color;
+    Vector3 m_color;
     float m_intensity;
 
     bool m_bLightDataDirty = true;

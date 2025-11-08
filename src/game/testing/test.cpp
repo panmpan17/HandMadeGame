@@ -333,6 +333,19 @@ void createLightingShadowDemo()
 {
     WorldScene* const pWorldScene = WorldScene::current;
 
+    {
+        Skybox* pSkybox = new Skybox();
+        pSkybox->loadSkyboxCubmaps(
+            "assets/images/skybox/right.jpg",
+            "assets/images/skybox/left.jpg",
+            "assets/images/skybox/top.jpg",
+            "assets/images/skybox/bottom.jpg",
+            "assets/images/skybox/front.jpg",
+            "assets/images/skybox/back.jpg"
+        );
+        pWorldScene->setSkybox(pSkybox);
+    }
+
     Shader* p3DMeshShader = ShaderLoader::getInstance()->getShader("3d_mesh");
 
     {

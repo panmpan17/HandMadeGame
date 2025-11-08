@@ -176,6 +176,7 @@ Node* processNode(const aiNode* pAiNode, const aiScene* pScene, std::shared_ptr<
     pAiNode->mTransformation.Decompose(scale, rotationQuatAi, position);
 
     Node* pNode = new Node();
+    pNode->setName(pAiNode->mName.C_Str());
     pNode->setPosition(position.x, position.y, position.z);
     pNode->setScale(scale.x, scale.y, scale.z);
     Quaternion rotationQuat(rotationQuatAi.w, rotationQuatAi.x, rotationQuatAi.y, rotationQuatAi.z);

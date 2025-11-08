@@ -236,4 +236,12 @@ private:
 
 
 #pragma endregion
+
+
+public:
+    inline const std::string& getName() const { return m_strName; }
+    inline void setName(const std::string& strName) { m_strName = strName; }
+
+private:
+    std::string m_strName;
 };
