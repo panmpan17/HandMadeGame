@@ -59,6 +59,7 @@ void MeshRenderer::initShader(Shader* const pShader)
 
     m_pDepthTextureUniform = pShader->getUniformHandle(SHADER_UNIFORM_TEXTURE_3);
     m_pLightMatrixUniform1 = pShader->getUniformHandle("u_LightMatrix");
+    m_pShadowColorUniform = pShader->getUniformHandle("u_shadowColor");
 
     bindDepthVertexArray();
     bindVertexArray(pShader);
@@ -196,24 +197,30 @@ void MeshRenderer::draw()
         }
     }
 
-    glUniform1i(m_pTextureEnabledUniform->m_nLocation, ntextureBitmask);
-
-    if (m_pDepthTextureUniform)
+    DirectionLightComponent* pMainDirLight = LightManager::getInstance()->getMainDirectionLightComponent();
+    if (pMainDirLight && pMainDirLight->getShadowsEnabled())
     {
-        glActiveTexture(GL_TEXTURE3);
-        glBindTexture(GL_TEXTURE_2D, LightManager::getInstance()->getShadowDepthMapTexture());
-        glUniform1i(m_pDepthTextureUniform->m_nLocation, 3);
-    }
+        if (m_pDepthTextureUniform)
+        {
+            glActiveTexture(GL_TEXTURE3);
+            glBindTexture(GL_TEXTURE_2D, LightManager::getInstance()->getShadowDepthMapTexture());
+            glUniform1i(m_pDepthTextureUniform->m_nLocation, 3);
+            ntextureBitmask |= 8; // Enable depth texture
+        }
 
-    if (m_pLightMatrixUniform1)
-    {
-        DirectionLightComponent* pMainDirLight = LightManager::getInstance()->getMainDirectionLightComponent();
-        glUniformMatrix4fv(m_pModelUniform->m_nLocation, 1, GL_FALSE, (const GLfloat*) local);
-        if (pMainDirLight)
+        if (m_pLightMatrixUniform1)
         {
             glUniformMatrix4fv(m_pLightMatrixUniform1->m_nLocation, 1, GL_FALSE, (const GLfloat*) pMainDirLight->getLightCastingMatrix());
         }
+
+        if (m_pShadowColorUniform)
+        {
+            const Vector3& vecShadowColor = pMainDirLight->getShadowColor();
+            glUniform3f(m_pShadowColorUniform->m_nLocation, vecShadowColor.x, vecShadowColor.y, vecShadowColor.z);
+        }
     }
+
+    glUniform1i(m_pTextureEnabledUniform->m_nLocation, ntextureBitmask);
 
     glBindVertexArray(m_nVertexArray);
     glCullFace(GL_FRONT);

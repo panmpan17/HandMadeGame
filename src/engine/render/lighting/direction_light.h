@@ -25,6 +25,11 @@ public:
     inline float getIntensity() const { return m_intensity; }
     inline void setIntensity(float intensity) { m_intensity = intensity; m_bLightDataDirty = true; }
 
+    inline bool getShadowsEnabled() const { return m_bEnableShadows; }
+    inline void setShadowsEnabled(bool enableShadows) { m_bEnableShadows = enableShadows; }
+
+    inline const Vector3& getShadowColor() const { return m_shadowColor; }
+    inline void setShadowColor(const Vector3& shadowColor) { m_shadowColor = shadowColor; }
 
     inline void updateLightData(DirectionLightGPUData* pOutLightData)
     {
@@ -58,6 +63,9 @@ public:
 private:
     Vector3 m_color;
     float m_intensity;
+
+    bool m_bEnableShadows = true;
+    Vector3 m_shadowColor = Vector3(0.0f, 0.0f, 0.0f);
 
     bool m_bLightDataDirty = true;
 

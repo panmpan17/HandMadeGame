@@ -58,6 +58,7 @@ private:
 
     const ShaderUniformHandle* m_pDepthTextureUniform = nullptr;
     const ShaderUniformHandle* m_pLightMatrixUniform1 = nullptr;
+    const ShaderUniformHandle* m_pShadowColorUniform = nullptr;
 
     Shader* m_pDepthShader = nullptr;
     const ShaderUniformHandle* m_pDepthModelUniform = nullptr;

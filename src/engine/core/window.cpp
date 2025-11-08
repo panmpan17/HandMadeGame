@@ -17,6 +17,7 @@
 #include "../render/shader_loader.h"
 #include "../render/post_process/render_process_queue.h"
 #include "../render/lighting/light_manager.h"
+#include "../render/lighting/direction_light.h"
 #include "../misc/preference.h"
 #include "../../editor/node_inspector.h"
 #include "../../editor/hierarchy_view.h"
@@ -374,31 +375,20 @@ void Window::drawFrame()
     }
     else
     {
-        glViewport(0, 0, LightManager::SHADOW_MAP_WIDTH, LightManager::SHADOW_MAP_HEIGHT);
-        glBindFramebuffer(GL_FRAMEBUFFER, LightManager::getInstance()->getShadowDepthMapFBO());
-        glClear(GL_DEPTH_BUFFER_BIT);
-        m_pWorldScene->renderDepth();
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        DirectionLightComponent* pMainDirLight = LightManager::getInstance()->getMainDirectionLightComponent();
+        if (pMainDirLight && pMainDirLight->getShadowsEnabled())
+        {
+            glViewport(0, 0, LightManager::SHADOW_MAP_WIDTH, LightManager::SHADOW_MAP_HEIGHT);
+            glBindFramebuffer(GL_FRAMEBUFFER, LightManager::getInstance()->getShadowDepthMapFBO());
+            glClear(GL_DEPTH_BUFFER_BIT);
+            m_pWorldScene->renderDepth();
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        }
 
         glViewport(0, 0, m_oActualSize.x, m_oActualSize.y);
         glClearColor(0.f, 0.f, 0.f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         m_pWorldScene->render();
-        // {
-        //     glUseProgram(pShader->getProgram());
-
-        //     glUniform1i(pTextureHandle->m_nLocation, 0);
-
-        //     glActiveTexture(GL_TEXTURE0);
-        //     glBindTexture(GL_TEXTURE_2D, LightManager::getInstance()->getShadowDepthMapTexture());
-
-        //     glBindVertexArray(nVertexArray);
-        //     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4); // Draw the quad using triangle strip
-
-        //     glBindTexture(GL_TEXTURE_2D, 0); // Unbind the texture
-        //     glBindVertexArray(0); // Unbind the vertex array
-        //     glUseProgram(0);
-        // }
     }
 
 #if IS_DEBUG_VERSION

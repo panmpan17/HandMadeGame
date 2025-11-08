@@ -106,6 +106,23 @@ void NodeInspector::updateComponent(Node* pNode, Component* pComponent)
         {
             pDirLight->setIntensity(fIntensity);
         }
+
+        bool bShadowsEnabled = pDirLight->getShadowsEnabled();
+        ImGui::Text("Shadows Enabled");ImGui::SameLine();
+        if (ImGui::Checkbox("##DirectionLightShadowsEnabled", &bShadowsEnabled))
+        {
+            pDirLight->setShadowsEnabled(bShadowsEnabled);
+        }
+        
+        if (bShadowsEnabled)
+        {
+            Vector3 vecShadowColor = pDirLight->getShadowColor();
+            ImGui::Text("Shadow Color"); ImGui::SameLine();
+            if (ImGui::ColorEdit3("##DirectionLightShadowColor", reinterpret_cast<float*>(&vecShadowColor), ImGuiColorEditFlags_NoInputs))
+            {
+                pDirLight->setShadowColor(vecShadowColor);
+            }
+        }
     }
     else if (Camera* const pCamera = dynamic_cast<Camera*>(pComponent))
     {

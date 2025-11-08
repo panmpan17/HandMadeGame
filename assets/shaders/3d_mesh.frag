@@ -39,6 +39,8 @@ uniform int u_textureEnabled; // bitmask for texture usage, 1: main texture, 2: 
 
 uniform vec2 u_SpecularParams; // x: intensity, y: power
 
+uniform vec3 u_shadowColor;
+
 in vec2 fragUV;
 in vec3 fragPos;
 in vec3 fragNormal;
@@ -59,6 +61,11 @@ float shadowCalculation(vec4 lightSpacePos, vec3 normal, vec3 lightDir)
     float shadow = currentDepth - bias > closestDepth ? 1.0 : 0.0;
 
     return shadow;
+}
+
+vec3 lerp(vec3 a, vec3 b, float f)
+{
+    return a + (b - a) * f;
 }
 
 void main()
@@ -109,8 +116,6 @@ void main()
         }
     }
 
-    vec3 lighting = vec3(1);
-
     vec4 texColor = vec4(1);
     if ((u_textureEnabled & 1) != 0)
     {
@@ -123,36 +128,13 @@ void main()
         specularSum *= specularMapColor.xyz;
     }
 
-    float shadow = shadowCalculation(fragLightSpacePos, norm, normalize(-u_DirectionLights[0].direction.xyz));
-    lighting = (((diffuseSum + specularSum) * (1 - shadow)) + u_AmbientLightColor) * texColor.xyz;
+    vec3 noAmbientLightSum = (diffuseSum + specularSum) * texColor.xyz;
+    if ((u_textureEnabled & 8) != 0)
+    {
+        float shadowFactor = shadowCalculation(fragLightSpacePos, norm, normalize(-u_DirectionLights[0].direction.xyz));
+        noAmbientLightSum = lerp(noAmbientLightSum, u_shadowColor, shadowFactor);
+    }
 
+    vec3 lighting = noAmbientLightSum + (u_AmbientLightColor * texColor.xyz);
     fragment = vec4(lighting, texColor.w);
-
-    /*
-    vec4 color = vec4(0);
-
-    if ((u_textureEnabled & 1) != 0)
-    {
-        vec4 texColor = texture(u_tex0, fragUV);
-        color.xyz += texColor.xyz * (u_AmbientLightColor + diffuseSum);
-        color.w = texColor.w; // preserve alpha from texture
-    }
-    else
-    {
-        color.xyz += u_AmbientLightColor + diffuseSum;
-        color.w = 1.0;
-    }
-
-    if ((u_textureEnabled & 2) != 0)
-    {
-        vec4 specularMapColor = texture(u_tex1, fragUV);
-        color.xyz += specularSum * specularMapColor.xyz;
-    }
-    else
-    {
-        color.xyz += specularSum;
-    }
-
-    fragment = color;
-    */
 }
