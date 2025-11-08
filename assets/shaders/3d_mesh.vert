@@ -1,11 +1,6 @@
 #version 330
 
-layout(std140) uniform CameraMatrices
-{
-    mat4 u_View;
-    mat4 u_Projection;
-    vec3 u_CamPos;
-};
+#include "assets/shaders/base/camera_data.glsl"
 
 uniform mat4 u_Model;
 uniform mat4 u_LightMatrix;

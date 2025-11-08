@@ -2,6 +2,7 @@
 #include <GLFW/glfw3.h>
 #include <vector>
 #include <stdexcept>
+#include <sstream>
 
 #include "vertex.h"
 #include "shader.h"
@@ -11,7 +12,7 @@
 #include "../../utils/file_utils.h"
 
 
-void Shader::checkShaderCompilResult(const std::string_view& strShaderPath, GLuint nShader)
+void checkShaderCompilResult(const std::string_view& strShaderPath, GLuint nShader)
 {
     GLint isCompiled = 0;
     glGetShaderiv(nShader, GL_COMPILE_STATUS, &isCompiled);
@@ -27,6 +28,58 @@ void Shader::checkShaderCompilResult(const std::string_view& strShaderPath, GLui
     }
 }
 
+void readShaderFile(const std::string& strFolderPath, std::ostringstream& ss)
+{
+    auto oReader = FileReader(strFolderPath);
+    if (!oReader.isOpen())
+    {
+        throw std::runtime_error("Failed to open shader file: " + strFolderPath);
+    }
+
+    {
+        std::string strLine;
+        while (oReader.readLine(strLine))
+        {
+            if (memcmp(strLine.data(), "#include", 8) == 0)
+            {
+                size_t nFirstQuoteIndex = strLine.find("\"", 8);
+                size_t nLastQuoteIndex = strLine.find("\"", nFirstQuoteIndex + 1);
+                if (nFirstQuoteIndex == std::string::npos || nLastQuoteIndex == std::string::npos || nLastQuoteIndex <= nFirstQuoteIndex)
+                {
+                    throw std::runtime_error("Invalid #include directive in shader file: " + strFolderPath);
+                }
+
+                std::string strIncludePath = strLine.substr(nFirstQuoteIndex + 1, nLastQuoteIndex - nFirstQuoteIndex - 1);
+                readShaderFile(strIncludePath, ss);
+            }
+            else
+            {
+                ss << strLine << '\n';
+            }
+        }
+    }
+
+    oReader.close();
+}
+
+GLuint loadShaderFileIntoGPU(std::string strFolderPath, bool isVertexShader)
+{
+    std::ostringstream ss;
+    readShaderFile(strFolderPath, ss);
+
+    GLuint nShader = glCreateShader(isVertexShader ? GL_VERTEX_SHADER : GL_FRAGMENT_SHADER);
+
+    std::string strShaderSource = ss.str();
+    const char* strShaderSourceConstChars = strShaderSource.c_str();
+    glShaderSource(nShader, 1, &strShaderSourceConstChars, NULL);
+    glCompileShader(nShader);
+
+#if IS_DEBUG_VERSION
+    checkShaderCompilResult(strFolderPath, nShader);
+#endif
+
+    return nShader;
+}
 
 Shader::Shader(int nId, const std::string& strShaderName, const std::string &strVertexShaderPath, const std::string &strFragmentShaderPath)
 {
@@ -36,43 +89,8 @@ Shader::Shader(int nId, const std::string& strShaderName, const std::string &str
     m_strVertexShaderPath = strVertexShaderPath;
     m_strFragmentShaderPath = strFragmentShaderPath;
 
-    {
-        auto reader = FileReader(strVertexShaderPath);
-        if (!reader.isOpen())
-        {
-            throw std::runtime_error("Failed to open vertex shader file: " + strVertexShaderPath);
-        }
-        std::string vertex_shader_text = reader.readAll();
-        reader.close();
-
-        m_nVertexShader = glCreateShader(GL_VERTEX_SHADER);
-        const char* vertex_shader_source = vertex_shader_text.c_str();
-        glShaderSource(m_nVertexShader, 1, &vertex_shader_source, NULL);
-        glCompileShader(m_nVertexShader);
-
-#if IS_DEBUG_VERSION
-        checkShaderCompilResult(strVertexShaderPath, m_nVertexShader);
-#endif
-    }
-
-    {
-        auto reader = FileReader(strFragmentShaderPath);
-        if (!reader.isOpen())
-        {
-            throw std::runtime_error("Failed to open fragment shader file: " + strFragmentShaderPath);
-        }
-        std::string fragment_shader_text = reader.readAll();
-        reader.close();
-
-        m_nFragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-        const char* fragment_shader_source = fragment_shader_text.c_str();
-        glShaderSource(m_nFragmentShader, 1, &fragment_shader_source, NULL);
-        glCompileShader(m_nFragmentShader);
-
-#if IS_DEBUG_VERSION
-        checkShaderCompilResult(strFragmentShaderPath, m_nFragmentShader);
-#endif
-    }
+    m_nVertexShader = loadShaderFileIntoGPU(strVertexShaderPath, true);
+    m_nFragmentShader = loadShaderFileIntoGPU(strFragmentShaderPath, false);
 
     m_nProgram = glCreateProgram();
     glAttachShader(m_nProgram, m_nVertexShader);
@@ -131,19 +149,6 @@ const ShaderUniformHandle* Shader::getUniformHandle(const std::string_view& strN
     return pHandle;
 }
 
-// void Shader::bindCameraUBO(int nBindingPoint)
-// {
-//     glBindBufferBase(GL_UNIFORM_BUFFER, nBindingPoint, Camera::main->getCameraUBO());
-//     GLuint viewProjIndex = glGetUniformBlockIndex(m_nProgram, SHADER_GLOBAL_UNIFORM_CAMERA_MATRICES.data());
-//     glUniformBlockBinding(m_nProgram, viewProjIndex, nBindingPoint);
-// }
-
-// void Shader::bindLightUBO(int nBindingPoint)
-// {
-//     glBindBufferBase(GL_UNIFORM_BUFFER, nBindingPoint, LightManager::getInstance()->getLightingUBO());
-//     GLuint lightIndex = glGetUniformBlockIndex(m_nProgram, SHADER_GLOBAL_UNIFORM_LIGHTING_DATA.data());
-//     glUniformBlockBinding(m_nProgram, lightIndex, nBindingPoint);
-// }
 void Shader::setCameraUBOBindingPoint(GLuint nBindingPoint)
 {
     m_nCameraUBOBindingPoint = nBindingPoint;

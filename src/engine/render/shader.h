@@ -26,8 +26,6 @@ struct ShaderUniformHandle
 class Shader
 {
 public:
-    static void checkShaderCompilResult(const std::string_view& strVertexShaderPath, GLuint nShader);
-
     // Shader(const std::string_view& strShaderName, const std::string_view &strVertexShaderPath, const std::string_view &strFragmentShaderPath);
     Shader(int nId, const std::string& strShaderName, const std::string &strVertexShaderPath, const std::string &strFragmentShaderPath);
     Shader();
