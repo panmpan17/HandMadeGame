@@ -11,6 +11,8 @@
 #include "../../core/scene/node.h"
 #include "../../core/math/vector.h"
 #include "../../components/render/mesh_renderer.h"
+#include "../../../utils/file_utils.h"
+#include "../../../utils/filesystem.h"
 
 /*
 void convertMat4x4(const aiMatrix4x4& aiMat, mat4x4& outMat)
@@ -109,8 +111,17 @@ Node* loadModel(const std::string_view& strPath, std::shared_ptr<Material>& pMat
 {
     Assimp::Importer importer;
 
-    const aiScene* pScene = importer.ReadFile(strPath.data(),
-                                              aiProcess_Triangulate | aiProcess_FlipUVs);
+    const aiScene* pScene;
+
+    if (*strPath.begin() != '/')
+    {
+        std::string strFullPath = fs::path(FileUtils::getResourcesPath()).append(strPath).string();
+        pScene = importer.ReadFile(strFullPath.c_str(), aiProcess_Triangulate | aiProcess_FlipUVs);
+    }
+    else
+    {
+        pScene = importer.ReadFile(strPath.data(), aiProcess_Triangulate | aiProcess_FlipUVs);
+    }
 
     if (!pScene || pScene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !pScene->mRootNode) 
     {

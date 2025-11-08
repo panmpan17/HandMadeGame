@@ -1,6 +1,7 @@
 #include "file_utils.h"
+
+#include "filesystem.h"
 #include "platform.h"
-#include <filesystem>
 #include <sstream>
 #include <iostream>
 
@@ -11,22 +12,6 @@
 #elif IS_PLATFORM_WINDOWS
 #include <windows.h>
 #include <stdexcept>
-#endif
-
-
-#ifndef __has_include
-  static_assert(false, "__has_include not supported");
-#else
-#  if __cplusplus >= 201703L && __has_include(<filesystem>)
-#    include <filesystem>
-     namespace fs = std::filesystem;
-#  elif __has_include(<experimental/filesystem>)
-#    include <experimental/filesystem>
-     namespace fs = std::experimental::filesystem;
-#  elif __has_include(<boost/filesystem.hpp>)
-#    include <boost/filesystem.hpp>
-     namespace fs = boost::filesystem;
-#  endif
 #endif
 
 
@@ -44,16 +29,23 @@ std::string FileUtils::getExecutablePath()
 
 std::string FileUtils::getResourcesPath()
 {
+    if (!m_strResourcesPath.empty())
+    {
+        return m_strResourcesPath;
+    }
+
     char path[1024];
     uint32_t size = sizeof(path);
     if (_NSGetExecutablePath(path, &size) == 0) {
 #ifdef MAC_APP_BUNDLE
-        std::string strFullPath = fs::path(path).parent_path().append("../Resources").string();
+        m_strResourcesPath = fs::path(path).parent_path().append("../Resources").string();
 #else
-        std::string strFullPath = fs::path(path).parent_path().string();
+        m_strResourcesPath = fs::path(path).parent_path().string();
 #endif
-        return strFullPath;
-    } else {
+        return m_strResourcesPath;
+    }
+    else
+    {
         return ""; // Buffer too small
     }
 }

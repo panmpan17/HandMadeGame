@@ -170,6 +170,13 @@ void Window::setupManagers()
         }
     });
 
+    InputManager::getInstance()->registerKeyPressCallback(KeyCode::KEY_FUNCTION_5, [](bool pressed) {
+        if (pressed)
+        {
+            ShaderLoader::getInstance()->reloadAllShaders();
+        }
+    });
+
     glfwSetKeyCallback(m_pWindow, &InputManager::onKeyCallback);
     glfwSetCursorEnterCallback(m_pWindow, &InputManager::onMouseEnterCallback);
     glfwSetCursorPosCallback(m_pWindow, &InputManager::onMousePosCallback);

@@ -46,6 +46,7 @@ public:
     void reloadCameraUBOBinding();
 
     void setLightUBOBindingPoint(GLuint nBindingPoint);
+    void reloadLightUBOBinding();
 
 protected:
     GLuint m_nProgram;

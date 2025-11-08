@@ -14,6 +14,10 @@ public:
     static std::string getExecutableDirectory();
 
     static std::string getResourcesPath();
+    static void setResourcesPath(const std::string& strPath) { m_strResourcesPath = strPath; }
+
+private:
+    static inline std::string m_strResourcesPath;
 };
 
 class FileReader {

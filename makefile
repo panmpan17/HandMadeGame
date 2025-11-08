@@ -20,7 +20,7 @@ ccquick: config-debug compile-debug
 
 quick: compile-debug
 	@echo "Running Debug Build...\n"
-	@if ./$(CMAKE_BIN)/$(OUTPUT_NAME); then \
+	@if (./$(CMAKE_BIN)/$(OUTPUT_NAME) .); then \
 		echo ""; \
 	else \
 		python3 utilites/check_error.py ${BUILD_DIR}/bin; \

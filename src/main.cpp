@@ -4,7 +4,19 @@
 #include "game/testing/test.h"
 #include "game/pingpong/game.h"
 
-int main() {
+#include "utils/file_utils.h"
+
+
+int main(int nArgumentCount, char* arrArguments[])
+{
+#if IS_DEBUG_VERSION
+    if (nArgumentCount >= 2)
+    {
+        LOGLN("Setting resource path to: {}", arrArguments[1]);
+        FileUtils::setResourcesPath(arrArguments[1]);
+    }
+#endif
+
     registerSignalHandlers();
 
     Window window;

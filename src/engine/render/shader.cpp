@@ -118,6 +118,25 @@ GLuint Shader::getAttributeLocation(const std::string& name) const
 
 void Shader::reload()
 {
+    glDeleteShader(m_nVertexShader);
+    glDeleteShader(m_nFragmentShader);
+    glDeleteProgram(m_nProgram);
+
+    m_nVertexShader = loadShaderFileIntoGPU(m_strVertexShaderPath, true);
+    m_nFragmentShader = loadShaderFileIntoGPU(m_strFragmentShaderPath, false);
+
+    m_nProgram = glCreateProgram();
+    glAttachShader(m_nProgram, m_nVertexShader);
+    glAttachShader(m_nProgram, m_nFragmentShader);
+    glLinkProgram(m_nProgram);
+
+    for (int i = 0; i < m_nUniformHandleCount; ++i)
+    {
+        m_arrUniformHandles[i].m_nLocation = getUniformLocation(std::string(m_arrUniformHandles[i].m_strName));
+    }
+
+    reloadCameraUBOBinding();
+    reloadLightUBOBinding();
 }
 
 const ShaderUniformHandle* Shader::getUniformHandle(const std::string_view& strName)
@@ -152,13 +171,7 @@ const ShaderUniformHandle* Shader::getUniformHandle(const std::string_view& strN
 void Shader::setCameraUBOBindingPoint(GLuint nBindingPoint)
 {
     m_nCameraUBOBindingPoint = nBindingPoint;
-
-    if (Camera::main)
-    {
-        glBindBufferBase(GL_UNIFORM_BUFFER, nBindingPoint, Camera::main->getCameraUBO());
-        GLuint viewProjIndex = glGetUniformBlockIndex(m_nProgram, SHADER_GLOBAL_UNIFORM_CAMERA_MATRICES.data());
-        glUniformBlockBinding(m_nProgram, viewProjIndex, nBindingPoint);
-    }
+    reloadCameraUBOBinding();
 }
 
 void Shader::reloadCameraUBOBinding()
@@ -174,8 +187,15 @@ void Shader::reloadCameraUBOBinding()
 void Shader::setLightUBOBindingPoint(GLuint nBindingPoint)
 {
     m_nLightUBOBindingPoint = nBindingPoint;
+    reloadLightUBOBinding();
+}
 
-    glBindBufferBase(GL_UNIFORM_BUFFER, nBindingPoint, LightManager::getInstance()->getLightingUBO());
-    GLuint lightIndex = glGetUniformBlockIndex(m_nProgram, SHADER_GLOBAL_UNIFORM_LIGHTING_DATA.data());
-    glUniformBlockBinding(m_nProgram, lightIndex, nBindingPoint);
+void Shader::reloadLightUBOBinding()
+{
+    if (m_nLightUBOBindingPoint != GL_INVALID_INDEX && LightManager::getInstance())
+    {
+        glBindBufferBase(GL_UNIFORM_BUFFER, m_nLightUBOBindingPoint, LightManager::getInstance()->getLightingUBO());
+        GLuint lightIndex = glGetUniformBlockIndex(m_nProgram, SHADER_GLOBAL_UNIFORM_LIGHTING_DATA.data());
+        glUniformBlockBinding(m_nProgram, lightIndex, m_nLightUBOBindingPoint);
+    }
 }

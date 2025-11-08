@@ -79,6 +79,8 @@ set(SOURCES
     src/editor/node_inspector.cpp
 )
 
+set(DO_COPY_ASSETS_CUSTOM_COMMAND ON)
+
 if (APPLE)
     if (BUILD_MAC_APP)
         add_executable(MichaelHandMadeGame MACOSX_BUNDLE
@@ -110,6 +112,8 @@ if (APPLE)
 
         set(EXECUTABLE_PATH ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
         set(ASSET_BUILD_TARGET_FOLDER ${EXECUTABLE_PATH}/assets)
+
+        set(DO_COPY_ASSETS_CUSTOM_COMMAND OFF)
     endif()
 
     target_compile_options(MichaelHandMadeGame PRIVATE
@@ -141,18 +145,19 @@ endif()
 
 
 # Assets files
-file(GLOB_RECURSE ASSETS "${CMAKE_SOURCE_DIR}/assets/*")
-
-add_custom_command(
-    OUTPUT ${CMAKE_BINARY_DIR}/assets.timestamp
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-        ${CMAKE_SOURCE_DIR}/assets
-        ${ASSET_BUILD_TARGET_FOLDER}
-    COMMAND ${CMAKE_COMMAND} -E touch ${CMAKE_BINARY_DIR}/assets.timestamp
-    DEPENDS ${ASSETS}
-)
-add_custom_target(copy_assets ALL DEPENDS ${CMAKE_BINARY_DIR}/assets.timestamp)
-add_dependencies(MichaelHandMadeGame copy_assets)
+if (DO_COPY_ASSETS_CUSTOM_COMMAND)
+    # Copy assets files
+    add_custom_command(
+        OUTPUT ${CMAKE_BINARY_DIR}/assets.timestamp
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+            ${CMAKE_SOURCE_DIR}/assets
+            ${ASSET_BUILD_TARGET_FOLDER}
+        COMMAND ${CMAKE_COMMAND} -E touch ${CMAKE_BINARY_DIR}/assets.timestamp
+        DEPENDS ${ASSETS}
+    )
+    add_custom_target(copy_assets ALL DEPENDS ${CMAKE_BINARY_DIR}/assets.timestamp)
+    add_dependencies(MichaelHandMadeGame copy_assets)
+endif()
 
 
 ### General Library
