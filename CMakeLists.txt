@@ -12,7 +12,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 
 # Options
-option(BUILD_MAC_APP "Build as a macOS .app bundle" OFF)
+option(BUILD_APP "Build as a macOS .app bundle" OFF)
 
 # Default to Release if nothing is specified
 if(NOT DEFINED CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
@@ -82,7 +82,7 @@ set(SOURCES
 set(DO_COPY_ASSETS_CUSTOM_COMMAND ON)
 
 if (APPLE)
-    if (BUILD_MAC_APP)
+    if (BUILD_APP)
         add_executable(MichaelHandMadeGame MACOSX_BUNDLE
                     ${SOURCES}
                     ${CMAKE_SOURCE_DIR}/app_packing/icon-windowed.icns
