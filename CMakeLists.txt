@@ -121,8 +121,11 @@ if (APPLE)
         -Wno-delete-abstract-non-virtual-dtor
     )
 else()
+    enable_language(RC)
+    
     add_executable(MichaelHandMadeGame
                    ${SOURCES}
+                   app_packing/appicon.rc
     )
 
     set(EXECUTABLE_PATH ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
