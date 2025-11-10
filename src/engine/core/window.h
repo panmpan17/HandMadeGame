@@ -10,6 +10,7 @@ typedef struct GLFWwindow GLFWwindow;
 class WorldScene;
 class RenderProcessQueue;
 class IEditorWindow;
+class FileWatchDog;
 
 typedef unsigned int GLuint;
 
@@ -64,6 +65,8 @@ private:
 
     bool m_bShowIMGUI = false;
     PointerExpandableArray<IEditorWindow*> m_oEditorWindows = PointerExpandableArray<IEditorWindow*>(2);
+
+    FileWatchDog* m_pFileWatchDog = nullptr;
 
     Event<Vector2i> m_onWindowResize;
 

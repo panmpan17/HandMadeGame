@@ -12,3 +12,4 @@ cmake-build/
 *.ini
 __pycache__/
 player_preferences.cfg
+crash_log.log

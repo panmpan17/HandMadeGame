@@ -15,6 +15,7 @@
 #include "scene/world.h"
 #include "../render/image.h"
 #include "../render/shader_loader.h"
+#include "../render/vertex.h"
 #include "../render/post_process/render_process_queue.h"
 #include "../render/lighting/light_manager.h"
 #include "../render/lighting/direction_light.h"
@@ -22,8 +23,7 @@
 #include "../../editor/node_inspector.h"
 #include "../../editor/hierarchy_view.h"
 #include "../../editor/post_process_inspector.h"
-
-#include "../render/vertex.h"
+#include "../../utils/file_watch_dog.h"
 
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
@@ -50,6 +50,13 @@ Window::Window()
 
 Window::~Window()
 {
+    if (m_pFileWatchDog)
+    {
+        m_pFileWatchDog->stopWatching();
+        delete m_pFileWatchDog;
+        m_pFileWatchDog = nullptr;
+    }
+
     if (m_pWindow)
     {
         int nWindowX, nWindowY;
@@ -231,6 +238,9 @@ void Window::setupManagers()
     m_oEditorWindows.addElement(new NodeInspector());
     m_oEditorWindows.addElement(new HierarchyView());
     m_oEditorWindows.addElement(new PostProcessInspector());
+
+    m_pFileWatchDog = new FileWatchDog("assets/");
+    m_pFileWatchDog->startWatching();
 }
 
 void Window::beforeLoop()

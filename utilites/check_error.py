@@ -63,7 +63,7 @@ def parse_log_content(content: str) -> CrashLog:
     if timestamp_index == -1 or atos_index == -1:
         return None
 
-    timestamp = int(content[timestamp_index + len("Timestamp("):content.find(")")])
+    timestamp = int(content[timestamp_index + len("Timestamp("):content.find(")", timestamp_index)])
     atos_line = content[atos_index:].strip()
 
     return CrashLog(timestamp=timestamp, atos_line=atos_line)
@@ -84,13 +84,14 @@ def parse_logs(log_file_path) -> List[CrashLog]:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Check error logs")
+    parser.add_argument("crash_log", help="Path to the crash log file")
     parser.add_argument("execute_folder", help="Path to the execute folder")
     args = parser.parse_args()
 
-    log_file_path = os.path.join(args.execute_folder, CRASH_LOG_FILENAME)
-    if not os.path.isfile(log_file_path):
+    if not os.path.isfile(args.crash_log):
         exit(0)
     
-    crash_logs = parse_logs(log_file_path)
+    crash_logs = parse_logs(args.crash_log)
+    print(f"Found {len(crash_logs)} crash logs.")
     if len(crash_logs) > 0:
         crash_logs[-1].run_atos(os.path.join(args.execute_folder, EXECUTABLE_PATH))

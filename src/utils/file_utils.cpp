@@ -96,6 +96,10 @@ FileReader::FileReader(const std::string& strPath)
         {
             file.open(strFullPath);
         }
+        else
+        {
+            std::cout << "File does not exist: " << strFullPath << std::endl;
+        }
     }
     else
     {
