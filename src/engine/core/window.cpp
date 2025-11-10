@@ -11,6 +11,7 @@
 
 #include "window.h"
 #include "camera.h"
+#include "engine_event_dispatcher.h"
 #include "input/input_manager.h"
 #include "scene/world.h"
 #include "../render/image.h"
@@ -199,6 +200,11 @@ void Window::setupManagers()
     m_pWorldScene->init();
 
     m_pFileWatchDog = new FileWatchDog("assets/");
+    m_pFileWatchDog->setFileChangeCallback([](const std::string& strFilePath, eFileChangeType eType) {
+        EngineEventDispatcher::getInstance().runOnMainThread([strFilePath, eType]() {
+            ShaderLoader::getInstance()->reloadAllShaders();
+        });
+    });
     m_pFileWatchDog->startWatching();
 }
 
@@ -211,13 +217,6 @@ void Window::setupInputManager()
         {
             Window::ins->m_bShowIMGUI = !Window::ins->m_bShowIMGUI;
             Preference::setEnableIMGUI(Window::ins->m_bShowIMGUI);
-        }
-    });
-
-    InputManager::getInstance()->registerKeyPressCallback(KeyCode::KEY_FUNCTION_5, [](bool pressed) {
-        if (pressed)
-        {
-            ShaderLoader::getInstance()->reloadAllShaders();
         }
     });
 
@@ -290,6 +289,8 @@ void Window::runUpdate()
     m_fCurrentDrawTime = glfwGetTime();
     m_fDeltaTime = m_fCurrentDrawTime - m_fLastDrawTime;
     m_fLastDrawTime = m_fCurrentDrawTime;
+
+    EngineEventDispatcher::getInstance().updateEvents(m_fDeltaTime);
 
     m_pWorldScene->update(m_fDeltaTime);
 }

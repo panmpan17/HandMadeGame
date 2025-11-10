@@ -38,7 +38,10 @@ void FileWatchDog::watchLoop()
             if (!std::filesystem::exists(iter->first))
             {
                 // File deleted
-                // TODO: Trigger file deleted event
+                if (m_funcFileChangeCallback)
+                {
+                    m_funcFileChangeCallback(iter->first, eFileChangeType::FILE_DELETED);
+                }
                 iter = mapFileLastState.erase(iter);
             }
             else
@@ -47,7 +50,10 @@ void FileWatchDog::watchLoop()
                 if (currentFileTime != iter->second)
                 {
                     // File modified
-                    // TODO: Trigger file modified event
+                    if (m_funcFileChangeCallback)
+                    {
+                        m_funcFileChangeCallback(iter->first, eFileChangeType::FILE_MODIFIED);
+                    }
                     iter->second = currentFileTime;
                 }
                 ++iter;
@@ -62,7 +68,10 @@ void FileWatchDog::watchLoop()
                 if (mapFileLastState.find(strPath) == mapFileLastState.end())
                 {
                     // New file created
-                    // TODO: Trigger file created event
+                    if (m_funcFileChangeCallback)
+                    {
+                        m_funcFileChangeCallback(strPath, eFileChangeType::FILE_CREATED);
+                    }
                     mapFileLastState[strPath] = std::filesystem::last_write_time(p.path());
                 }
             }
