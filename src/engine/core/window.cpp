@@ -64,6 +64,10 @@ Window::~Window()
         Preference::setWindowPositionX(nWindowX);
         Preference::setWindowPositionY(nWindowY);
 
+        glfwGetWindowSize(m_pWindow, &m_oWindowSize.x, &m_oWindowSize.y);
+        Preference::setWindowWidth(m_oWindowSize.x);
+        Preference::setWindowHeight(m_oWindowSize.y);
+
         glfwDestroyWindow(m_pWindow);
     }
     if (m_pWorldScene)
@@ -161,13 +165,46 @@ bool Window::configureAndCreateWindow()
     // }
 #endif
 
+    // glfwSetWindowOpacity(m_pWindow, 0.5f); // Fun
+    glfwMakeContextCurrent(m_pWindow);
+    glfwSwapInterval(1); // Enable vsync
+
+
+    // Set up GLAD
+    gladLoadGL(glfwGetProcAddress);
+
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
+    glEnable(GL_CULL_FACE);
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
     return true;
 }
 
 void Window::setupManagers()
 {
-    InputManager::Initialize();
     ImageLoader::Initialize();
+    LightManager::Initialize();
+    ShaderLoader::Initialize();    
+
+    setupInputManager();
+    setupIMGUIAndEditorWindows();
+
+    m_pRenderProcessQueue = new RenderProcessQueue(this);
+    m_pRenderProcessQueue->setupProcesses();
+
+    m_pWorldScene = new WorldScene();
+    m_pWorldScene->init();
+
+    m_pFileWatchDog = new FileWatchDog("assets/");
+    m_pFileWatchDog->startWatching();
+}
+
+void Window::setupInputManager()
+{
+    InputManager::Initialize();
 
     InputManager::getInstance()->registerKeyPressCallback(KeyCode::KEY_FUNCTION_3, [](bool pressed) {
         if (pressed)
@@ -188,59 +225,23 @@ void Window::setupManagers()
     glfwSetCursorEnterCallback(m_pWindow, &InputManager::onMouseEnterCallback);
     glfwSetCursorPosCallback(m_pWindow, &InputManager::onMousePosCallback);
     glfwSetMouseButtonCallback(m_pWindow, &InputManager::onMouseButtonCallback);
+}
 
-    // glfwSetWindowOpacity(m_pWindow, 0.5f); // Fun
+void Window::setupIMGUIAndEditorWindows()
+{
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO();
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
 
-    glfwMakeContextCurrent(m_pWindow);
-    gladLoadGL(glfwGetProcAddress);
-    glfwSwapInterval(1); // Enable vsync
-
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LESS);
-    // glDepthMask(GL_FALSE);
-    glEnable(GL_CULL_FACE);
-
-
-    // Setup Dear ImGui context
-    {
-        IMGUI_CHECKVERSION();
-        ImGui::CreateContext();
-        ImGuiIO& io = ImGui::GetIO();
-        io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
-        io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
-
-        // Setup Platform/Renderer backends
-        ImGui_ImplGlfw_InitForOpenGL(m_pWindow, true);          // Second param install_callback=true will install GLFW callbacks and chain to existing ones.
-        ImGui_ImplOpenGL3_Init();
-    }
-
-    LightManager::Initialize();
-
-    ShaderLoader::Initialize();
-    
-    ImageLoader::getInstance()->registerImage("test", "assets/images/test.png");
-    ImageLoader::getInstance()->registerImage("dust", "assets/images/dust_1.png");
-    ImageLoader::getInstance()->registerImage("character", "assets/images/character_animation.png");
-    ImageLoader::getInstance()->registerImage("cover_test", "assets/images/cover_test_3.jpg");
-    ImageLoader::getInstance()->registerImage("box_uv", "assets/images/box_test_uv.jpg");
-    ImageLoader::getInstance()->registerImage("container", "assets/images/container.png");
-    ImageLoader::getInstance()->registerImage("container_specular", "assets/images/container_specular.png");
-
-    m_pRenderProcessQueue = new RenderProcessQueue(this);
-    m_pRenderProcessQueue->setupProcesses();
-
-    m_pWorldScene = new WorldScene();
-    m_pWorldScene->init();
-
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    // Setup Platform/Renderer backends
+    ImGui_ImplGlfw_InitForOpenGL(m_pWindow, true);          // Second param install_callback=true will install GLFW callbacks and chain to existing ones.
+    ImGui_ImplOpenGL3_Init();
 
     m_oEditorWindows.addElement(new NodeInspector());
     m_oEditorWindows.addElement(new HierarchyView());
     m_oEditorWindows.addElement(new PostProcessInspector());
-
-    m_pFileWatchDog = new FileWatchDog("assets/");
-    m_pFileWatchDog->startWatching();
 }
 
 void Window::beforeLoop()
@@ -270,35 +271,30 @@ void Window::mainLoop()
             m_onWindowResize.invoke(Vector2i(m_oActualSize.x, m_oActualSize.y));
 
             glfwGetWindowSize(m_pWindow, &m_oWindowSize.x, &m_oWindowSize.y);
-            Preference::setWindowWidth(m_oWindowSize.x);
-            Preference::setWindowHeight(m_oWindowSize.y);
         }
 
-
-        if (m_bShowIMGUI)
-        {
-            mainLoop_IMGUI();
-        }
-
-        m_fCurrentDrawTime = glfwGetTime();
-        m_fDeltaTime = m_fCurrentDrawTime - m_fLastDrawTime;
-        m_fLastDrawTime = m_fCurrentDrawTime;
-
-        m_pWorldScene->update(m_fDeltaTime);
-
+        runUpdate();
         drawFrame();
-
-        if (m_bShowIMGUI)
-        {
-            ImGui::Render();
-            ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-        }
 
         glfwSwapBuffers(m_pWindow);
     }
 }
 
-void Window::mainLoop_IMGUI()
+void Window::runUpdate()
+{
+    if (m_bShowIMGUI)
+    {
+        updateIMGUI();
+    }
+
+    m_fCurrentDrawTime = glfwGetTime();
+    m_fDeltaTime = m_fCurrentDrawTime - m_fLastDrawTime;
+    m_fLastDrawTime = m_fCurrentDrawTime;
+
+    m_pWorldScene->update(m_fDeltaTime);
+}
+
+void Window::updateIMGUI()
 {
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
@@ -378,12 +374,14 @@ void Window::drawFrame()
         m_pWorldScene->render();
     }
 
-#if IS_DEBUG_VERSION
     if (m_bShowIMGUI)
     {
+#if IS_DEBUG_VERSION
         drawFrameInfo();
-    }
 #endif
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+    }
 }
 
 void Window::drawFrameInfo()

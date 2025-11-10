@@ -70,8 +70,12 @@ private:
 
     Event<Vector2i> m_onWindowResize;
 
+    void setupInputManager();
+    void setupIMGUIAndEditorWindows();
+
     void beforeLoop();
-    void mainLoop_IMGUI();
+    void runUpdate();
+    void updateIMGUI();
     void drawFrame();
     void drawFrameInfo();
 };

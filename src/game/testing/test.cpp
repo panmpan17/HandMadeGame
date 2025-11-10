@@ -35,8 +35,8 @@ void createDemo1()
     Shader* pImageShader = ShaderLoader::getInstance()->getShader("image");
     Shader* pParticleShader = ShaderLoader::getInstance()->getShader("particle_instance");
 
-    Image* pTestImage = ImageLoader::getInstance()->getImage("test");
-    Image* pDustImage = ImageLoader::getInstance()->getImage("dust");
+    Image* pTestImage = ImageLoader::getInstance()->getImageByPath("assets/images/test.png");
+    Image* pDustImage = ImageLoader::getInstance()->getImageByPath("assets/images/dust_1.png");
 
     { // Triangle
         auto pNode = new Node(-0.5f, 0.f, 0.f);
@@ -164,7 +164,7 @@ void createDemo1()
     oSerializer << pNode7;
 
     {
-        Image* pCharacter = ImageLoader::getInstance()->getImage("character");
+        Image* pCharacter = ImageLoader::getInstance()->getImageByPath("assets/images/character_animation.png");
 
         auto pPlayer = new Node(0.f, 0.f, 0.f);
         auto pSprite = new Sprite(pCharacter, 4, 4);
@@ -321,8 +321,8 @@ void createVisualEffectDemo()
         auto pMeshRenderer = new MeshRenderer();
         pMeshRenderer->setMesh(readerBox);
         pMeshRenderer->setShader(p3DMeshShader);
-        pMeshRenderer->setMainTexture(ImageLoader::getInstance()->getImage("container"));
-        pMeshRenderer->setSpecularMap(ImageLoader::getInstance()->getImage("container_specular"));
+        pMeshRenderer->setMainTexture(ImageLoader::getInstance()->getImageByPath("assets/images/container.png"));
+        pMeshRenderer->setSpecularMap(ImageLoader::getInstance()->getImageByPath("assets/images/container_specular.png"));
         pNode->addComponent(pMeshRenderer);
 
         addNode(pNode);
