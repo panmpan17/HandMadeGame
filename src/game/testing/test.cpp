@@ -6,7 +6,7 @@
 #include "../../engine/core/scene/node.h"
 #include "../../engine/core/scene/world.h"
 #include "../../engine/core/math/random.h"
-#include "../../engine/render/image.h"
+#include "../../engine/render/image_loader.h"
 #include "../../engine/render/shader.h"
 #include "../../engine/render/shader_loader.h"
 #include "../../engine/render/material.h"

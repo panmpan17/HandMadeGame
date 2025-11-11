@@ -6,7 +6,7 @@
 #include "../math/random.h"
 #include "../serialization/serializer.h"
 #include "../../render/skybox.h"
-#include "../../render/image.h"
+#include "../../render/image_loader.h"
 #include "../../render/shader_loader.h"
 #include "../../components/input/first_person_free_control_camera.h"
 

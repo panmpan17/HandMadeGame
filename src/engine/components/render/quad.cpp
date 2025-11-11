@@ -4,7 +4,7 @@
 #include <GLFW/glfw3.h>
 
 #include "quad.h"
-#include "../../render/image.h"
+#include "../../render/image_loader.h"
 #include "../../core/camera.h"
 #include "../../core/debug_macro.h"
 #include "../../core/window.h"

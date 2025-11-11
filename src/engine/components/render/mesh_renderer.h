@@ -26,12 +26,8 @@ public:
     virtual void draw() override;
     virtual void drawDepth() override;
 
-    void setShader(Shader* pShader);
-
     void setMaterial(std::shared_ptr<Material>& pMaterial);
     inline void setMesh(const std::shared_ptr<Mesh>& pMesh) { m_pMesh = pMesh; }
-    inline void setMainTexture(Image* pImage) { m_pMainTexture = pImage; }
-    inline void setSpecularMap(Image* pImage) { m_pSpecularMap = pImage; }
 
     void initShader(Shader* const pShader);
 
@@ -39,11 +35,6 @@ private:
     std::shared_ptr<Mesh> m_pMesh = nullptr;
 
     std::shared_ptr<Material> m_pMaterial = nullptr;
-
-    Image* m_pMainTexture = nullptr;
-    Image* m_pSpecularMap = nullptr;
-
-    Shader* m_pShader = nullptr;
 
     GLuint m_nVertexArray = 0;
     GLuint m_nVertexBuffer = 0;

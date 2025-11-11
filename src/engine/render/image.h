@@ -33,25 +33,3 @@ private:
     GLuint m_nTextureID = 0; // Texture ID for OpenGL texture binding
     std::string_view m_strPath;
 };
-
-
-class ImageLoader
-{
-public:
-    inline static ImageLoader* getInstance() { return ins; }
-
-    static void Initialize();
-    static void Cleanup();
-
-    void registerImage(const std::string_view& strName, const std::string_view& strPath);
-    Image* getImage(const std::string_view& strName);
-    Image* getImageByPath(const std::string_view& strPath);
-
-private:
-    ImageLoader();
-    ~ImageLoader();
-
-    static ImageLoader* ins;
-
-    std::unordered_map<std::string_view, Image*> m_mapLoadedImages;
-};

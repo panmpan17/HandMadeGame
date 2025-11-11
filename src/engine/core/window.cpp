@@ -14,7 +14,7 @@
 #include "engine_event_dispatcher.h"
 #include "input/input_manager.h"
 #include "scene/world.h"
-#include "../render/image.h"
+#include "../render/image_loader.h"
 #include "../render/shader_loader.h"
 #include "../render/vertex.h"
 #include "../render/post_process/render_process_queue.h"

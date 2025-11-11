@@ -5,7 +5,7 @@
 #include "../vertex.h"
 #include "../shader.h"
 #include "../shader_loader.h"
-#include "../image.h"
+#include "../image_loader.h"
 #include "../../core/window.h"
 #include "../../core/camera.h"
 #include "../../core/debug_macro.h"
