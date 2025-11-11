@@ -63,7 +63,8 @@ void main()
     {
         vec3 lightDir = normalize(-u_DirectionLights[i].direction.xyz);
         float diff = max(dot(norm, lightDir), 0.0);
-        diffuseSum += diff * u_DirectionLights[i].color.xyz;
+        // diffuseSum += diff * u_DirectionLights[i].color.xyz;
+        diffuseSum = vec3(norm);
 
         vec3 reflectDir = reflect(-lightDir, norm);
         float spec = pow(max(dot(viewDir, reflectDir), 0.0), max(u_SpecularParams.y, 32.0));
@@ -88,10 +89,10 @@ void main()
         }
     }
 
-    vec4 texColor = vec4(1);
+    vec4 texColor = vec4(.85);
     if ((u_textureEnabled & 1) != 0)
     {
-        texColor = texture(u_tex0, fragUV);
+        // texColor = texture(u_tex0, fragUV);
     }
 
     if ((u_textureEnabled & 2) != 0)
@@ -100,7 +101,7 @@ void main()
         specularSum *= specularMapColor.xyz;
     }
 
-    vec3 noAmbientLightSum = (diffuseSum + specularSum) * texColor.xyz;
+    vec3 noAmbientLightSum = (diffuseSum + diffuseSum) * texColor.xyz;
     if ((u_textureEnabled & 8) != 0)
     {
         float shadowFactor = shadowCalculation(fragLightSpacePos, norm, normalize(-u_DirectionLights[0].direction.xyz));

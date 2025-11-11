@@ -421,12 +421,13 @@ void createLightingShadowDemo()
         Node* pBackPackFbx = loadModel("assets/models/back_pack.fbx", pMaterial);
         pBackPackFbx->setScale(0.01f);
         pBackPackFbx->setPosition(2.f, 0.f, 0.f);
+        pBackPackFbx->setRotationQuaternion(Quaternion::fromEulerAngles({0.f, -105.f, 0.f}));
         pWorldScene->addNode(pBackPackFbx);
     }
 
     {
         Node* pDirectionLightNode = new Node(0, 10.f, 0.f);
-        pDirectionLightNode->setRotationQuaternion(Quaternion::fromEulerAngles({-45.f, 45.f, 0.f}));
+        pDirectionLightNode->setRotationQuaternion(Quaternion::fromEulerAngles({-130.f, 30.f, 0.f}));
 
         DirectionLightComponent* pPointLightComp = new DirectionLightComponent();
         pPointLightComp->setColor({1.f, 1.f, .5f});
