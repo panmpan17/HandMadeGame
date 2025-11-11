@@ -106,6 +106,11 @@ Shader::~Shader()
     }
 }
 
+bool Shader::getIsUsingFile(const std::string& strFilePath) const
+{
+    return (strFilePath == m_strVertexShaderPath || strFilePath == m_strFragmentShaderPath);
+}
+
 GLuint Shader::getUniformLocation(const std::string& name) const
 {
     return glGetUniformLocation(m_nProgram, name.c_str());

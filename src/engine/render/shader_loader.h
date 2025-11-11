@@ -3,6 +3,7 @@
 // #include "../expandable_array.h"
 #include <unordered_map>
 #include <string>
+#include "../../utils/file_watch_dog.h"
 
 
 class Shader;
@@ -19,6 +20,8 @@ public:
     Shader* getShader(const std::string_view& strName) const;
 
     void reloadAllShaders();
+
+    void onFileChangedListener(const std::string& strFilePath, eFileChangeType eType);
 
     void onMainCameraChanged();
 

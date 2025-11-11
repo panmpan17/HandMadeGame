@@ -145,6 +145,23 @@ void ShaderLoader::reloadAllShaders()
     }
 }
 
+void ShaderLoader::onFileChangedListener(const std::string& strFilePath, eFileChangeType eType)
+{
+    if (eType != eFileChangeType::FILE_MODIFIED)
+    {
+        return;
+    }
+
+    for (auto& pair : m_mapShaders)
+    {
+        if (pair.second->getIsUsingFile(strFilePath))
+        {
+            pair.second->reload();
+            break;
+        }
+    }
+}
+
 void ShaderLoader::onMainCameraChanged()
 {
     for (auto& pair : m_mapShaders)

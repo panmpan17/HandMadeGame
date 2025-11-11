@@ -199,13 +199,15 @@ void Window::setupManagers()
     m_pWorldScene = new WorldScene();
     m_pWorldScene->init();
 
+#if IS_DEBUG_VERSION
     m_pFileWatchDog = new FileWatchDog("assets/");
     m_pFileWatchDog->setFileChangeCallback([](const std::string& strFilePath, eFileChangeType eType) {
         EngineEventDispatcher::getInstance().runOnMainThread([strFilePath, eType]() {
-            ShaderLoader::getInstance()->reloadAllShaders();
+            ShaderLoader::getInstance()->onFileChangedListener(strFilePath, eType);
         });
     });
     m_pFileWatchDog->startWatching();
+#endif
 }
 
 void Window::setupInputManager()

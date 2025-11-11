@@ -36,6 +36,8 @@ public:
 
     inline GLuint getProgram() const { return m_nProgram; }
 
+    bool getIsUsingFile(const std::string& strFilePath) const;
+
     const ShaderUniformHandle* getUniformHandle(const std::string_view& strName);
 
     GLuint getAttributeLocation(const std::string& name) const;
