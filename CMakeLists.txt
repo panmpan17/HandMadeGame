@@ -28,57 +28,7 @@ endif()
 
 
 # Source files
-set(SOURCES
-    src/utils/file_utils.cpp
-    src/utils/file_watch_dog.cpp
-    src/utils/player_preference.cpp
-    src/game/pingpong/game.cpp
-    src/game/pingpong/pong.cpp
-    src/game/pingpong/paddle_control.cpp
-    src/game/testing/test.cpp
-    src/engine/core/camera.cpp
-    src/engine/core/error_handler.cpp
-    src/engine/core/input/input_manager.cpp
-    src/engine/core/window.cpp
-    src/engine/core/serialization/type_registry.cpp
-    src/engine/core/serialization/serializer.cpp
-    src/engine/core/math/random.cpp
-    src/engine/core/math/vector.cpp
-    src/engine/core/scene/node.cpp
-    src/engine/core/scene/world.cpp
-    src/engine/render/post_process/render_process_queue.cpp
-    src/engine/render/post_process/order_dithering.cpp
-    src/engine/render/post_process/bloom_test.cpp
-    src/engine/render/post_process/difference_of_gaussian.cpp
-    src/engine/render/post_process/gamma_correction.cpp
-    src/engine/render/image.cpp
-    src/engine/render/shader_loader.cpp
-    src/engine/render/models/mesh.cpp
-    src/engine/render/models/simple_obj_reader.cpp
-    src/engine/render/models/assimp_model_reader.cpp
-    src/engine/render/shader.cpp
-    src/engine/render/skybox.cpp
-    src/engine/render/lighting/light_manager.cpp
-    src/engine/render/lighting/direction_light.cpp
-    src/engine/render/lighting/point_light.cpp
-    src/engine/components/input/first_person_free_control_camera.cpp
-    src/engine/components/component.cpp
-    src/engine/components/render/sprite_animation.cpp
-    src/engine/components/render/mesh_renderer.cpp
-    src/engine/components/render/quad.cpp
-    src/engine/components/render/character2d.cpp
-    src/engine/components/render/triangle.cpp
-    src/engine/components/particle/particle_spawn.cpp
-    src/engine/components/particle/particle_system.cpp
-    src/engine/components/particle/simple_particle_system.cpp
-    src/engine/components/particle/particle_lifetime_change.cpp
-    src/engine/components/transform/movement.cpp
-    src/engine/components/transform/rotate.cpp
-    src/main.cpp
-    src/editor/hierarchy_view.cpp
-    src/editor/post_process_inspector.cpp
-    src/editor/node_inspector.cpp
-)
+include(src/CMakeLists.txt)
 
 
 file(GLOB_RECURSE ASSETS "${CMAKE_SOURCE_DIR}/assets/*")

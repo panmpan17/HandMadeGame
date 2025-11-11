@@ -6,8 +6,6 @@
 #include "../math/random.h"
 #include "../serialization/serializer.h"
 #include "../../render/skybox.h"
-#include "../../render/image_loader.h"
-#include "../../render/shader_loader.h"
 #include "../../components/input/first_person_free_control_camera.h"
 
 WorldScene* WorldScene::current = nullptr;
@@ -50,19 +48,13 @@ void WorldScene::readFromFiles(const std::string_view& strFilePath)
     DataDeserializer deserializer(strFilePath);
     deserializer.read();
 
-    std::vector<ISerializable*> deserializedObjects = deserializer.getDeserializedObjects();
+    const std::vector<ISerializable*>& vecDeserializedObjects = deserializer.getDeserializedObjects();
 
-    Shader* pTestShader = ShaderLoader::getInstance()->getShader("test");
-    Shader* pImageShader = ShaderLoader::getInstance()->getShader("image");
-    Shader* pParticleShader = ShaderLoader::getInstance()->getShader("particle_instance");
-
-    Image* pTestImage = ImageLoader::getInstance()->getImage("test");
-
-    int nSize = deserializedObjects.size();
+    int nSize = vecDeserializedObjects.size();
     Node* pCurrentNode = nullptr;
     for (int i = 0; i < nSize; ++i)
     {
-        ISerializable* pObject = deserializedObjects[i];
+        ISerializable* pObject = vecDeserializedObjects[i];
         if (Node* pNode = dynamic_cast<Node*>(pObject))
         {
             if (pCurrentNode)

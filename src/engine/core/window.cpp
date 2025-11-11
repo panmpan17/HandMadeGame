@@ -242,6 +242,16 @@ void Window::setupIMGUIAndEditorWindows()
     m_oEditorWindows.addElement(new NodeInspector());
     m_oEditorWindows.addElement(new HierarchyView());
     m_oEditorWindows.addElement(new PostProcessInspector());
+
+    for (int i = 0; i < m_oEditorWindows.getSize(); ++i)
+    {
+        IEditorWindow* pWindow = m_oEditorWindows.getElement(i);
+        if (pWindow)
+        {
+            bool bActive = Preference::getPlayerPreferenceInstance().getBool(std::string("EditorWindow_") + typeid(*pWindow).name(), true);
+            pWindow->setActive(bActive);
+        }
+    }
 }
 
 void Window::beforeLoop()
@@ -324,6 +334,7 @@ void Window::updateIMGUI()
                     if (ImGui::MenuItem(typeid(*pWindow).name(), NULL, pWindow->isActive()))
                     {
                         pWindow->setActive(!pWindow->isActive());
+                        Preference::getPlayerPreferenceInstance().setBool(std::string("EditorWindow_") + typeid(*pWindow).name(), pWindow->isActive());
                     }
                 }
             }

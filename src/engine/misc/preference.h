@@ -26,13 +26,13 @@ public:
     inline static int getWindowPositionY() { return getPlayerPreferenceInstance().getInt("WindowPositionY", 0); }
     inline static void setWindowPositionY(int y) { getPlayerPreferenceInstance().setInt("WindowPositionY", y); }
 
-private:
     static PlayerPreference& getPlayerPreferenceInstance()
     {
         static PlayerPreference instance("player_preferences.cfg");
         return instance;
     }
 
+private:
     static void setVector2(const std::string& strKey, const Vector2& vec)
     {
         getPlayerPreferenceInstance().setInt(strKey + "_x", static_cast<int>(vec.x));
