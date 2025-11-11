@@ -157,7 +157,6 @@ void ShaderLoader::onFileChangedListener(const std::string& strFilePath, eFileCh
         if (pair.second->getIsUsingFile(strFilePath))
         {
             pair.second->reload();
-            break;
         }
     }
 }

@@ -5,13 +5,15 @@
 #include "../vertex.h"
 #include "../shader.h"
 #include "../shader_loader.h"
+#include "../image.h"
 #include "../../core/window.h"
 #include "../../core/camera.h"
 #include "../../core/debug_macro.h"
 
 
-constexpr float LIGHT_SIZE = 10.f;
+constexpr float GIZMOS_SIZE = 2.f;
 
+Image* pDirectionLightGizmosImage = nullptr;
 
 DirectionLightComponent::DirectionLightComponent()
 {
@@ -32,11 +34,18 @@ void DirectionLightComponent::onAddToNode()
 
     m_pNode->registerOnRotationChangedListener(std::bind(&DirectionLightComponent::markLightDataDirty, this));
 
-    m_pShader = ShaderLoader::getInstance()->getShader("point_light");
-    m_pMVPUniformHandle = m_pShader->getUniformHandle("u_MVP");
-    m_pLightColorUniformHandle = m_pShader->getUniformHandle("u_lightColor");
+    m_pShader = ShaderLoader::getInstance()->getShader("simple_gizmos");
+    m_pPositionUniform = m_pShader->getUniformHandle("u_WorldPosition");
+    m_pColorUniform = m_pShader->getUniformHandle("u_imageColor");
+    m_pTextureUniform = m_pShader->getUniformHandle(SHADER_UNIFORM_TEXTURE_0);
+    m_pUseTextureUniform = m_pShader->getUniformHandle("u_useTexture");
 
     registerBuffer();
+
+    if (!pDirectionLightGizmosImage)
+    {
+        pDirectionLightGizmosImage = ImageLoader::getInstance()->getImageByPath("assets/gizmos/direction_light.png");
+    }
 }
 
 void DirectionLightComponent::registerBuffer()
@@ -44,21 +53,24 @@ void DirectionLightComponent::registerBuffer()
     glGenBuffers(1, &m_nVertexBuffer);
     glBindBuffer(GL_ARRAY_BUFFER, m_nVertexBuffer);
 
-    float fStartX = -LIGHT_SIZE / 2.0f;
-    float fStartY = -LIGHT_SIZE / 2.0f;
+    float fStartX = -GIZMOS_SIZE / 2.0f;
+    float fStartY = -GIZMOS_SIZE / 2.0f;
     VertexWUV arrVertices[4];
-    arrVertices[0] = { { fStartX, fStartY } }; // Bottom left
-    arrVertices[1] = { { fStartX, fStartY + LIGHT_SIZE } }; // Top right
-    arrVertices[2] = { { fStartX + LIGHT_SIZE, fStartY } }; // Bottom right
-    arrVertices[3] = { { fStartX + LIGHT_SIZE, fStartY + LIGHT_SIZE } }; // Top left
+    arrVertices[0] = { { fStartX, fStartY }, { 0, 0}  }; // Bottom left
+    arrVertices[2] = { { fStartX, fStartY + GIZMOS_SIZE }, { 0, 1 } }; // Top right
+    arrVertices[1] = { { fStartX + GIZMOS_SIZE, fStartY }, { 1, 0 } }; // Bottom right
+    arrVertices[3] = { { fStartX + GIZMOS_SIZE, fStartY + GIZMOS_SIZE }, { 1, 1 } }; // Top left
     glBufferData(GL_ARRAY_BUFFER, sizeof(arrVertices), arrVertices, GL_STATIC_DRAW);
 
     GLuint nVPosAttr = m_pShader->getAttributeLocation("a_vPos");
+    GLuint nUVAttr = m_pShader->getAttributeLocation("a_vUV");
 
     glGenVertexArrays(1, &m_nVertexArray);
     glBindVertexArray(m_nVertexArray);
     glEnableVertexAttribArray(nVPosAttr);
     glVertexAttribPointer(nVPosAttr, 2, GL_FLOAT, GL_FALSE, sizeof(VertexWUV), (void*)offsetof(VertexWUV, pos));
+    glEnableVertexAttribArray(nUVAttr);
+    glVertexAttribPointer(nUVAttr, 2, GL_FLOAT, GL_FALSE, sizeof(VertexWUV), (void*)offsetof(VertexWUV, uv));
 
     // Unbind
     glBindVertexArray(0);
@@ -69,19 +81,27 @@ void DirectionLightComponent::draw()
 {
     ASSERT(m_pShader, "Shader must be set before drawing the quad");
 
-    mat4x4 mvp;
     const mat4x4& matModel = m_pNode->getWorldMatrix();
-    const mat4x4& cameraViewMatrix = Camera::main->getViewProjectionMatrix();
-    mat4x4_mul(mvp, cameraViewMatrix, matModel);
 
     glUseProgram(m_pShader->getProgram());
-    if (m_pMVPUniformHandle)
+    if (m_pPositionUniform)
     {
-        glUniformMatrix4fv(m_pMVPUniformHandle->m_nLocation, 1, GL_FALSE, (const GLfloat*) mvp);
+        const Vector3& worldPos = m_pNode->getPositionInWorld();
+        glUniform3f(m_pPositionUniform->m_nLocation, worldPos.x, worldPos.y, worldPos.z);
     }
-    if (m_pLightColorUniformHandle)
+    if (m_pColorUniform)
     {
-        glUniform3f(m_pLightColorUniformHandle->m_nLocation, m_color.x * m_intensity, m_color.y * m_intensity, m_color.z * m_intensity);
+        glUniform4f(m_pColorUniform->m_nLocation, m_color.x, m_color.y, m_color.z, 1);
+    }
+    if (m_pUseTextureUniform)
+    {
+        glUniform1i(m_pUseTextureUniform->m_nLocation, pDirectionLightGizmosImage ? 1 : 0); // true
+    }
+    if (m_pTextureUniform && pDirectionLightGizmosImage)
+    {
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, pDirectionLightGizmosImage->getTextureID());
+        glUniform1i(m_pTextureUniform->m_nLocation, 0);
     }
 
     glBindVertexArray(m_nVertexArray);

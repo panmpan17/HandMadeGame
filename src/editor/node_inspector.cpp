@@ -27,6 +27,13 @@ void NodeInspector::update(float fDeltaTime)
     Node* pSelectedNode = Editor::getSelectedNode();
     if (pSelectedNode)
     {
+        bool bActive = pSelectedNode->isActive();
+        if (ImGui::Checkbox("##NodeActive", &bActive))
+        {
+            pSelectedNode->setActive(bActive);
+        }
+        ImGui::SameLine();
+
         const std::string& strName = pSelectedNode->getName();
         if (strName.empty())
         {

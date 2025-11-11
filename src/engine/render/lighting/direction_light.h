@@ -73,8 +73,10 @@ private:
     bool m_bLightCastingMatrixDirty = true;
 
     Shader* m_pShader = nullptr;
-    const ShaderUniformHandle* m_pMVPUniformHandle = nullptr;
-    const ShaderUniformHandle* m_pLightColorUniformHandle = nullptr;
+    const ShaderUniformHandle* m_pPositionUniform = nullptr;
+    const ShaderUniformHandle* m_pColorUniform = nullptr;
+    const ShaderUniformHandle* m_pTextureUniform = nullptr;
+    const ShaderUniformHandle* m_pUseTextureUniform = nullptr;
 
     GLuint m_nPointLightVAO = 0;
     GLuint m_nPointLightVBO = 0;

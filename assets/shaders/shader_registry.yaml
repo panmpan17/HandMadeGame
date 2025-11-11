@@ -69,3 +69,8 @@
   name: 3d_depth
   vertex: assets/shaders/3d_depth.vert
   fragment: assets/shaders/3d_depth.frag
+18:
+  name: simple_gizmos
+  vertex: assets/shaders/billboard.vert
+  fragment: assets/shaders/image.frag
+  cameraUBO: 0
