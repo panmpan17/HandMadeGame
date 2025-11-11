@@ -1,4 +1,4 @@
-.PHONY: config-debug compile-debug compile clean build
+.PHONY: config-debug compile-debug compile ccquick quick clean build
 
 BUILD_DIR := cmake-build
 
@@ -11,6 +11,9 @@ else
 endif
 
 OUTPUT_NAME := MichaelHandMadeGame
+XCODE_PROJECT_FOLDER := xcode_proj
+
+REBUILD ?= 0
 
 config-debug:
 	cmake -S . -B ${BUILD_DIR} -DBUILD_MAC_APP=OFF -DCMAKE_BUILD_TYPE=Debug
@@ -49,6 +52,14 @@ ifeq ($(OS),Windows_NT)
 else
 	@open "$(CMAKE_BIN)"
 endif
+
+port-xcode:
+	@if [ "$(REBUILD)" -eq "1" ]; then \
+		echo "Rebuilding Xcode project..."; \
+		rm -rf ${XCODE_PROJECT_FOLDER}; \
+	fi
+	cmake -S . -B ${XCODE_PROJECT_FOLDER} -G Xcode -DCMAKE_BUILD_TYPE=Debug
+	open -R ${XCODE_PROJECT_FOLDER}/${OUTPUT_NAME}.xcodeproj
 
 clean:
 	@echo "Cleaning up..."

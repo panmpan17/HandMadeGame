@@ -80,10 +80,56 @@ set(SOURCES
     src/editor/node_inspector.cpp
 )
 
+
+file(GLOB_RECURSE ASSETS "${CMAKE_SOURCE_DIR}/assets/*")
+file(GLOB_RECURSE ASSETS_RELATIVE RELATIVE "${CMAKE_SOURCE_DIR}/assets" "${CMAKE_SOURCE_DIR}/assets/*")
+
+
 set(DO_COPY_ASSETS_CUSTOM_COMMAND ON)
 
 if (APPLE)
-    if (BUILD_APP)
+    if (CMAKE_GENERATOR STREQUAL "Xcode")
+        set(DO_COPY_ASSETS_CUSTOM_COMMAND OFF)
+
+        # This will make xcode execute in command mode
+        # add_executable(MichaelHandMadeGame
+        #                ${SOURCES}
+        # )
+
+        # This will make xcode build an application build, then start it
+        add_executable(MichaelHandMadeGame MACOSX_BUNDLE
+                       ${SOURCES}
+        )
+
+        # For macOS builds, mark files as bundle resources
+        
+        set(ASSET_SOURCES "")
+        foreach(asset ${ASSETS_RELATIVE})
+            message(STATUS "Adding asset to bundle: ${asset}")
+            set(src "${CMAKE_SOURCE_DIR}/assets/${asset}")
+            # Compute the relative path inside the bundle
+            get_filename_component(asset_path "${asset}" PATH)
+            set_source_files_properties("${src}" PROPERTIES
+                MACOSX_PACKAGE_LOCATION "Resources/assets/${asset_path}"
+            )
+            list(APPEND ASSET_SOURCES "${src}")
+        endforeach()
+
+        target_compile_options(MichaelHandMadeGame PRIVATE
+            -DMAC_APP_BUNDLE
+        )
+
+        target_sources(MichaelHandMadeGame PRIVATE ${ASSET_SOURCES})
+
+        # In future can modify the xcode project file directly to add a folder reference
+        # to the assets folder, so that changes to assets are automatically reflected
+        # isa = PBXFileReference;
+        # lastKnownFileType = folder;
+        # name = Resources;
+        # path = assets;
+        # sourceTree = "<group>";
+
+    elseif (BUILD_APP)
         add_executable(MichaelHandMadeGame MACOSX_BUNDLE
                     ${SOURCES}
                     ${CMAKE_SOURCE_DIR}/app_packing/icon-windowed.icns
@@ -147,6 +193,19 @@ else()
 endif()
 
 
+if (DO_COPY_ASSETS_CUSTOM_COMMAND)
+    # Copy assets files
+    add_custom_command(
+        OUTPUT ${CMAKE_BINARY_DIR}/assets.timestamp
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+            ${CMAKE_SOURCE_DIR}/assets
+            ${ASSET_BUILD_TARGET_FOLDER}
+        COMMAND ${CMAKE_COMMAND} -E touch ${CMAKE_BINARY_DIR}/assets.timestamp
+        DEPENDS ${ASSETS}
+    )
+    add_custom_target(copy_assets ALL DEPENDS ${CMAKE_BINARY_DIR}/assets.timestamp)
+    add_dependencies(MichaelHandMadeGame copy_assets)
+endif()
 
 # Assets files
 if (DO_COPY_ASSETS_CUSTOM_COMMAND)
