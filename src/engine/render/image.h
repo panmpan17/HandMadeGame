@@ -5,11 +5,15 @@
 
 typedef unsigned int GLuint;
 
+class aiTexture;
+
+
 class Image
 {
 public:
     Image(const std::string& strPath, bool flipVertically = true);
     Image(const std::string_view& strPath, bool flipVertically = true);
+    Image(const aiTexture* pAiTexture, bool flipVertically = true);
     ~Image();
 
     inline int getWidth() const { return m_nWidth; }

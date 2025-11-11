@@ -31,11 +31,12 @@ int main(int nArgumentCount, char* arrArguments[])
 
         window.setupManagers();
 
-        setupPostProcess();
+        // setupPostProcess();
         // createDemo1();
         // createVisualEffectDemo();
-        createLightingShadowDemo();
+        // createLightingShadowDemo();
         // createPingPongGame();
+        sceneTest();
 
         window.mainLoop();
     }

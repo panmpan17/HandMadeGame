@@ -3,6 +3,7 @@
 
 #include <glad/gl.h>
 #include <GLFW/glfw3.h>
+#include <assimp/scene.h>
 
 #include "../../utils/filesystem.h"
 #include "../../utils/file_utils.h"
@@ -60,6 +61,40 @@ Image::Image(const std::string_view& strPath, bool flipVertically/* = true */)
         }
     }
 
+}
+
+Image::Image(const aiTexture* pAiTexture, bool flipVertically/* = true */)
+{
+    stbi_set_flip_vertically_on_load(flipVertically);
+
+    m_strPath = "<embedded_texture>";
+
+    if (pAiTexture->mHeight == 0)
+    {
+        // Compressed texture
+        m_pData = stbi_load_from_memory(
+            reinterpret_cast<const stbi_uc*>(pAiTexture->pcData),
+            pAiTexture->mWidth,
+            &m_nWidth,
+            &m_nHeight,
+            &m_nChannels,
+            0
+        );
+        if (!m_pData)
+        {
+            LOGERR("Failed to load embedded compressed texture");
+        }
+    }
+    else
+    {
+        // Uncompressed texture
+        m_nWidth = pAiTexture->mWidth;
+        m_nHeight = pAiTexture->mHeight;
+        m_nChannels = 4; // Assimp stores uncompressed textures as ARGB8888
+        size_t nDataSize = m_nWidth * m_nHeight * m_nChannels;
+        m_pData = new unsigned char[nDataSize];
+        memcpy(m_pData, pAiTexture->pcData, nDataSize);
+    }
 }
 
 Image::~Image()

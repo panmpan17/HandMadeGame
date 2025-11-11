@@ -131,54 +131,78 @@ Node* loadModel(const std::string_view& strPath, std::shared_ptr<Material>& pMat
 
     LOGLN( "Model {} loaded successfully with {} meshes.", strPath, pScene->mNumMeshes);
 
-    // for (unsigned int i = 0; i < pScene->mNumMaterials; i++)
-    // {
-    //     const aiMaterial* const pMaterial = pScene->mMaterials[i];
-    //     int nDiffuseTexCount = pMaterial->GetTextureCount(aiTextureType_DIFFUSE);
-    //     LOGLN("Material {} has {} DIFFUSE, {} SPECULAR, {} AMBIENT, {} EMISSIVE, {} HEIGHT, {} NORMALS, {} SHININESS, {} OPACITY, {} DISPLACEMENT, {} LIGHTMAP, {} REFLECTION, {} BASE_COLOR, {} NORMAL_CAMERA, {} EMISSION_COLOR, {} METALNESS, {} DIFFUSE_ROUGHNESS, {} AMBIENT_OCCLUSION, {} UNKNOWN, {} SHEEN, {} CLEARCOAT, {} TRANSMISSION, {} MAYA_BASE, {} MAYA_SPECULAR, {} MAYA_SPECULAR_COLOR, {} MAYA_SPECULAR_ROUGHNESS, {} ANISOTROPY, {} GLTF_METALLIC_ROUGHNES",
-    //         pMaterial->GetName().C_Str(),
-    //         pMaterial->GetTextureCount(aiTextureType_DIFFUSE),
-    //         pMaterial->GetTextureCount(aiTextureType_SPECULAR),
-    //         pMaterial->GetTextureCount(aiTextureType_AMBIENT),
-    //         pMaterial->GetTextureCount(aiTextureType_EMISSIVE),
-    //         pMaterial->GetTextureCount(aiTextureType_HEIGHT),
-    //         pMaterial->GetTextureCount(aiTextureType_NORMALS),
-    //         pMaterial->GetTextureCount(aiTextureType_SHININESS),
-    //         pMaterial->GetTextureCount(aiTextureType_OPACITY),
-    //         pMaterial->GetTextureCount(aiTextureType_DISPLACEMENT),
-    //         pMaterial->GetTextureCount(aiTextureType_LIGHTMAP),
-    //         pMaterial->GetTextureCount(aiTextureType_REFLECTION),
-    //         pMaterial->GetTextureCount(aiTextureType_BASE_COLOR),
-    //         pMaterial->GetTextureCount(aiTextureType_NORMAL_CAMERA),
-    //         pMaterial->GetTextureCount(aiTextureType_EMISSION_COLOR),
-    //         pMaterial->GetTextureCount(aiTextureType_METALNESS),
-    //         pMaterial->GetTextureCount(aiTextureType_DIFFUSE_ROUGHNESS),
-    //         pMaterial->GetTextureCount(aiTextureType_AMBIENT_OCCLUSION),
-    //         pMaterial->GetTextureCount(aiTextureType_UNKNOWN),
-    //         pMaterial->GetTextureCount(aiTextureType_SHEEN),
-    //         pMaterial->GetTextureCount(aiTextureType_CLEARCOAT),
-    //         pMaterial->GetTextureCount(aiTextureType_TRANSMISSION),
-    //         pMaterial->GetTextureCount(aiTextureType_MAYA_BASE),
-    //         pMaterial->GetTextureCount(aiTextureType_MAYA_SPECULAR),
-    //         pMaterial->GetTextureCount(aiTextureType_MAYA_SPECULAR_COLOR),
-    //         pMaterial->GetTextureCount(aiTextureType_MAYA_SPECULAR_ROUGHNESS),
-    //         pMaterial->GetTextureCount(aiTextureType_ANISOTROPY),
-    //         pMaterial->GetTextureCount(aiTextureType_GLTF_METALLIC_ROUGHNESS)
-    //         );
-    //     for (unsigned int j = 0; j < nDiffuseTexCount; ++j)
-    //     {
-    //         aiString strTexturePath;
-    //         if (pMaterial->GetTexture(aiTextureType_DIFFUSE, j, &strTexturePath) == AI_SUCCESS)
-    //         {
-    //             LOGLN("Material {} has diffuse texture: {}", i, strTexturePath.C_Str());
-    //         }
-    //     }
-    // }
+    std::vector<std::shared_ptr<Material>> arrMaterials;
+    for (unsigned int i = 0; i < pScene->mNumMaterials; i++)
+    {
+        std::shared_ptr<Material> pNewMaterial = std::make_shared<Material>(pMaterial->getShader());
 
-    return processNode(pScene->mRootNode, pScene, pMaterial);
+        const aiMaterial* const pAiMaterial = pScene->mMaterials[i];
+
+        // LOGLN("Material {} has {} DIFFUSE, {} SPECULAR, {} AMBIENT, {} EMISSIVE, {} HEIGHT, {} NORMALS, {} SHININESS, {} OPACITY, {} DISPLACEMENT, {} LIGHTMAP, {} REFLECTION, {} BASE_COLOR, {} NORMAL_CAMERA, {} EMISSION_COLOR, {} METALNESS, {} DIFFUSE_ROUGHNESS, {} AMBIENT_OCCLUSION, {} UNKNOWN, {} SHEEN, {} CLEARCOAT, {} TRANSMISSION, {} MAYA_BASE, {} MAYA_SPECULAR, {} MAYA_SPECULAR_COLOR, {} MAYA_SPECULAR_ROUGHNESS, {} ANISOTROPY, {} GLTF_METALLIC_ROUGHNES",
+        //     pAiMaterial->GetName().C_Str(),
+        //     pAiMaterial->GetTextureCount(aiTextureType_DIFFUSE),
+        //     pAiMaterial->GetTextureCount(aiTextureType_SPECULAR),
+        //     pAiMaterial->GetTextureCount(aiTextureType_AMBIENT),
+        //     pAiMaterial->GetTextureCount(aiTextureType_EMISSIVE),
+        //     pAiMaterial->GetTextureCount(aiTextureType_HEIGHT),
+        //     pAiMaterial->GetTextureCount(aiTextureType_NORMALS),
+        //     pAiMaterial->GetTextureCount(aiTextureType_SHININESS),
+        //     pAiMaterial->GetTextureCount(aiTextureType_OPACITY),
+        //     pAiMaterial->GetTextureCount(aiTextureType_DISPLACEMENT),
+        //     pAiMaterial->GetTextureCount(aiTextureType_LIGHTMAP),
+        //     pAiMaterial->GetTextureCount(aiTextureType_REFLECTION),
+        //     pAiMaterial->GetTextureCount(aiTextureType_BASE_COLOR),
+        //     pAiMaterial->GetTextureCount(aiTextureType_NORMAL_CAMERA),
+        //     pAiMaterial->GetTextureCount(aiTextureType_EMISSION_COLOR),
+        //     pAiMaterial->GetTextureCount(aiTextureType_METALNESS),
+        //     pAiMaterial->GetTextureCount(aiTextureType_DIFFUSE_ROUGHNESS),
+        //     pAiMaterial->GetTextureCount(aiTextureType_AMBIENT_OCCLUSION),
+        //     pAiMaterial->GetTextureCount(aiTextureType_UNKNOWN),
+        //     pAiMaterial->GetTextureCount(aiTextureType_SHEEN),
+        //     pAiMaterial->GetTextureCount(aiTextureType_CLEARCOAT),
+        //     pAiMaterial->GetTextureCount(aiTextureType_TRANSMISSION),
+        //     pAiMaterial->GetTextureCount(aiTextureType_MAYA_BASE),
+        //     pAiMaterial->GetTextureCount(aiTextureType_MAYA_SPECULAR),
+        //     pAiMaterial->GetTextureCount(aiTextureType_MAYA_SPECULAR_COLOR),
+        //     pAiMaterial->GetTextureCount(aiTextureType_MAYA_SPECULAR_ROUGHNESS),
+        //     pAiMaterial->GetTextureCount(aiTextureType_ANISOTROPY),
+        //     pAiMaterial->GetTextureCount(aiTextureType_GLTF_METALLIC_ROUGHNESS)
+        //     );
+
+        int nDiffuseTexCount = pAiMaterial->GetTextureCount(aiTextureType_DIFFUSE);
+        for (unsigned int j = 0; j < nDiffuseTexCount; ++j)
+        {
+            aiString strTexturePath;
+            if (pAiMaterial->GetTexture(aiTextureType_DIFFUSE, j, &strTexturePath) == AI_SUCCESS)
+            {
+                const aiTexture* pAiTexture = pScene->GetEmbeddedTexture(strTexturePath.C_Str());
+                Image* pDiffuseImage = new Image(pAiTexture);
+                pDiffuseImage->loadTextureToGL();
+                pNewMaterial->setAlbedoMap(pDiffuseImage);
+            }
+        }
+
+        int nNormalTexCount = pAiMaterial->GetTextureCount(aiTextureType_NORMALS);
+        for (unsigned int j = 0; j < nNormalTexCount; ++j)
+        {
+            aiString strTexturePath;
+            if (pAiMaterial->GetTexture(aiTextureType_NORMALS, j, &strTexturePath) == AI_SUCCESS)
+            {
+                const aiTexture* pAiTexture = pScene->GetEmbeddedTexture(strTexturePath.C_Str());
+                Image* pNormalImage = new Image(pAiTexture);
+                pNormalImage->loadTextureToGL();
+                pNewMaterial->setNormalMap(pNormalImage);
+            }
+        }
+
+        arrMaterials.push_back(pNewMaterial);
+    }
+
+
+    return processNode(pScene->mRootNode, pScene, arrMaterials, pMaterial);
 }
 
-Node* processNode(const aiNode* pAiNode, const aiScene* pScene, std::shared_ptr<Material>& pMaterial)
+Node* processNode(const aiNode* pAiNode, const aiScene* pScene, std::vector<std::shared_ptr<Material>>& vecSceneMaterials, std::shared_ptr<Material>& pMaterial)
 {
     aiVector3D scale;
     aiVector3D position;
@@ -198,14 +222,24 @@ Node* processNode(const aiNode* pAiNode, const aiScene* pScene, std::shared_ptr<
     {
         auto pMeshRenderer = new MeshRenderer();
         pMeshRenderer->setMesh(processMesh(pScene->mMeshes[pAiNode->mMeshes[i]], pScene));
-        pMeshRenderer->setMaterial(pMaterial);
+
+        unsigned int nMaterialIndex = pScene->mMeshes[pAiNode->mMeshes[i]]->mMaterialIndex;
+        if (nMaterialIndex < vecSceneMaterials.size())
+        {
+            LOGLN( "Assigning material index {} to mesh.", nMaterialIndex );
+            pMeshRenderer->setMaterial(vecSceneMaterials.at(nMaterialIndex));
+        }
+        else
+        {
+            pMeshRenderer->setMaterial(pMaterial);
+        }
         pNode->addComponent(pMeshRenderer);
     }
 
     // then do the same for each of its children
     for (unsigned int i = 0; i < pAiNode->mNumChildren; i++)
     {
-        Node* pChildNod = processNode(pAiNode->mChildren[i], pScene, pMaterial);
+        Node* pChildNod = processNode(pAiNode->mChildren[i], pScene, vecSceneMaterials, pMaterial);
         pNode->addChildNode(pChildNod);
     }
 

@@ -178,12 +178,6 @@ public:
         }
         return m_oWorldMatrixCache;
     }
-    inline void setChildMatrix(const mat4x4& matrix)
-    {
-        mat4x4_dup(m_oWorldMatrixCache, matrix);
-        m_bWorldMatrixDirty = false;
-        m_bChildMatrixDirty = false;
-    }
     inline bool isChildMatrixDirty() const { return m_bChildMatrixDirty; }
 
     inline Vector3 transformPoint(const Vector3& point)

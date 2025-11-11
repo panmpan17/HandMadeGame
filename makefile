@@ -16,7 +16,7 @@ XCODE_PROJECT_FOLDER := xcode_proj
 REBUILD ?= 0
 
 config-debug:
-	cmake -S . -B ${BUILD_DIR} -DBUILD_MAC_APP=OFF -DCMAKE_BUILD_TYPE=Debug
+	cmake -S . -B ${BUILD_DIR} -DBUILD_APP=OFF -DCMAKE_BUILD_TYPE=Debug
 
 compile-debug:
 	cmake --build ${BUILD_DIR} --parallel 8

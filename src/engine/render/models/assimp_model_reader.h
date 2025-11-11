@@ -4,6 +4,7 @@
 #include <memory>
 #include "mesh.h"
 #include <linmath.h>
+#include <vector>
 // #include "../node.h"
 // #include "../src/components/mesh_renderer.h"
 
@@ -29,7 +30,7 @@ class Material;
 
 Node* loadModel(const std::string_view& strPath, std::shared_ptr<Material>& pMaterial);
 
-Node* processNode(const aiNode* pAiNode, const aiScene* pScene, std::shared_ptr<Material>& pMaterial);
+Node* processNode(const aiNode* pAiNode, const aiScene* pScene, std::vector<std::shared_ptr<Material>>& vecSceneMaterials, std::shared_ptr<Material>& pMaterial);
 
 std::shared_ptr<Mesh> processMesh(const aiMesh* pMesh, const aiScene* pScene);
 

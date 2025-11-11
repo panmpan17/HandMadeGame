@@ -436,3 +436,30 @@ void createLightingShadowDemo()
         pWorldScene->addNode(pDirectionLightNode);
     }
 }
+
+void sceneTest()
+{
+    WorldScene* const pWorldScene = WorldScene::current;
+    Shader* p3DMeshShader = ShaderLoader::getInstance()->getShader("3d_mesh");
+
+    {
+        std::shared_ptr<Material> pMaterial = std::make_shared<Material>(p3DMeshShader);
+
+        Node* pBackPackFbx = loadModel("assets/models/toilet.glb", pMaterial);
+        pBackPackFbx->setScale(1.f);
+        pBackPackFbx->setPosition(0.f, 0.f, 0.f);
+        pWorldScene->addNode(pBackPackFbx);
+    }
+
+    {
+        Node* pDirectionLightNode = new Node(0, 10.f, 0.f);
+        pDirectionLightNode->setRotationQuaternion(Quaternion::fromEulerAngles({-45.f, 45.f, 0.f}));
+
+        DirectionLightComponent* pPointLightComp = new DirectionLightComponent();
+        pPointLightComp->setColor({1.f, 1.f, 1.f});
+        pPointLightComp->setIntensity(1.f);
+        pDirectionLightNode->addComponent(pPointLightComp);
+
+        pWorldScene->addNode(pDirectionLightNode);
+    }
+}
