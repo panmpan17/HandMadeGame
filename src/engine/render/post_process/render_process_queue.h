@@ -22,11 +22,11 @@ public:
     inline bool isActive() const { return m_bActive; }
     inline void setActive(bool bActive) { m_bActive = bActive; }
 
+    virtual void initialize() = 0;
+
 protected:
     RenderProcessQueue* m_pProcessQueue = nullptr;
     bool m_bActive = true;
-
-    virtual void initialize() = 0;
 
     static void registerShaderPosAndUV(Shader* pShader);
     static void initializeRenderTextureAndFBO(GLuint& nFBO, GLuint& nTexture, int nWidth, int nHeight);
@@ -40,9 +40,6 @@ public:
 
     RenderProcessQueue(Window* pWindow);
     ~RenderProcessQueue();
-
-    // void resize(int width, int height);
-    void setupProcesses();
 
     void beginFrame();
     void endFrame();
@@ -65,7 +62,7 @@ public:
 
     inline int getProcessCount() const { return m_oProcessArray.getSize(); }
     inline IRenderProcess* getProcessAt(int index) const { return m_oProcessArray.getElement(index); }
-    inline int addProcess(IRenderProcess* pProcess) { return m_oProcessArray.addElement(pProcess); }
+    inline int addProcess(IRenderProcess* pProcess) { pProcess->initialize(); return m_oProcessArray.addElement(pProcess); }
     inline int getProcessIndex(IRenderProcess* pProcess) const { return m_oProcessArray.getElementIndex(pProcess); }
     inline void swapProcesses(int index1, int index2) { m_oProcessArray.swap(index1, index2); }
 

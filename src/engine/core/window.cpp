@@ -194,7 +194,6 @@ void Window::setupManagers()
     setupIMGUIAndEditorWindows();
 
     m_pRenderProcessQueue = new RenderProcessQueue(this);
-    m_pRenderProcessQueue->setupProcesses();
 
     m_pWorldScene = new WorldScene();
     m_pWorldScene->init();

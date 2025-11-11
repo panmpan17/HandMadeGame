@@ -31,6 +31,7 @@ int main(int nArgumentCount, char* arrArguments[])
 
         window.setupManagers();
 
+        setupPostProcess();
         // createDemo1();
         // createVisualEffectDemo();
         createLightingShadowDemo();

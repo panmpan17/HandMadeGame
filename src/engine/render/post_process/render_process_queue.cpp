@@ -151,25 +151,6 @@ void RenderProcessQueue::initializeOriginalFBO()
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void RenderProcessQueue::setupProcesses()
-{
-    auto pGammaCorrection = new GammaCorrection(this);
-    pGammaCorrection->initialize();
-    m_oProcessArray.addElement(pGammaCorrection);
-
-    auto pDifferenceOfGaussian = new DifferenceOfGaussian(this);
-    pDifferenceOfGaussian->initialize();
-    m_oProcessArray.addElement(pDifferenceOfGaussian);
-
-    auto pOrderDithering = new OrderDithering(this);
-    pOrderDithering->initialize();
-    m_oProcessArray.addElement(pOrderDithering);
-
-    auto pBloomTest = new BloomTest(this);
-    pBloomTest->initialize();
-    m_oProcessArray.addElement(pBloomTest);
-}
-
 #pragma mark Drawing every frame
 void RenderProcessQueue::beginFrame()
 {

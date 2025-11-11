@@ -32,6 +32,8 @@ public:
     inline bool isPostProcessEnabled() const { return m_bEnablePostProcess; }
     inline void setPostProcessEnabled(bool enabled) { m_bEnablePostProcess = enabled; }
 
+    inline RenderProcessQueue* getRenderProcessQueue() const { return m_pRenderProcessQueue; }
+
     bool configureAndCreateWindow();
     void setupManagers();
 

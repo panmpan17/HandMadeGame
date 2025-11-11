@@ -1,6 +1,7 @@
 #include "test.h"
 
 #include "../../engine/core/camera.h"
+#include "../../engine/core/window.h"
 #include "../../engine/core/serialization/serializer.h"
 #include "../../engine/core/scene/node.h"
 #include "../../engine/core/scene/world.h"
@@ -13,6 +14,11 @@
 #include "../../engine/render/models/assimp_model_reader.h"
 #include "../../engine/render/lighting/direction_light.h"
 #include "../../engine/render/lighting/point_light.h"
+#include "../../engine/render/post_process/render_process_queue.h"
+#include "../../engine/render/post_process/bloom_test.h"
+#include "../../engine/render/post_process/order_dithering.h"
+#include "../../engine/render/post_process/difference_of_gaussian.h"
+#include "../../engine/render/post_process/gamma_correction.h"
 #include "../../engine/components/render/quad.h"
 #include "../../engine/components/render/triangle.h"
 #include "../../engine/components/render/character2d.h"
@@ -23,6 +29,26 @@
 #include "../../engine/components/particle/particle_lifetime_change.h"
 
 
+void setupPostProcess()
+{
+    RenderProcessQueue* pQueue;
+    if (!Window::ins || !(pQueue = Window::ins->getRenderProcessQueue()))
+    {
+        return;
+    }
+
+    auto pGammaCorrection = new GammaCorrection(pQueue);
+    pQueue->addProcess(pGammaCorrection);
+
+    auto pDifferenceOfGaussian = new DifferenceOfGaussian(pQueue);
+    pQueue->addProcess(pDifferenceOfGaussian);
+
+    auto pOrderDithering = new OrderDithering(pQueue);
+    pQueue->addProcess(pOrderDithering);
+
+    auto pBloomTest = new BloomTest(pQueue);
+    pQueue->addProcess(pBloomTest);
+}
 
 void createDemo1()
 {
