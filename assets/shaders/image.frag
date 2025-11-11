@@ -16,6 +16,8 @@ void main()
     if (u_useTexture)
     {
         vec4 textColor = texture(u_tex0, uv);
+        if (textColor.a < 0.01)
+            discard;
         fragment = textColor * u_imageColor;
     }
     else

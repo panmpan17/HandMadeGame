@@ -1,9 +1,9 @@
 #include "paddle_control.h"
-#include "../../input_handle.h"
-#include "../../node.h"
-#include "../../components/quad.h"
-#include "../../draw/shader_loader.h"
-#include "../../debug_macro.h"
+#include "../../engine/core/input/input_manager.h"
+#include "../../engine/core/scene/node.h"
+#include "../../engine/components/render/quad.h"
+#include "../../engine/render/shader_loader.h"
+#include "../../engine/core/debug_macro.h"
 
 #define BIND_CALLBACK_1(func) std::bind(&PaddleControl::func, this, std::placeholders::_1)
 
@@ -72,20 +72,20 @@ void PaddleControl::update(float fDeltaTime)
     }
 
     float fMoveDistance = m_fMaxSpeed * fDeltaTime;
-    float posY = m_pNode->getPositionY();
+    float posY = m_pNode->getPosition().y;
     if (m_bUpPressed && !m_bDownPressed)
     {
         posY += fMoveDistance;
 
         if (posY > m_fPositionMaxY) posY = m_fPositionMaxY;
-        m_pNode->setPosition(m_pNode->getPositionX(), posY);
+        m_pNode->setPosition(m_pNode->getPosition().x, posY);
     }
     else if (m_bDownPressed && !m_bUpPressed)
     {
         posY -= fMoveDistance;
 
         if (posY < m_fPositionMinY) posY = m_fPositionMinY;
-        m_pNode->setPosition(m_pNode->getPositionX(), posY);
+        m_pNode->setPosition(m_pNode->getPosition().x, posY);
     }
 }
 
@@ -93,19 +93,20 @@ void PaddleControl::updateAI(float fDeltaTime)
 {
     if (!m_pPong) return;
 
-    float fBallY = m_pPong->getPositionY();
+    float fBallY = m_pPong->getPosition().y;
+    float pNodeY = m_pNode->getPosition().y;
 
-    if (fBallY > m_pNode->getPositionY() + 0.3)
+    if (fBallY > pNodeY + 0.3)
     {
         m_bUpPressed = true;
         m_bDownPressed = false;
     }
-    else if (fBallY < m_pNode->getPositionY() - 0.3)
+    else if (fBallY < pNodeY - 0.3)
     {
         m_bUpPressed = false;
         m_bDownPressed = true;
     }
-    else if (fabs(fBallY - m_pNode->getPositionY()) <= 0.03f)
+    else if (fabs(fBallY - pNodeY) <= 0.03f)
     {
         m_bUpPressed = false;
         m_bDownPressed = false;

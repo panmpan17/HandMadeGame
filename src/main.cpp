@@ -1,7 +1,22 @@
-#include "window.h"
-#include "error_handler.h"
+#include "engine/core/window.h"
+#include "engine/core/error_handler.h"
 
-int main() {
+#include "game/testing/test.h"
+#include "game/pingpong/game.h"
+
+#include "utils/file_utils.h"
+
+
+int main(int nArgumentCount, char* arrArguments[])
+{
+#if IS_DEBUG_VERSION
+    if (nArgumentCount >= 2)
+    {
+        LOGLN("Setting resource path to: {}", arrArguments[1]);
+        FileUtils::setResourcesPath(arrArguments[1]);
+    }
+#endif
+
     registerSignalHandlers();
 
     Window window;
@@ -9,18 +24,24 @@ int main() {
     try
     {
         window.setResizable(true);
-        window.configureAndCreateWindow();
-
-        if (!window.isValid())
+        if (!window.configureAndCreateWindow())
         {
             return -1; // Initialization failed
         }
 
-        window.start();
+        window.setupManagers();
+
+        setupPostProcess();
+        // createDemo1();
+        // createVisualEffectDemo();
+        createLightingShadowDemo();
+        // createPingPongGame();
+
+        window.mainLoop();
     }
     catch (const std::exception& e)
     {
-        std::cerr << 20 << e.what() << '\n';
+        std::cerr << "main.cpp catch exception: " << e.what() << '\n';
         return -1;
     }
 

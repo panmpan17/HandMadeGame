@@ -12,7 +12,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 
 # Options
-option(BUILD_MAC_APP "Build as a macOS .app bundle" OFF)
+option(BUILD_APP "Build as a macOS .app bundle" OFF)
 
 # Default to Release if nothing is specified
 if(NOT DEFINED CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
@@ -29,47 +29,55 @@ endif()
 
 # Source files
 set(SOURCES
-    "src/main.cpp"
-    "src/post_process/render_process_queue.cpp"
-    "src/post_process/order_dithering.cpp"
-    "src/post_process/bloom_test.cpp"
-    "src/post_process/difference_of_gaussian.cpp"
-    "src/camera.cpp"
-    "src/error_handler.cpp"
-    "src/window.cpp"
-    "src/random.cpp"
-    "src/serialization/serializer.cpp"
-    "src/serialization/type_registry.cpp"
-    "src/node.cpp"
-    "src/models/mesh.cpp"
-    "src/models/simple_obj_reader.cpp"
-    "src/models/assimp_model_reader.cpp"
-    "src/game/pingpong/pong.cpp"
-    "src/game/pingpong/paddle_control.cpp"
-    "src/input_handle.cpp"
-    "src/vector.cpp"
-    "src/light_manager.cpp"
-    "src/components/sprite_animation.cpp"
-    "src/components/mesh_renderer.cpp"
-    "src/components/component.cpp"
-    "src/components/quad.cpp"
-    "src/components/character2d.cpp"
-    "src/components/movement.cpp"
-    "src/components/rotate.cpp"
-    "src/components/triangle.cpp"
-    "src/components/particle/particle_spawn.cpp"
-    "src/components/particle/particle_system.cpp"
-    "src/components/particle/simple_particle_system.cpp"
-    "src/components/particle/particle_lifetime_change.cpp"
-    "src/components/first_person_free_control_camera.cpp"
-    "src/file_utils.cpp"
-    "src/world.cpp"
-    "src/draw/image.cpp"
-    "src/draw/shader_loader.cpp"
-    "src/draw/shader.cpp"
-    "src/editor/camera_inspector.cpp"
-    "src/editor/hierarchy_view.cpp"
-    "src/editor/post_process_inspector.cpp"
+    src/utils/file_utils.cpp
+    src/utils/file_watch_dog.cpp
+    src/utils/player_preference.cpp
+    src/game/pingpong/game.cpp
+    src/game/pingpong/pong.cpp
+    src/game/pingpong/paddle_control.cpp
+    src/game/testing/test.cpp
+    src/engine/core/camera.cpp
+    src/engine/core/error_handler.cpp
+    src/engine/core/input/input_manager.cpp
+    src/engine/core/window.cpp
+    src/engine/core/serialization/type_registry.cpp
+    src/engine/core/serialization/serializer.cpp
+    src/engine/core/math/random.cpp
+    src/engine/core/math/vector.cpp
+    src/engine/core/scene/node.cpp
+    src/engine/core/scene/world.cpp
+    src/engine/render/post_process/render_process_queue.cpp
+    src/engine/render/post_process/order_dithering.cpp
+    src/engine/render/post_process/bloom_test.cpp
+    src/engine/render/post_process/difference_of_gaussian.cpp
+    src/engine/render/post_process/gamma_correction.cpp
+    src/engine/render/image.cpp
+    src/engine/render/shader_loader.cpp
+    src/engine/render/models/mesh.cpp
+    src/engine/render/models/simple_obj_reader.cpp
+    src/engine/render/models/assimp_model_reader.cpp
+    src/engine/render/shader.cpp
+    src/engine/render/skybox.cpp
+    src/engine/render/lighting/light_manager.cpp
+    src/engine/render/lighting/direction_light.cpp
+    src/engine/render/lighting/point_light.cpp
+    src/engine/components/input/first_person_free_control_camera.cpp
+    src/engine/components/component.cpp
+    src/engine/components/render/sprite_animation.cpp
+    src/engine/components/render/mesh_renderer.cpp
+    src/engine/components/render/quad.cpp
+    src/engine/components/render/character2d.cpp
+    src/engine/components/render/triangle.cpp
+    src/engine/components/particle/particle_spawn.cpp
+    src/engine/components/particle/particle_system.cpp
+    src/engine/components/particle/simple_particle_system.cpp
+    src/engine/components/particle/particle_lifetime_change.cpp
+    src/engine/components/transform/movement.cpp
+    src/engine/components/transform/rotate.cpp
+    src/main.cpp
+    src/editor/hierarchy_view.cpp
+    src/editor/post_process_inspector.cpp
+    src/editor/node_inspector.cpp
 )
 
 
@@ -121,7 +129,7 @@ if (APPLE)
         # path = assets;
         # sourceTree = "<group>";
 
-    elseif (BUILD_MAC_APP)
+    elseif (BUILD_APP)
         add_executable(MichaelHandMadeGame MACOSX_BUNDLE
                     ${SOURCES}
                     ${CMAKE_SOURCE_DIR}/app_packing/icon-windowed.icns
@@ -140,7 +148,7 @@ if (APPLE)
         )
 
         add_custom_command(TARGET MichaelHandMadeGame POST_BUILD
-            COMMAND codesign --force --deep --sign "ApplicationCodeSign"
+            COMMAND codesign --force --deep --verify --verbose --sign -
                     "$<TARGET_BUNDLE_DIR:MichaelHandMadeGame>"
         )
 
@@ -151,6 +159,8 @@ if (APPLE)
 
         set(EXECUTABLE_PATH ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
         set(ASSET_BUILD_TARGET_FOLDER ${EXECUTABLE_PATH}/assets)
+
+        set(DO_COPY_ASSETS_CUSTOM_COMMAND OFF)
     endif()
 
     target_compile_options(MichaelHandMadeGame PRIVATE
@@ -158,8 +168,11 @@ if (APPLE)
         -Wno-delete-abstract-non-virtual-dtor
     )
 else()
+    enable_language(RC)
+    
     add_executable(MichaelHandMadeGame
                    ${SOURCES}
+                   app_packing/appicon.rc
     )
 
     set(EXECUTABLE_PATH ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
@@ -180,6 +193,21 @@ else()
 endif()
 
 
+if (DO_COPY_ASSETS_CUSTOM_COMMAND)
+    # Copy assets files
+    add_custom_command(
+        OUTPUT ${CMAKE_BINARY_DIR}/assets.timestamp
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+            ${CMAKE_SOURCE_DIR}/assets
+            ${ASSET_BUILD_TARGET_FOLDER}
+        COMMAND ${CMAKE_COMMAND} -E touch ${CMAKE_BINARY_DIR}/assets.timestamp
+        DEPENDS ${ASSETS}
+    )
+    add_custom_target(copy_assets ALL DEPENDS ${CMAKE_BINARY_DIR}/assets.timestamp)
+    add_dependencies(MichaelHandMadeGame copy_assets)
+endif()
+
+# Assets files
 if (DO_COPY_ASSETS_CUSTOM_COMMAND)
     # Copy assets files
     add_custom_command(

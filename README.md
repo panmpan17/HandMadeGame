@@ -46,12 +46,12 @@ Requirements:
 
 With make
 ```bash
-$ make compile # the exe should be under "cmake-build/bin/"
+$ make build # When exe is bult, will automatically reveal in File Explorer
 ```
 
 Without make
 ```bash
-$ cmake -S . -B ${BUILD_DIR} -DBUILD_MAC_APP=OFF -DCMAKE_BUILD_TYPE=Debug
+$ cmake -S . -B ${BUILD_DIR} -DBUILD_APP=OFF -DCMAKE_BUILD_TYPE=Debug
 $ cmake --build ${BUILD_DIR} --parallel <cpu count>
 ```
 

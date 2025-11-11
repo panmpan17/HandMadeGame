@@ -3,7 +3,7 @@
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
-#include "../camera.h"
+#include "../engine/core/camera.h"
 
 
 CameraInspector::CameraInspector()
@@ -20,7 +20,7 @@ void CameraInspector::update(float fDeltaTime)
     ImGui::SetWindowSize(ImVec2(300, 130), ImGuiCond_FirstUseEver);
     ImGui::SetWindowPos(ImVec2(5, 25), ImGuiCond_FirstUseEver);
 
-    bool bIsOrtho = Camera::main->isUsingOrthoProjection();
+    bool bIsOrtho = Camera::main->getUsingOrthoProjection();
     if (ImGui::Checkbox("Ortho", &bIsOrtho))
     {
         Camera::main->setUseOrthoProjection(bIsOrtho);

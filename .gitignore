@@ -12,3 +12,5 @@ cmake-build/
 *.ini
 __pycache__/
 xcode_proj/
+player_preferences.cfg
+crash_log.log

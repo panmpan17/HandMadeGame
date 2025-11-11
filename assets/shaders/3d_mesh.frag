@@ -1,51 +1,58 @@
 #version 330
 
-layout(std140) uniform CameraMatrices
-{
-    mat4 u_View;
-    mat4 u_Projection;
-    vec3 u_CamPos;
-};
-
-struct DirectionLight // 32
-{
-    vec4 direction; // 12 + 4
-    vec4 color; // 12 + 4
-};
-
-struct PointLight // 48
-{
-    vec4 positionAndRange; // 16
-    vec4 color; // 12 + 4
-    vec4 attenuationParams; // 12 + 4
-};
-
-layout(std140) uniform LightData // 544
-{
-    vec3 u_AmbientLightColor; // 12 + 4
-    
-    DirectionLight u_DirectionLights[4]; // 32 * 4 = 128
-
-    PointLight u_PointLights[8]; // 48 * 8 = 384
-
-    ivec2 u_LightCounts; // 16 + 16
-};
+#include "assets/shaders/base/camera_data.glsl"
+#include "assets/shaders/base/light_data.glsl"
 
 uniform sampler2D u_tex0; // main texture
 uniform sampler2D u_tex1; // specular map
+uniform sampler2D u_tex2; // normal map
+uniform sampler2D u_tex3; // depth map
 uniform int u_textureEnabled; // bitmask for texture usage, 1: main texture, 2: specular map, 3: both
 
 uniform vec2 u_SpecularParams; // x: intensity, y: power
 
+uniform vec3 u_shadowColor;
+
 in vec2 fragUV;
 in vec3 fragPos;
 in vec3 fragNormal;
+in vec4 fragLightSpacePos;
 
 out vec4 fragment;
 
+float shadowCalculation(vec4 lightSpacePos, vec3 normal, vec3 lightDir)
+{
+    vec3 projCoords = lightSpacePos.xyz / lightSpacePos.w;
+    projCoords = projCoords * 0.5 + 0.5;
+
+    float closestDepth = texture(u_tex3, projCoords.xy).r;
+    float currentDepth = projCoords.z;
+
+    // float bias = 0.005;
+    float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);  
+    float shadow = currentDepth - bias > closestDepth ? 1.0 : 0.0;
+
+    return shadow;
+}
+
+vec3 lerp(vec3 a, vec3 b, float f)
+{
+    return a + (b - a) * f;
+}
+
 void main()
 {
-    vec3 norm = normalize(fragNormal);
+    vec3 norm;
+
+    if ((u_textureEnabled & 4) != 0)
+    {
+        vec4 texColor = texture(u_tex2, fragUV);
+        norm = normalize(texColor.xyz * 2.0 - 1.0);
+    }
+    else
+    {
+        norm = normalize(fragNormal);
+    }
 
     vec3 viewDir = normalize(u_CamPos - fragPos);
 
@@ -81,29 +88,25 @@ void main()
         }
     }
 
-    vec4 color = vec4(0);
-
+    vec4 texColor = vec4(1);
     if ((u_textureEnabled & 1) != 0)
     {
-        vec4 texColor = texture(u_tex0, fragUV);
-        color.xyz += texColor.xyz * (u_AmbientLightColor + diffuseSum);
-        color.w = texColor.w; // preserve alpha from texture
-    }
-    else
-    {
-        color.xyz += u_AmbientLightColor + diffuseSum;
-        color.w = 1.0;
+        texColor = texture(u_tex0, fragUV);
     }
 
     if ((u_textureEnabled & 2) != 0)
     {
         vec4 specularMapColor = texture(u_tex1, fragUV);
-        color.xyz += specularSum * specularMapColor.xyz;
-    }
-    else
-    {
-        color.xyz += specularSum;
+        specularSum *= specularMapColor.xyz;
     }
 
-    fragment = color;
+    vec3 noAmbientLightSum = (diffuseSum + specularSum) * texColor.xyz;
+    if ((u_textureEnabled & 8) != 0)
+    {
+        float shadowFactor = shadowCalculation(fragLightSpacePos, norm, normalize(-u_DirectionLights[0].direction.xyz));
+        noAmbientLightSum = lerp(noAmbientLightSum, u_shadowColor, shadowFactor);
+    }
+
+    vec3 lighting = noAmbientLightSum + (u_AmbientLightColor * texColor.xyz);
+    fragment = vec4(lighting, texColor.w);
 }

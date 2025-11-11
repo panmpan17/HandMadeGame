@@ -1,8 +1,9 @@
 #pragma once
 
-#include "../../components/component.h"
-#include "../../vector.h"
-#include "../../physics/box.h"
+#include <linmath.h>
+#include "../../engine/components/component.h"
+#include "../../engine/core/math/vector.h"
+#include "../../engine/physics/box.h"
 
 class PaddleControl;
 
