@@ -26,9 +26,12 @@ void IRenderProcess::registerShaderPosAndUV(Shader* pShader)
     glVertexAttribPointer(nVUVAttr, 2, GL_FLOAT, GL_FALSE, sizeof(VertexWUV), (void*)offsetof(VertexWUV, uv));
 }
 
-void IRenderProcess::initializeRenderTextureAndFBO(GLuint& nFBO, GLuint& nTexture, int nWidth, int nHeight)
+void IRenderProcess::initializeRenderTextureAndFBO(GLuint& nFBO, GLuint& nTexture, int nWidth, int nHeight, bool bGenerateFramebuffer/* = true*/)
 {
-    glGenFramebuffers(1, &nFBO);
+    if (bGenerateFramebuffer)
+    {
+        glGenFramebuffers(1, &nFBO);
+    }
     glBindFramebuffer(GL_FRAMEBUFFER, nFBO);
 
     glGenTextures(1, &nTexture);
@@ -59,11 +62,30 @@ RenderProcessQueue::RenderProcessQueue(Window* pWindow)
     ins = this;
     m_pWindow = pWindow;
 
+    m_pWindow->registerResizeListener(std::bind(&RenderProcessQueue::onWindowSizeChanged, this, std::placeholders::_1));
+
     init(pWindow->GetActualWidth(), pWindow->GetActualHeight());
 }
 
 RenderProcessQueue::~RenderProcessQueue()
 {
+    glDeleteFramebuffers(1, &m_nFBOID_original);
+    glDeleteTextures(1, &m_nRenderTexture_original);
+    glDeleteRenderbuffers(1, &m_nDepthBuffer_original);
+
+    glDeleteBuffers(1, &m_nVertexBuffer);
+    glDeleteVertexArrays(1, &m_nVertexArray);
+
+    int nSize = m_oProcessArray.getCount();
+    for (int i = 0; i < nSize; ++i)
+    {
+        IRenderProcess* pProcess = m_oProcessArray.getElement(i);
+        if (pProcess)
+        {
+            delete pProcess;
+        }
+    }
+    m_oProcessArray.clear();
 }
 
 int RenderProcessQueue::getActualWidth() const { return m_pWindow->GetActualWidth(); }
@@ -122,9 +144,12 @@ void RenderProcessQueue::initializeQuad()
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void RenderProcessQueue::initializeOriginalFBO()
+void RenderProcessQueue::initializeOriginalFBO(bool bGenFramebuffer/* = true*/)
 {
-    glGenFramebuffers(1, &m_nFBOID_original);
+    if (bGenFramebuffer)
+    {
+        glGenFramebuffers(1, &m_nFBOID_original);
+    }
     glBindFramebuffer(GL_FRAMEBUFFER, m_nFBOID_original);
 
     glGenTextures(1, &m_nRenderTexture_original);
@@ -151,6 +176,26 @@ void RenderProcessQueue::initializeOriginalFBO()
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
+void RenderProcessQueue::onWindowSizeChanged(Vector2i oSize)
+{
+    m_nRenderWidth = oSize.x;
+    m_nRenderHeight = oSize.y;
+
+    glDeleteTextures(1, &m_nRenderTexture_original);
+    glDeleteRenderbuffers(1, &m_nDepthBuffer_original);
+    initializeOriginalFBO(false);
+
+    int nSize = m_oProcessArray.getCount();
+    for (int i = 0; i < nSize; ++i)
+    {
+        IRenderProcess* pProcess = m_oProcessArray.getElement(i);
+        if (pProcess)
+        {
+            pProcess->onWindowResize();
+        }
+    }
+}
+
 #pragma mark Drawing every frame
 void RenderProcessQueue::beginFrame()
 {
@@ -172,7 +217,7 @@ void RenderProcessQueue::endFrame()
 
 void RenderProcessQueue::startProcessing()
 {
-    int nSize = m_oProcessArray.getSize();
+    int nSize = m_oProcessArray.getCount();
     for (int i = 0; i < nSize; ++i)
     {
         IRenderProcess* pProcess = m_oProcessArray.getElement(i);

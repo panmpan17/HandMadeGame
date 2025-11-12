@@ -16,6 +16,8 @@ public:
 
     void renderProcess() override;
 
+    void onWindowResize() override;
+
     inline void setHighlightThreshold(float threshold) { m_fHighlightThreshold = threshold; }
     inline float getHighlightThreshold() const { return m_fHighlightThreshold; }
 

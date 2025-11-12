@@ -16,6 +16,8 @@ public:
 
     void renderProcess() override;
 
+    void onWindowResize() override;
+
     inline float getGamma() const { return m_fGamma; }
     inline void setGamma(float fGamma) { m_fGamma = fGamma; }
 

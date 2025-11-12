@@ -16,6 +16,8 @@ public:
 
     void renderProcess() override;
 
+    void onWindowResize() override;
+
 private:
     GLuint m_nFBOID = 0;
     GLuint m_nRenderTexture = 0;

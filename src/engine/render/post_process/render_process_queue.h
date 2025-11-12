@@ -2,6 +2,7 @@
 
 #include "../shader.h"
 #include "../../core/serialization/type_registry.h"
+#include "../../core/math/vector.h"
 #include "../../../utils/expandable_array.h"
 
 typedef unsigned int GLuint;
@@ -24,12 +25,14 @@ public:
 
     virtual void initialize() = 0;
 
+    virtual void onWindowResize() {}
+
 protected:
     RenderProcessQueue* m_pProcessQueue = nullptr;
     bool m_bActive = true;
 
     static void registerShaderPosAndUV(Shader* pShader);
-    static void initializeRenderTextureAndFBO(GLuint& nFBO, GLuint& nTexture, int nWidth, int nHeight);
+    static void initializeRenderTextureAndFBO(GLuint& nFBO, GLuint& nTexture, int nWidth, int nHeight, bool bGenerateFramebuffer = true);
 };
 
 
@@ -105,5 +108,6 @@ private:
 
     void init(int nWidth, int nHeight);
     void initializeQuad();
-    void initializeOriginalFBO();
+    void initializeOriginalFBO(bool bGenFramebuffer = true);
+    void onWindowSizeChanged(Vector2i oSize);
 };

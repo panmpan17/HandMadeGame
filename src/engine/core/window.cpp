@@ -278,7 +278,7 @@ void Window::mainLoop()
         if (m_fRatio != fNewRatio)
         {
             m_fRatio = fNewRatio;
-            m_onWindowResize.invoke(Vector2i(m_oActualSize.x, m_oActualSize.y));
+            m_onWindowResize.invoke(m_oActualSize);
 
             glfwGetWindowSize(m_pWindow, &m_oWindowSize.x, &m_oWindowSize.y);
         }

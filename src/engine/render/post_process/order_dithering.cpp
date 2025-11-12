@@ -63,3 +63,13 @@ void OrderDithering::render()
 
     m_pProcessQueue->setFinalRenderTexture(m_nRenderTexture);
 }
+
+void OrderDithering::onWindowResize()
+{
+    m_nRenderWidth = m_pProcessQueue->getRenderWidth();
+    m_nRenderHeight = m_pProcessQueue->getRenderHeight();
+
+    glDeleteTextures(1, &m_nRenderTexture);
+    
+    initializeRenderTextureAndFBO(m_nFBOID, m_nRenderTexture, m_nRenderWidth, m_nRenderHeight);
+}

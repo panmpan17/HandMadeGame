@@ -16,6 +16,8 @@ public:
 
     void renderProcess() override;
 
+    void onWindowResize() override;
+
     inline float getBlurRadius1() const { return m_fBlurRadius1; }
     inline void setBlurRadius1(float fRadius) { m_fBlurRadius1 = fRadius; }
 

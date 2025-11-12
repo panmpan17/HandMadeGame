@@ -217,3 +217,24 @@ void BloomTest::renderComposite()
 
     m_pProcessQueue->setFinalRenderTexture(m_nRenderTexture_Final);
 }
+
+void BloomTest::onWindowResize()
+{
+    m_nRenderWidth = m_pProcessQueue->getRenderWidth();
+    m_nRenderHeight = m_pProcessQueue->getRenderHeight();
+
+    glDeleteTextures(1, &m_nRenderTexture_ColorHighlight);
+    glDeleteTextures(1, &m_nRenderTexture_HorizontalBlur);
+    glDeleteTextures(1, &m_nRenderTexture_VerticalBlur);
+    glDeleteTextures(1, &m_nRenderTexture_Final);
+
+    int nOneForthWidth = static_cast<int>(m_nRenderWidth * BLUR_TEXTURE_RATIO);
+    int nOneForthHeight = static_cast<int>(m_nRenderHeight * BLUR_TEXTURE_RATIO);
+    initializeRenderTextureAndFBO(m_nFBOID_ColorHighlight, m_nRenderTexture_ColorHighlight, m_nRenderWidth, m_nRenderHeight);
+    initializeRenderTextureAndFBO(m_nFBOID_HorizontalBlur, m_nRenderTexture_HorizontalBlur, nOneForthWidth, nOneForthHeight);
+    initializeRenderTextureAndFBO(m_nFBOID_VerticalBlur, m_nRenderTexture_VerticalBlur, nOneForthWidth, nOneForthHeight);
+    initializeRenderTextureAndFBO(m_nFBOID_Final, m_nRenderTexture_Final, m_nRenderWidth, m_nRenderHeight);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0); // Unbind the FBO when done
+    glBindTexture(GL_TEXTURE_2D, 0); // Unbind any texture when done
+}

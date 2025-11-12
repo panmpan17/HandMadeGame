@@ -228,3 +228,23 @@ void DifferenceOfGaussian::renderComposite()
     m_pProcessQueue->setFinalRenderTexture(m_nRenderTexture_Final);
 }
 
+void DifferenceOfGaussian::onWindowResize()
+{
+    m_nRenderWidth = m_pProcessQueue->getRenderWidth();
+    m_nRenderHeight = m_pProcessQueue->getRenderHeight();
+
+    glDeleteTextures(1, &m_nRenderTexture_Blur1_Horizontal);
+    glDeleteTextures(1, &m_nRenderTexture_Blur1_Vertical);
+    glDeleteTextures(1, &m_nRenderTexture_Blur2_Horizontal);
+    glDeleteTextures(1, &m_nRenderTexture_Blur2_Vertical);
+    glDeleteTextures(1, &m_nRenderTexture_Final);
+
+    int nOneForthWidth = static_cast<int>(m_nRenderWidth * BLUR_TEXTURE_RATIO);
+    int nOneForthHeight = static_cast<int>(m_nRenderHeight * BLUR_TEXTURE_RATIO);
+    initializeRenderTextureAndFBO(m_nFBOID_Blur1_Horizontal, m_nRenderTexture_Blur1_Horizontal, nOneForthWidth, nOneForthHeight);
+    initializeRenderTextureAndFBO(m_nFBOID_BLur1_Vertical, m_nRenderTexture_Blur1_Vertical, nOneForthWidth, nOneForthHeight);
+    initializeRenderTextureAndFBO(m_nFBOID_Blur2_Horizontal, m_nRenderTexture_Blur2_Horizontal, nOneForthWidth, nOneForthHeight);
+    initializeRenderTextureAndFBO(m_nFBOID_BLur2_Vertical, m_nRenderTexture_Blur2_Vertical, nOneForthWidth, nOneForthHeight);
+    initializeRenderTextureAndFBO(m_nFBOID_Final, m_nRenderTexture_Final, m_nRenderWidth, m_nRenderHeight);
+}
+
