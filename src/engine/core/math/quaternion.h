@@ -20,12 +20,12 @@ public:
 
     static Quaternion fromEulerAngles(const Vector3& eulerAngles)
     {
-        float cy = cos(eulerAngles.z * 0.5f);
-        float sy = sin(eulerAngles.z * 0.5f);
-        float cp = cos(eulerAngles.y * 0.5f);
-        float sp = sin(eulerAngles.y * 0.5f);
-        float cr = cos(eulerAngles.x * 0.5f);
-        float sr = sin(eulerAngles.x * 0.5f);
+        float cy = cos(eulerAngles.z / (180.0f / M_PI) * 0.5f);
+        float sy = sin(eulerAngles.z / (180.0f / M_PI) * 0.5f);
+        float cp = cos(eulerAngles.y / (180.0f / M_PI) * 0.5f);
+        float sp = sin(eulerAngles.y / (180.0f / M_PI) * 0.5f);
+        float cr = cos(eulerAngles.x / (180.0f / M_PI) * 0.5f);
+        float sr = sin(eulerAngles.x / (180.0f / M_PI) * 0.5f);
 
         Quaternion q;
         q.w = cr * cp * cy + sr * sp * sy;
@@ -143,19 +143,19 @@ public:
         // roll (x-axis rotation)
         float sinr_cosp = 2.0f * (w * x + y * z);
         float cosr_cosp = 1.0f - 2.0f * (x * x + y * y);
-        outEuler.x = atan2f(sinr_cosp, cosr_cosp);
+        outEuler.x = atan2f(sinr_cosp, cosr_cosp) * (180.0f / M_PI);
 
         // pitch (y-axis rotation)
         float sinp = 2.0f * (w * y - z * x);
         if (fabs(sinp) >= 1)
-            outEuler.y = copysignf(M_PI / 2, sinp); // use 90 degrees if out of range
+            outEuler.y = copysignf(M_PI / 2, sinp) * (180.0f / M_PI); // use 90 degrees if out of range
         else
-            outEuler.y = asinf(sinp);
+            outEuler.y = asinf(sinp) * (180.0f / M_PI);
 
         // yaw (z-axis rotation)
         float siny_cosp = 2.0f * (w * z + x * y);
         float cosy_cosp = 1.0f - 2.0f * (y * y + z * z);
-        outEuler.z = atan2f(siny_cosp, cosy_cosp);
+        outEuler.z = atan2f(siny_cosp, cosy_cosp) * (180.0f / M_PI);
     }
 };
 

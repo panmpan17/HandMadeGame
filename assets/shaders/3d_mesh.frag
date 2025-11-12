@@ -15,7 +15,7 @@ uniform vec3 u_shadowColor;
 
 in vec2 fragUV;
 in vec3 fragPos;
-in vec3 fragNormal;
+in mat3 fragTBN;
 in vec4 fragLightSpacePos;
 
 out vec4 fragment;
@@ -46,12 +46,12 @@ void main()
 
     if ((u_textureEnabled & 4) != 0)
     {
-        vec4 texColor = texture(u_tex2, fragUV);
-        norm = normalize(texColor.xyz * 2.0 - 1.0);
+        vec3 texureNormal = texture(u_tex2, fragUV).rgb * 2.0 - 1.0;
+        norm = normalize(fragTBN * texureNormal);
     }
     else
     {
-        norm = normalize(fragNormal);
+        norm = normalize(fragTBN * vec3(0.0, 0.0, 1.0));
     }
 
     vec3 viewDir = normalize(u_CamPos - fragPos);
@@ -64,6 +64,7 @@ void main()
         vec3 lightDir = normalize(-u_DirectionLights[i].direction.xyz);
         float diff = max(dot(norm, lightDir), 0.0);
         diffuseSum += diff * u_DirectionLights[i].color.xyz;
+        // diffuseSum = vec3(norm);
 
         vec3 reflectDir = reflect(-lightDir, norm);
         float spec = pow(max(dot(viewDir, reflectDir), 0.0), max(u_SpecularParams.y, 32.0));
@@ -88,7 +89,7 @@ void main()
         }
     }
 
-    vec4 texColor = vec4(1);
+    vec4 texColor = vec4(.85);
     if ((u_textureEnabled & 1) != 0)
     {
         texColor = texture(u_tex0, fragUV);
@@ -100,7 +101,7 @@ void main()
         specularSum *= specularMapColor.xyz;
     }
 
-    vec3 noAmbientLightSum = (diffuseSum + specularSum) * texColor.xyz;
+    vec3 noAmbientLightSum = (diffuseSum + diffuseSum) * texColor.xyz;
     if ((u_textureEnabled & 8) != 0)
     {
         float shadowFactor = shadowCalculation(fragLightSpacePos, norm, normalize(-u_DirectionLights[0].direction.xyz));

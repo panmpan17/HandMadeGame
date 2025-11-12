@@ -116,11 +116,15 @@ Node* loadModel(const std::string_view& strPath, std::shared_ptr<Material>& pMat
     if (*strPath.begin() != '/')
     {
         std::string strFullPath = fs::path(FileUtils::getResourcesPath()).append(strPath).string();
-        pScene = importer.ReadFile(strFullPath.c_str(), aiProcess_Triangulate | aiProcess_FlipUVs);
+        pScene = importer.ReadFile(strFullPath.c_str(),
+                                   aiProcess_Triangulate | aiProcess_FlipUVs
+                                   | aiProcess_CalcTangentSpace | aiProcess_GenNormals);
     }
     else
     {
-        pScene = importer.ReadFile(strPath.data(), aiProcess_Triangulate | aiProcess_FlipUVs);
+        pScene = importer.ReadFile(strPath.data(),
+                                   aiProcess_Triangulate | aiProcess_FlipUVs
+                                   | aiProcess_CalcTangentSpace | aiProcess_GenNormals);
     }
 
     if (!pScene || pScene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !pScene->mRootNode) 
@@ -132,6 +136,7 @@ Node* loadModel(const std::string_view& strPath, std::shared_ptr<Material>& pMat
     LOGLN( "Model {} loaded successfully with {} meshes.", strPath, pScene->mNumMeshes);
 
     std::vector<std::shared_ptr<Material>> arrMaterials;
+    /*
     for (unsigned int i = 0; i < pScene->mNumMaterials; i++)
     {
         std::shared_ptr<Material> pNewMaterial = std::make_shared<Material>(pMaterial->getShader());
@@ -197,6 +202,7 @@ Node* loadModel(const std::string_view& strPath, std::shared_ptr<Material>& pMat
 
         arrMaterials.push_back(pNewMaterial);
     }
+    */
 
 
     return processNode(pScene->mRootNode, pScene, arrMaterials, pMaterial);
@@ -251,10 +257,10 @@ std::shared_ptr<Mesh> processMesh(const aiMesh* pAiMesh, const aiScene* pScene)
     std::shared_ptr<Mesh> pMesh = std::make_shared<Mesh>();
 
     pMesh->m_nVertexCount = pAiMesh->mNumVertices;
-    pMesh->m_arrVertices = new VertexWUVNormal[pMesh->m_nVertexCount];
+    pMesh->m_arrVertices = new VertexWUVNormalTangent[pMesh->m_nVertexCount];
     for (unsigned int i = 0; i < pAiMesh->mNumVertices; ++i)
     {
-        VertexWUVNormal& oVertex = pMesh->m_arrVertices[i];
+        VertexWUVNormalTangent& oVertex = pMesh->m_arrVertices[i];
         const aiVector3D& aiPos = pAiMesh->mVertices[i];
         oVertex.pos[0] = aiPos.x;
         oVertex.pos[1] = aiPos.y;
@@ -282,6 +288,35 @@ std::shared_ptr<Mesh> processMesh(const aiMesh* pAiMesh, const aiScene* pScene)
         {
             oVertex.uv[0] = 0.0f;
             oVertex.uv[1] = 0.0f;
+        }
+
+        if (pAiMesh->mTangents)
+        {
+            const aiVector3D& aiTangent = pAiMesh->mTangents[i];
+            oVertex.tangent[0] = aiTangent.x;
+            oVertex.tangent[1] = aiTangent.y;
+            oVertex.tangent[2] = aiTangent.z;
+        }
+        else
+        {
+            oVertex.tangent[0] = 0.0f;
+            oVertex.tangent[1] = 0.0f;
+            oVertex.tangent[2] = 0.0f;
+        }
+
+        // Bitangents can be computed if needed
+        if (pAiMesh->mBitangents)
+        {
+            const aiVector3D& aiBitangent = pAiMesh->mBitangents[i];
+            oVertex.bitangent[0] = aiBitangent.x;
+            oVertex.bitangent[1] = aiBitangent.y;
+            oVertex.bitangent[2] = aiBitangent.z;
+        }
+        else
+        {
+            oVertex.bitangent[0] = 0.0f;
+            oVertex.bitangent[1] = 0.0f;
+            oVertex.bitangent[2] = 0.0f;
         }
     }
 

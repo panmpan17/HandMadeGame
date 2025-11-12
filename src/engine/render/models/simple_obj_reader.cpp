@@ -149,10 +149,10 @@ std::shared_ptr<Mesh> SimpleObjReader::loadWavefrontFile(const std::string_view&
     std::shared_ptr<Mesh> pMesh = std::make_shared<Mesh>();
 
     pMesh->m_nVertexCount = vecUniqueVertices.size();
-    pMesh->m_arrVertices = new VertexWUVNormal[pMesh->m_nVertexCount];
+    pMesh->m_arrVertices = new VertexWUVNormalTangent[pMesh->m_nVertexCount];
     for (int i = 0; i < pMesh->m_nVertexCount; ++i)
     {
-        VertexWUVNormal& oVertex = pMesh->m_arrVertices[i];
+        VertexWUVNormalTangent& oVertex = pMesh->m_arrVertices[i];
         const TriangleFaceVertex& triVert = vecUniqueVertices[i];
         if (triVert.m_nVertexIndex >= 0 && triVert.m_nVertexIndex < vecVertices.size())
         {
@@ -170,6 +170,18 @@ std::shared_ptr<Mesh> SimpleObjReader::loadWavefrontFile(const std::string_view&
             oVertex.normal[0] = vecNormals[triVert.m_nNormalIndex].x;
             oVertex.normal[1] = vecNormals[triVert.m_nNormalIndex].y;
             oVertex.normal[2] = vecNormals[triVert.m_nNormalIndex].z;
+        }
+        if (triVert.m_nNormalIndex >= 0 && triVert.m_nNormalIndex < vecNormals.size())
+        {
+            oVertex.tangent[0] = 0.0f;
+            oVertex.tangent[1] = 0.0f;
+            oVertex.tangent[2] = 0.0f;
+        }
+        if (triVert.m_nNormalIndex >= 0 && triVert.m_nNormalIndex < vecNormals.size())
+        {
+            oVertex.bitangent[0] = 0.0f;;
+            oVertex.bitangent[1] = 0.0f;
+            oVertex.bitangent[2] = 0.0f;
         }
     }
 
