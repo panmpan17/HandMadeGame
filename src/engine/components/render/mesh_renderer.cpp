@@ -174,7 +174,7 @@ void MeshRenderer::draw()
         if (m_pShadowColorUniform)
         {
             const Vector3& vecShadowColor = pMainDirLight->getShadowColor();
-            glUniform3f(m_pShadowColorUniform->m_nLocation, vecShadowColor.x, vecShadowColor.y, vecShadowColor.z);
+            glUniform4f(m_pShadowColorUniform->m_nLocation, vecShadowColor.x, vecShadowColor.y, vecShadowColor.z, pMainDirLight->getShadowIntensity());
         }
     }
 

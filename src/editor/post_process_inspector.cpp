@@ -123,7 +123,7 @@ void PostProcessInspector::updateRenderProcessQueue(IRenderProcess* pProcess)
         }
 
         float threshold = pBloom->getHighlightThreshold();
-        if (ImGui::DragFloat("Highlight Threshold", &threshold, 0.01f, 0.0f, 1.0f))
+        if (ImGui::DragFloat("Highlight Threshold", &threshold, 0.01f, 0.0f, 10.0f))
         {
             pBloom->setHighlightThreshold(threshold);
         }

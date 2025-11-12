@@ -38,15 +38,18 @@ void setupPostProcess()
     }
 
     auto pGammaCorrection = new GammaCorrection(pQueue);
+    pGammaCorrection->setGamma(1.3f);
     pQueue->addProcess(pGammaCorrection);
 
     auto pDifferenceOfGaussian = new DifferenceOfGaussian(pQueue);
+    pDifferenceOfGaussian->setActive(false);
     pQueue->addProcess(pDifferenceOfGaussian);
 
     auto pOrderDithering = new OrderDithering(pQueue);
     pQueue->addProcess(pOrderDithering);
 
     auto pBloomTest = new BloomTest(pQueue);
+    pBloomTest->setHighlightThreshold(1.1f);
     pQueue->addProcess(pBloomTest);
 }
 
@@ -422,6 +425,7 @@ void createLightingShadowDemo()
         pBackPackFbx->setScale(0.01f);
         pBackPackFbx->setPosition(2.f, 0.f, 0.f);
         pBackPackFbx->setRotationQuaternion(Quaternion::fromEulerAngles({0.f, -105.f, 0.f}));
+        pBackPackFbx->addComponent(new Rotate3D(0.f, 20.f, 0.f));
         pWorldScene->addNode(pBackPackFbx);
     }
 

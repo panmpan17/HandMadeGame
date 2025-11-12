@@ -129,6 +129,13 @@ void NodeInspector::updateComponent(Node* pNode, Component* pComponent)
             {
                 pDirLight->setShadowColor(vecShadowColor);
             }
+
+            float fShadowIntensity = pDirLight->getShadowIntensity();
+            ImGui::Text("Shadow Intensity"); ImGui::SameLine();
+            if (ImGui::InputFloat("##DirectionLightShadowIntensity", &fShadowIntensity))
+            {
+                pDirLight->setShadowIntensity(fShadowIntensity);
+            }
         }
     }
     else if (Camera* const pCamera = dynamic_cast<Camera*>(pComponent))

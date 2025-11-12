@@ -11,7 +11,7 @@ uniform int u_textureEnabled; // bitmask for texture usage, 1: main texture, 2: 
 
 uniform vec2 u_SpecularParams; // x: intensity, y: power
 
-uniform vec3 u_shadowColor;
+uniform vec4 u_shadowColor;
 
 in vec2 fragUV;
 in vec3 fragPos;
@@ -20,7 +20,7 @@ in vec4 fragLightSpacePos;
 
 out vec4 fragment;
 
-float shadowCalculation(vec4 lightSpacePos, vec3 normal, vec3 lightDir)
+float shadowCalculation(vec4 lightSpacePos, vec3 normal, vec3 lightDir, float shadowIntensity)
 {
     vec3 projCoords = lightSpacePos.xyz / lightSpacePos.w;
     projCoords = projCoords * 0.5 + 0.5;
@@ -30,13 +30,19 @@ float shadowCalculation(vec4 lightSpacePos, vec3 normal, vec3 lightDir)
 
     // float bias = 0.005;
     float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);  
-    float shadow = currentDepth - bias > closestDepth ? 1.0 : 0.0;
+    float shadow = currentDepth - bias > closestDepth ? shadowIntensity : 0.0;
 
     return shadow;
 }
 
 vec3 lerp(vec3 a, vec3 b, float f)
 {
+    return a + (b - a) * f;
+}
+
+vec3 lerpClamp(vec3 a, vec3 b, float f)
+{
+    f = clamp(f, 0.0, 1.0);
     return a + (b - a) * f;
 }
 
@@ -104,8 +110,8 @@ void main()
     vec3 noAmbientLightSum = (diffuseSum + diffuseSum) * texColor.xyz;
     if ((u_textureEnabled & 8) != 0)
     {
-        float shadowFactor = shadowCalculation(fragLightSpacePos, norm, normalize(-u_DirectionLights[0].direction.xyz));
-        noAmbientLightSum = lerp(noAmbientLightSum, u_shadowColor, shadowFactor);
+        float shadowFactor = shadowCalculation(fragLightSpacePos, norm, normalize(-u_DirectionLights[0].direction.xyz), u_shadowColor.w);
+        noAmbientLightSum = lerpClamp(noAmbientLightSum, u_shadowColor.xyz, shadowFactor);
     }
 
     vec3 lighting = noAmbientLightSum + (u_AmbientLightColor * texColor.xyz);
