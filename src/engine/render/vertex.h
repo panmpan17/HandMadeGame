@@ -25,3 +25,12 @@ typedef struct VertexWUVNormal
     vec2 uv;
     vec3 normal;
 } VertexWUVNormal;
+
+typedef struct VertexWUVNormalTangent
+{
+    vec3 pos;
+    vec2 uv;
+    vec3 normal;
+    vec3 tangent;
+    vec3 bitangent;
+} VertexWUVNormalTangent;

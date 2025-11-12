@@ -61,16 +61,24 @@ void MeshRenderer::bindVertexArray(Shader* const pShader)
     GLuint nVPosAttr = pShader->getAttributeLocation("a_vPos");
     GLuint nVUVAttr = pShader->getAttributeLocation("a_vUV");
     GLuint nVNormalAttr = pShader->getAttributeLocation("a_vNormal");
+    GLuint nVTangentAttr = pShader->getAttributeLocation("a_vTangent");
+    GLuint nVBitangentAttr = pShader->getAttributeLocation("a_vBitangent");
 
     // Enable and set the vertex attributes using the retrieved locations
     glEnableVertexAttribArray(nVPosAttr);
-    glVertexAttribPointer(nVPosAttr, 3, GL_FLOAT, GL_FALSE, sizeof(VertexWUVNormal), (void*)offsetof(VertexWUVNormal, pos));
+    glVertexAttribPointer(nVPosAttr, 3, GL_FLOAT, GL_FALSE, sizeof(VertexWUVNormalTangent), (void*)offsetof(VertexWUVNormalTangent, pos));
 
     glEnableVertexAttribArray(nVUVAttr);
-    glVertexAttribPointer(nVUVAttr, 2, GL_FLOAT, GL_FALSE, sizeof(VertexWUVNormal), (void*)offsetof(VertexWUVNormal, uv));
+    glVertexAttribPointer(nVUVAttr, 2, GL_FLOAT, GL_FALSE, sizeof(VertexWUVNormalTangent), (void*)offsetof(VertexWUVNormalTangent, uv));
 
     glEnableVertexAttribArray(nVNormalAttr);
-    glVertexAttribPointer(nVNormalAttr, 3, GL_FLOAT, GL_FALSE, sizeof(VertexWUVNormal), (void*)offsetof(VertexWUVNormal, normal));
+    glVertexAttribPointer(nVNormalAttr, 3, GL_FLOAT, GL_FALSE, sizeof(VertexWUVNormalTangent), (void*)offsetof(VertexWUVNormalTangent, normal));
+
+    glEnableVertexAttribArray(nVTangentAttr);
+    glVertexAttribPointer(nVTangentAttr, 3, GL_FLOAT, GL_FALSE, sizeof(VertexWUVNormalTangent), (void*)offsetof(VertexWUVNormalTangent, tangent));
+
+    glEnableVertexAttribArray(nVBitangentAttr);
+    glVertexAttribPointer(nVBitangentAttr, 3, GL_FLOAT, GL_FALSE, sizeof(VertexWUVNormalTangent), (void*)offsetof(VertexWUVNormalTangent, bitangent));
 
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
