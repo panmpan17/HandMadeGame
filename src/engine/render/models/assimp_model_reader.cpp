@@ -254,10 +254,8 @@ Node* processNode(const aiNode* pAiNode, const aiScene* pScene, std::vector<std:
 
 std::shared_ptr<Mesh> processMesh(const aiMesh* pAiMesh, const aiScene* pScene)
 {
-    std::shared_ptr<Mesh> pMesh = std::make_shared<Mesh>();
+    std::shared_ptr<Mesh> pMesh = std::make_shared<Mesh>(pAiMesh->mNumVertices, pAiMesh->mNumFaces * 3);
 
-    pMesh->m_nVertexCount = pAiMesh->mNumVertices;
-    pMesh->m_arrVertices = new VertexWUVNormalTangent[pMesh->m_nVertexCount];
     for (unsigned int i = 0; i < pAiMesh->mNumVertices; ++i)
     {
         VertexWUVNormalTangent& oVertex = pMesh->m_arrVertices[i];
@@ -320,8 +318,6 @@ std::shared_ptr<Mesh> processMesh(const aiMesh* pAiMesh, const aiScene* pScene)
         }
     }
 
-    pMesh->m_nIndiceCount = pAiMesh->mNumFaces * 3;
-    pMesh->m_arrIndices = new unsigned int[pMesh->m_nIndiceCount];
     unsigned int index = 0;
     for (unsigned int i = 0; i < pAiMesh->mNumFaces; ++i)
     {
@@ -332,7 +328,7 @@ std::shared_ptr<Mesh> processMesh(const aiMesh* pAiMesh, const aiScene* pScene)
         }
     }
 
-    loadMeshToGPU(pMesh);
+    pMesh->loadToGPU();
 
     return pMesh;
 }

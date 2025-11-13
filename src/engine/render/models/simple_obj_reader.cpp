@@ -146,10 +146,8 @@ std::shared_ptr<Mesh> SimpleObjReader::loadWavefrontFile(const std::string_view&
         }
     }
 
-    std::shared_ptr<Mesh> pMesh = std::make_shared<Mesh>();
+    std::shared_ptr<Mesh> pMesh = std::make_shared<Mesh>(vecUniqueVertices.size(), vecFaces.size() * 3);
 
-    pMesh->m_nVertexCount = vecUniqueVertices.size();
-    pMesh->m_arrVertices = new VertexWUVNormalTangent[pMesh->m_nVertexCount];
     for (int i = 0; i < pMesh->m_nVertexCount; ++i)
     {
         VertexWUVNormalTangent& oVertex = pMesh->m_arrVertices[i];
@@ -185,11 +183,9 @@ std::shared_ptr<Mesh> SimpleObjReader::loadWavefrontFile(const std::string_view&
         }
     }
 
-    pMesh->m_nIndiceCount = vecFaces.size() * 3;
-    pMesh->m_arrIndices = new unsigned int[pMesh->m_nIndiceCount];
     memcpy(pMesh->m_arrIndices, vecFaces.data(), sizeof(unsigned int) * pMesh->m_nIndiceCount);
 
-    loadMeshToGPU(pMesh);
+    pMesh->loadToGPU();
 
     LOGLN("OBJ parsed: {} vertices, {} tex coords, {} normals, {} unique vertices, {} faces", vecVertices.size(), vecTexCoords.size(), vecNormals.size(), vecUniqueVertices.size(), vecFaces.size());
 
