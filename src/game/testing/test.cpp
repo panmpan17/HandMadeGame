@@ -128,14 +128,6 @@ void createDemo1()
 
     oSerializer << pNode3;
 
-    // Particle System
-    // auto pNode4 = new Node(0, 0, 0, 0);
-    // auto particle = new SimpleParticleSystem(10000);
-    // particle->setShader(ShaderLoader::getInstance()->getShader("particle"));
-    // particle->registerBuffer();
-    // pNode4->addComponent(particle);
-    // addNode(pNode4);
-
     auto pNode5 = new Node(0, 0, 0);
     auto particle2 = new ParticleSystem(100, false);
     particle2->setImage(pDustImage);
@@ -233,7 +225,7 @@ void createVisualEffectDemo()
         pWorldScene->setSkybox(pSkybox);
     }
 
-    Shader* p3DMeshShader = ShaderLoader::getInstance()->getShader("3d_mesh");
+    Shader* p3DMeshShader = ShaderLoader::getInstance()->getShader("3d_lit_default");
 
     // Node* pMonkey = loadModel("assets/models/monkey.obj", p3DMeshShader);
     // pMonkey->addComponent(new Rotate3D(10, 30.f, 20.f));
@@ -388,7 +380,7 @@ void createLightingShadowDemo()
         pWorldScene->setSkybox(pSkybox);
     }
 
-    Shader* p3DMeshShader = ShaderLoader::getInstance()->getShader("3d_mesh");
+    Shader* p3DMeshShader = ShaderLoader::getInstance()->getShader("3d_lit_default");
 
     {
         std::shared_ptr<Material> pMaterial = std::make_shared<Material>(p3DMeshShader);
@@ -445,7 +437,7 @@ void createLightingShadowDemo()
 void sceneTest()
 {
     WorldScene* const pWorldScene = WorldScene::current;
-    Shader* p3DMeshShader = ShaderLoader::getInstance()->getShader("3d_mesh");
+    Shader* p3DMeshShader = ShaderLoader::getInstance()->getShader("3d_lit_default");
 
     {
         std::shared_ptr<Material> pMaterial = std::make_shared<Material>(p3DMeshShader);

@@ -1,11 +1,7 @@
 1:
   name: image
-  vertex: assets/shaders/image.vert
-  fragment: assets/shaders/image.frag
-# 2:
-#   name: particle
-#   vertex: assets/shaders/particle.vert
-#   fragment: assets/shaders/particle.frag
+  vertex: assets/shaders/2d/image.vert
+  fragment: assets/shaders/2d/image.frag
 3:
   name: particle_instance
   vertex: assets/shaders/particle_instance.vert
@@ -16,40 +12,40 @@
   fragment: assets/shaders/test.frag
 5:
   name: bloom_filter
-  vertex: assets/shaders/screen_pos.vert
-  fragment: assets/shaders/bloom_filter.frag
+  vertex: assets/shaders/postprocess/screen_pos.vert
+  fragment: assets/shaders/postprocess/bloom_filter.frag
 6:
   name: horizontal_blur
-  vertex: assets/shaders/screen_pos.vert
-  fragment: assets/shaders/horizontal_blur.frag
+  vertex: assets/shaders/postprocess/screen_pos.vert
+  fragment: assets/shaders/postprocess/horizontal_blur.frag
 7:
   name: vertical_blur
-  vertex: assets/shaders/screen_pos.vert
-  fragment: assets/shaders/vertical_blur.frag
+  vertex: assets/shaders/postprocess/screen_pos.vert
+  fragment: assets/shaders/postprocess/vertical_blur.frag
 8:
   name: bloom_composite
-  vertex: assets/shaders/screen_pos.vert
-  fragment: assets/shaders/bloom_composite.frag
+  vertex: assets/shaders/postprocess/screen_pos.vert
+  fragment: assets/shaders/postprocess/bloom_composite.frag
 9:
   name: pure_texture
-  vertex: assets/shaders/screen_pos.vert
-  fragment: assets/shaders/pure_texture.frag
+  vertex: assets/shaders/postprocess/screen_pos.vert
+  fragment: assets/shaders/postprocess/pure_texture.frag
 10:
   name: split_texture
-  vertex: assets/shaders/screen_pos.vert
-  fragment: assets/shaders/split_texture.frag
+  vertex: assets/shaders/postprocess/screen_pos.vert
+  fragment: assets/shaders/postprocess/split_texture.frag
 11:
   name: order_dithering
-  vertex: assets/shaders/screen_pos.vert
-  fragment: assets/shaders/order_dithering.frag
+  vertex: assets/shaders/postprocess/screen_pos.vert
+  fragment: assets/shaders/postprocess/order_dithering.frag
 12:
   name: difference_of_gaussian_composite
-  vertex: assets/shaders/screen_pos.vert
-  fragment: assets/shaders/difference_of_gaussian_composite.frag
+  vertex: assets/shaders/postprocess/screen_pos.vert
+  fragment: assets/shaders/postprocess/difference_of_gaussian_composite.frag
 13:
-  name: 3d_mesh
-  vertex: assets/shaders/3d_mesh.vert
-  fragment: assets/shaders/3d_mesh.frag
+  name: 3d_lit_default
+  vertex: assets/shaders/3d/lit_default.vert
+  fragment: assets/shaders/3d/lit_default.frag
   cameraUBO: 0
   lightUBO: 1
 14:
@@ -58,19 +54,19 @@
   fragment: assets/shaders/point_light.frag
 15:
   name: skybox
-  vertex: assets/shaders/cubemap.vert
-  fragment: assets/shaders/cubemap.frag
+  vertex: assets/shaders/3d/cubemap.vert
+  fragment: assets/shaders/3d/cubemap.frag
   cameraUBO: 0
 16:
   name: gamma_correction
-  vertex: assets/shaders/screen_pos.vert
-  fragment: assets/shaders/gamma_correction.frag
+  vertex: assets/shaders/postprocess/screen_pos.vert
+  fragment: assets/shaders/postprocess/gamma_correction.frag
 17:
   name: 3d_depth
-  vertex: assets/shaders/3d_depth.vert
-  fragment: assets/shaders/3d_depth.frag
+  vertex: assets/shaders/3d/depth.vert
+  fragment: assets/shaders/3d/depth.frag
 18:
   name: simple_gizmos
-  vertex: assets/shaders/billboard.vert
-  fragment: assets/shaders/image.frag
+  vertex: assets/shaders/3d/billboard.vert
+  fragment: assets/shaders/2d/image.frag
   cameraUBO: 0
