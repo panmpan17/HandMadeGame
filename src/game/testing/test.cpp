@@ -238,8 +238,8 @@ void createVisualEffectDemo()
         Image* const pMetallicImage = ImageLoader::getInstance()->getImageByPath("assets/images/container_specular.png");
 
         std::shared_ptr<Material> pMaterial = std::make_shared<Material>(p3DMeshShader);
-        pMaterial->setAlbedoMap(pMainImage);
-        pMaterial->setSpecularMap(pMetallicImage);
+        pMaterial->bindTextureWithImage(SHADER_UNIFORM_TEXTURE_0, pMainImage);
+        pMaterial->bindTextureWithImage(SHADER_UNIFORM_TEXTURE_1, pMetallicImage);
 
         Node* pBackPackObj = loadModel("assets/models/box.obj", pMaterial);
         pBackPackObj->setPosition(-2.f, 0.f, 0.f);
@@ -252,9 +252,9 @@ void createVisualEffectDemo()
         Image* const pMetallicImage = ImageLoader::getInstance()->getImageByPath("assets/models/1001_metallic.jpg");
 
         std::shared_ptr<Material> pMaterial = std::make_shared<Material>(p3DMeshShader);
-        pMaterial->setAlbedoMap(pMainImage);
-        pMaterial->setNormalMap(pNormalImage);
-        pMaterial->setSpecularMap(pMetallicImage);
+        pMaterial->bindTextureWithImage(SHADER_UNIFORM_TEXTURE_0, pMainImage);
+        pMaterial->bindTextureWithImage(SHADER_UNIFORM_TEXTURE_1, pMetallicImage);
+        pMaterial->bindTextureWithImage(SHADER_UNIFORM_TEXTURE_2, pNormalImage);
 
         Node* pBackPackFbx = loadModel("assets/models/back_pack.fbx", pMaterial);
         pBackPackFbx->setScale(0.01f);
@@ -395,8 +395,8 @@ void createLightingShadowDemo()
         Image* const pMetallicImage = ImageLoader::getInstance()->getImageByPath("assets/images/container_specular.png");
 
         std::shared_ptr<Material> pMaterial = std::make_shared<Material>(p3DMeshShader);
-        pMaterial->setAlbedoMap(pMainImage);
-        pMaterial->setSpecularMap(pMetallicImage);
+        pMaterial->bindTextureWithImage(SHADER_UNIFORM_TEXTURE_0, pMainImage);
+        pMaterial->bindTextureWithImage(SHADER_UNIFORM_TEXTURE_1, pMetallicImage);
 
         Node* pBackPackObj = loadModel("assets/models/box.obj", pMaterial);
         pBackPackObj->setPosition(-2.f, 0.f, 0.f);
@@ -409,9 +409,9 @@ void createLightingShadowDemo()
         Image* const pMetallicImage = ImageLoader::getInstance()->getImageByPath("assets/models/1001_metallic.jpg");
 
         std::shared_ptr<Material> pMaterial = std::make_shared<Material>(p3DMeshShader);
-        pMaterial->setAlbedoMap(pMainImage);
-        pMaterial->setNormalMap(pNormalImage);
-        pMaterial->setSpecularMap(pMetallicImage);
+        pMaterial->bindTextureWithImage(SHADER_UNIFORM_TEXTURE_0, pMainImage);
+        pMaterial->bindTextureWithImage(SHADER_UNIFORM_TEXTURE_1, pMetallicImage);
+        pMaterial->bindTextureWithImage(SHADER_UNIFORM_TEXTURE_2, pNormalImage);
 
         Node* pBackPackFbx = loadModel("assets/models/back_pack.fbx", pMaterial);
         pBackPackFbx->setScale(0.01f);

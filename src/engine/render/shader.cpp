@@ -6,6 +6,7 @@
 
 #include "vertex.h"
 #include "shader.h"
+#include "image.h"
 #include "lighting/light_manager.h"
 #include "../core/debug_macro.h"
 #include "../core/camera.h"
@@ -161,12 +162,6 @@ const ShaderUniformHandle* Shader::getUniformHandle(const std::string_view& strN
     }
 
     GLuint nLocation = getUniformLocation(std::string(strName));
-    if (nLocation == GL_INVALID_INDEX)
-    {
-        LOGLN("Uniform '{}' not found in shader '{}'", std::string(strName), m_strName);
-        return nullptr;
-    }
-
     ShaderUniformHandle* pHandle = &m_arrUniformHandles[m_nUniformHandleCount++];
     pHandle->m_nLocation = nLocation;
     pHandle->m_strName = strName;
@@ -203,4 +198,44 @@ void Shader::reloadLightUBOBinding()
         GLuint lightIndex = glGetUniformBlockIndex(m_nProgram, SHADER_GLOBAL_UNIFORM_LIGHTING_DATA.data());
         glUniformBlockBinding(m_nProgram, lightIndex, m_nLightUBOBindingPoint);
     }
+}
+
+
+bool ShaderUniformHandle::sendData(const ShaderUniformHandle* const pHandle, const mat4x4& matrix)
+{
+    if (!pHandle || pHandle->m_nLocation == GL_INVALID_INDEX)
+    {
+        return false;
+    }
+
+    glUniformMatrix4fv(pHandle->m_nLocation, 1, GL_FALSE, reinterpret_cast<const GLfloat*>(&matrix));
+    return true;
+}
+
+bool ShaderUniformHandle::sendTexture(const ShaderUniformHandle* const pHandle, const Image* const pImage, int nIndex)
+{
+    if (!pHandle || pHandle->m_nLocation == GL_INVALID_INDEX || !pImage || !pImage->isGPULoaded())
+    {
+        return false;
+    }
+
+    
+    glActiveTexture(GL_TEXTURE0 + nIndex);
+    glBindTexture(GL_TEXTURE_2D, pImage->getTextureID());
+    glUniform1i(pHandle->m_nLocation, nIndex);
+    return true;
+}
+
+bool ShaderUniformHandle::sendTexture(const ShaderUniformHandle* const pHandle, GLuint nTextureId, int nIndex)
+{
+    if (!pHandle || pHandle->m_nLocation == GL_INVALID_INDEX)
+    {
+        return false;
+    }
+
+    
+    glActiveTexture(GL_TEXTURE0 + nIndex);
+    glBindTexture(GL_TEXTURE_2D, nTextureId);
+    glUniform1i(pHandle->m_nLocation, nIndex);
+    return true;
 }

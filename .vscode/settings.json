@@ -40,10 +40,15 @@
         "external/assimp/test/**": true,
         "external/assimp/doc/**": true,
         "external/assimp/samples/**": true,
+        "external/assimp/code/**": true,
+        "external/assimp/include/**": true,
+        "external/assimp/**": true,
 
         "external/glfw/deps/**": true,
         "external/glfw/examples/**": true,
         "external/glfw/tests/**": true,
+
+        "external/imgui/examples/**": true,
         "cmake-build/**": true
     }
 }

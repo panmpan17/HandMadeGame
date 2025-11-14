@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <linmath.h>
 
 typedef unsigned int GLuint;
 #define GL_INVALID_INDEX 0xFFFFFFFF
@@ -16,10 +17,18 @@ inline constexpr std::string_view SHADER_GLOBAL_UNIFORM_CAMERA_MATRICES = "Camer
 inline constexpr std::string_view SHADER_GLOBAL_UNIFORM_LIGHTING_DATA = "LightData";
 
 
+class Image;
+
+
 struct ShaderUniformHandle
 {
     GLuint m_nLocation;
     std::string_view m_strName;
+
+    static bool sendData(const ShaderUniformHandle* const pHandle, const mat4x4& matrix);
+
+    static bool sendTexture(const ShaderUniformHandle* const pHandle, const Image* const pImage, int nIndex);
+    static bool sendTexture(const ShaderUniformHandle* const pHandle, GLuint nTextureId, int nIndex);
 };
 
 

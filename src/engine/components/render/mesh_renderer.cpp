@@ -33,9 +33,6 @@ void MeshRenderer::initShader(Shader* const pShader)
     // Main 3d shader uniforms
     m_pModelUniform = pShader->getUniformHandle("u_Model");
     m_pSpecularParamUniform = pShader->getUniformHandle("u_SpecularParams");
-    m_pMainTexUniform = pShader->getUniformHandle(SHADER_UNIFORM_TEXTURE_0);
-    m_pSpecularMapUniform = pShader->getUniformHandle(SHADER_UNIFORM_TEXTURE_1);
-    m_pNormalMapUniform = pShader->getUniformHandle(SHADER_UNIFORM_TEXTURE_2);
     m_pTextureEnabledUniform = pShader->getUniformHandle("u_textureEnabled");
 
     // Depth shader uniforms
@@ -128,63 +125,24 @@ void MeshRenderer::draw()
 {
     ASSERT(m_pMesh, "Mesh must be set before drawing the mesh");
 
-    const mat4x4& local = m_pNode->getWorldMatrix();
-
     if (!m_pMaterial || !m_pMaterial->getShader())
     {
         ASSERT(false, "Shader and material not set for MeshRenderer");
         return;
     }
 
-    glUseProgram(m_pMaterial->getShader()->getProgram());
+    m_pMaterial->useShader();
 
-    if (m_pModelUniform)
-    {
-        glUniformMatrix4fv(m_pModelUniform->m_nLocation, 1, GL_FALSE, (const GLfloat*) local);
-    }
-    if (m_pSpecularParamUniform)
-    {
-        glUniform2f(m_pSpecularParamUniform->m_nLocation, 1.f, 32.f);
-    }
+    ShaderUniformHandle::sendData(m_pModelUniform, m_pNode->getWorldMatrix());
 
-    int ntextureBitmask = 0;
-
-    if (m_pMainTexUniform && m_pMaterial && m_pMaterial->getAlbedoMap())
-    {
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, m_pMaterial->getAlbedoMap()->getTextureID());
-        glUniform1i(m_pMainTexUniform->m_nLocation, 0);
-
-        ntextureBitmask |= 1; // Enable main texture
-    }
-
-    if (m_pSpecularMapUniform && m_pMaterial && m_pMaterial->getSpecularMap())
-    {
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, m_pMaterial->getSpecularMap()->getTextureID());
-        glUniform1i(m_pSpecularMapUniform->m_nLocation, 1);
-
-        ntextureBitmask |= 2; // Enable specular map
-    }
-
-    if (m_pNormalMapUniform && m_pMaterial && m_pMaterial->getNormalMap())
-    {
-        glActiveTexture(GL_TEXTURE2);
-        glBindTexture(GL_TEXTURE_2D, m_pMaterial->getNormalMap()->getTextureID());
-        glUniform1i(m_pNormalMapUniform->m_nLocation, 2);
-
-        ntextureBitmask |= 4; // Enable normal map
-    }
+    int ntextureBitmask = m_pMaterial->sendTexturesData();
 
     DirectionLightComponent* pMainDirLight = LightManager::getInstance()->getMainDirectionLightComponent();
     if (pMainDirLight && pMainDirLight->getShadowsEnabled())
     {
-        if (m_pDepthTextureUniform)
+        if (ShaderUniformHandle::sendTexture(m_pDepthTextureUniform, LightManager::getInstance()->getShadowDepthMapTexture(), 3))
         {
-            glActiveTexture(GL_TEXTURE3);
-            glBindTexture(GL_TEXTURE_2D, LightManager::getInstance()->getShadowDepthMapTexture());
-            glUniform1i(m_pDepthTextureUniform->m_nLocation, 3);
-            ntextureBitmask |= 8; // Enable depth texture
+            ntextureBitmask |= (1 << 3); // Enable shadow map texture
         }
 
         if (m_pLightMatrixUniform1)
