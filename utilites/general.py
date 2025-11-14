@@ -1,18 +1,6 @@
 import os
 import argparse
 
-PYTHON_BASE_FOLDER = os.path.dirname(os.path.realpath(__file__))
-DATA_FOLDER = os.path.join(PYTHON_BASE_FOLDER, "data")
-RES_FOLDER = os.path.join(PYTHON_BASE_FOLDER, "resource")
-OUTPUT_FOLDER = os.path.join(PYTHON_BASE_FOLDER, "output")
-
-if not os.path.exists(DATA_FOLDER):
-    os.makedirs(DATA_FOLDER)
-if not os.path.exists(RES_FOLDER):
-    os.makedirs(RES_FOLDER)
-if not os.path.exists(OUTPUT_FOLDER):
-    os.makedirs(OUTPUT_FOLDER)
-
 class Terminal:
     LIGHT_BLUE = '\033[96m'
     GREEN = '\033[92m'
