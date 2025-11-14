@@ -65,20 +65,35 @@ void MeshRenderer::bindVertexArray(Shader* const pShader)
     GLuint nVBitangentAttr = pShader->getAttributeLocation("a_vBitangent");
 
     // Enable and set the vertex attributes using the retrieved locations
-    glEnableVertexAttribArray(nVPosAttr);
-    glVertexAttribPointer(nVPosAttr, 3, GL_FLOAT, GL_FALSE, sizeof(VertexWUVNormalTangent), (void*)offsetof(VertexWUVNormalTangent, pos));
+    if (nVPosAttr != GL_INVALID_VALUE)
+    {
+        glEnableVertexAttribArray(nVPosAttr);
+        glVertexAttribPointer(nVPosAttr, 3, GL_FLOAT, GL_FALSE, sizeof(VertexWUVNormalTangent), (void*)offsetof(VertexWUVNormalTangent, pos));
+    }
 
-    glEnableVertexAttribArray(nVUVAttr);
-    glVertexAttribPointer(nVUVAttr, 2, GL_FLOAT, GL_FALSE, sizeof(VertexWUVNormalTangent), (void*)offsetof(VertexWUVNormalTangent, uv));
+    if (nVUVAttr != GL_INVALID_VALUE)
+    {
+        glEnableVertexAttribArray(nVUVAttr);
+        glVertexAttribPointer(nVUVAttr, 2, GL_FLOAT, GL_FALSE, sizeof(VertexWUVNormalTangent), (void*)offsetof(VertexWUVNormalTangent, uv));
+    }
 
-    glEnableVertexAttribArray(nVNormalAttr);
-    glVertexAttribPointer(nVNormalAttr, 3, GL_FLOAT, GL_FALSE, sizeof(VertexWUVNormalTangent), (void*)offsetof(VertexWUVNormalTangent, normal));
+    if (nVNormalAttr != GL_INVALID_VALUE)
+    {
+        glEnableVertexAttribArray(nVNormalAttr);
+        glVertexAttribPointer(nVNormalAttr, 3, GL_FLOAT, GL_FALSE, sizeof(VertexWUVNormalTangent), (void*)offsetof(VertexWUVNormalTangent, normal));
+    }
 
-    glEnableVertexAttribArray(nVTangentAttr);
-    glVertexAttribPointer(nVTangentAttr, 3, GL_FLOAT, GL_FALSE, sizeof(VertexWUVNormalTangent), (void*)offsetof(VertexWUVNormalTangent, tangent));
+    if (nVTangentAttr != GL_INVALID_VALUE)
+    {
+        glEnableVertexAttribArray(nVTangentAttr);
+        glVertexAttribPointer(nVTangentAttr, 3, GL_FLOAT, GL_FALSE, sizeof(VertexWUVNormalTangent), (void*)offsetof(VertexWUVNormalTangent, tangent));
+    }
 
-    glEnableVertexAttribArray(nVBitangentAttr);
-    glVertexAttribPointer(nVBitangentAttr, 3, GL_FLOAT, GL_FALSE, sizeof(VertexWUVNormalTangent), (void*)offsetof(VertexWUVNormalTangent, bitangent));
+    if (nVBitangentAttr != GL_INVALID_VALUE)
+    {
+        glEnableVertexAttribArray(nVBitangentAttr);
+        glVertexAttribPointer(nVBitangentAttr, 3, GL_FLOAT, GL_FALSE, sizeof(VertexWUVNormalTangent), (void*)offsetof(VertexWUVNormalTangent, bitangent));
+    }
 
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -123,8 +138,14 @@ void MeshRenderer::draw()
 
     glUseProgram(m_pMaterial->getShader()->getProgram());
 
-    glUniformMatrix4fv(m_pModelUniform->m_nLocation, 1, GL_FALSE, (const GLfloat*) local);
-    glUniform2f(m_pSpecularParamUniform->m_nLocation, 1.f, 32.f);
+    if (m_pModelUniform)
+    {
+        glUniformMatrix4fv(m_pModelUniform->m_nLocation, 1, GL_FALSE, (const GLfloat*) local);
+    }
+    if (m_pSpecularParamUniform)
+    {
+        glUniform2f(m_pSpecularParamUniform->m_nLocation, 1.f, 32.f);
+    }
 
     int ntextureBitmask = 0;
 
@@ -178,7 +199,10 @@ void MeshRenderer::draw()
         }
     }
 
-    glUniform1i(m_pTextureEnabledUniform->m_nLocation, ntextureBitmask);
+    if (m_pTextureEnabledUniform)
+    {
+        glUniform1i(m_pTextureEnabledUniform->m_nLocation, ntextureBitmask);
+    }
 
     glBindVertexArray(m_nVertexArray);
     glCullFace(GL_FRONT);

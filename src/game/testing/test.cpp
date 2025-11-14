@@ -460,3 +460,16 @@ void sceneTest()
         pWorldScene->addNode(pDirectionLightNode);
     }
 }
+
+void testShaderMaterial()
+{
+    WorldScene* const pWorldScene = WorldScene::current;
+
+    Shader* pTestShader = ShaderLoader::getInstance()->getShader("test");
+
+    std::shared_ptr<Material> pMaterial = std::make_shared<Material>(pTestShader);
+    Node* pGround = loadModel("assets/models/box.obj", pMaterial);
+    pGround->setPosition(0.f, -3.f, 0.f);
+    pGround->setScale(10.f, 0.5f, 10.f);
+    pWorldScene->addNode(pGround);
+}

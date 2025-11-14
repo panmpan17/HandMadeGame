@@ -1,9 +1,12 @@
 #version 330
 
-in vec3 color;
+#include "assets/shaders/base/voronoi.glsl"
+
+in vec2 fragUV;
 out vec4 fragment;
 
 void main()
 {
-    fragment = vec4(color, .7);
+    float fValue = voronoi(fragUV * 10, 0);
+    fragment = vec4(fValue, fValue, fValue, 1);
 }

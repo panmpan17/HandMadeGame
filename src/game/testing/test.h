@@ -7,3 +7,5 @@ void createVisualEffectDemo();
 void createLightingShadowDemo();
 
 void sceneTest();
+
+void testShaderMaterial();
