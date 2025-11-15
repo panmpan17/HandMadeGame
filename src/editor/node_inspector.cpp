@@ -18,7 +18,7 @@ NodeInspector::~NodeInspector()
 {
 }
 
-void NodeInspector::update(float fDeltaTime)
+void NodeInspector::update()
 {
     ImGui::Begin("Inspector", &m_bCollapsed);
     ImGui::SetWindowSize(ImVec2(300, 130), ImGuiCond_FirstUseEver);

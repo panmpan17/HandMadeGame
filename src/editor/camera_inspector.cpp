@@ -14,7 +14,7 @@ CameraInspector::~CameraInspector()
 {
 }
 
-void CameraInspector::update(float fDeltaTime)
+void CameraInspector::update()
 {
     ImGui::Begin("Camera Inspector", &m_bCollapsed);
     ImGui::SetWindowSize(ImVec2(300, 130), ImGuiCond_FirstUseEver);

@@ -55,9 +55,9 @@ private:
     Vector2i m_oActualSize;
     float m_fRatio = 1.0f;
 
-    double m_fCurrentDrawTime = 0.0;
-    double m_fLastDrawTime = 0.0;
-    float m_fDeltaTime = 0.0;
+    // double m_fCurrentDrawTime = 0.0;
+    // double m_fLastDrawTime = 0.0;
+    // float m_fDeltaTime = 0.0;
 
     WorldScene* m_pWorldScene = nullptr;
 

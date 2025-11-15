@@ -11,6 +11,7 @@
 
 #include "window.h"
 #include "camera.h"
+#include "time.h"
 #include "engine_event_dispatcher.h"
 #include "input/input_manager.h"
 #include "scene/world.h"
@@ -186,6 +187,7 @@ bool Window::configureAndCreateWindow()
 
 void Window::setupManagers()
 {
+    TimeManager::Initialize();
     ImageLoader::Initialize();
     LightManager::Initialize();
     ShaderLoader::Initialize();    
@@ -265,7 +267,7 @@ void Window::mainLoop()
 {
     beforeLoop();
 
-    m_fLastDrawTime = glfwGetTime();
+    TimeManager::getInstance()->onWindowStart();
 
     while (!glfwWindowShouldClose(m_pWindow))
     {
@@ -297,13 +299,12 @@ void Window::runUpdate()
         updateIMGUI();
     }
 
-    m_fCurrentDrawTime = glfwGetTime();
-    m_fDeltaTime = m_fCurrentDrawTime - m_fLastDrawTime;
-    m_fLastDrawTime = m_fCurrentDrawTime;
 
-    EngineEventDispatcher::getInstance().updateEvents(m_fDeltaTime);
+    float fDeltaTime = TimeManager::getInstance()->preUpdate();
 
-    m_pWorldScene->update(m_fDeltaTime);
+    EngineEventDispatcher::getInstance().updateEvents(fDeltaTime);
+
+    m_pWorldScene->update(fDeltaTime);
 }
 
 void Window::updateIMGUI()
@@ -318,7 +319,7 @@ void Window::updateIMGUI()
         IEditorWindow* pWindow = m_oEditorWindows.getElement(i);
         if (pWindow && pWindow->isActive())
         {
-            pWindow->update(m_fDeltaTime);
+            pWindow->update();
         }
     }
 

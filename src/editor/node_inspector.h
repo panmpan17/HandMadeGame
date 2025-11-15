@@ -13,7 +13,7 @@ public:
     NodeInspector();
     ~NodeInspector();
 
-    void update(float fDeltaTime) override;
+    void update() override;
 
 private:
     bool m_bCollapsed = false;

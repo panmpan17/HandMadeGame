@@ -10,6 +10,7 @@
   name: test
   vertex: assets/shaders/test.vert
   fragment: assets/shaders/test.frag
+  timeUBO: 2
 5:
   name: bloom_filter
   vertex: assets/shaders/postprocess/screen_pos.vert

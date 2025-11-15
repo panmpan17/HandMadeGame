@@ -10,6 +10,7 @@
 #include "lighting/light_manager.h"
 #include "../core/debug_macro.h"
 #include "../core/camera.h"
+#include "../core/time.h"
 #include "../../utils/file_utils.h"
 
 
@@ -143,6 +144,7 @@ void Shader::reload()
 
     reloadCameraUBOBinding();
     reloadLightUBOBinding();
+    reloadTimeDataUBOBinding();
 }
 
 const ShaderUniformHandle* Shader::getUniformHandle(const std::string_view& strName)
@@ -200,6 +202,21 @@ void Shader::reloadLightUBOBinding()
     }
 }
 
+void Shader::setTimeDataUBOBindingPoint(GLuint nBindingPoint)
+{
+    m_nTimeDataUBOBindingPoint = nBindingPoint;
+    reloadTimeDataUBOBinding();
+}
+
+void Shader::reloadTimeDataUBOBinding()
+{
+    if (m_nTimeDataUBOBindingPoint != GL_INVALID_INDEX && TimeManager::getInstance())
+    {
+        glBindBufferBase(GL_UNIFORM_BUFFER, m_nTimeDataUBOBindingPoint, TimeManager::getInstance()->getTimeUBO());
+        GLuint timeIndex = glGetUniformBlockIndex(m_nProgram, SHADER_GLOBAL_UNIFORM_TIME_DATA.data());
+        glUniformBlockBinding(m_nProgram, timeIndex, m_nTimeDataUBOBindingPoint);
+    }
+}
 
 bool ShaderUniformHandle::sendData(const ShaderUniformHandle* const pHandle, const mat4x4& matrix)
 {

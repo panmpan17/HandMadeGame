@@ -32,7 +32,7 @@ HierarchyView::~HierarchyView()
 {
 }
 
-void HierarchyView::update(float fDeltaTime)
+void HierarchyView::update()
 {
     if (ImGui::Begin("Hierarchy View", &m_bCollapsed))
     {

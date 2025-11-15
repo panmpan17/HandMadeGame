@@ -7,6 +7,8 @@ list(APPEND SOURCES
     ${CMAKE_CURRENT_LIST_DIR}/error_handler.h
     ${CMAKE_CURRENT_LIST_DIR}/window.cpp
     ${CMAKE_CURRENT_LIST_DIR}/window.h
+    ${CMAKE_CURRENT_LIST_DIR}/time.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/time.h
 )
 
 # Include sub-directory CMakeLists

@@ -15,7 +15,7 @@ public:
     HierarchyView();
     ~HierarchyView();
 
-    void update(float fDeltaTime) override;
+    void update() override;
 
 private:
     bool m_bCollapsed = false;

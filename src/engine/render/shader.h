@@ -15,6 +15,7 @@ inline constexpr std::string_view SHADER_UNIFORM_MVP = "u_MVP";
 
 inline constexpr std::string_view SHADER_GLOBAL_UNIFORM_CAMERA_MATRICES = "CameraMatrices";
 inline constexpr std::string_view SHADER_GLOBAL_UNIFORM_LIGHTING_DATA = "LightData";
+inline constexpr std::string_view SHADER_GLOBAL_UNIFORM_TIME_DATA = "TimeData";
 
 
 class Image;
@@ -59,6 +60,9 @@ public:
     void setLightUBOBindingPoint(GLuint nBindingPoint);
     void reloadLightUBOBinding();
 
+    void setTimeDataUBOBindingPoint(GLuint nBindingPoint);
+    void reloadTimeDataUBOBinding();
+
 protected:
     GLuint m_nProgram;
     GLuint m_nVertexShader;
@@ -66,6 +70,7 @@ protected:
 
     GLuint m_nCameraUBOBindingPoint = GL_INVALID_INDEX;
     GLuint m_nLightUBOBindingPoint = GL_INVALID_INDEX;
+    GLuint m_nTimeDataUBOBindingPoint = GL_INVALID_INDEX;
 
     int m_nId;
     std::string m_strName;

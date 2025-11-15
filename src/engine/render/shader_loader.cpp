@@ -45,9 +45,10 @@ void ShaderLoader::readRegistryFromFile()
     int nCurrentShaderId = -1;
     GLuint nCameraUBOIndex = GL_INVALID_INDEX;
     GLuint nLightUBOIndex = GL_INVALID_INDEX;
+    GLuint nTimeDataUBOIndex = GL_INVALID_INDEX;
     std::string strCurrentShaderName, strCurrentVertexPath, strCurrentFragmentPath;
 
-    std::function funcCreateShader = [this, &nCurrentShaderId, &nCameraUBOIndex, &nLightUBOIndex, &strCurrentShaderName, &strCurrentVertexPath, &strCurrentFragmentPath]()
+    std::function funcCreateShader = [this, &nCurrentShaderId, &nCameraUBOIndex, &nLightUBOIndex, &nTimeDataUBOIndex, &strCurrentShaderName, &strCurrentVertexPath, &strCurrentFragmentPath]()
     {
         auto pShader = new Shader(nCurrentShaderId, strCurrentShaderName, strCurrentVertexPath, strCurrentFragmentPath);
         if (nCameraUBOIndex != GL_INVALID_INDEX)
@@ -59,6 +60,11 @@ void ShaderLoader::readRegistryFromFile()
         {
             pShader->setLightUBOBindingPoint(nLightUBOIndex);
             LOGLN("Shader ID {} assigned to Light UBO binding point {}", nCurrentShaderId, nLightUBOIndex);
+        }
+        if (nTimeDataUBOIndex != GL_INVALID_INDEX)
+        {
+            pShader->setTimeDataUBOBindingPoint(nTimeDataUBOIndex);
+            LOGLN("Shader ID {} assigned to TimeData UBO binding point {}", nCurrentShaderId, nTimeDataUBOIndex);
         }
         m_mapShaders[nCurrentShaderId] = pShader;
     };
@@ -80,8 +86,9 @@ void ShaderLoader::readRegistryFromFile()
                 strCurrentShaderName = "";
                 strCurrentVertexPath = "";
                 strCurrentFragmentPath = "";
-                nCameraUBOIndex = -1;
-                nLightUBOIndex = -1;
+                nCameraUBOIndex = GL_INVALID_INDEX;
+                nLightUBOIndex = GL_INVALID_INDEX;
+                nTimeDataUBOIndex = GL_INVALID_INDEX;
             }
 
             // Id of the shader
@@ -106,6 +113,10 @@ void ShaderLoader::readRegistryFromFile()
         else if (memcmp(strLine.data() + 2, "lightUBO", 8) == 0)
         {
             nLightUBOIndex = std::stoi(strLine.substr(2 + 10));
+        }
+        else if (memcmp(strLine.data() + 2, "timeUBO", 7) == 0)
+        {
+            nTimeDataUBOIndex = std::stoi(strLine.substr(2 + 9));
         }
     }
 

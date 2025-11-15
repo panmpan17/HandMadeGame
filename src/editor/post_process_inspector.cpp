@@ -23,7 +23,7 @@ PostProcessInspector::~PostProcessInspector()
 {
 }
 
-void PostProcessInspector::update(float fDeltaTime)
+void PostProcessInspector::update()
 {
     if (ImGui::Begin("Post Process Inspector", &m_bCollapsed))
     {
