@@ -3,6 +3,7 @@
 
 #include "game/testing/test.h"
 #include "game/pingpong/game.h"
+#include "game/colorpicker/picker.h"
 
 #include "utils/file_utils.h"
 
@@ -20,24 +21,28 @@ int main(int nArgumentCount, char* arrArguments[])
     registerSignalHandlers();
 
     Window window;
+    ColorPicker colorPicker;
 
     try
     {
         window.setResizable(true);
+        colorPicker.preconfigureWindowObject(&window);
         if (!window.configureAndCreateWindow())
         {
             return -1; // Initialization failed
         }
 
         window.setupManagers();
+        window.setupGameEngineRelatedObject();
 
         // setupPostProcess();
         // createDemo1();
-        testShaderMaterial();
+        // testShaderMaterial();
         // createVisualEffectDemo();
         // createLightingShadowDemo();
         // createPingPongGame();
         // sceneTest();
+        colorPicker.pickerMain();
 
         window.mainLoop();
     }

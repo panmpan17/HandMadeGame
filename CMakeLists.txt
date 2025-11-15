@@ -143,20 +143,6 @@ else()
 endif()
 
 
-if (DO_COPY_ASSETS_CUSTOM_COMMAND)
-    # Copy assets files
-    add_custom_command(
-        OUTPUT ${CMAKE_BINARY_DIR}/assets.timestamp
-        COMMAND ${CMAKE_COMMAND} -E copy_directory
-            ${CMAKE_SOURCE_DIR}/assets
-            ${ASSET_BUILD_TARGET_FOLDER}
-        COMMAND ${CMAKE_COMMAND} -E touch ${CMAKE_BINARY_DIR}/assets.timestamp
-        DEPENDS ${ASSETS}
-    )
-    add_custom_target(copy_assets ALL DEPENDS ${CMAKE_BINARY_DIR}/assets.timestamp)
-    add_dependencies(MichaelHandMadeGame copy_assets)
-endif()
-
 # Assets files
 if (DO_COPY_ASSETS_CUSTOM_COMMAND)
     # Copy assets files

@@ -185,6 +185,16 @@ bool Window::configureAndCreateWindow()
     return true;
 }
 
+void Window::setWindowSize(int nWidth, int nHeight)
+{
+    m_oWindowSize.x = nWidth;
+    m_oWindowSize.y = nHeight;
+    if (m_pWindow)
+    {
+        glfwSetWindowSize(m_pWindow, nWidth, nHeight);
+    }
+}
+
 void Window::setupManagers()
 {
     TimeManager::Initialize();
@@ -193,12 +203,33 @@ void Window::setupManagers()
     ShaderLoader::Initialize();    
 
     setupInputManager();
-    setupIMGUIAndEditorWindows();
 
     m_pRenderProcessQueue = new RenderProcessQueue(this);
-
     m_pWorldScene = new WorldScene();
+}
+
+void Window::setupInputManager()
+{
+    InputManager::Initialize();
+    glfwSetKeyCallback(m_pWindow, &InputManager::onKeyCallback);
+    glfwSetCursorEnterCallback(m_pWindow, &InputManager::onMouseEnterCallback);
+    glfwSetCursorPosCallback(m_pWindow, &InputManager::onMousePosCallback);
+    glfwSetMouseButtonCallback(m_pWindow, &InputManager::onMouseButtonCallback);
+}
+
+void Window::setupGameEngineRelatedObject()
+{
     m_pWorldScene->init();
+
+    setupIMGUIAndEditorWindows();
+
+    InputManager::getInstance()->registerKeyPressCallback(KeyCode::KEY_FUNCTION_3, [](bool pressed) {
+        if (pressed)
+        {
+            Window::ins->m_bShowIMGUI = !Window::ins->m_bShowIMGUI;
+            Preference::setEnableIMGUI(Window::ins->m_bShowIMGUI);
+        }
+    });
 
 #if IS_DEBUG_VERSION
     m_pFileWatchDog = new FileWatchDog("assets/");
@@ -209,24 +240,6 @@ void Window::setupManagers()
     });
     m_pFileWatchDog->startWatching();
 #endif
-}
-
-void Window::setupInputManager()
-{
-    InputManager::Initialize();
-
-    InputManager::getInstance()->registerKeyPressCallback(KeyCode::KEY_FUNCTION_3, [](bool pressed) {
-        if (pressed)
-        {
-            Window::ins->m_bShowIMGUI = !Window::ins->m_bShowIMGUI;
-            Preference::setEnableIMGUI(Window::ins->m_bShowIMGUI);
-        }
-    });
-
-    glfwSetKeyCallback(m_pWindow, &InputManager::onKeyCallback);
-    glfwSetCursorEnterCallback(m_pWindow, &InputManager::onMouseEnterCallback);
-    glfwSetCursorPosCallback(m_pWindow, &InputManager::onMousePosCallback);
-    glfwSetMouseButtonCallback(m_pWindow, &InputManager::onMouseButtonCallback);
 }
 
 void Window::setupIMGUIAndEditorWindows()
@@ -241,9 +254,12 @@ void Window::setupIMGUIAndEditorWindows()
     ImGui_ImplGlfw_InitForOpenGL(m_pWindow, true);          // Second param install_callback=true will install GLFW callbacks and chain to existing ones.
     ImGui_ImplOpenGL3_Init();
 
-    m_oEditorWindows.addElement(new NodeInspector());
-    m_oEditorWindows.addElement(new HierarchyView());
-    m_oEditorWindows.addElement(new PostProcessInspector());
+    if (m_bAddGameRelatedIMGUIWindows)
+    {
+        m_oEditorWindows.addElement(new NodeInspector());
+        m_oEditorWindows.addElement(new HierarchyView());
+        m_oEditorWindows.addElement(new PostProcessInspector());
+    }
 
     for (int i = 0; i < m_oEditorWindows.getSize(); ++i)
     {
@@ -391,7 +407,10 @@ void Window::drawFrame()
     if (m_bShowIMGUI)
     {
 #if IS_DEBUG_VERSION
-        drawFrameInfo();
+        if (m_bShowFPS)
+        {
+            drawFrameInfo();
+        }
 #endif
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

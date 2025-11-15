@@ -32,8 +32,12 @@ public:
     inline Skybox* getSkybox() const { return m_pSkybox; }
     inline void setSkybox(Skybox* pSkybox) { m_pSkybox = pSkybox; }
 
+    inline void setInitEditorCamera(bool bInit) { m_bInitEditorCamera = bInit; }
+
 private:
     PointerExpandableArray<Node*> m_oNodeArray = PointerExpandableArray<Node*>(10);
 
     Skybox* m_pSkybox = nullptr;
+
+    bool m_bInitEditorCamera = true;
 };

@@ -28,14 +28,22 @@ public:
     inline Vector2i& getActualSize() { return m_oActualSize; }
     inline int GetActualWidth() const { return m_oActualSize.x; }
     inline int GetActualHeight() const { return m_oActualSize.y; }
+    void setWindowSize(int nWidth, int nHeight);    
 
     inline bool isPostProcessEnabled() const { return m_bEnablePostProcess; }
     inline void setPostProcessEnabled(bool enabled) { m_bEnablePostProcess = enabled; }
 
     inline RenderProcessQueue* getRenderProcessQueue() const { return m_pRenderProcessQueue; }
 
+    inline void setAddGameRelatedIMGUIWindows(bool bAdd) { m_bAddGameRelatedIMGUIWindows = bAdd; }
+    inline void addEditorWindow(IEditorWindow* pWindow) { m_oEditorWindows.addElement(pWindow); }
+
+    inline void setShowFPS(bool bShow) { m_bShowFPS = bShow; }
+
     bool configureAndCreateWindow();
+
     void setupManagers();
+    void setupGameEngineRelatedObject();
 
     void mainLoop();
 
@@ -66,6 +74,8 @@ private:
     int m_nDrawCallCount = 0;
 
     bool m_bShowIMGUI = false;
+    bool m_bAddGameRelatedIMGUIWindows = true;
+    bool m_bShowFPS = true;
     PointerExpandableArray<IEditorWindow*> m_oEditorWindows = PointerExpandableArray<IEditorWindow*>(2);
 
     FileWatchDog* m_pFileWatchDog = nullptr;
@@ -73,6 +83,7 @@ private:
     Event<Vector2i> m_onWindowResize;
 
     void setupInputManager();
+
     void setupIMGUIAndEditorWindows();
 
     void beforeLoop();

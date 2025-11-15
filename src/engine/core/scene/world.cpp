@@ -22,6 +22,7 @@ WorldScene::~WorldScene()
 
 void WorldScene::init()
 {
+    if (m_bInitEditorCamera)
     {
         auto pNode = new Node(0.f, 0.f, 2.5f);
         pNode->setName("Editor Camera");
