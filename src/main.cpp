@@ -21,12 +21,12 @@ int main(int nArgumentCount, char* arrArguments[])
     registerSignalHandlers();
 
     Window window;
-    ColorPicker colorPicker;
+    // ColorPicker colorPicker;
 
     try
     {
         window.setResizable(true);
-        colorPicker.preconfigureWindowObject(&window);
+        // colorPicker.preconfigureWindowObject(&window);
         if (!window.configureAndCreateWindow())
         {
             return -1; // Initialization failed
@@ -35,14 +35,14 @@ int main(int nArgumentCount, char* arrArguments[])
         window.setupManagers();
         window.setupGameEngineRelatedObject();
 
-        // setupPostProcess();
+        setupPostProcess();
         // createDemo1();
         // testShaderMaterial();
         // createVisualEffectDemo();
-        // createLightingShadowDemo();
+        createLightingShadowDemo();
         // createPingPongGame();
         // sceneTest();
-        colorPicker.pickerMain();
+        // colorPicker.pickerMain();
 
         window.mainLoop();
     }

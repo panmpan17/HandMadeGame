@@ -35,7 +35,7 @@ Quad* g_pColorDisplayQuad = nullptr;
 
 void copyToClipboardShell(const std::string& text)
 {
-    std::string command = "echo \"" + text + "\" | pbcopy";
+    std::string command = "echo \"" + text + "\" | tr -d '\n' | pbcopy";
     std::system(command.c_str());
     
 }
@@ -92,7 +92,7 @@ void ColorPicker::pickerMain()
         {
             vec4 color;
             g_pColorDisplayQuad->getColor(color);
-            std::string strContent = std::format("vec3({}, {}, {})", color[0], color[1], color[2]);
+            std::string strContent = std::format("vec3({:.2f}, {:.2f}, {:.2f})", color[0], color[1], color[2]);
             copyToClipboardShell(strContent);
             // int a = static_cast<int>(color[3] * 255.f);
             // char szColorCode[16];
