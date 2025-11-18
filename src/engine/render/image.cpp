@@ -125,6 +125,14 @@ void Image::loadTextureToGL()
     {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_nWidth, m_nHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, m_pData);
     }
+    else if (m_nChannels == 1)
+    {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, m_nWidth, m_nHeight, 0, GL_RED, GL_UNSIGNED_BYTE, m_pData);
+    }
+    else
+    {
+        LOGERR("Unsupported number of channels ({}) in image: {}", m_nChannels, m_strPath);
+    }
     
     glBindTexture(GL_TEXTURE_2D, 0); // Unbind the texture
 }

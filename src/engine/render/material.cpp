@@ -34,11 +34,12 @@ int Material::sendTexturesData() const
 {
     int nTextureBitmask = 0;
 
-    for (const TextureUniform& texUniform : m_vecTextureUniforms)
+    for (int nTextureIndex = 0; nTextureIndex < static_cast<int>(m_vecTextureUniforms.size()); ++nTextureIndex)
     {
-        if (ShaderUniformHandle::sendTexture(texUniform.pUniformHandle, texUniform.pImage, nTextureBitmask))
+        const TextureUniform& texUniform = m_vecTextureUniforms[nTextureIndex];
+        if (ShaderUniformHandle::sendTexture(texUniform.pUniformHandle, texUniform.pImage, nTextureIndex))
         {
-            nTextureBitmask |= (1 << nTextureBitmask); // Enable corresponding texture
+            nTextureBitmask |= (1 << nTextureIndex); // Enable corresponding texture
         }
     }
 

@@ -436,7 +436,11 @@ void createLightingShadowDemo()
     {
         Shader* pTestShader = ShaderLoader::getInstance()->getShader("test");
 
+        Image* const pNoiseImage = ImageLoader::getInstance()->getImageByPath("assets/shaders/noise_texture/perlin_1024.jpg");
+
         std::shared_ptr<Material> pMaterial = std::make_shared<Material>(pTestShader);
+        pMaterial->bindTextureWithImage("u_perlinNoiseTex", pNoiseImage);
+
         Node* pGround = loadModel("assets/models/box.obj", pMaterial);
         pGround->setPosition(10.f, -3.f, 0.f);
         pGround->setScale(10.f, 0.2f, 10.f);

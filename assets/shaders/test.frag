@@ -3,6 +3,8 @@
 #include "assets/shaders/base/voronoi.glsl"
 #include "assets/shaders/base/time_data.glsl"
 
+uniform sampler2D u_perlinNoiseTex;
+
 in vec2 fragUV;
 out vec4 fragment;
 
@@ -24,7 +26,8 @@ void main()
 
     float waveStrength = voronoi(fragUV * 10, u_Time);
 
-    
-    
+    float perlinValue = texture(u_perlinNoiseTex, fragUV).r;
+    waveStrength *= perlinValue;
+
     fragment = vec4(lerpClamp(baseColor, waveColor, waveStrength), 1);
 }
