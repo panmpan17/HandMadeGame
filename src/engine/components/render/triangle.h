@@ -8,20 +8,6 @@ typedef unsigned int GLuint;
 
 
 
-// REGISTER_CLASS(Triangle)
-// inline std::string Triangle_getTypeName() { return "Triangle"; }
-// namespace
-// { struct Triangle_Registrator
-//     { Triangle_Registrator()
-//     { TypeRegistry::instance().registerType(Triangle_getTypeName(), []() -> ISerializable*
-//     { return new Triangle(); }); } };
-//     static Triangle_Registrator global_Triangle_registrator; }
-
-// class Triangle : public IDrawable
-// {
-
-// };
-
 class Triangle : public IDrawable
 {
 public:

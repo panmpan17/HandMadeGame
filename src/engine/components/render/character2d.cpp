@@ -32,20 +32,8 @@ bool Character2d::deserializeField(DataDeserializer& deserializer, const std::st
     IF_DESERIALIZE_FIELD_CHECK(m_pAnimation)
     {
         size_t nId = std::stoull(strFieldValue.data());
-
         deserializer.getSerializableFromId(nId, [this](ISerializable* pObj) {
             m_pAnimation = static_cast<SpriteAnimation*>(pObj);
-            
-            m_nIdleAnimationIndex = m_pAnimation->getAnimationIndexByName("idle");
-            m_nWalkAnimationIndex = m_pAnimation->getAnimationIndexByName("walk");
-            
-            InputManager::getInstance()->registerKeyPressCallback(KeyCode::KEY_D, [this](bool bPressed) {
-                if (bPressed) {
-                    m_pAnimation->playAnimationInfo(m_nWalkAnimationIndex);
-                } else {
-                    m_pAnimation->playAnimationInfo(m_nIdleAnimationIndex);
-                }
-            });
         });
     }
 
@@ -54,5 +42,18 @@ bool Character2d::deserializeField(DataDeserializer& deserializer, const std::st
 
 void Character2d::onNodeFinishedDeserialization()
 {
+    if (m_pAnimation)
+    {
+        m_nIdleAnimationIndex = m_pAnimation->getAnimationIndexByName("idle");
+        m_nWalkAnimationIndex = m_pAnimation->getAnimationIndexByName("walk");
+        
+        InputManager::getInstance()->registerKeyPressCallback(KeyCode::KEY_D, [this](bool bPressed) {
+            if (bPressed) {
+                m_pAnimation->playAnimationInfo(m_nWalkAnimationIndex);
+            } else {
+                m_pAnimation->playAnimationInfo(m_nIdleAnimationIndex);
+            }
+        });
+    }
 }
 

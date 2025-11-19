@@ -126,38 +126,18 @@ void Quad::serializeToWrapper(DataSerializer& serializer) const
     serializer.ADD_ATTRIBUTES(m_fWidth);
     serializer.ADD_ATTRIBUTES(m_fHeight);
     serializer.ADD_ATTRIBUTES(m_color);
-
-    if (m_pImage)
-    {
-        serializer.ADD_ATTRIBUTES_VALUE(m_pImage, m_pImage->getPath());
-    }
-
-    if (m_pShader)
-    {
-        serializer.ADD_ATTRIBUTES_VALUE(m_pShader, m_pShader->getId());
-    }
+    serializer.ADD_ATTRIBUTES(m_pImage);
+    serializer.ADD_ATTRIBUTES(m_pShader);
 }
 
 bool Quad::deserializeField(DataDeserializer& deserializer, const std::string_view& strFieldName, const std::string_view& strFieldValue)
 {
     if (Component::deserializeField(deserializer, strFieldName, strFieldValue)) return true;
-
     DESERIALIZE_FIELD(m_fWidth);
     DESERIALIZE_FIELD(m_fHeight);
     DESERIALIZE_FIELD(m_color);
-
-    IF_DESERIALIZE_FIELD_CHECK(m_pImage)
-    {
-        m_pImage = ImageLoader::getInstance()->getImageByPath(strFieldValue);
-        return true;
-    }
-
-    IF_DESERIALIZE_FIELD_CHECK(m_pShader)
-    {
-        m_pShader = ShaderLoader::getInstance()->getShader(std::atoi(strFieldValue.data()));
-        return true;
-    }
-
+    DESERIALIZE_FIELD(m_pShader);
+    DESERIALIZE_FIELD(m_pImage);
     return false;
 }
 

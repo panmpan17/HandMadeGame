@@ -47,11 +47,3 @@ protected:
     virtual void onNodeFinishedDeserialization() override;\
 protected:\
     virtual void serializeToWrapper(DataSerializer& serializer) const override;
-
-
-#define COMPONENT_REGISTER_SERIALIZABLE_(T)public:\
-    inline std::string getTypeName() const override { return #T; }\
-    virtual bool deserializeField(DataDeserializer& deserializer, const std::string_view& strFieldName, const std::string_view& strFieldValue) override;\
-    virtual void onNodeFinishedDeserialization() override;\
-protected:\
-    virtual void serializeToWrapper(DataSerializer& serializer) const override;

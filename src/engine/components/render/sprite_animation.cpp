@@ -82,9 +82,6 @@ void SpriteAnimation::serializeToWrapper(DataSerializer& serializer) const
 {
     serializer.ADD_ATTRIBUTES(m_pSprite);
     serializer.ADD_ATTRIBUTES(m_strAnimationFileName);
-
-    // TODO: add m_pSprite link
-    // TODO: add animation infos
 }
 
 bool SpriteAnimation::deserializeField(DataDeserializer& deserializer, const std::string_view& strFieldName, const std::string_view& strFieldValue)

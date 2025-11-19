@@ -7,6 +7,9 @@
 #include <vector>
 #include <functional>
 #include "../math/vector.h"
+#include "../../render/shader.h"
+#include "../../render/shader_loader.h"
+#include "../../render/image_loader.h"
 #include "../../../utils/platform.h"
 
 
@@ -102,6 +105,18 @@ public:
         CHECK_FILE_IS_OPEN;
         m_oOutputFile << strAttributeNames << ": " << strValue << "\n";
     }
+    void addAttributes(const std::string_view& strAttributeNames, const Shader* pShader)
+    {
+        if (!pShader) return;
+        CHECK_FILE_IS_OPEN;
+        m_oOutputFile << strAttributeNames << ": " << pShader->getId() << "\n";
+    }
+    void addAttributes(const std::string_view& strAttributeNames, const Image* pImage)
+    {
+        if (!pImage) return;
+        CHECK_FILE_IS_OPEN;
+        m_oOutputFile << strAttributeNames << ": " << pImage->getPath() << "\n";
+    }
     void addAttributes(const std::string_view& strAttributeNames, ISerializable* pValue);
 
     DataSerializer& operator<<(const ISerializable* pObject);
@@ -155,6 +170,14 @@ public:
     static void deserializeField(bool& outBool, const std::string_view& strFieldValue)
     {
         outBool = std::string(strFieldValue) == "1";
+    }
+    static void deserializeField(Shader*& pShader, const std::string_view& strFieldValue)
+    {
+        pShader = ShaderLoader::getInstance()->getShader(std::atoi(strFieldValue.data()));
+    }
+    static void deserializeField(Image*& pImage, const std::string_view& strFieldValue)
+    {
+        pImage = ImageLoader::getInstance()->getImageByPath(strFieldValue);
     }
 
     DataDeserializer(const std::string_view& strFilename)

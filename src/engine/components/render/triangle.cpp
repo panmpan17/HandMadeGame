@@ -70,20 +70,12 @@ void Triangle::draw()
 
 void Triangle::serializeToWrapper(DataSerializer& serializer) const
 {
-    if (m_pShader)
-    {
-        serializer.ADD_ATTRIBUTES_VALUE(m_pShader, m_pShader->getId());
-    }
+    serializer.ADD_ATTRIBUTES(m_pShader);
 }
 
 bool Triangle::deserializeField(DataDeserializer& deserializer, const std::string_view& strFieldName, const std::string_view& strFieldValue)
 {
-    IF_DESERIALIZE_FIELD_CHECK(m_pShader)
-    {
-        m_pShader = ShaderLoader::getInstance()->getShader(std::atoi(strFieldValue.data()));
-        return true;
-    }
-
+    DESERIALIZE_FIELD(m_pShader);
     return false;
 }
 
