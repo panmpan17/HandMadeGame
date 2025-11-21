@@ -7,6 +7,7 @@
 #include "../../core/window.h"
 #include "../../core/camera.h"
 #include "../../core/debug_macro.h"
+#include "../../core/serialization/serializer.h"
 
 
 constexpr float POINT_LIGHT_SIZE = 0.3f;
@@ -38,6 +39,36 @@ void PointLightComponent::onAddToNode()
 
 
     registerBuffer();
+}
+
+
+bool PointLightComponent::deserializeField(DataDeserializer& deserializer, const std::string_view& strFieldName, const std::string_view& strFieldValue)
+{
+    if (Component::deserializeField(deserializer, strFieldName, strFieldValue)) return true;
+
+    DESERIALIZE_FIELD(m_fRange);
+    DESERIALIZE_FIELD(m_color);
+    DESERIALIZE_FIELD(m_intensity);
+    DESERIALIZE_FIELD(m_fAttenuationConstant);
+    DESERIALIZE_FIELD(m_fAttenuationLinear);
+    DESERIALIZE_FIELD(m_fAttenuationQuadratic);
+
+    return false;
+}
+
+void PointLightComponent::serializeToWrapper(DataSerializer& serializer) const
+{
+    serializer.ADD_ATTRIBUTES(m_fRange);
+    serializer.ADD_ATTRIBUTES(m_color);
+    serializer.ADD_ATTRIBUTES(m_intensity);
+    serializer.ADD_ATTRIBUTES(m_fAttenuationConstant);
+    serializer.ADD_ATTRIBUTES(m_fAttenuationLinear);
+    serializer.ADD_ATTRIBUTES(m_fAttenuationQuadratic);
+}
+
+void PointLightComponent::onNodeFinishedDeserialization()
+{
+    // TODO: does this need to trigger on add to node?
 }
 
 

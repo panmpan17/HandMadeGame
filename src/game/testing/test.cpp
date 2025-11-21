@@ -46,6 +46,7 @@ void setupPostProcess()
     pQueue->addProcess(pDifferenceOfGaussian);
 
     auto pOrderDithering = new OrderDithering(pQueue);
+    pOrderDithering->setActive(false);
     pQueue->addProcess(pOrderDithering);
 
     auto pBloomTest = new BloomTest(pQueue);
@@ -387,6 +388,7 @@ void createLightingShadowDemo()
         Node* pGround = loadModel("assets/models/box.obj", pMaterial);
         pGround->setPosition(0.f, -3.f, 0.f);
         pGround->setScale(10.f, 0.5f, 10.f);
+        pGround->setActive(false);
         pWorldScene->addNode(pGround);
     }
 
@@ -442,7 +444,7 @@ void createLightingShadowDemo()
         pMaterial->bindTextureWithImage("u_perlinNoiseTex", pNoiseImage);
 
         Node* pGround = loadModel("assets/models/box.obj", pMaterial);
-        pGround->setPosition(10.f, -3.f, 0.f);
+        pGround->setPosition(0.f, -3.f, 0.f);
         pGround->setScale(10.f, 0.2f, 10.f);
         pWorldScene->addNode(pGround);
     }

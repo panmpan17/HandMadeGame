@@ -3,6 +3,7 @@
 #include "../component.h"
 #include "../../core/scene/node.h"
 #include "../../core/serialization/type_registry.h"
+#include "../../core/math/vector.h"
 
 
 // class Rotate : public Component
@@ -39,7 +40,7 @@ class Rotate3D : public Component
 {
 public:
     Rotate3D(float fXSpeed = 0, float fYSpeed = 0, float fZSpeed = 0)
-        : m_fXSpeed(fXSpeed), m_fYSpeed(fYSpeed), m_fZSpeed(fZSpeed) {}
+        : m_vecCurrentEulerAngles(fXSpeed, fYSpeed, fZSpeed) {}
 
     virtual bool isIDrawable() const override { return false; }
     virtual bool isUpdatable() const override { return true; }
@@ -49,19 +50,16 @@ public:
         Node* pNode = getNode();
         if (pNode)
         {
-            pNode->rotateQuaternion(Quaternion::fromAxisAngle({ m_fXSpeed, m_fYSpeed, m_fZSpeed }, deltaTime));
+            pNode->rotateQuaternion(Quaternion::fromAxisAngle({ m_vecCurrentEulerAngles.x, m_vecCurrentEulerAngles.y, m_vecCurrentEulerAngles.z }, deltaTime));
         }
     }
 
     virtual void draw() override {}
 
 protected:
-    float m_fXSpeed = 0.0f; // Speed of rotation around the X-axis in degrees per second
-    float m_fYSpeed = 0.0f; // Speed of rotation around the Y-axis in degrees per second
-    float m_fZSpeed = 0.0f; // Speed of rotation around the Z-axis in degrees per second
+    Vector3 m_vecCurrentEulerAngles = { 0.0f, 0.0f, 0.0f };
 
-    // COMPONENT_REGISTER_SERIALIZABLE(Rotate)
+    COMPONENT_REGISTER_SERIALIZABLE(Rotate3D)
 };
 
-// REGISTER_CLASS(Rotate)
-
+REGISTER_CLASS(Rotate3D)

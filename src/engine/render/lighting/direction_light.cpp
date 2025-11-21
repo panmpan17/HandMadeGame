@@ -9,6 +9,7 @@
 #include "../../core/window.h"
 #include "../../core/camera.h"
 #include "../../core/debug_macro.h"
+#include "../../core/serialization/serializer.h"
 
 
 constexpr float GIZMOS_SIZE = 2.f;
@@ -47,6 +48,35 @@ void DirectionLightComponent::onAddToNode()
         pDirectionLightGizmosImage = ImageLoader::getInstance()->getImageByPath("assets/gizmos/direction_light.png");
     }
 }
+
+
+bool DirectionLightComponent::deserializeField(DataDeserializer& deserializer, const std::string_view& strFieldName, const std::string_view& strFieldValue)
+{
+    if (Component::deserializeField(deserializer, strFieldName, strFieldValue)) return true;
+
+    DESERIALIZE_FIELD(m_color);
+    DESERIALIZE_FIELD(m_intensity);
+    DESERIALIZE_FIELD(m_bEnableShadows);
+    DESERIALIZE_FIELD(m_shadowColor);
+    DESERIALIZE_FIELD(m_fShadowIntensity);
+
+    return false;
+}
+
+void DirectionLightComponent::serializeToWrapper(DataSerializer& serializer) const
+{
+    serializer.ADD_ATTRIBUTES(m_color);
+    serializer.ADD_ATTRIBUTES(m_intensity);
+    serializer.ADD_ATTRIBUTES(m_bEnableShadows);
+    serializer.ADD_ATTRIBUTES(m_shadowColor);
+    serializer.ADD_ATTRIBUTES(m_fShadowIntensity);
+}
+
+void DirectionLightComponent::onNodeFinishedDeserialization()
+{
+    // TODO: does this need to trigger on add to node?
+}
+
 
 void DirectionLightComponent::registerBuffer()
 {

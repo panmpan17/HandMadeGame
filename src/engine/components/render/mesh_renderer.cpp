@@ -121,6 +121,25 @@ void MeshRenderer::bindDepthVertexArray()
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
+
+bool MeshRenderer::deserializeField(DataDeserializer& deserializer, const std::string_view& strFieldName, const std::string_view& strFieldValue)
+{
+    if (Component::deserializeField(deserializer, strFieldName, strFieldValue)) return true;
+
+    // TODO: Deserialize m_pMesh, m_pMaterial
+
+    return false;
+}
+
+void MeshRenderer::serializeToWrapper(DataSerializer& serializer) const
+{
+    // TODO: Serialize m_pMesh, m_pMaterial
+}
+
+void MeshRenderer::onNodeFinishedDeserialization()
+{}
+
+
 void MeshRenderer::draw()
 {
     ASSERT(m_pMesh, "Mesh must be set before drawing the mesh");
@@ -172,7 +191,6 @@ void MeshRenderer::draw()
 
     glUseProgram(0);
 }
-
 
 void MeshRenderer::drawDepth()
 {

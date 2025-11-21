@@ -61,8 +61,8 @@ private:
     // int m_nIdleAnimationIndex = -1;
     // int m_nWalkAnimationIndex = -1;
 
-    // COMPONENT_REGISTER_SERIALIZABLE(MeshRenderer)
+    COMPONENT_REGISTER_SERIALIZABLE(MeshRenderer)
 };
 
-// REGISTER_CLASS(MeshRenderer)
+REGISTER_CLASS(MeshRenderer)
 

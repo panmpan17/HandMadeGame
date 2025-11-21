@@ -88,4 +88,8 @@ private:
     GLuint m_nVertexBuffer = 0;
     GLuint m_nVertexArray = 0;
     void registerBuffer();
+
+    COMPONENT_REGISTER_SERIALIZABLE(DirectionLightComponent)
 };
+
+REGISTER_CLASS(DirectionLightComponent)
