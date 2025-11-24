@@ -33,12 +33,15 @@ public:
     inline void setActive(bool isActive) { m_bIsActive = isActive; }
     inline bool isActive() const { return m_bIsActive; }
 
+    inline void setShouldSerialize(bool shouldSerialize) { m_bShouldSerialize = shouldSerialize; }
+    inline bool getShouldSerialize() const { return m_bShouldSerialize; }
     void serializedTo(DataSerializer& serializer) const override;
     bool deserializeField(DataDeserializer& deserializer, const std::string_view& strFieldName, const std::string_view& strFieldValue) override;
     void onFinishedDeserialization();
 
 private:
     bool m_bIsActive = true;
+    bool m_bShouldSerialize = true;
 
 #pragma endregion
 
@@ -213,6 +216,8 @@ public:
     inline Node* getChildNode(int nIndex) const { return m_oChildNodeArray.getElement(nIndex); }
     inline void addChildNode(Node* pNode) { m_oChildNodeArray.addElement(pNode); pNode->m_pParentNode = this; }
     // inline void removeChildNode(int nIndex) { m_oChildNodeArray.removeElement(nIndex); }
+
+    inline Node* getParentNode() const { return m_pParentNode; }
 
 
     inline int getComponentCount() const { return m_oComponentArray.getCount(); }

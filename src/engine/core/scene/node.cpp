@@ -23,13 +23,23 @@ Node::~Node()
 
 void Node::serializedTo(DataSerializer& serializer) const
 {
+    if (!m_bShouldSerialize)
+        return;
+
     serializer.startClassHeader("Node");
     serializer.ADD_ATTRIBUTES(m_nID);
+    serializer.ADD_ATTRIBUTES(m_strName);
     serializer.ADD_ATTRIBUTES(m_vecPosition);
     serializer.ADD_ATTRIBUTES(m_bIsActive);
+
+    if (m_pParentNode)
+    {
+        serializer.ADD_ATTRIBUTES_VALUE(m_pParentNode, m_pParentNode->getID());
+    }
+
     serializer.endClassHeader();
 
-    for (int i = 0; i < m_oComponentArray.getSize(); ++i)
+    for (int i = 0; i < m_oComponentArray.getCount(); ++i)
     {
         Component* pComponent = m_oComponentArray.getElement(i);
         if (pComponent)
@@ -37,13 +47,32 @@ void Node::serializedTo(DataSerializer& serializer) const
             serializer << pComponent;
         }
     }
+
+    for (int i = 0; i < m_oChildNodeArray.getCount(); ++i)
+    {
+        Node* pChildNode = m_oChildNodeArray.getElement(i);
+        if (pChildNode)
+        {
+            serializer << pChildNode;
+        }
+    }
 }
 
 bool Node::deserializeField(DataDeserializer& deserializer, const std::string_view& strFieldName, const std::string_view& strFieldValue)
 {
+    DESERIALIZE_FIELD(m_strName);
     DESERIALIZE_FIELD(m_nID);
     DESERIALIZE_FIELD(m_vecPosition);
     DESERIALIZE_FIELD(m_bIsActive);
+
+    IF_DESERIALIZE_FIELD_CHECK(m_pParentNode)
+    {
+        size_t nId = std::stoull(strFieldValue.data());
+        deserializer.getSerializableFromId(nId, [this](ISerializable* pObj) {
+            auto pParentNode = static_cast<Node*>(pObj);
+            pParentNode->addChildNode(this);
+        });
+    }
 
     return false;
 }

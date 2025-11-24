@@ -26,6 +26,7 @@ void WorldScene::init()
     {
         auto pNode = new Node(0.f, 0.f, 2.5f);
         pNode->setName("Editor Camera");
+        pNode->setShouldSerialize(false);
 
         auto pCameraNode = new Node(0.f, 0.f, 0.f);
         pCameraNode->setName("Camera");
@@ -64,7 +65,11 @@ void WorldScene::readFromFiles(const std::string_view& strFilePath)
             }
 
             pCurrentNode = pNode;
-            addNode(pNode);
+
+            if (pNode->getParentNode() == nullptr)
+            {
+                addNode(pNode);
+            }
         }
         else if (Component* pComponent = dynamic_cast<Component*>(pObject))
         {

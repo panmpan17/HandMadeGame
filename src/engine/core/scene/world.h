@@ -26,7 +26,7 @@ public:
     void render();
     void renderDepth();
 
-    inline int getNodeCount() const { return m_oNodeArray.getSize(); }
+    inline int getNodeCount() const { return m_oNodeArray.getCount(); }
     inline Node* getNode(int nIndex) const { return m_oNodeArray.getElement(nIndex); }
 
     inline Skybox* getSkybox() const { return m_pSkybox; }

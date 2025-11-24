@@ -489,3 +489,51 @@ void testShaderMaterial()
     pGround->setScale(10.f, 0.5f, 10.f);
     pWorldScene->addNode(pGround);
 }
+
+void serializationTest()
+{
+    WorldScene* const pWorldScene = WorldScene::current;
+
+    {
+        auto pParentNode = new Node(0.f, 0.f, 0.f);
+        pParentNode->setName("ParentNode");
+
+        {
+            auto pChildNode1 = new Node(1.f, 0.f, 0.f);
+            pChildNode1->setName("C1");
+            pParentNode->addChildNode(pChildNode1);
+
+            {
+                auto pGrandChildNode1 = new Node(0.f, 1.f, 0.f);
+                pGrandChildNode1->setName("CC1");
+                pChildNode1->addChildNode(pGrandChildNode1);
+            }
+        }
+
+        {
+            auto pChildNode2 = new Node(-1.f, 0.f, 0.f);
+            pChildNode2->setName("C2");
+            pParentNode->addChildNode(pChildNode2);
+
+            {
+                auto pGrandChildNode2 = new Node(0.f, -1.f, 0.f);
+                pGrandChildNode2->setName("CC2");
+                pChildNode2->addChildNode(pGrandChildNode2);
+            }
+        }
+
+        pWorldScene->addNode(pParentNode);
+
+        // oSerializer << pParentNode;
+    }
+
+    DataSerializer oSerializer("assets/nested_node.txt");
+    int nNodeCount = pWorldScene->getNodeCount();
+    for (int i = 0; i < nNodeCount; ++i)
+    {
+        const Node* const pNode = pWorldScene->getNode(i);
+        oSerializer << pNode;
+    }
+
+    // pWorldScene->readFromFiles("assets/nested_node.txt");
+}

@@ -9,3 +9,5 @@ void createLightingShadowDemo();
 void sceneTest();
 
 void testShaderMaterial();
+
+void serializationTest();

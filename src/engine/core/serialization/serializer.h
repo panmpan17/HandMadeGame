@@ -100,7 +100,7 @@ public:
         CHECK_FILE_IS_OPEN;
         m_oOutputFile << strAttributeNames << ": " << bValue << "\n";
     }
-    void addAttributes(const std::string_view& strAttributeNames, const std::string_view& strValue)
+    void addAttributes(const std::string_view& strAttributeNames, const std::string& strValue)
     {
         CHECK_FILE_IS_OPEN;
         m_oOutputFile << strAttributeNames << ": " << strValue << "\n";
@@ -178,6 +178,10 @@ public:
     static void deserializeField(Image*& pImage, const std::string_view& strFieldValue)
     {
         pImage = ImageLoader::getInstance()->getImageByPath(strFieldValue);
+    }
+    static void deserializeField(std::string& outString, const std::string_view& strFieldValue)
+    {
+        outString = strFieldValue;
     }
 
     DataDeserializer(const std::string_view& strFilename)
