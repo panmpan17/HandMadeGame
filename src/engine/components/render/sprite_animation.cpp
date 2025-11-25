@@ -106,8 +106,3 @@ bool SpriteAnimation::deserializeField(DataDeserializer& deserializer, const std
 
     return false;
 }
-
-void SpriteAnimation::onNodeFinishedDeserialization()
-{
-    
-}

@@ -27,6 +27,8 @@ private:
     const ShaderUniformHandle* m_pMVPHandle = nullptr;
 
     COMPONENT_REGISTER_SERIALIZABLE(Triangle)
+public:
+    virtual void onNodeFinishedDeserialization() override;
 };
 
 REGISTER_CLASS(Triangle)

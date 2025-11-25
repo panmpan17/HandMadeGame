@@ -93,22 +93,19 @@ void WorldScene::clearAllNodes()
     m_oNodeArray.clear();
 }
 
-void WorldScene::onStart()
+void WorldScene::update(float fDeltatime)
 {
-    int nSize = m_oNodeArray.getSize();
+    int nSize = m_oNodeArray.getCount();
     for (int i = 0; i < nSize; ++i)
     {
         Node* pNode = m_oNodeArray.getElement(i);
-        if (pNode && pNode->isActive())
+        if (pNode && pNode->isActive() && !pNode->getIsStarted())
         {
             pNode->onStart();
         }
     }
-}
 
-void WorldScene::update(float fDeltatime)
-{
-    int nSize = m_oNodeArray.getSize();
+    nSize = m_oNodeArray.getCount();
     for (int i = 0; i < nSize; ++i)
     {
         Node* pNode = m_oNodeArray.getElement(i);

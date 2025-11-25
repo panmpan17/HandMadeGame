@@ -31,12 +31,7 @@ void Node::serializedTo(DataSerializer& serializer) const
     serializer.ADD_ATTRIBUTES(m_strName);
     serializer.ADD_ATTRIBUTES(m_vecPosition);
     serializer.ADD_ATTRIBUTES(m_bIsActive);
-
-    if (m_pParentNode)
-    {
-        serializer.ADD_ATTRIBUTES_VALUE(m_pParentNode, m_pParentNode->getID());
-    }
-
+    serializer.ADD_ATTRIBUTES(m_pParentNode);
     serializer.endClassHeader();
 
     for (int i = 0; i < m_oComponentArray.getCount(); ++i)
@@ -122,6 +117,8 @@ void Node::onStart()
             pChildNode->onStart();
         }
     }
+
+    m_bHasStarted = true;
 }
 
 void Node::update(float deltaTime)
@@ -238,5 +235,4 @@ void Node::addComponent(Component* pComponent)
     if (pComponent == nullptr) return;
     m_oComponentArray.addElement(pComponent);
     pComponent->setNode(this);
-    pComponent->onAddToNode();
 }

@@ -40,17 +40,6 @@ void Camera::useAsMain()
     }
 }
 
-void Camera::onAddToNode()
-{
-    if (!m_pNode)
-    {
-        return;
-    }
-
-    m_pNode->registerOnPositionChangedListener(std::bind(&Camera::markViewMatrixDirty, this));
-    m_pNode->registerOnRotationChangedListener(std::bind(&Camera::markViewMatrixDirty, this));
-}
-
 void Camera::markViewMatrixDirty()
 {
     m_bViewMatrixDirty = true;
@@ -136,6 +125,14 @@ const mat4x4& Camera::getViewProjectionMatrix()
 void Camera::onStart()
 {
     setRatio(Window::ins->getWindowRatio());
+
+    if (!m_pNode)
+    {
+        return;
+    }
+
+    m_pNode->registerOnPositionChangedListener(std::bind(&Camera::markViewMatrixDirty, this));
+    m_pNode->registerOnRotationChangedListener(std::bind(&Camera::markViewMatrixDirty, this));
 }
 
 void Camera::updateCameraDataBuffer()

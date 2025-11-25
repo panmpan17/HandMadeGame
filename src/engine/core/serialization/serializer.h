@@ -6,6 +6,7 @@
 #include <iostream>
 #include <vector>
 #include <functional>
+#include "iserializable.h"
 #include "../math/vector.h"
 #include "../../render/shader.h"
 #include "../../render/shader_loader.h"
@@ -105,19 +106,23 @@ public:
         CHECK_FILE_IS_OPEN;
         m_oOutputFile << strAttributeNames << ": " << strValue << "\n";
     }
-    void addAttributes(const std::string_view& strAttributeNames, const Shader* pShader)
+    void addAttributes(const std::string_view& strAttributeNames, const Shader* const pShader)
     {
         if (!pShader) return;
         CHECK_FILE_IS_OPEN;
         m_oOutputFile << strAttributeNames << ": " << pShader->getId() << "\n";
     }
-    void addAttributes(const std::string_view& strAttributeNames, const Image* pImage)
+    void addAttributes(const std::string_view& strAttributeNames, const Image* const pImage)
     {
         if (!pImage) return;
         CHECK_FILE_IS_OPEN;
         m_oOutputFile << strAttributeNames << ": " << pImage->getPath() << "\n";
     }
-    void addAttributes(const std::string_view& strAttributeNames, ISerializable* pValue);
+    void addAttributes(const std::string_view& strAttributeNames, const ISerializable* const pSerializable)
+    {
+        CHECK_FILE_IS_OPEN;
+        m_oOutputFile << strAttributeNames << ": " << (pSerializable ? pSerializable->getID() : 0) << "\n";
+    }
 
     DataSerializer& operator<<(const ISerializable* pObject);
 

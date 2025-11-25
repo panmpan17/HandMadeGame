@@ -275,8 +275,6 @@ void Window::setupIMGUIAndEditorWindows()
 void Window::beforeLoop()
 {
     m_fRatio = m_oActualSize.x / (float) m_oActualSize.y;
-
-    m_pWorldScene->onStart();
 }
 
 void Window::mainLoop()

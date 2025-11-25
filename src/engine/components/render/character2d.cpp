@@ -5,16 +5,23 @@
 
 Character2d::Character2d(SpriteAnimation* pAnimation) : m_pAnimation(pAnimation)
 {
-    m_nIdleAnimationIndex = m_pAnimation->getAnimationIndexByName("idle");
-    m_nWalkAnimationIndex = m_pAnimation->getAnimationIndexByName("walk");
-    
-    InputManager::getInstance()->registerKeyPressCallback(KeyCode::KEY_D, [this](bool bPressed) {
-        if (bPressed) {
-            m_pAnimation->playAnimationInfo(m_nWalkAnimationIndex);
-        } else {
-            m_pAnimation->playAnimationInfo(m_nIdleAnimationIndex);
-        }
-    });
+}
+
+void Character2d::onStart()
+{
+    if (m_pAnimation)
+    {
+        m_nIdleAnimationIndex = m_pAnimation->getAnimationIndexByName("idle");
+        m_nWalkAnimationIndex = m_pAnimation->getAnimationIndexByName("walk");
+        
+        InputManager::getInstance()->registerKeyPressCallback(KeyCode::KEY_D, [this](bool bPressed) {
+            if (bPressed) {
+                m_pAnimation->playAnimationInfo(m_nWalkAnimationIndex);
+            } else {
+                m_pAnimation->playAnimationInfo(m_nIdleAnimationIndex);
+            }
+        });
+    }
 }
 
 void Character2d::serializeToWrapper(DataSerializer& serializer) const
@@ -39,21 +46,3 @@ bool Character2d::deserializeField(DataDeserializer& deserializer, const std::st
 
     return false;
 }
-
-void Character2d::onNodeFinishedDeserialization()
-{
-    if (m_pAnimation)
-    {
-        m_nIdleAnimationIndex = m_pAnimation->getAnimationIndexByName("idle");
-        m_nWalkAnimationIndex = m_pAnimation->getAnimationIndexByName("walk");
-        
-        InputManager::getInstance()->registerKeyPressCallback(KeyCode::KEY_D, [this](bool bPressed) {
-            if (bPressed) {
-                m_pAnimation->playAnimationInfo(m_nWalkAnimationIndex);
-            } else {
-                m_pAnimation->playAnimationInfo(m_nIdleAnimationIndex);
-            }
-        });
-    }
-}
-

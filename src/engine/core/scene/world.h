@@ -20,8 +20,6 @@ public:
     void addNode(Node* pNode);
     void clearAllNodes();
 
-    void onStart();
-
     void update(float fDeltatime);
     void render();
     void renderDepth();

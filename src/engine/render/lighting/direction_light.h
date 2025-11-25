@@ -54,8 +54,7 @@ public:
     bool isLightDataDirty() const { return m_bLightDataDirty; }
     void markLightDataDirty() { m_bLightDataDirty = true; m_bLightCastingMatrixDirty = true; }
 
-    void onAddToNode() override;
-    // void onStart() override {}
+    void onStart() override;
     void draw() override;
     void update(float deltaTime) override {}
 

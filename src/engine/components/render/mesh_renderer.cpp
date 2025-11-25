@@ -136,9 +136,6 @@ void MeshRenderer::serializeToWrapper(DataSerializer& serializer) const
     // TODO: Serialize m_pMesh, m_pMaterial
 }
 
-void MeshRenderer::onNodeFinishedDeserialization()
-{}
-
 
 void MeshRenderer::draw()
 {

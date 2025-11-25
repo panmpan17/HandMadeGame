@@ -23,7 +23,7 @@ PointLightComponent::~PointLightComponent()
     LightManager::getInstance()->unregisterPointLightComponent(this);
 }
 
-void PointLightComponent::onAddToNode()
+void PointLightComponent::onStart()
 {
     if (!m_pNode)
     {
@@ -31,12 +31,10 @@ void PointLightComponent::onAddToNode()
     }
 
     m_pNode->registerOnPositionChangedListener(std::bind(&PointLightComponent::markLightDataDirty, this));
-
     
     m_pShader = ShaderLoader::getInstance()->getShader("point_light");
     m_pMVPUniformHandle = m_pShader->getUniformHandle("u_MVP");
     m_pLightColorUniformHandle = m_pShader->getUniformHandle("u_lightColor");
-
 
     registerBuffer();
 }
@@ -65,12 +63,6 @@ void PointLightComponent::serializeToWrapper(DataSerializer& serializer) const
     serializer.ADD_ATTRIBUTES(m_fAttenuationLinear);
     serializer.ADD_ATTRIBUTES(m_fAttenuationQuadratic);
 }
-
-void PointLightComponent::onNodeFinishedDeserialization()
-{
-    // TODO: does this need to trigger on add to node?
-}
-
 
 void PointLightComponent::registerBuffer()
 {

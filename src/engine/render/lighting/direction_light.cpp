@@ -26,7 +26,7 @@ DirectionLightComponent::~DirectionLightComponent()
     LightManager::getInstance()->unregisterDirectionLightComponent(this);
 }
 
-void DirectionLightComponent::onAddToNode()
+void DirectionLightComponent::onStart()
 {
     if (!m_pNode)
     {
@@ -71,12 +71,6 @@ void DirectionLightComponent::serializeToWrapper(DataSerializer& serializer) con
     serializer.ADD_ATTRIBUTES(m_shadowColor);
     serializer.ADD_ATTRIBUTES(m_fShadowIntensity);
 }
-
-void DirectionLightComponent::onNodeFinishedDeserialization()
-{
-    // TODO: does this need to trigger on add to node?
-}
-
 
 void DirectionLightComponent::registerBuffer()
 {

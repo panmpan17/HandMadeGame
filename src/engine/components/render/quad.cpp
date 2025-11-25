@@ -224,9 +224,3 @@ bool Sprite::deserializeField(DataDeserializer& deserializer, const std::string_
 
     return false;
 }
-
-void Sprite::onNodeFinishedDeserialization()
-{
-    Quad::onNodeFinishedDeserialization();
-}
-

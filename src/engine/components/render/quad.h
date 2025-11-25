@@ -48,6 +48,8 @@ protected:
     Image* m_pImage = nullptr; // Optional, if the quad uses an image texture
 
     COMPONENT_REGISTER_SERIALIZABLE(Quad)
+public:
+    virtual void onNodeFinishedDeserialization() override;
 };
 
 REGISTER_CLASS(Quad)

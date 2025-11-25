@@ -15,8 +15,6 @@ public:
     Camera();
     ~Camera();
 
-    void onAddToNode() override;
-
     void useAsMain();
     inline bool isMainCamera() const { return main == this; }
     

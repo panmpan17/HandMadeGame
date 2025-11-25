@@ -424,12 +424,7 @@ bool ParticleSystem::deserializeField(DataDeserializer& deserializer, const std:
     DESERIALIZE_FIELD(m_fStartVelocityMax);
     DESERIALIZE_FIELD(m_bSimulateInLocal);
     DESERIALIZE_FIELD(m_fGravity);
-
-    IF_DESERIALIZE_FIELD_CHECK(m_pShader)
-    {
-        m_pShader = ShaderLoader::getInstance()->getShader(std::atoi(strFieldValue.data()));
-        return true;
-    }
+    DESERIALIZE_FIELD(m_pShader);
 
     IF_DESERIALIZE_FIELD_CHECK(module)
     {

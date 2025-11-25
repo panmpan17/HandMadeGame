@@ -13,8 +13,6 @@ class Component : public ISerializable
 public:
     virtual ~Component() = default;
 
-    virtual void onAddToNode() {}
-
     virtual bool isIDrawable() const = 0;
 
     virtual bool isUpdatable() const = 0;
@@ -44,6 +42,5 @@ protected:
 #define COMPONENT_REGISTER_SERIALIZABLE(T)public:\
     inline std::string getTypeName() const override { return #T; }\
     virtual bool deserializeField(DataDeserializer& deserializer, const std::string_view& strFieldName, const std::string_view& strFieldValue) override;\
-    virtual void onNodeFinishedDeserialization() override;\
 protected:\
     virtual void serializeToWrapper(DataSerializer& serializer) const override;

@@ -1,13 +1,6 @@
 #include "serializer.h"
-#include "iserializable.h"
 #include "../debug_macro.h"
 #include "../scene/node.h"
-
-void DataSerializer::addAttributes(const std::string_view& strAttributeNames, ISerializable* pValue)
-{
-    CHECK_FILE_IS_OPEN;
-    m_oOutputFile << strAttributeNames << ": " << (pValue ? pValue->getID() : 0) << "\n";
-}
 
 DataSerializer& DataSerializer::operator<<(const ISerializable* pObject)
 {

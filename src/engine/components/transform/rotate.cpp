@@ -14,5 +14,3 @@ void Rotate3D::serializeToWrapper(DataSerializer& serializer) const
 {
     serializer.ADD_ATTRIBUTES(m_vecCurrentEulerAngles);
 }
-
-void Rotate3D::onNodeFinishedDeserialization() {}

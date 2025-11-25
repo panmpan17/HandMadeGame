@@ -78,8 +78,6 @@ bool Movement::deserializeField(DataDeserializer& deserializer, const std::strin
     return false;
 }
 
-void Movement::onNodeFinishedDeserialization() {}
-
 
 #if defined(__APPLE__) || defined(__MACH__)
 float lerp(float fStart, float fEnd, float fT)
@@ -145,5 +143,3 @@ bool TwoPointsMovement::deserializeField(DataDeserializer& deserializer, const s
 
     return false;
 }
-
-void TwoPointsMovement::onNodeFinishedDeserialization() {}

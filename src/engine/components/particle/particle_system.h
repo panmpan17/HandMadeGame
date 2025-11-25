@@ -196,6 +196,8 @@ private:
     void sortAliveParticleInFront();
 
     COMPONENT_REGISTER_SERIALIZABLE(ParticleSystem)
+public:
+    virtual void onNodeFinishedDeserialization() override;
 };
 
 REGISTER_CLASS(ParticleSystem)

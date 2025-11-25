@@ -16,6 +16,7 @@ public:
     virtual bool isIDrawable() const override { return false; }
     virtual bool isUpdatable() const override { return true; }
 
+    virtual void onStart() override;
     virtual void update(float fDeltaTime) override {}
 
     virtual void draw() override {}

@@ -10,22 +10,6 @@
 
 PaddleControl::PaddleControl(const Box& oBox, PaddleControlType eControlType, float fMaxSpeed) : m_oBox(oBox), m_eControlType(eControlType), m_fMaxSpeed(fMaxSpeed)
 {
-    switch (m_eControlType)
-    {
-    case PaddleControlType::PLAYER1:
-        InputManager::getInstance()->registerKeyPressCallback(KeyCode::KEY_W, BIND_CALLBACK_1(onUpPressCallback));
-        InputManager::getInstance()->registerKeyPressCallback(KeyCode::KEY_S, BIND_CALLBACK_1(onDownPressCallback));
-        InputManager::getInstance()->registerKeyPressCallback(KeyCode::KEY_SPACE, BIND_CALLBACK_1(onPrimaryPressCallback));
-        break;
-    case PaddleControlType::PLAYER2:
-        InputManager::getInstance()->registerKeyPressCallback(KeyCode::KEY_O, BIND_CALLBACK_1(onUpPressCallback));
-        InputManager::getInstance()->registerKeyPressCallback(KeyCode::KEY_L, BIND_CALLBACK_1(onDownPressCallback));
-        InputManager::getInstance()->registerKeyPressCallback(KeyCode::KEY_SPACE, BIND_CALLBACK_1(onPrimaryPressCallback));
-        break;
-
-    default:
-        break;
-    }
 }
 
 PaddleControl::~PaddleControl()
@@ -47,6 +31,23 @@ void PaddleControl::start()
     pQuad->setShader(pImageShader);
     pQuad->registerBuffer();
     m_pNode->addComponent(pQuad);
+
+    switch (m_eControlType)
+    {
+    case PaddleControlType::PLAYER1:
+        InputManager::getInstance()->registerKeyPressCallback(KeyCode::KEY_W, BIND_CALLBACK_1(onUpPressCallback));
+        InputManager::getInstance()->registerKeyPressCallback(KeyCode::KEY_S, BIND_CALLBACK_1(onDownPressCallback));
+        InputManager::getInstance()->registerKeyPressCallback(KeyCode::KEY_SPACE, BIND_CALLBACK_1(onPrimaryPressCallback));
+        break;
+    case PaddleControlType::PLAYER2:
+        InputManager::getInstance()->registerKeyPressCallback(KeyCode::KEY_O, BIND_CALLBACK_1(onUpPressCallback));
+        InputManager::getInstance()->registerKeyPressCallback(KeyCode::KEY_L, BIND_CALLBACK_1(onDownPressCallback));
+        InputManager::getInstance()->registerKeyPressCallback(KeyCode::KEY_SPACE, BIND_CALLBACK_1(onPrimaryPressCallback));
+        break;
+
+    default:
+        break;
+    }
 }
 
 void PaddleControl::onUpPressCallback(bool bPressed)
