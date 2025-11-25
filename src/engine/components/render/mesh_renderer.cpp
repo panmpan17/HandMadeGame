@@ -22,7 +22,7 @@ MeshRenderer::~MeshRenderer()
 {
 }
 
-void MeshRenderer::setMaterial(std::shared_ptr<Material>& pMaterial)
+void MeshRenderer::setMaterial(const std::shared_ptr<Material>& pMaterial)
 {
     m_pMaterial = pMaterial;
     initShader(m_pMaterial->getShader());

@@ -26,7 +26,15 @@ public:
     virtual void draw() override;
     virtual void drawDepth() override;
 
-    void setMaterial(std::shared_ptr<Material>& pMaterial);
+    virtual Component* clone() const override
+    {
+        MeshRenderer* pNewMeshRenderer = new MeshRenderer();
+        pNewMeshRenderer->setMesh(m_pMesh);
+        pNewMeshRenderer->setMaterial(m_pMaterial);
+        return pNewMeshRenderer;
+    }
+
+    void setMaterial(const std::shared_ptr<Material>& pMaterial);
     inline void setMesh(const std::shared_ptr<Mesh>& pMesh) { m_pMesh = pMesh; }
 
     void initShader(Shader* const pShader);

@@ -56,6 +56,13 @@ public:
 
     virtual void draw() override {}
 
+    virtual Component* clone() const override
+    {
+        Rotate3D* pNewRotate = new Rotate3D();
+        pNewRotate->m_vecCurrentEulerAngles = this->m_vecCurrentEulerAngles;
+        return pNewRotate;
+    }
+
 protected:
     Vector3 m_vecCurrentEulerAngles = { 0.0f, 0.0f, 0.0f };
 

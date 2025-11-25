@@ -236,3 +236,47 @@ void Node::addComponent(Component* pComponent)
     m_oComponentArray.addElement(pComponent);
     pComponent->setNode(this);
 }
+
+Node* Node::clone() const
+{
+    Node* pNewNode = new Node();
+    pNewNode->m_strName = this->m_strName;
+    pNewNode->m_vecPosition = this->m_vecPosition;
+    pNewNode->m_bIsActive = this->m_bIsActive;
+
+    // Clone components
+    int nComponentCount = this->m_oComponentArray.getCount();
+    for (int i = 0; i < nComponentCount; ++i)
+    {
+        Component* pComponent = this->m_oComponentArray.getElement(i);
+        if (pComponent)
+        {
+            Component* pClonedComponent = pComponent->clone();
+            if (pClonedComponent)
+            {
+                pNewNode->addComponent(pClonedComponent);
+            }
+            else
+            {
+                LOGLN("Component of type {} does not support cloning.", pComponent->getTypeName());
+            }
+        }
+    }
+
+    // Clone child nodes
+    int nChildCount = this->m_oChildNodeArray.getCount();
+    for (int i = 0; i < nChildCount; ++i)
+    {
+        Node* pChildNode = this->m_oChildNodeArray.getElement(i);
+        if (pChildNode)
+        {
+            Node* pClonedChild = pChildNode->clone();
+            if (pClonedChild)
+            {
+                pNewNode->addChildNode(pClonedChild);
+            }
+        }
+    }
+
+    return pNewNode;
+}

@@ -524,16 +524,54 @@ void serializationTest()
 
         pWorldScene->addNode(pParentNode);
 
+        Node* pClonedNode = pParentNode->clone();
+        pWorldScene->addNode(pClonedNode);
         // oSerializer << pParentNode;
     }
 
-    DataSerializer oSerializer("assets/nested_node.txt");
-    int nNodeCount = pWorldScene->getNodeCount();
-    for (int i = 0; i < nNodeCount; ++i)
+    Shader* p3DMeshShader = ShaderLoader::getInstance()->getShader("3d_lit_default");
+
     {
-        const Node* const pNode = pWorldScene->getNode(i);
-        oSerializer << pNode;
+        Image* const pMainImage = ImageLoader::getInstance()->getImageByPath("assets/models/1001_albedo.jpg");
+        Image* const pNormalImage = ImageLoader::getInstance()->getImageByPath("assets/models/1001_normal.png");
+        Image* const pMetallicImage = ImageLoader::getInstance()->getImageByPath("assets/models/1001_metallic.jpg");
+
+        std::shared_ptr<Material> pMaterial = std::make_shared<Material>(p3DMeshShader);
+        pMaterial->bindTextureWithImage(SHADER_UNIFORM_TEXTURE_0, pMainImage);
+        pMaterial->bindTextureWithImage(SHADER_UNIFORM_TEXTURE_1, pMetallicImage);
+        pMaterial->bindTextureWithImage(SHADER_UNIFORM_TEXTURE_2, pNormalImage);
+
+        Node* pBackPackFbx = loadModel("assets/models/back_pack.fbx", pMaterial);
+        pBackPackFbx->setScale(0.01f);
+        pBackPackFbx->setPosition(2.f, 0.f, 0.f);
+        pBackPackFbx->setRotationQuaternion(Quaternion::fromEulerAngles({0.f, -105.f, 0.f}));
+        pBackPackFbx->addComponent(new Rotate3D(0.f, 20.f, 0.f));
+        pWorldScene->addNode(pBackPackFbx);
+
+        Node* pClonedNode = pBackPackFbx->clone();
+        pClonedNode->setPosition(-2.f, 0.f, 0.f);
+        pWorldScene->addNode(pClonedNode);
     }
+
+    {
+        Node* pDirectionLightNode = new Node(0, 10.f, 0.f);
+        pDirectionLightNode->setRotationQuaternion(Quaternion::fromEulerAngles({-130.f, 30.f, 0.f}));
+
+        DirectionLightComponent* pPointLightComp = new DirectionLightComponent();
+        pPointLightComp->setColor({1.f, 1.f, .5f});
+        pPointLightComp->setIntensity(2.f);
+        pDirectionLightNode->addComponent(pPointLightComp);
+
+        pWorldScene->addNode(pDirectionLightNode);
+    }
+
+    // DataSerializer oSerializer("assets/nested_node.txt");
+    // int nNodeCount = pWorldScene->getNodeCount();
+    // for (int i = 0; i < nNodeCount; ++i)
+    // {
+    //     const Node* const pNode = pWorldScene->getNode(i);
+    //     oSerializer << pNode;
+    // }
 
     // pWorldScene->readFromFiles("assets/nested_node.txt");
 }

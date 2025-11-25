@@ -26,6 +26,8 @@ public:
     virtual void drawDepth() {}
     virtual void update(float deltaTime) = 0;
 
+    virtual Component* clone() const { return nullptr; };
+
     virtual std::string getTypeName() const { return typeid(*this).name(); };
 
     void serializedTo(DataSerializer& serializer) const override;

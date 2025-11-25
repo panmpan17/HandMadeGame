@@ -41,6 +41,8 @@ public:
     bool deserializeField(DataDeserializer& deserializer, const std::string_view& strFieldName, const std::string_view& strFieldValue) override;
     void onFinishedDeserialization();
 
+    Node* clone() const;
+
 private:
     bool m_bIsActive = true;
     bool m_bShouldSerialize = true;
