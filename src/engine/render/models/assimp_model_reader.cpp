@@ -109,6 +109,8 @@ void rotationMatrixToQuaternion(const mat4x4& rotationMatrix, Quaternion& outQua
 
 Node* loadModel(const std::string_view& strPath, std::shared_ptr<Material>& pMaterial)
 {
+    // DEBUG_START_TIMER();
+
     Assimp::Importer importer;
 
     const aiScene* pScene;
@@ -126,6 +128,8 @@ Node* loadModel(const std::string_view& strPath, std::shared_ptr<Material>& pMat
                                    aiProcess_Triangulate | aiProcess_FlipUVs
                                    | aiProcess_CalcTangentSpace | aiProcess_GenNormals);
     }
+
+    // DEBUG_END_TIMER("Assimp Importer ReadFile");
 
     if (!pScene || pScene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !pScene->mRootNode) 
     {
@@ -205,7 +209,9 @@ Node* loadModel(const std::string_view& strPath, std::shared_ptr<Material>& pMat
     */
 
 
-    return processNode(pScene->mRootNode, pScene, arrMaterials, pMaterial);
+    Node* pRootNode = processNode(pScene->mRootNode, pScene, arrMaterials, pMaterial);
+    // DEBUG_END_TIMER("Process root node done");
+    return pRootNode;
 }
 
 Node* processNode(const aiNode* pAiNode, const aiScene* pScene, std::vector<std::shared_ptr<Material>>& vecSceneMaterials, std::shared_ptr<Material>& pMaterial)

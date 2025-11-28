@@ -4,6 +4,7 @@
 #include <format>
 #include <iostream>
 #include "../../utils/platform.h"
+#include <ctime>
 
 #if !IS_PLATFORM_WINDOWS
 #include <print>
@@ -41,6 +42,10 @@
 //         }\
 //     } while (0)
 
+#define DEBUG_START_TIMER() std::clock_t oDebugTimedStart = std::clock();
+#define DEBUG_END_TIMER(strTag) LOGLN("{}, Time: {} ms", strTag, (std::clock() - oDebugTimedStart) / (double)(CLOCKS_PER_SEC / 1000)); oDebugTimedStart = std::clock();
+#define DEBUG_REFRESH_TIMER() oDebugTimedStart = std::clock();
+
 #else
 
 #define LOG(msg, ...) do {} while (0)
@@ -49,5 +54,9 @@
 #define ASSERT(condition, msg) do {} while (0)
 
 #define LOGERR(msg, ...) do {} while (0)
+
+#define DEBUG_START_TIMER() do {} while (0)
+#define DEBUG_END_TIMER(strTag) do {} while (0)
+#define DEBUG_REFRESH_TIMER() do {} while (0)
 
 #endif
