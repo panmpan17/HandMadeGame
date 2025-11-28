@@ -242,6 +242,8 @@ Node* Node::clone() const
     Node* pNewNode = new Node();
     pNewNode->m_strName = this->m_strName;
     pNewNode->m_vecPosition = this->m_vecPosition;
+    pNewNode->m_oRotationQuaternion = this->m_oRotationQuaternion;
+    pNewNode->m_vecScale = this->m_vecScale;
     pNewNode->m_bIsActive = this->m_bIsActive;
 
     // Clone components
