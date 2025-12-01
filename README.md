@@ -1,5 +1,8 @@
 # Michael's Hand Made Game
 
+[![Youtube Demo Video's Thumbnail](doc/youtube_thumbnail.jpg)](https://www.youtube.com/watch?v=Pfb9lFXOHsQ)
+[Youtube Demo Video](https://www.youtube.com/watch?v=Pfb9lFXOHsQ)
+
 A fully custom C++ game engine built from scratch, focusing on rendering, cross-platform builds, and a clean modular architecture.
 This project demonstrates my understanding of real-time graphics, engine architecture, and build systems across macOS and Windows.
 
