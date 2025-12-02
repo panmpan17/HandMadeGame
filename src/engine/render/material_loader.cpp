@@ -27,7 +27,13 @@ std::shared_ptr<Material> MaterialLoader::getMaterial(const std::string& strFile
         return it->second;
     }
 
-    return loadMaterialFromFile(strFilePath);
+    std::shared_ptr<Material> pMaterial = loadMaterialFromFile(strFilePath);
+    if (pMaterial)
+    {
+        m_mapMaterials[strFilePath] = pMaterial;
+    }
+
+    return pMaterial;
 }
 
 enum class MaterialUniformType : uint8_t
@@ -105,10 +111,24 @@ std::shared_ptr<Material> MaterialLoader::loadMaterialFromFile(const std::string
         }
     }
 
-    if (pMaterial)
+    return pMaterial;
+}
+
+void MaterialLoader::onFileChangedListener(const std::string& strFilePath, eFileChangeType eType)
+{
+    if (eType != eFileChangeType::FILE_MODIFIED)
     {
-        m_mapMaterials[strFilePath] = pMaterial;
+        return;
     }
 
-    return pMaterial;
+    auto it = m_mapMaterials.find(strFilePath);
+    if (it != m_mapMaterials.end())
+    {
+        // Reload material
+        std::shared_ptr<Material> pNewMaterial = loadMaterialFromFile(strFilePath);
+        if (pNewMaterial)
+        {
+            it->second->syncTo(pNewMaterial.get());
+        }
+    }
 }

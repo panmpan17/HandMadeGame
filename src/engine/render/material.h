@@ -31,6 +31,8 @@ public:
 
     int sendTexturesData() const;
 
+    void syncTo(const Material* const pOtherMaterial);
+
 private:
     Shader* m_pShader = nullptr;
 

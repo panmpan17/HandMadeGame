@@ -238,6 +238,7 @@ void Window::setupGameEngineRelatedObject()
     m_pFileWatchDog->setFileChangeCallback([](const std::string& strFilePath, eFileChangeType eType) {
         EngineEventDispatcher::getInstance().runOnMainThread([strFilePath, eType]() {
             ShaderLoader::getInstance()->onFileChangedListener(strFilePath, eType);
+            MaterialLoader::getInstance()->onFileChangedListener(strFilePath, eType);
         });
     });
     m_pFileWatchDog->startWatching();

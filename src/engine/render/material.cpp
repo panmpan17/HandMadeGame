@@ -2,6 +2,7 @@
 
 #include <glad/gl.h>
 #include "shader.h"
+#include "image.h"
 #include "../core/debug_macro.h"
 
 
@@ -46,4 +47,15 @@ int Material::sendTexturesData() const
     }
 
     return nTextureBitmask;
+}
+
+void Material::syncTo(const Material* const pOtherMaterial)
+{
+    if (!pOtherMaterial)
+    {
+        return;
+    }
+
+    m_pShader = pOtherMaterial->m_pShader;
+    m_vecTextureUniforms = pOtherMaterial->m_vecTextureUniforms;
 }
