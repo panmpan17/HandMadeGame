@@ -166,7 +166,7 @@ const ShaderUniformHandle* Shader::getUniformHandle(const std::string_view& strN
     GLuint nLocation = getUniformLocation(std::string(strName));
     ShaderUniformHandle* pHandle = &m_arrUniformHandles[m_nUniformHandleCount++];
     pHandle->m_nLocation = nLocation;
-    pHandle->m_strName = strName;
+    pHandle->m_strName = std::string(strName);
     return pHandle;
 }
 

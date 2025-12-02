@@ -35,14 +35,14 @@ int main(int nArgumentCount, char* arrArguments[])
         window.setupManagers();
         window.setupGameEngineRelatedObject();
 
-        setupPostProcess();
+        // setupPostProcess();
         // createDemo1();
-        // testShaderMaterial();
         // createVisualEffectDemo();
         createLightingShadowDemo();
         // createPingPongGame();
         // sceneTest();
         // colorPicker.pickerMain();
+        // serializationTest();
 
         window.mainLoop();
     }

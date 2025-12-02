@@ -9,7 +9,7 @@
 #include "../../engine/render/image_loader.h"
 #include "../../engine/render/shader.h"
 #include "../../engine/render/shader_loader.h"
-#include "../../engine/render/material.h"
+#include "../../engine/render/material_loader.h"
 #include "../../engine/render/skybox.h"
 #include "../../engine/render/models/assimp_model_reader.h"
 #include "../../engine/render/lighting/direction_light.h"
@@ -235,28 +235,14 @@ void createVisualEffectDemo()
     // addNode(pMonkey);
 
     {
-        Image* const pMainImage = ImageLoader::getInstance()->getImageByPath("assets/images/container.png");
-        Image* const pMetallicImage = ImageLoader::getInstance()->getImageByPath("assets/images/container_specular.png");
-
-        std::shared_ptr<Material> pMaterial = std::make_shared<Material>(p3DMeshShader);
-        pMaterial->bindTextureWithImage(SHADER_UNIFORM_TEXTURE_0, pMainImage);
-        pMaterial->bindTextureWithImage(SHADER_UNIFORM_TEXTURE_1, pMetallicImage);
-
+        std::shared_ptr<Material> pMaterial = MaterialLoader::getInstance()->getMaterial("assets/materials/box.yaml");
         Node* pBackPackObj = loadModel("assets/models/box.obj", pMaterial);
         pBackPackObj->setPosition(-2.f, 0.f, 0.f);
         pWorldScene->addNode(pBackPackObj);
     }
 
     {
-        Image* const pMainImage = ImageLoader::getInstance()->getImageByPath("assets/models/1001_albedo.jpg");
-        Image* const pNormalImage = ImageLoader::getInstance()->getImageByPath("assets/models/1001_normal.png");
-        Image* const pMetallicImage = ImageLoader::getInstance()->getImageByPath("assets/models/1001_metallic.jpg");
-
-        std::shared_ptr<Material> pMaterial = std::make_shared<Material>(p3DMeshShader);
-        pMaterial->bindTextureWithImage(SHADER_UNIFORM_TEXTURE_0, pMainImage);
-        pMaterial->bindTextureWithImage(SHADER_UNIFORM_TEXTURE_1, pMetallicImage);
-        pMaterial->bindTextureWithImage(SHADER_UNIFORM_TEXTURE_2, pNormalImage);
-
+        std::shared_ptr<Material> pMaterial = MaterialLoader::getInstance()->getMaterial("assets/materials/backpack.yaml");
         Node* pBackPackFbx = loadModel("assets/models/back_pack.fbx", pMaterial);
         pBackPackFbx->setScale(0.01f);
         pBackPackFbx->setPosition(2.f, 0.f, 0.f);
@@ -393,28 +379,14 @@ void createLightingShadowDemo()
     }
 
     {
-        Image* const pMainImage = ImageLoader::getInstance()->getImageByPath("assets/images/container.png");
-        Image* const pMetallicImage = ImageLoader::getInstance()->getImageByPath("assets/images/container_specular.png");
-
-        std::shared_ptr<Material> pMaterial = std::make_shared<Material>(p3DMeshShader);
-        pMaterial->bindTextureWithImage(SHADER_UNIFORM_TEXTURE_0, pMainImage);
-        pMaterial->bindTextureWithImage(SHADER_UNIFORM_TEXTURE_1, pMetallicImage);
-
+        std::shared_ptr<Material> pMaterial = MaterialLoader::getInstance()->getMaterial("assets/materials/box.yaml");
         Node* pBackPackObj = loadModel("assets/models/box.obj", pMaterial);
         pBackPackObj->setPosition(-2.f, 0.f, 0.f);
         pWorldScene->addNode(pBackPackObj);
     }
 
     {
-        Image* const pMainImage = ImageLoader::getInstance()->getImageByPath("assets/models/1001_albedo.jpg");
-        Image* const pNormalImage = ImageLoader::getInstance()->getImageByPath("assets/models/1001_normal.png");
-        Image* const pMetallicImage = ImageLoader::getInstance()->getImageByPath("assets/models/1001_metallic.jpg");
-
-        std::shared_ptr<Material> pMaterial = std::make_shared<Material>(p3DMeshShader);
-        pMaterial->bindTextureWithImage(SHADER_UNIFORM_TEXTURE_0, pMainImage);
-        pMaterial->bindTextureWithImage(SHADER_UNIFORM_TEXTURE_1, pMetallicImage);
-        pMaterial->bindTextureWithImage(SHADER_UNIFORM_TEXTURE_2, pNormalImage);
-
+        std::shared_ptr<Material> pMaterial = MaterialLoader::getInstance()->getMaterial("assets/materials/backpack.yaml");
         Node* pBackPackFbx = loadModel("assets/models/back_pack.fbx", pMaterial);
         pBackPackFbx->setScale(0.01f);
         pBackPackFbx->setPosition(2.f, 0.f, 0.f);
@@ -477,19 +449,6 @@ void sceneTest()
     }
 }
 
-void testShaderMaterial()
-{
-    WorldScene* const pWorldScene = WorldScene::current;
-
-    Shader* pTestShader = ShaderLoader::getInstance()->getShader("test");
-
-    std::shared_ptr<Material> pMaterial = std::make_shared<Material>(pTestShader);
-    Node* pGround = loadModel("assets/models/box.obj", pMaterial);
-    pGround->setPosition(0.f, -3.f, 0.f);
-    pGround->setScale(10.f, 0.5f, 10.f);
-    pWorldScene->addNode(pGround);
-}
-
 void serializationTest()
 {
     WorldScene* const pWorldScene = WorldScene::current;
@@ -532,15 +491,7 @@ void serializationTest()
     Shader* p3DMeshShader = ShaderLoader::getInstance()->getShader("3d_lit_default");
 
     {
-        Image* const pMainImage = ImageLoader::getInstance()->getImageByPath("assets/models/1001_albedo.jpg");
-        Image* const pNormalImage = ImageLoader::getInstance()->getImageByPath("assets/models/1001_normal.png");
-        Image* const pMetallicImage = ImageLoader::getInstance()->getImageByPath("assets/models/1001_metallic.jpg");
-
-        std::shared_ptr<Material> pMaterial = std::make_shared<Material>(p3DMeshShader);
-        pMaterial->bindTextureWithImage(SHADER_UNIFORM_TEXTURE_0, pMainImage);
-        pMaterial->bindTextureWithImage(SHADER_UNIFORM_TEXTURE_1, pMetallicImage);
-        pMaterial->bindTextureWithImage(SHADER_UNIFORM_TEXTURE_2, pNormalImage);
-
+        std::shared_ptr<Material> pMaterial = MaterialLoader::getInstance()->getMaterial("assets/materials/backpack.yaml");
         Node* pBackPackFbx = loadModel("assets/models/back_pack.fbx", pMaterial);
         pBackPackFbx->setScale(0.01f);
         pBackPackFbx->setPosition(2.f, 0.f, 0.f);

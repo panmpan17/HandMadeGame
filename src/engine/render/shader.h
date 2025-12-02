@@ -24,7 +24,7 @@ class Image;
 struct ShaderUniformHandle
 {
     GLuint m_nLocation;
-    std::string_view m_strName;
+    std::string m_strName;
 
     static bool sendData(const ShaderUniformHandle* const pHandle, const mat4x4& matrix);
 

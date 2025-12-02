@@ -2,6 +2,7 @@
 
 #include <glad/gl.h>
 #include "shader.h"
+#include "../core/debug_macro.h"
 
 
 void Material::useShader() const
@@ -34,7 +35,8 @@ int Material::sendTexturesData() const
 {
     int nTextureBitmask = 0;
 
-    for (int nTextureIndex = 0; nTextureIndex < static_cast<int>(m_vecTextureUniforms.size()); ++nTextureIndex)
+    int nSize = static_cast<int>(m_vecTextureUniforms.size());
+    for (int nTextureIndex = 0; nTextureIndex < nSize; ++nTextureIndex)
     {
         const TextureUniform& texUniform = m_vecTextureUniforms[nTextureIndex];
         if (ShaderUniformHandle::sendTexture(texUniform.pUniformHandle, texUniform.pImage, nTextureIndex))

@@ -1,0 +1,4 @@
+shader: 3d_lit_default
+textures:
+  u_tex0: assets/images/container.png
+  u_tex1: assets/images/container_specular.png

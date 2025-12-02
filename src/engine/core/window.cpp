@@ -17,6 +17,7 @@
 #include "scene/world.h"
 #include "../render/image_loader.h"
 #include "../render/shader_loader.h"
+#include "../render/material_loader.h"
 #include "../render/vertex.h"
 #include "../render/post_process/render_process_queue.h"
 #include "../render/lighting/light_manager.h"
@@ -201,6 +202,7 @@ void Window::setupManagers()
     ImageLoader::Initialize();
     LightManager::Initialize();
     ShaderLoader::Initialize();    
+    MaterialLoader::Initialize();
 
     setupInputManager();
 
