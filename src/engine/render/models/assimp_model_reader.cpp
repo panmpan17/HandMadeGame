@@ -137,8 +137,6 @@ Node* loadModel(const std::string_view& strPath, std::shared_ptr<Material>& pMat
         return nullptr;
     }
 
-    LOGLN( "Model {} loaded successfully with {} meshes.", strPath, pScene->mNumMeshes);
-
     std::vector<std::shared_ptr<Material>> arrMaterials;
     /*
     for (unsigned int i = 0; i < pScene->mNumMaterials; i++)

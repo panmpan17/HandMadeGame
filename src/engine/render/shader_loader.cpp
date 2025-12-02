@@ -54,17 +54,14 @@ void ShaderLoader::readRegistryFromFile()
         if (nCameraUBOIndex != GL_INVALID_INDEX)
         {
             pShader->setCameraUBOBindingPoint(nCameraUBOIndex);
-            LOGLN("Shader ID {} assigned to Camera UBO binding point {}", nCurrentShaderId, nCameraUBOIndex);
         }
         if (nLightUBOIndex != GL_INVALID_INDEX)
         {
             pShader->setLightUBOBindingPoint(nLightUBOIndex);
-            LOGLN("Shader ID {} assigned to Light UBO binding point {}", nCurrentShaderId, nLightUBOIndex);
         }
         if (nTimeDataUBOIndex != GL_INVALID_INDEX)
         {
             pShader->setTimeDataUBOBindingPoint(nTimeDataUBOIndex);
-            LOGLN("Shader ID {} assigned to TimeData UBO binding point {}", nCurrentShaderId, nTimeDataUBOIndex);
         }
         m_mapShaders[nCurrentShaderId] = pShader;
     };

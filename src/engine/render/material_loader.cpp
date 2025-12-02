@@ -83,7 +83,6 @@ std::shared_ptr<Material> MaterialLoader::loadMaterialFromFile(const std::string
         {
             if (eUniformType == MaterialUniformType::Texture2D)
             {
-                // LOGLN("Material file {} info: loading texture uniform: {}", strFilePath, strLine);
                 size_t nSeperate = strLine.find(": ");
                 if (nSeperate == std::string::npos)
                 {
@@ -101,7 +100,6 @@ std::shared_ptr<Material> MaterialLoader::loadMaterialFromFile(const std::string
                     return nullptr;
                 }
 
-                LOGLN("Material file {} info: loading texture uniform: '{}' with image path: '{}'", strFilePath, strUniformName, strImagePath);
                 pMaterial->bindTextureWithImage(strUniformName, pImage);
             }
         }

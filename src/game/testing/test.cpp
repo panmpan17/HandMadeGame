@@ -226,8 +226,6 @@ void createVisualEffectDemo()
         pWorldScene->setSkybox(pSkybox);
     }
 
-    Shader* p3DMeshShader = ShaderLoader::getInstance()->getShader("3d_lit_default");
-
     // Node* pMonkey = loadModel("assets/models/monkey.obj", p3DMeshShader);
     // pMonkey->addComponent(new Rotate3D(10, 30.f, 20.f));
     // // pMonkey->addComponent(new TwoPointsMovement(vec2{-1, 0}, vec2{1, 0}, 2.0f));
@@ -367,11 +365,10 @@ void createLightingShadowDemo()
         pWorldScene->setSkybox(pSkybox);
     }
 
-    Shader* p3DMeshShader = ShaderLoader::getInstance()->getShader("3d_lit_default");
+    std::shared_ptr<Material> pDefaultMaterial = MaterialLoader::getInstance()->getMaterial("assets/materials/default.yaml");
 
     {
-        std::shared_ptr<Material> pMaterial = std::make_shared<Material>(p3DMeshShader);
-        Node* pGround = loadModel("assets/models/box.obj", pMaterial);
+        Node* pGround = loadModel("assets/models/box.obj", pDefaultMaterial);
         pGround->setPosition(0.f, -3.f, 0.f);
         pGround->setScale(10.f, 0.5f, 10.f);
         pGround->setActive(false);
@@ -408,13 +405,7 @@ void createLightingShadowDemo()
     }
 
     {
-        Shader* pTestShader = ShaderLoader::getInstance()->getShader("test");
-
-        Image* const pNoiseImage = ImageLoader::getInstance()->getImageByPath("assets/shaders/noise_texture/perlin_1024.jpg");
-
-        std::shared_ptr<Material> pMaterial = std::make_shared<Material>(pTestShader);
-        pMaterial->bindTextureWithImage("u_perlinNoiseTex", pNoiseImage);
-
+        std::shared_ptr<Material> pMaterial = MaterialLoader::getInstance()->getMaterial("assets/materials/water.yaml");
         Node* pGround = loadModel("assets/models/box.obj", pMaterial);
         pGround->setPosition(0.f, -3.f, 0.f);
         pGround->setScale(10.f, 0.2f, 10.f);
@@ -425,12 +416,10 @@ void createLightingShadowDemo()
 void sceneTest()
 {
     WorldScene* const pWorldScene = WorldScene::current;
-    Shader* p3DMeshShader = ShaderLoader::getInstance()->getShader("3d_lit_default");
+    std::shared_ptr<Material> pDefaultMaterial = MaterialLoader::getInstance()->getMaterial("assets/materials/default.yaml");
 
     {
-        std::shared_ptr<Material> pMaterial = std::make_shared<Material>(p3DMeshShader);
-
-        Node* pBackPackFbx = loadModel("assets/models/toilet.glb", pMaterial);
+        Node* pBackPackFbx = loadModel("assets/models/toilet.glb", pDefaultMaterial);
         pBackPackFbx->setScale(1.f);
         pBackPackFbx->setPosition(0.f, 0.f, 0.f);
         pWorldScene->addNode(pBackPackFbx);
@@ -487,8 +476,6 @@ void serializationTest()
         pWorldScene->addNode(pClonedNode);
         // oSerializer << pParentNode;
     }
-
-    Shader* p3DMeshShader = ShaderLoader::getInstance()->getShader("3d_lit_default");
 
     {
         std::shared_ptr<Material> pMaterial = MaterialLoader::getInstance()->getMaterial("assets/materials/backpack.yaml");

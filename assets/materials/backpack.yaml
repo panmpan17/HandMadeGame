@@ -1,5 +1,5 @@
 shader: 3d_lit_default
 textures:
   u_tex0: assets/models/1001_albedo.jpg
-  u_tex1: assets/models/1001_normal.png
-  u_tex2: assets/models/1001_metallic.jpg
+  u_tex1: assets/models/1001_metallic.jpg
+  u_tex2: assets/models/1001_normal.png
