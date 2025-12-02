@@ -234,14 +234,16 @@ void createVisualEffectDemo()
 
     {
         std::shared_ptr<Material> pMaterial = MaterialLoader::getInstance()->getMaterial("assets/materials/box.yaml");
-        Node* pBackPackObj = loadModel("assets/models/box.obj", pMaterial);
+        AssimpModelReader oModelReader("assets/models/box.obj", { pMaterial });
+        Node* pBackPackObj = oModelReader.loadModel();
         pBackPackObj->setPosition(-2.f, 0.f, 0.f);
         pWorldScene->addNode(pBackPackObj);
     }
 
     {
         std::shared_ptr<Material> pMaterial = MaterialLoader::getInstance()->getMaterial("assets/materials/backpack.yaml");
-        Node* pBackPackFbx = loadModel("assets/models/back_pack.fbx", pMaterial);
+        AssimpModelReader oModelReader("assets/models/back_pack.fbx", { pMaterial });
+        Node* pBackPackFbx = oModelReader.loadModel();
         pBackPackFbx->setScale(0.01f);
         pBackPackFbx->setPosition(2.f, 0.f, 0.f);
         pWorldScene->addNode(pBackPackFbx);
@@ -367,24 +369,28 @@ void createLightingShadowDemo()
 
     std::shared_ptr<Material> pDefaultMaterial = MaterialLoader::getInstance()->getMaterial("assets/materials/default.yaml");
 
+    AssimpModelReader oBoxModelReader("assets/models/box.obj", { pDefaultMaterial });
+    oBoxModelReader.loadModel();
+
     {
-        Node* pGround = loadModel("assets/models/box.obj", pDefaultMaterial);
+        Node* pGround = oBoxModelReader.instantiateCloneNode();
         pGround->setPosition(0.f, -3.f, 0.f);
         pGround->setScale(10.f, 0.5f, 10.f);
-        pGround->setActive(false);
+        pGround->setActive(true);
         pWorldScene->addNode(pGround);
     }
 
     {
         std::shared_ptr<Material> pMaterial = MaterialLoader::getInstance()->getMaterial("assets/materials/box.yaml");
-        Node* pBackPackObj = loadModel("assets/models/box.obj", pMaterial);
+        Node* pBackPackObj = oBoxModelReader.instantiateCloneNode({ pMaterial });
         pBackPackObj->setPosition(-2.f, 0.f, 0.f);
         pWorldScene->addNode(pBackPackObj);
     }
 
     {
         std::shared_ptr<Material> pMaterial = MaterialLoader::getInstance()->getMaterial("assets/materials/backpack.yaml");
-        Node* pBackPackFbx = loadModel("assets/models/back_pack.fbx", pMaterial);
+        AssimpModelReader oModelReader("assets/models/back_pack.fbx", { pMaterial });
+        Node* pBackPackFbx = oModelReader.loadModel();
         pBackPackFbx->setScale(0.01f);
         pBackPackFbx->setPosition(2.f, 0.f, 0.f);
         pBackPackFbx->setRotationQuaternion(Quaternion::fromEulerAngles({0.f, -105.f, 0.f}));
@@ -406,10 +412,10 @@ void createLightingShadowDemo()
 
     {
         std::shared_ptr<Material> pMaterial = MaterialLoader::getInstance()->getMaterial("assets/materials/water.yaml");
-        Node* pGround = loadModel("assets/models/box.obj", pMaterial);
-        pGround->setPosition(0.f, -3.f, 0.f);
-        pGround->setScale(10.f, 0.2f, 10.f);
-        pWorldScene->addNode(pGround);
+        Node* pWater = oBoxModelReader.instantiateCloneNode({ pMaterial });
+        pWater->setPosition(10.f, -3.f, 0.f);
+        pWater->setScale(10.f, 0.2f, 10.f);
+        pWorldScene->addNode(pWater);
     }
 }
 
@@ -419,7 +425,8 @@ void sceneTest()
     std::shared_ptr<Material> pDefaultMaterial = MaterialLoader::getInstance()->getMaterial("assets/materials/default.yaml");
 
     {
-        Node* pBackPackFbx = loadModel("assets/models/toilet.glb", pDefaultMaterial);
+        AssimpModelReader oModelReader("assets/models/toilet.glb", { pDefaultMaterial });
+        Node* pBackPackFbx = oModelReader.loadModel();
         pBackPackFbx->setScale(1.f);
         pBackPackFbx->setPosition(0.f, 0.f, 0.f);
         pWorldScene->addNode(pBackPackFbx);
@@ -479,7 +486,8 @@ void serializationTest()
 
     {
         std::shared_ptr<Material> pMaterial = MaterialLoader::getInstance()->getMaterial("assets/materials/backpack.yaml");
-        Node* pBackPackFbx = loadModel("assets/models/back_pack.fbx", pMaterial);
+        AssimpModelReader oModelReader("assets/models/back_pack.fbx", { pMaterial });
+        Node* pBackPackFbx = oModelReader.loadModel();
         pBackPackFbx->setScale(0.01f);
         pBackPackFbx->setPosition(2.f, 0.f, 0.f);
         pBackPackFbx->setRotationQuaternion(Quaternion::fromEulerAngles({0.f, -105.f, 0.f}));

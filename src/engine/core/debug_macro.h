@@ -6,10 +6,6 @@
 #include "../../utils/platform.h"
 #include <ctime>
 
-#if !IS_PLATFORM_WINDOWS
-#include <print>
-#endif
-
 
 #ifndef DEBUG_FLAG
 #define DEBUG_FLAG 1
@@ -18,17 +14,17 @@
 #define IS_DEBUG_VERSION (DEBUG_FLAG == 1)
 
 
-#if IS_DEBUG_VERSION && !IS_PLATFORM_WINDOWS
+#if IS_DEBUG_VERSION
 
-#define LOG(msg, ...) std::print(msg __VA_OPT__(,) __VA_ARGS__)
-#define LOGLN(msg, ...) std::println(msg __VA_OPT__(,) __VA_ARGS__)
+#define LOG(msg, ...) std::cout << std::format(msg __VA_OPT__(,) __VA_ARGS__);
+#define LOGLN(msg, ...) std::cout << std::format(msg __VA_OPT__(,) __VA_ARGS__) << std::endl;
 
 #define LOGERR(msg, ...) std::cout << "\033[91m" << std::format(msg __VA_OPT__(,) __VA_ARGS__) << "\033[0m" << std::endl;
 
 #define ASSERT(condition, msg) \
     do { \
         if (!(condition)) { \
-            std::println("Assertion failed: {}", msg); \
+            std::cout << "Assertion failed: " << msg << std::endl; \
             exit(1); \
         } \
     } while (0)

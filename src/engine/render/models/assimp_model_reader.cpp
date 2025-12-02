@@ -14,130 +14,35 @@
 #include "../../../utils/file_utils.h"
 #include "../../../utils/filesystem.h"
 
-/*
-void convertMat4x4(const aiMatrix4x4& aiMat, mat4x4& outMat)
-{
-    outMat[0][0] = aiMat.a1; outMat[0][1] = aiMat.b1; outMat[0][2] = aiMat.c1; outMat[0][3] = aiMat.d1;
-    outMat[1][0] = aiMat.a2; outMat[1][1] = aiMat.b2; outMat[1][2] = aiMat.c2; outMat[1][3] = aiMat.d2;
-    outMat[2][0] = aiMat.a3; outMat[2][1] = aiMat.b3; outMat[2][2] = aiMat.c3; outMat[2][3] = aiMat.d3;
-    outMat[3][0] = aiMat.a4; outMat[3][1] = aiMat.b4; outMat[3][2] = aiMat.c4; outMat[3][3] = aiMat.d4;
-}
 
-void extractPositionFromMatrix(const mat4x4& matrix, Vector3& outPosition, bool bSwapYZ/* = false*)
-{
-    outPosition.x = matrix[3][0];
-    if (bSwapYZ)
-    {
-        outPosition.y = matrix[3][2];
-        outPosition.z = matrix[3][1];
-    }
-    else
-    {
-        outPosition.y = matrix[3][1];
-        outPosition.z = matrix[3][2];
-    }
-}
-
-void extractScaleFromMatrix(const mat4x4& matrix, Vector3& outScale)
-{
-    // Extract scale factors from the columns of the matrix
-    outScale.x = sqrtf(matrix[0][0] * matrix[0][0] + matrix[0][1] * matrix[0][1] + matrix[0][2] * matrix[0][2]);
-    outScale.y = sqrtf(matrix[1][0] * matrix[1][0] + matrix[1][1] * matrix[1][1] + matrix[1][2] * matrix[1][2]);
-    outScale.z = sqrtf(matrix[2][0] * matrix[2][0] + matrix[2][1] * matrix[2][1] + matrix[2][2] * matrix[2][2]);
-}
-
-void extractRotationMatrixFromMatrix(const mat4x4& matrix, const Vector3& scale, mat4x4& rotationMatrix)
-{
-    rotationMatrix[0][0] = matrix[0][0] / scale.x;
-    rotationMatrix[0][1] = matrix[0][1] / scale.x;
-    rotationMatrix[0][2] = matrix[0][2] / scale.x;
-    rotationMatrix[0][3] = 0.0f;
-
-    rotationMatrix[1][0] = matrix[1][0] / scale.y;
-    rotationMatrix[1][1] = matrix[1][1] / scale.y;
-    rotationMatrix[1][2] = matrix[1][2] / scale.y;
-    rotationMatrix[1][3] = 0.0f;
-
-    rotationMatrix[2][0] = matrix[2][0] / scale.z;
-    rotationMatrix[2][1] = matrix[2][1] / scale.z;
-    rotationMatrix[2][2] = matrix[2][2] / scale.z;
-    rotationMatrix[2][3] = 0.0f;
-
-    rotationMatrix[3][0] = 0.0f;
-    rotationMatrix[3][1] = 0.0f;
-    rotationMatrix[3][2] = 0.0f;
-    rotationMatrix[3][3] = 1.0f;
-}
-
-void rotationMatrixToQuaternion(const mat4x4& rotationMatrix, Quaternion& outQuat)
-{
-    float trace = rotationMatrix[0][0] + rotationMatrix[1][1] + rotationMatrix[2][2];
-    if (trace > 0.0f)
-    {
-        float s = sqrtf(trace + 1.0f) * 2.0f; // S=4*qw
-        outQuat.w = 0.25f * s;
-        outQuat.x = (rotationMatrix[2][1] - rotationMatrix[1][2]) / s;
-        outQuat.y = (rotationMatrix[0][2] - rotationMatrix[2][0]) / s;
-        outQuat.z = (rotationMatrix[1][0] - rotationMatrix[0][1]) / s;
-    }
-    else if (rotationMatrix[0][0] > rotationMatrix[1][1] && rotationMatrix[0][0] > rotationMatrix[2][2])
-    {
-        float s = sqrtf(1.0f + rotationMatrix[0][0] - rotationMatrix[1][1] - rotationMatrix[2][2]) * 2.0f; // S=4*qx
-        outQuat.w = (rotationMatrix[2][1] - rotationMatrix[1][2]) / s;
-        outQuat.x = 0.25f * s;
-        outQuat.y = (rotationMatrix[0][1] + rotationMatrix[1][0]) / s;
-        outQuat.z = (rotationMatrix[0][2] + rotationMatrix[2][0]) / s;
-    }
-    else if (rotationMatrix[1][1] > rotationMatrix[2][2])
-    {
-        float s = sqrtf(1.0f + rotationMatrix[1][1] - rotationMatrix[0][0] - rotationMatrix[2][2]) * 2.0f; // S=4*qy
-        outQuat.w = (rotationMatrix[0][2] - rotationMatrix[2][0]) / s;
-        outQuat.x = (rotationMatrix[0][1] + rotationMatrix[1][0]) / s;
-        outQuat.y = 0.25f * s;
-        outQuat.z = (rotationMatrix[1][2] + rotationMatrix[2][1]) / s;
-    }
-    else
-    {
-        float s = sqrtf(1.0f + rotationMatrix[2][2] - rotationMatrix[0][0] - rotationMatrix[1][1]) * 2.0f; // S=4*qz
-        outQuat.w = (rotationMatrix[1][0] - rotationMatrix[0][1]) / s;
-        outQuat.x = (rotationMatrix[0][2] + rotationMatrix[2][0]) / s;
-        outQuat.y = (rotationMatrix[1][2] + rotationMatrix[2][1]) / s;
-        outQuat.z = 0.25f * s;
-    }
-}
-*/
-
-Node* loadModel(const std::string_view& strPath, std::shared_ptr<Material>& pMaterial)
+Node* AssimpModelReader::loadModel()
 {
     // DEBUG_START_TIMER();
 
     Assimp::Importer importer;
 
-    const aiScene* pScene;
-
-    if (*strPath.begin() != '/')
+    if (*m_strPath.begin() != '/')
     {
-        std::string strFullPath = fs::path(FileUtils::getResourcesPath()).append(strPath).string();
-        pScene = importer.ReadFile(strFullPath.c_str(),
+        std::string strFullPath = fs::path(FileUtils::getResourcesPath()).append(m_strPath).string();
+        m_pScene = importer.ReadFile(strFullPath.c_str(),
                                    aiProcess_Triangulate | aiProcess_FlipUVs
                                    | aiProcess_CalcTangentSpace | aiProcess_GenNormals);
     }
     else
     {
-        pScene = importer.ReadFile(strPath.data(),
+        m_pScene = importer.ReadFile(m_strPath.data(),
                                    aiProcess_Triangulate | aiProcess_FlipUVs
                                    | aiProcess_CalcTangentSpace | aiProcess_GenNormals);
     }
 
     // DEBUG_END_TIMER("Assimp Importer ReadFile");
 
-    if (!pScene || pScene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !pScene->mRootNode) 
+    if (!m_pScene || m_pScene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !m_pScene->mRootNode) 
     {
         LOGLN( "Error loading model: {}", importer.GetErrorString() );
         return nullptr;
     }
 
-    std::vector<std::shared_ptr<Material>> arrMaterials;
     /*
     for (unsigned int i = 0; i < pScene->mNumMaterials; i++)
     {
@@ -207,12 +112,12 @@ Node* loadModel(const std::string_view& strPath, std::shared_ptr<Material>& pMat
     */
 
 
-    Node* pRootNode = processNode(pScene->mRootNode, pScene, arrMaterials, pMaterial);
+    m_pRootNode = processNode(m_pScene->mRootNode);
     // DEBUG_END_TIMER("Process root node done");
-    return pRootNode;
+    return m_pRootNode;
 }
 
-Node* processNode(const aiNode* pAiNode, const aiScene* pScene, std::vector<std::shared_ptr<Material>>& vecSceneMaterials, std::shared_ptr<Material>& pMaterial)
+Node* AssimpModelReader::processNode(const aiNode* pAiNode)
 {
     aiVector3D scale;
     aiVector3D position;
@@ -231,32 +136,33 @@ Node* processNode(const aiNode* pAiNode, const aiScene* pScene, std::vector<std:
     for (unsigned int i = 0; i < pAiNode->mNumMeshes; i++)
     {
         auto pMeshRenderer = new MeshRenderer();
-        pMeshRenderer->setMesh(processMesh(pScene->mMeshes[pAiNode->mMeshes[i]], pScene));
+        pMeshRenderer->setMesh(processMesh(m_pScene->mMeshes[pAiNode->mMeshes[i]]));
 
-        unsigned int nMaterialIndex = pScene->mMeshes[pAiNode->mMeshes[i]]->mMaterialIndex;
-        if (nMaterialIndex < vecSceneMaterials.size())
+        unsigned int nMaterialIndex = m_pScene->mMeshes[pAiNode->mMeshes[i]]->mMaterialIndex;
+        if (nMaterialIndex < m_vecOverrideMaterials.size())
         {
-            LOGLN( "Assigning material index {} to mesh.", nMaterialIndex );
-            pMeshRenderer->setMaterial(vecSceneMaterials.at(nMaterialIndex));
+            pMeshRenderer->setMaterial(m_vecOverrideMaterials.at(nMaterialIndex));
         }
-        else
+        else if (nMaterialIndex < m_vecSceneMaterials.size())
         {
-            pMeshRenderer->setMaterial(pMaterial);
+            pMeshRenderer->setMaterial(m_vecSceneMaterials.at(nMaterialIndex));
         }
+
+        m_mapMeshToMaterialIndex[pMeshRenderer] = nMaterialIndex;
         pNode->addComponent(pMeshRenderer);
     }
 
     // then do the same for each of its children
     for (unsigned int i = 0; i < pAiNode->mNumChildren; i++)
     {
-        Node* pChildNod = processNode(pAiNode->mChildren[i], pScene, vecSceneMaterials, pMaterial);
+        Node* pChildNod = processNode(pAiNode->mChildren[i]);
         pNode->addChildNode(pChildNod);
     }
 
     return pNode;
 }
 
-std::shared_ptr<Mesh> processMesh(const aiMesh* pAiMesh, const aiScene* pScene)
+std::shared_ptr<Mesh> AssimpModelReader::processMesh(const aiMesh* pAiMesh)
 {
     std::shared_ptr<Mesh> pMesh = std::make_shared<Mesh>(pAiMesh->mNumVertices, pAiMesh->mNumFaces * 3);
 
@@ -335,4 +241,55 @@ std::shared_ptr<Mesh> processMesh(const aiMesh* pAiMesh, const aiScene* pScene)
     pMesh->loadToGPU();
 
     return pMesh;
+}
+
+Node* AssimpModelReader::instantiateCloneNode() const
+{
+    if (m_pRootNode)
+    {
+        return m_pRootNode->clone();
+    }
+    return nullptr;
+}
+
+Node* AssimpModelReader::instantiateCloneNode(const std::vector<std::shared_ptr<Material>>& vecOverrideMaterials)
+{
+    m_vecOverrideMaterials = vecOverrideMaterials;
+
+    if (m_pRootNode)
+    {
+        Node* pClonedNode = m_pRootNode->clone();
+        overrideCloneNodeMaterials(m_pRootNode, pClonedNode, vecOverrideMaterials);
+        return pClonedNode;
+    }
+
+    return nullptr;
+}
+
+void AssimpModelReader::overrideCloneNodeMaterials(Node* pOriginalNode, Node* pClonedNode, const std::vector<std::shared_ptr<Material>>& vecOverrideMaterials)
+{
+    int nSize = pClonedNode->getComponentCount();
+    for (int i = 0; i < nSize; ++i)
+    {
+        MeshRenderer* pOriginalMeshRenderer = dynamic_cast<MeshRenderer*>(pOriginalNode->getComponent(i));
+        if (pOriginalMeshRenderer)
+        {
+            MeshRenderer* pMeshRenderer = static_cast<MeshRenderer*>(pClonedNode->getComponent(i));
+            auto it = m_mapMeshToMaterialIndex.find(pOriginalMeshRenderer);
+            if (it != m_mapMeshToMaterialIndex.end())
+            {
+                unsigned int nMaterialIndex = it->second;
+                if (nMaterialIndex < vecOverrideMaterials.size())
+                {
+                    pMeshRenderer->setMaterial(vecOverrideMaterials.at(nMaterialIndex));
+                }
+            }
+        }
+    }
+
+    nSize = pClonedNode->getChildNodeCount();
+    for (int i = 0; i < nSize; ++i)
+    {
+        overrideCloneNodeMaterials(pOriginalNode->getChildNode(i), pClonedNode->getChildNode(i), vecOverrideMaterials);
+    }
 }
