@@ -17,8 +17,6 @@ public:
 
     virtual void update(float fDeltaTime) override;
 
-    virtual void draw() override {}
-
 protected:
     float m_fMoveSpeed = 0.0f;
     std::bitset<4> m_bMovementKeyPressed = 0;
@@ -55,8 +53,6 @@ public:
     virtual bool isUpdatable() const override { return true; }
 
     virtual void update(float fDeltaTime) override;
-
-    virtual void draw() override {}
 
 protected:
     vec3 m_vecStart;

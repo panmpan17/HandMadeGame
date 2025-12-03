@@ -31,7 +31,6 @@ public:
 
     void start();
     void update(float fDeltaTime) override;
-    void draw() override {}
 
     Box getBox() const;
 

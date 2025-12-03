@@ -19,8 +19,6 @@ public:
     virtual void onStart() override;
     virtual void update(float fDeltaTime) override {}
 
-    virtual void draw() override {}
-
 private:
     SpriteAnimation* m_pAnimation = nullptr;
 

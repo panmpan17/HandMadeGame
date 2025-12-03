@@ -15,7 +15,7 @@ public:
     Triangle();
     ~Triangle();
 
-    void registerBuffer() override;
+    void registerBuffer();
     void draw() override;
 
     void setShader(Shader* pShader) override;

@@ -31,7 +31,7 @@ public:
     bool isUpdatable() const override { return true; }
 
     
-    void registerBuffer() override;
+    void registerBuffer();
     void draw() override;
     void setShader(Shader* pShader) override;
 

@@ -13,9 +13,11 @@ public:
     virtual bool isIDrawable() const override { return true; }
     virtual bool isUpdatable() const override { return false; }
 
-    virtual void registerBuffer() = 0;
     virtual void setShader(Shader* pShader) = 0;
 
     virtual void update(float _) override {}
+
+    virtual void draw() = 0;
+    virtual void drawDepth() {}
 };
 

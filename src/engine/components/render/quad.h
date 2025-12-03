@@ -18,7 +18,7 @@ public:
     Quad(float fWidth, float fHeight, vec4 color);
     ~Quad();
 
-    void registerBuffer() override;
+    void registerBuffer();
     void draw() override;
 
     virtual void setShader(Shader* pShader) override;

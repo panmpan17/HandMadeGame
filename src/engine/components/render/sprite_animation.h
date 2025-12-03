@@ -108,8 +108,6 @@ public:
         }
     }
 
-    virtual void draw() override {}
-
 protected:
     Sprite* m_pSprite;
     std::string m_strAnimationFileName;

@@ -45,8 +45,6 @@ public:
         pNode->setScale(Vector3::lerp(m_vecStart, m_vecEnd, m_fTimer / m_fDuration));
     }
 
-    virtual void draw() override {}
-
 protected:
     Vector3 m_vecStart;
     Vector3 m_vecEnd;

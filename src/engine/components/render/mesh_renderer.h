@@ -1,5 +1,6 @@
 #include <memory>
 #include "../component.h"
+#include "../drawable_interface.h"
 #include "../../render/shader.h"
 
 class SimpleObjReader;
@@ -12,15 +13,11 @@ class Material;
 typedef unsigned int GLuint;
 
 
-class MeshRenderer : public Component
+class MeshRenderer : public IDrawable
 {
 public:
     MeshRenderer();
     ~MeshRenderer();
-
-    virtual bool isIDrawable() const override { return true; }
-    virtual bool isUpdatable() const override { return false; }
-
     virtual void update(float fDeltaTime) override {}
 
     virtual void draw() override;
@@ -33,6 +30,8 @@ public:
         pNewMeshRenderer->setMaterial(m_pMaterial);
         return pNewMeshRenderer;
     }
+
+    void setShader(Shader* pShader) override {}
 
     void setMaterial(const std::shared_ptr<Material>& pMaterial);
     inline void setMesh(const std::shared_ptr<Mesh>& pMesh) { m_pMesh = pMesh; }

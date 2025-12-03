@@ -12,8 +12,6 @@ public:
 
     virtual void update(float fDeltaTime) override;
 
-    virtual void draw() override {}
-
 private:
     const float DEFAULT_MOVE_SPEED = 5.f;
     const float BOOSTED_MOVE_SPEED = 15.f;

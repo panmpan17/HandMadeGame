@@ -24,7 +24,6 @@ public:
 
     void start();
     void update(float deltaTime) override;
-    void draw() override {}
 
     Box getBox() const;
 

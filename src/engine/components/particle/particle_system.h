@@ -84,7 +84,7 @@ public:
     bool isUpdatable() const override { return true; }
 
     
-    void registerBuffer() override;
+    void registerBuffer();
     void draw() override;
 
     void setMaterial(const std::shared_ptr<Material>& pMaterial);

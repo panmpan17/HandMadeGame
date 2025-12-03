@@ -63,7 +63,6 @@ public:
 
     void onStart() override;
 
-    void draw() override {}
     void update(float deltaTime) override {}
 
     void updateCameraDataBuffer();

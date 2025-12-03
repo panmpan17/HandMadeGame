@@ -24,8 +24,6 @@
 //         }
 //     }
 
-//     virtual void draw() override {}
-
 // protected:
 //     float m_fRotationSpeed = 0.0f; // Speed of rotation in degrees per second
 
@@ -53,8 +51,6 @@ public:
             pNode->rotateQuaternion(Quaternion::fromAxisAngle({ m_vecCurrentEulerAngles.x, m_vecCurrentEulerAngles.y, m_vecCurrentEulerAngles.z }, deltaTime));
         }
     }
-
-    virtual void draw() override {}
 
     virtual Component* clone() const override
     {

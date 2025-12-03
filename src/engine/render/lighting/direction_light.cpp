@@ -101,41 +101,42 @@ void DirectionLightComponent::registerBuffer()
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void DirectionLightComponent::draw()
-{
-    ASSERT(m_pShader, "Shader must be set before drawing the quad");
+// void DirectionLightComponent::draw()
+// {
+//     ASSERT(m_pShader, "Shader must be set before drawing the quad");
 
-    const mat4x4& matModel = m_pNode->getWorldMatrix();
+//     // TODO: Move this part into gizmos renderer
+//     const mat4x4& matModel = m_pNode->getWorldMatrix();
 
-    glUseProgram(m_pShader->getProgram());
-    if (m_pPositionUniform)
-    {
-        const Vector3& worldPos = m_pNode->getPositionInWorld();
-        glUniform3f(m_pPositionUniform->m_nLocation, worldPos.x, worldPos.y, worldPos.z);
-    }
-    if (m_pColorUniform)
-    {
-        glUniform4f(m_pColorUniform->m_nLocation, m_color.x, m_color.y, m_color.z, 1);
-    }
-    if (m_pUseTextureUniform)
-    {
-        glUniform1i(m_pUseTextureUniform->m_nLocation, pDirectionLightGizmosImage ? 1 : 0); // true
-    }
-    if (m_pTextureUniform && pDirectionLightGizmosImage)
-    {
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, pDirectionLightGizmosImage->getTextureID());
-        glUniform1i(m_pTextureUniform->m_nLocation, 0);
-    }
+//     glUseProgram(m_pShader->getProgram());
+//     if (m_pPositionUniform)
+//     {
+//         const Vector3& worldPos = m_pNode->getPositionInWorld();
+//         glUniform3f(m_pPositionUniform->m_nLocation, worldPos.x, worldPos.y, worldPos.z);
+//     }
+//     if (m_pColorUniform)
+//     {
+//         glUniform4f(m_pColorUniform->m_nLocation, m_color.x, m_color.y, m_color.z, 1);
+//     }
+//     if (m_pUseTextureUniform)
+//     {
+//         glUniform1i(m_pUseTextureUniform->m_nLocation, pDirectionLightGizmosImage ? 1 : 0); // true
+//     }
+//     if (m_pTextureUniform && pDirectionLightGizmosImage)
+//     {
+//         glActiveTexture(GL_TEXTURE0);
+//         glBindTexture(GL_TEXTURE_2D, pDirectionLightGizmosImage->getTextureID());
+//         glUniform1i(m_pTextureUniform->m_nLocation, 0);
+//     }
 
-    glBindVertexArray(m_nVertexArray);
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4); // Draw the quad using triangle strip
-    INCREASE_DRAW_CALL_COUNT();
+//     glBindVertexArray(m_nVertexArray);
+//     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4); // Draw the quad using triangle strip
+//     INCREASE_DRAW_CALL_COUNT();
 
-    glBindTexture(GL_TEXTURE_2D, 0); // Unbind the texture
-    glBindVertexArray(0); // Unbind the vertex array
-    glUseProgram(0);
-}
+//     glBindTexture(GL_TEXTURE_2D, 0); // Unbind the texture
+//     glBindVertexArray(0); // Unbind the vertex array
+//     glUseProgram(0);
+// }
 
 const mat4x4& DirectionLightComponent::getLightCastingMatrix()
 {

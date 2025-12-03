@@ -59,10 +59,9 @@ public:
     void markLightDataDirty() { m_bLightDataDirty = true; }
 
     void onStart() override;
-    void draw() override;
     void update(float deltaTime) override {}
 
-    bool isIDrawable() const override { return true; }
+    bool isIDrawable() const override { return false; }
     bool isUpdatable() const override { return false; }
 
 
