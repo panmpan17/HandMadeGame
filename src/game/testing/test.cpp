@@ -549,3 +549,80 @@ void serializationTest()
 
     // pWorldScene->readFromFiles("assets/nested_node.txt");
 }
+
+void createProfolioSceneDemo()
+{
+    WorldScene* const pWorldScene = WorldScene::current;
+
+    {
+        Skybox* pSkybox = new Skybox();
+        pSkybox->loadSkyboxCubmaps(
+            "assets/images/skybox/right.jpg",
+            "assets/images/skybox/left.jpg",
+            "assets/images/skybox/top.jpg",
+            "assets/images/skybox/bottom.jpg",
+            "assets/images/skybox/front.jpg",
+            "assets/images/skybox/back.jpg"
+        );
+        pWorldScene->setSkybox(pSkybox);
+    }
+
+    Shader* p3DMeshShader = ShaderLoader::getInstance()->getShader("3d_lit_default");
+
+    {
+        std::shared_ptr<Material> pMaterial = MaterialLoader::getInstance()->getMaterial("assets/models/ground/grass.yaml");
+
+        AssimpModelReader oModelReader("assets/models/ground/ground.fbx", { pMaterial });
+        auto pGround = oModelReader.loadModel();
+        pGround->setPosition(5.f, -10.f, 10.f);
+        pGround->setScale(.002f);
+        pWorldScene->addNode(pGround);
+    }
+
+
+    std::shared_ptr<Material> pRockMaterial = MaterialLoader::getInstance()->getMaterial("assets/models/rock/rock.yaml");
+    AssimpModelReader oRockModelReader("assets/models/rock/rock.fbx", { pRockMaterial });
+    oRockModelReader.loadModel();
+
+    {
+        auto pRock = oRockModelReader.instantiateCloneNode();
+        pRock->setName("Rock1");
+        pRock->setPosition(10.f, -10.f, 4.f);
+        pRock->setRotationQuaternion(Quaternion::fromEulerAngles({0.f, 10.f, -20.f}));
+        pRock->setScale(.05f);
+        pWorldScene->addNode(pRock);
+    }
+
+    {
+        auto pRock = oRockModelReader.instantiateCloneNode();
+        pRock->setName("Rock2");
+        pRock->setPosition(8.f, -10.f, 7.5f);
+        pRock->setRotationQuaternion(Quaternion::fromEulerAngles({0.f, 10.f, 5.f}));
+        pRock->setScale(.06f);
+        pWorldScene->addNode(pRock);
+    }
+
+    {
+        std::shared_ptr<Material> pMaterial = MaterialLoader::getInstance()->getMaterial("assets/materials/backpack.yaml");
+        AssimpModelReader oModelReader("assets/models/back_pack.fbx", { pMaterial });
+        Node* pBackPackFbx = oModelReader.loadModel();
+        pBackPackFbx->setName("BackPack");
+        pBackPackFbx->setScale(0.01f);
+        pBackPackFbx->setPosition(10.f, -8.f, 11.f);
+        pBackPackFbx->setRotationQuaternion(Quaternion::fromEulerAngles({-40.f, 40.f, 0.f}));
+        pWorldScene->addNode(pBackPackFbx);
+    }
+
+    {
+        Node* pDirectionLightNode = new Node(0, 10.f, 0.f);
+        pDirectionLightNode->setName("DirectionLight");
+        pDirectionLightNode->setRotationQuaternion(Quaternion::fromEulerAngles({-130.f, 30.f, 0.f}));
+
+        DirectionLightComponent* pPointLightComp = new DirectionLightComponent();
+        pPointLightComp->setColor({0.84f, 0.84f, 0.84f});
+        pPointLightComp->setIntensity(1.f);
+        pDirectionLightNode->addComponent(pPointLightComp);
+
+        pWorldScene->addNode(pDirectionLightNode);
+    }
+}

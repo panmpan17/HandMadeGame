@@ -41,6 +41,7 @@ int main(int nArgumentCount, char* arrArguments[])
         createLightingShadowDemo();
         // createPingPongGame();
         // sceneTest();
+        // createProfolioSceneDemo();
         // colorPicker.pickerMain();
         // serializationTest();
 
