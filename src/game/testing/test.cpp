@@ -417,6 +417,34 @@ void createLightingShadowDemo()
         pWater->setScale(10.f, 0.2f, 10.f);
         pWorldScene->addNode(pWater);
     }
+
+    {
+        // Shader* pParticleShader = ShaderLoader::getInstance()->getShader("particle_instance");
+        // Image* pDustImage = ImageLoader::getInstance()->getImageByPath("assets/images/dust_1.png");
+        std::shared_ptr<Material> pMaterial = MaterialLoader::getInstance()->getMaterial("assets/materials/dust_particle.yaml");
+
+        Node* pNode5 = new Node(0, 0, 0);
+        ParticleSystem* particle = new ParticleSystem(100, false);
+        // particle->setImage(pDustImage);
+        // particle->setShader(pParticleShader);
+        particle->setMaterial(pMaterial);
+        particle->registerBuffer();
+        particle->setParticleStartColor({ 1.f, 1.f, 1.f, 1.f }, { 0.9f, 0.9f, 0.9f, 1.f });
+        particle->setIsLooping(true);
+        particle->addParticleModule(new ParticleIntervalSpawn(10));
+        particle->addParticleIndividualModule(new ScaleThroughParticleLifetime(0.1f, 1.f));
+        particle->setParticleLifetime(4, 6);
+        particle->setParticleStartVelocity(1, 1);
+        particle->setGravity({ 0, -0.6f });
+        particle->setParticleStartVelocityDirectionOverride([](vec2& velocity) {
+            velocity[0] = randomFloat(-0.2f, 0.2f); // Override X direction
+            velocity[1] = 1.f; // Override Y direction
+        });
+
+        pNode5->addComponent(particle);
+        pNode5->setActive(true);
+        pWorldScene->addNode(pNode5);
+    }
 }
 
 void sceneTest()

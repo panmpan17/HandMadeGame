@@ -5,6 +5,7 @@
 #include "../../render/vertex.h"
 #include "../../render/shader_loader.h"
 #include "../../render/image.h"
+#include "../../render/material.h"
 #include "../../core/debug_macro.h"
 #include "../../core/scene/node.h"
 #include "../../core/camera.h"
@@ -126,37 +127,37 @@ void ParticleSystem::registerBuffer()
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
+void ParticleSystem::setMaterial(const std::shared_ptr<Material>& pMaterial)
+{
+    m_pMaterial = pMaterial;
+    setShader(m_pMaterial->getShader());
+}
+
 void ParticleSystem::setShader(Shader* pShader)
 {
-    m_pShader = pShader;
-
     m_pMVPUniForm = pShader->getUniformHandle("u_MVP");
     m_pNodeTransformUniform = pShader->getUniformHandle("u_nodeTransform");
     m_pUseNodeTransformUniform = pShader->getUniformHandle("u_useNodeTransform");
     m_pUseTextureUniform = pShader->getUniformHandle("u_useTexture");
-    m_pTextureUniform = pShader->getUniformHandle(SHADER_UNIFORM_TEXTURE_0);
 }
 
 void ParticleSystem::draw()
 {
-    ASSERT(m_pShader, "Shader must be set before drawing the quad");
+    ASSERT(m_pMaterial && m_pMaterial->getShader(), "Material must be set before drawing the quad");
 
     if (m_nAliveParticleCount <= 0) return;
 
     glBindVertexArray(m_nVertexArray);
-    glUseProgram(m_pShader->getProgram());
+    m_pMaterial->useShader();
 
     glUniform1i(m_pUseNodeTransformUniform->m_nLocation, m_bSimulateInLocal ? 1 : 0);
-    glUniform1i(m_pUseTextureUniform->m_nLocation, m_pImage ? 1 : 0);
-
-    glUniform1i(m_pTextureUniform->m_nLocation, 0);
 
     const mat4x4& cameraViewMatrix = Camera::main->getViewProjectionMatrix();
 
     glUniformMatrix4fv(m_pMVPUniForm->m_nLocation, 1, GL_FALSE, (const GLfloat*) cameraViewMatrix);
 
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, m_pImage ? m_pImage->getTextureID() : 0);
+    int nResult = m_pMaterial->sendTexturesData();
+    glUniform1i(m_pUseTextureUniform->m_nLocation, nResult);
 
     if (m_bSimulateInLocal)
     {
@@ -371,11 +372,8 @@ void ParticleSystem::serializeToWrapper(DataSerializer& serializer) const
     serializer.ADD_ATTRIBUTES(m_fStartVelocityMax);
     serializer.ADD_ATTRIBUTES(m_bSimulateInLocal);
     serializer.ADD_ATTRIBUTES(m_fGravity);
-
-    if (m_pShader)
-    {
-        serializer.ADD_ATTRIBUTES_VALUE(m_pShader, m_pShader->getId());
-    }
+    
+    // TODO: Store material properly
 
     for (int i = 0; i < 4; ++i)
     {
@@ -424,7 +422,8 @@ bool ParticleSystem::deserializeField(DataDeserializer& deserializer, const std:
     DESERIALIZE_FIELD(m_fStartVelocityMax);
     DESERIALIZE_FIELD(m_bSimulateInLocal);
     DESERIALIZE_FIELD(m_fGravity);
-    DESERIALIZE_FIELD(m_pShader);
+
+    // TODO: Load material properly
 
     IF_DESERIALIZE_FIELD_CHECK(module)
     {
@@ -465,9 +464,9 @@ bool ParticleSystem::deserializeField(DataDeserializer& deserializer, const std:
 
 void ParticleSystem::onNodeFinishedDeserialization()
 {
-    if (m_pShader)
+    if (m_pMaterial)
     {
-        setShader(m_pShader);
+        setMaterial(m_pMaterial);
         registerBuffer();
     }
 }

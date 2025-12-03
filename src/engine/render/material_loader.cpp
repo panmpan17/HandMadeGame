@@ -75,6 +75,17 @@ std::shared_ptr<Material> MaterialLoader::loadMaterialFromFile(const std::string
 
             pMaterial = std::make_shared<Material>(pShader);
         }
+        else if (memcmp(strLine.data(), "transparent", 11) == 0)
+        {
+            if (!pMaterial)
+            {
+                LOGLN("Material file {} error: transparent defined before shader.", strFilePath);
+                return nullptr;
+            }
+
+            int nTransparentValue = atoi(strLine.substr(2 + 11).c_str());
+            pMaterial->setTransparent(nTransparentValue == 1);
+        }
         else if (memcmp(strLine.data(), "texture", 7) == 0)
         {
             if (!pMaterial)

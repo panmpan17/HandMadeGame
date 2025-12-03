@@ -8,6 +8,8 @@
 
 typedef unsigned int GLuint;
 class Image;
+class Material;
+
 
 struct ParticleGPUInstance
 {
@@ -84,6 +86,8 @@ public:
     
     void registerBuffer() override;
     void draw() override;
+
+    void setMaterial(const std::shared_ptr<Material>& pMaterial);
     void setShader(Shader* pShader) override;
 
     void update(float fDeltaTime) override;
@@ -147,9 +151,8 @@ private:
     const ShaderUniformHandle* m_pUseTextureUniform = nullptr;
     const ShaderUniformHandle* m_pMVPUniForm = nullptr;
     const ShaderUniformHandle* m_pNodeTransformUniform = nullptr;
-    const ShaderUniformHandle* m_pTextureUniform = nullptr;
 
-    Shader* m_pShader = nullptr;
+    std::shared_ptr<Material> m_pMaterial = nullptr;
 
     int m_nAllParticleCount = 0;
     int m_nAliveParticleCount = 0;
