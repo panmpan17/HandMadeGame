@@ -150,7 +150,6 @@ void Skybox::loadSkyboxCubmaps(const std::string_view& strRight, const std::stri
 
 void Skybox::draw()
 {
-    // glDepthMask(GL_FALSE);
     glDepthFunc(GL_LEQUAL);
 
     glUseProgram(m_pSkyboxShader->getProgram());
@@ -166,5 +165,4 @@ void Skybox::draw()
     glUseProgram(0);
 
     glDepthFunc(GL_LESS);
-    // glDepthMask(GL_TRUE);
 }

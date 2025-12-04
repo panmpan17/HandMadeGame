@@ -160,7 +160,7 @@ void createDemo1()
     particle3->setShader(pParticleShader);
     particle3->registerBuffer();
     particle3->setParticleStartColor({ 1.f, 0.f, 0.f, 1.f }, { 0.9f, 0.f, 0.f, 1.f });
-    particle3->setSpawnShape(eParticleSpawnShape::BOX);
+    particle3->setSpawnShape(eParticleSpawnShape::RECTANGLE);
     particle3->setSpawnShapeDimensions(0.2f, 0.5f);
     // particle3->addParticleModule(new ParticleIntervalSpawn(10));
     particle3->addParticleModule(new ParticleBurstSpawn(1.0f, 20));
@@ -436,11 +436,13 @@ void createLightingShadowDemo()
         particle->addParticleIndividualModule(new ScaleThroughParticleLifetime(0.1f, 1.f));
         particle->setParticleLifetime(4, 6);
         particle->setParticleStartVelocity(1, 1);
-        particle->setGravity(0, -0.6f, 0);
+        particle->setGravity(0, 0, 0);
+        particle->setSpawnShape(eParticleSpawnShape::BOX);
+        particle->setSpawnShapeDimensions(.1f, .1f, .1f);
         particle->setParticleStartVelocityDirectionOverride([](vec3& velocity) {
-            velocity[0] = randomFloat(-0.2f, 0.2f); // Override X direction
-            velocity[1] = 1.f; // Override Y direction
-            velocity[2] = randomFloat(-0.2f, 0.2f); // Override Z direction
+            velocity[0] = randomFloat(-0.05f, 0.05f); // Override X direction
+            velocity[1] = randomFloat(-0.05f, 0.05f); // Override Y direction
+            velocity[2] = randomFloat(-0.05f, 0.05f); // Override Z direction
         });
 
         pNode5->addComponent(particle);

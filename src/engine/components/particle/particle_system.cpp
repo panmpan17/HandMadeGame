@@ -300,10 +300,27 @@ void ParticleSystem::spawnNewParticles(int nSpawnCount/* = 1*/)
                     }
                     break;
 
-                case eParticleSpawnShape::BOX:
+                case eParticleSpawnShape::RECTANGLE:
                     m_arrParticlesGPU[i].m_vecPosition[0] = randomFloat(-m_fSpawnShapeWidth, m_fSpawnShapeWidth) + vecBasePositionX;
                     m_arrParticlesGPU[i].m_vecPosition[1] = randomFloat(-m_fSpawnShapeHeight, m_fSpawnShapeHeight) + vecBasePositionY;
                     m_arrParticlesGPU[i].m_vecPosition[2] = vecBasePositionZ;
+                    break;
+                
+                case eParticleSpawnShape::SPHERE:
+                    {
+                        float fTheta = randomFloat(0.0f, 2.0f * M_PI);
+                        float fPhi = randomFloat(0.0f, M_PI);
+                        float fRadius = randomFloat(0.0f, m_fSpawnShapeWidth);
+                        m_arrParticlesGPU[i].m_vecPosition[0] = fRadius * sin(fPhi) * cos(fTheta) + vecBasePositionX;
+                        m_arrParticlesGPU[i].m_vecPosition[1] = fRadius * sin(fPhi) * sin(fTheta) + vecBasePositionY;
+                        m_arrParticlesGPU[i].m_vecPosition[2] = fRadius * cos(fPhi) + vecBasePositionZ;
+                    }
+                    break;
+
+                case eParticleSpawnShape::BOX:
+                    m_arrParticlesGPU[i].m_vecPosition[0] = randomFloat(-m_fSpawnShapeWidth, m_fSpawnShapeWidth) + vecBasePositionX;
+                    m_arrParticlesGPU[i].m_vecPosition[1] = randomFloat(-m_fSpawnShapeHeight, m_fSpawnShapeHeight) + vecBasePositionY;
+                    m_arrParticlesGPU[i].m_vecPosition[2] = randomFloat(-m_fSpawnShapeDepth, m_fSpawnShapeDepth) + vecBasePositionZ;
                     break;
             }
 
@@ -365,6 +382,7 @@ void ParticleSystem::serializeToWrapper(DataSerializer& serializer) const
     serializer.ADD_ATTRIBUTES_VALUE(m_eSpawnShape, static_cast<int>(m_eSpawnShape));
     serializer.ADD_ATTRIBUTES(m_fSpawnShapeWidth);
     serializer.ADD_ATTRIBUTES(m_fSpawnShapeHeight);
+    serializer.ADD_ATTRIBUTES(m_fSpawnShapeDepth);
     serializer.ADD_ATTRIBUTES(m_fLifetimeMin);
     serializer.ADD_ATTRIBUTES(m_fLifetimeMax);
     serializer.ADD_ATTRIBUTES(m_fStartRotationMin);
@@ -415,6 +433,7 @@ bool ParticleSystem::deserializeField(DataDeserializer& deserializer, const std:
 
     DESERIALIZE_FIELD(m_fSpawnShapeWidth);
     DESERIALIZE_FIELD(m_fSpawnShapeHeight);
+    DESERIALIZE_FIELD(m_fSpawnShapeDepth);
     DESERIALIZE_FIELD(m_fLifetimeMin);
     DESERIALIZE_FIELD(m_fLifetimeMax);
     DESERIALIZE_FIELD(m_fStartRotationMin);

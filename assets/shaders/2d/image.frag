@@ -12,6 +12,10 @@ in vec2 uv;
 void main()
 {
     // vec2 diffToCenter = (gl_FragCoord.xy - ripperCenter.xy) / u_resolution.xy;
+    if (u_imageColor.a < 0.01)
+    {
+        discard;
+    }
 
     if (u_useTexture)
     {

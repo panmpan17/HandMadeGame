@@ -10,9 +10,19 @@ out vec4 fragment;
 
 void main()
 {
+    if (fragmentColor.a < 0.01)
+    {
+        discard;
+    }
+
     if (u_useTexture)
     {
-        fragment = texture(u_tex0, uv) * fragmentColor;
+        vec4 textColor = texture(u_tex0, uv);
+        if (textColor.a < 0.01)
+        {
+            discard;
+        }
+        fragment = textColor * fragmentColor;
     }
     else
     {

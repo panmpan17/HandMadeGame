@@ -68,6 +68,8 @@ enum class eParticleSpawnShape : int
 {
     DOT,
     CIRCLE,
+    RECTANGLE,
+    SPHERE,
     BOX,
 };
 
@@ -109,6 +111,7 @@ public:
 
     void setSpawnShape(eParticleSpawnShape eShape) { m_eSpawnShape = eShape; }
     void setSpawnShapeDimensions(float fWidth, float fHeight) { m_fSpawnShapeWidth = fWidth; m_fSpawnShapeHeight = fHeight; }
+    void setSpawnShapeDimensions(float fWidth, float fHeight, float fDepth) { m_fSpawnShapeWidth = fWidth; m_fSpawnShapeHeight = fHeight; m_fSpawnShapeDepth = fDepth; }
 
     void setGravity(float fX, float fY, float fZ) { m_fGravity[0] = fX; m_fGravity[1] = fY; m_fGravity[2] = fZ; }
 
@@ -158,6 +161,7 @@ private:
     eParticleSpawnShape m_eSpawnShape = eParticleSpawnShape::DOT;
     float m_fSpawnShapeWidth = 0.1f;
     float m_fSpawnShapeHeight = 0.1f;
+    float m_fSpawnShapeDepth = 0.1f;
 
     float m_fLifetimeMin = 1.0f;
     float m_fLifetimeMax = 3.0f;
