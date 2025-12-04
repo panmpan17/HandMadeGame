@@ -50,7 +50,7 @@ void Pong::start()
     m_pTestParticle->setParticleLifetime(.8f, 1);
     m_pTestParticle->setParticleStartVelocity(.8, 1);
     m_pTestParticle->setParticleStartScale(0.2f, 0.25f);
-    m_pTestParticle->setGravity({ 0, -0.6f });
+    m_pTestParticle->setGravity(0, -0.6f, 0);
     m_pTestParticle->stop();
 
     m_pNode->addComponent(m_pTestParticle);

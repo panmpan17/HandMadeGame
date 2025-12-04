@@ -57,6 +57,14 @@ void randomOnUnitCircle(vec2& vResult)
     vResult[1] = sin(angle);
 }
 
+void randomOnUnitCircle(vec3& vResult)
+{
+    float angle = randomFloat(0.0f, 2.0f * M_PI);
+    vResult[0] = cos(angle);
+    vResult[1] = sin(angle);
+    vResult[2] = 0.0f;
+}
+
 void randomOnUnitSphere(vec3& vResult)
 {
     float theta = randomFloat(0.0f, 2.0f * M_PI);

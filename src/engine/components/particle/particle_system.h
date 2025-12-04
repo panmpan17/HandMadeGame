@@ -13,7 +13,7 @@ class Material;
 
 struct ParticleGPUInstance
 {
-    vec2 m_vecPosition;
+    vec3 m_vecPosition;
     vec4 m_vecColor;
     float m_fRotation;
     float m_fScale;
@@ -23,7 +23,7 @@ struct ParticleGPUInstance
 struct ParticleCPUInstance
 {
     float m_fRotationSpeed;
-    vec2 m_vecVelocity;
+    vec3 m_vecVelocity;
     float m_fLifetime;
     float m_fMaxLifetime;
     float m_fBaseScale;
@@ -71,7 +71,7 @@ enum class eParticleSpawnShape : int
     BOX,
 };
 
-typedef std::function<void(vec2&)> ParticleStartVelocityDirectionOverride;
+typedef std::function<void(vec3&)> ParticleStartVelocityDirectionOverride;
 
 
 class ParticleSystem : public IDrawable
@@ -110,8 +110,7 @@ public:
     void setSpawnShape(eParticleSpawnShape eShape) { m_eSpawnShape = eShape; }
     void setSpawnShapeDimensions(float fWidth, float fHeight) { m_fSpawnShapeWidth = fWidth; m_fSpawnShapeHeight = fHeight; }
 
-    void setGravity(const vec2& vecGravity) { vec2_dup(m_fGravity, vecGravity); }
-    void setGravity(float fX, float fY) { m_fGravity[0] = fX; m_fGravity[1] = fY; }
+    void setGravity(float fX, float fY, float fZ) { m_fGravity[0] = fX; m_fGravity[1] = fY; m_fGravity[2] = fZ; }
 
     void setImage(Image* pImage) { m_pImage = pImage; }
 
@@ -178,7 +177,7 @@ private:
     float m_fStartVelocityMax = 0.5f;
     ParticleStartVelocityDirectionOverride m_funcStartVelocityDirectionOverride = nullptr;
 
-    vec2 m_fGravity = { 0.0f, -0.981f };
+    vec3 m_fGravity = { 0.0f, -0.981f, 0.0f };
 
     bool m_bSimulateInLocal = false;
 

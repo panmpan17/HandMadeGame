@@ -92,7 +92,7 @@ void createPingPongGame()
         particle->addParticleModule(new ParticleIntervalSpawn(10));
         particle->setParticleLifetime(0.5, 0.5);
         particle->setParticleStartVelocity(0, 0);
-        particle->setGravity({ 0, 0 });
+        particle->setGravity(0, 0, 0);
         particle->addParticleIndividualModule(new OpacityThroughParticleLifetime(1.f, 0.f));
         pBall->addComponent(particle);
 

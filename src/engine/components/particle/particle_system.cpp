@@ -104,7 +104,7 @@ void ParticleSystem::registerBuffer()
     glBufferData(GL_ARRAY_BUFFER, m_nAllParticleCount * sizeof(ParticleGPUInstance), m_arrParticlesGPU, GL_DYNAMIC_DRAW);
 
     glEnableVertexAttribArray(2);
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(ParticleGPUInstance), (void*)offsetof(ParticleGPUInstance, m_vecPosition));
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(ParticleGPUInstance), (void*)offsetof(ParticleGPUInstance, m_vecPosition));
     glVertexAttribDivisor(2, 1);
 
     glEnableVertexAttribArray(3);
@@ -237,9 +237,11 @@ void ParticleSystem::updateParticle(int& nIndex, float fDeltaTime)
 
     m_arrParticlesCPU[nIndex].m_vecVelocity[0] += m_fGravity[0] * fDeltaTime;
     m_arrParticlesCPU[nIndex].m_vecVelocity[1] += m_fGravity[1] * fDeltaTime;
+    m_arrParticlesCPU[nIndex].m_vecVelocity[2] += m_fGravity[2] * fDeltaTime;
 
     m_arrParticlesGPU[nIndex].m_vecPosition[0] += m_arrParticlesCPU[nIndex].m_vecVelocity[0] * fDeltaTime;
     m_arrParticlesGPU[nIndex].m_vecPosition[1] += m_arrParticlesCPU[nIndex].m_vecVelocity[1] * fDeltaTime;
+    m_arrParticlesGPU[nIndex].m_vecPosition[2] += m_arrParticlesCPU[nIndex].m_vecVelocity[2] * fDeltaTime;
 
     for (IParticleIndividualModule*& pModule : m_arrParticleIndividualModules)
     {
@@ -265,17 +267,19 @@ void ParticleSystem::spawnNewParticles(int nSpawnCount/* = 1*/)
             m_arrParticlesCPU[i].m_fMaxLifetime = m_arrParticlesCPU[i].m_fLifetime;
             m_arrParticlesCPU[i].m_fRotationSpeed = randomFloat(m_fStartRotationSpeedMin, m_fStartRotationSpeedMax); // Random m_fRotation speed
 
-            float vecBasePositionX, vecBasePositionY;
+            float vecBasePositionX, vecBasePositionY, vecBasePositionZ;
             if (m_bSimulateInLocal)
             {
                 vecBasePositionX = 0;
                 vecBasePositionY = 0;
+                vecBasePositionZ = 0;
             }
             else
             {
                 const Vector3& vecBasePosition = getNode()->getPosition();
                 vecBasePositionX = vecBasePosition.x;
                 vecBasePositionY = vecBasePosition.y;
+                vecBasePositionZ = vecBasePosition.z;
             }
 
             switch (m_eSpawnShape)
@@ -283,6 +287,7 @@ void ParticleSystem::spawnNewParticles(int nSpawnCount/* = 1*/)
                 case eParticleSpawnShape::DOT:
                     m_arrParticlesGPU[i].m_vecPosition[0] = vecBasePositionX;
                     m_arrParticlesGPU[i].m_vecPosition[1] = vecBasePositionY;
+                    m_arrParticlesGPU[i].m_vecPosition[2] = vecBasePositionZ;
                     break;
 
                 case eParticleSpawnShape::CIRCLE:
@@ -291,12 +296,14 @@ void ParticleSystem::spawnNewParticles(int nSpawnCount/* = 1*/)
                         float fRadius = randomFloat(0.0f, m_fSpawnShapeWidth);
                         m_arrParticlesGPU[i].m_vecPosition[0] = cos(fAngle) * fRadius + vecBasePositionX;
                         m_arrParticlesGPU[i].m_vecPosition[1] = sin(fAngle) * fRadius + vecBasePositionY;
+                        m_arrParticlesGPU[i].m_vecPosition[2] = vecBasePositionZ;
                     }
                     break;
 
                 case eParticleSpawnShape::BOX:
                     m_arrParticlesGPU[i].m_vecPosition[0] = randomFloat(-m_fSpawnShapeWidth, m_fSpawnShapeWidth) + vecBasePositionX;
                     m_arrParticlesGPU[i].m_vecPosition[1] = randomFloat(-m_fSpawnShapeHeight, m_fSpawnShapeHeight) + vecBasePositionY;
+                    m_arrParticlesGPU[i].m_vecPosition[2] = vecBasePositionZ;
                     break;
             }
 
@@ -312,7 +319,7 @@ void ParticleSystem::spawnNewParticles(int nSpawnCount/* = 1*/)
 
             m_arrParticlesCPU[i].m_vecVelocity[0] *= fStartVelocity;
             m_arrParticlesCPU[i].m_vecVelocity[1] *= fStartVelocity;
-            // m_arrParticlesGPU[i]
+            m_arrParticlesCPU[i].m_vecVelocity[2] *= fStartVelocity;
 
             randomBetweenVec4(m_arrParticlesGPU[i].m_vecColor, m_vecStartColorMin, m_vecStartColorMax);
             m_arrParticlesGPU[i].m_fRotation = randomFloat(m_fStartRotationMin, m_fStartRotationMax);

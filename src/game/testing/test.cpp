@@ -140,10 +140,11 @@ void createDemo1()
     particle2->addParticleIndividualModule(new ScaleThroughParticleLifetime(0.1f, 1.f));
     particle2->setParticleLifetime(4, 6);
     particle2->setParticleStartVelocity(1, 1);
-    particle2->setGravity({ 0, -0.6f });
-    particle2->setParticleStartVelocityDirectionOverride([](vec2& velocity) {
+    particle2->setGravity(0, -0.6f, 0);
+    particle2->setParticleStartVelocityDirectionOverride([](vec3& velocity) {
         velocity[0] = randomFloat(-0.2f, 0.2f); // Override X direction
         velocity[1] = 1.f; // Override Y direction
+        velocity[2] = 0;
     });
 
     // particle2->addParticleModule(new ParticleBurstSpawn(1.0f, 20));
@@ -435,13 +436,17 @@ void createLightingShadowDemo()
         particle->addParticleIndividualModule(new ScaleThroughParticleLifetime(0.1f, 1.f));
         particle->setParticleLifetime(4, 6);
         particle->setParticleStartVelocity(1, 1);
-        particle->setGravity({ 0, -0.6f });
-        particle->setParticleStartVelocityDirectionOverride([](vec2& velocity) {
+        particle->setGravity(0, -0.6f, 0);
+        particle->setParticleStartVelocityDirectionOverride([](vec3& velocity) {
             velocity[0] = randomFloat(-0.2f, 0.2f); // Override X direction
             velocity[1] = 1.f; // Override Y direction
+            velocity[2] = randomFloat(-0.2f, 0.2f); // Override Z direction
         });
 
         pNode5->addComponent(particle);
+
+        pNode5->addComponent(new TwoPointsMovement({ -0.5f, 0.f, 0.f }, { 0.5f, 0.f, 0.f }, 2.0f));
+
         pNode5->setActive(true);
         pWorldScene->addNode(pNode5);
     }
