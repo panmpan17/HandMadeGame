@@ -7,6 +7,7 @@
 #include "../serialization/serializer.h"
 #include "../../render/skybox.h"
 #include "../../components/input/first_person_free_control_camera.h"
+#include "../../components/drawable_interface.h"
 
 WorldScene* WorldScene::current = nullptr;
 
@@ -14,6 +15,9 @@ WorldScene* WorldScene::current = nullptr;
 WorldScene::WorldScene()
 {
     current = this;
+
+    m_oOpaqueDrawableArray.setCallDeleteOnDestruct(false);
+    m_oTransparentDrawableArray.setCallDeleteOnDestruct(false);
 }
 
 WorldScene::~WorldScene()
@@ -118,13 +122,14 @@ void WorldScene::update(float fDeltatime)
 
 void WorldScene::render()
 {
-    int nSize = m_oNodeArray.getSize();
+    glEnable(GL_DEPTH_TEST);
+    int nSize = m_oOpaqueDrawableArray.getCount();
     for (int i = 0; i < nSize; ++i)
     {
-        Node* pNode = m_oNodeArray.getElement(i);
-        if (pNode && pNode->isActive())
+        IDrawable* pDrawable = m_oOpaqueDrawableArray.getElement(i);
+        if (pDrawable)
         {
-            pNode->draw();
+            pDrawable->draw();
         }
     }
 
@@ -132,19 +137,31 @@ void WorldScene::render()
     {
         m_pSkybox->draw();
     }
+
+    glDisable(GL_DEPTH_TEST);
+
+    int nTransparentSize = m_oTransparentDrawableArray.getCount();
+    for (int i = 0; i < nTransparentSize; ++i)
+    {
+        IDrawable* pDrawable = m_oTransparentDrawableArray.getElement(i);
+        if (pDrawable)
+        {
+            pDrawable->draw();
+        }
+    }
 }
 
 void WorldScene::renderDepth()
 {
     glCullFace(GL_FRONT);
 
-    int nSize = m_oNodeArray.getSize();
+    int nSize = m_oOpaqueDrawableArray.getCount();
     for (int i = 0; i < nSize; ++i)
     {
-        Node* pNode = m_oNodeArray.getElement(i);
-        if (pNode && pNode->isActive())
+        IDrawable* pDrawable = m_oOpaqueDrawableArray.getElement(i);
+        if (pDrawable)
         {
-            pNode->drawDepth();
+            pDrawable->draw();
         }
     }
 
@@ -156,4 +173,21 @@ void WorldScene::addNode(Node* pNode)
     if (pNode == nullptr)
         return;
     m_oNodeArray.addElement(pNode);
+
+    pNode->onAddToWorldScene();
+}
+
+void WorldScene::addDrawable(IDrawable* const pDrawable)
+{
+    if (pDrawable == nullptr)
+        return;
+
+    if (pDrawable->getIsTransparent())
+    {
+        m_oTransparentDrawableArray.addElement(pDrawable);
+    }
+    else
+    {
+        m_oOpaqueDrawableArray.addElement(pDrawable);
+    }
 }

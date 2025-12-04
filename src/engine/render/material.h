@@ -34,7 +34,7 @@ public:
     void syncTo(const Material* const pOtherMaterial);
 
     void setTransparent(bool bTransparent) { m_bTransparent = bTransparent; }
-    bool isTransparent() const { return m_bTransparent; }
+    bool getIsTransparent() const { return m_bTransparent; }
 
 private:
     Shader* m_pShader = nullptr;

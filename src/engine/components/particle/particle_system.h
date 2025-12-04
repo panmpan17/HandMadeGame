@@ -152,8 +152,6 @@ private:
     const ShaderUniformHandle* m_pMVPUniForm = nullptr;
     const ShaderUniformHandle* m_pNodeTransformUniform = nullptr;
 
-    std::shared_ptr<Material> m_pMaterial = nullptr;
-
     int m_nAllParticleCount = 0;
     int m_nAliveParticleCount = 0;
     int m_nLastAliveParticleIndex = 0;

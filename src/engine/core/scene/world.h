@@ -4,6 +4,7 @@
 #include "node.h"
 
 class Node;
+class IDrawable;
 class Skybox;
 
 class WorldScene {
@@ -20,6 +21,8 @@ public:
     void addNode(Node* pNode);
     void clearAllNodes();
 
+    void addDrawable(IDrawable* const pDrawable);
+
     void update(float fDeltatime);
     void render();
     void renderDepth();
@@ -33,7 +36,9 @@ public:
     inline void setInitEditorCamera(bool bInit) { m_bInitEditorCamera = bInit; }
 
 private:
-    PointerExpandableArray<Node*> m_oNodeArray = PointerExpandableArray<Node*>(10);
+    PointerExpandableArray<Node*> m_oNodeArray = PointerExpandableArray<Node*>(16);
+    PointerExpandableArray<IDrawable*> m_oOpaqueDrawableArray = PointerExpandableArray<IDrawable*>(16);
+    PointerExpandableArray<IDrawable*> m_oTransparentDrawableArray = PointerExpandableArray<IDrawable*>(16);
 
     Skybox* m_pSkybox = nullptr;
 

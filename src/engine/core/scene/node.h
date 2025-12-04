@@ -24,13 +24,14 @@ public:
 #pragma region Lifecycle and Serialization
 
 public:
+    void onAddToWorldScene();
     void onStart();
 
     void update(float deltaTime);
     void draw();
     void drawDepth();
 
-    inline void setActive(bool isActive) { m_bIsActive = isActive; }
+    inline void setActive(bool isActive) { m_bIsActive = isActive; /* TODO: Should trigger add to world scene or removal */ }
     inline bool isActive() const { return m_bIsActive; }
 
     inline bool getIsStarted() const { return m_bHasStarted; }

@@ -1,9 +1,11 @@
 #pragma once
 
 #include "../components/component.h"
+#include "../render/material.h"
 
 
 class Shader;
+class Material;
 
 class IDrawable : public Component
 {
@@ -19,5 +21,17 @@ public:
 
     virtual void draw() = 0;
     virtual void drawDepth() {}
+
+    bool getIsTransparent() const
+    {
+        if (m_pMaterial)
+        {
+            return m_pMaterial->getIsTransparent();
+        }
+        return false;
+    }
+
+protected:
+    std::shared_ptr<Material> m_pMaterial = nullptr;
 };
 

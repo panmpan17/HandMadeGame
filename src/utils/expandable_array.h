@@ -39,9 +39,12 @@ public:
 
     ~PointerExpandableArray()
     {
-        for (int i = 0; i < m_nSize; ++i)
+        if (m_bCallDeleteOnDestruct)
         {
-            delete m_pArray[i];
+            for (int i = 0; i < m_nSize; ++i)
+            {
+                delete m_pArray[i];
+            }
         }
         free(m_pArray);
     }
@@ -176,8 +179,11 @@ public:
         m_pArray[index2] = temp;
     }
 
+    void setCallDeleteOnDestruct(bool bCallDelete) { m_bCallDeleteOnDestruct = bCallDelete; }
+
 private:
     int m_nSize;
     int m_nCount = 0;
+    bool m_bCallDeleteOnDestruct = true;
     T* m_pArray = nullptr;
 };

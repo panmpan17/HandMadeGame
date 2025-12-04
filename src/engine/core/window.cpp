@@ -176,7 +176,6 @@ bool Window::configureAndCreateWindow()
     // Set up GLAD
     gladLoadGL(glfwGetProcAddress);
 
-    glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
     glEnable(GL_CULL_FACE);
 

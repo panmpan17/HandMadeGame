@@ -376,7 +376,7 @@ void createLightingShadowDemo()
         Node* pGround = oBoxModelReader.instantiateCloneNode();
         pGround->setPosition(0.f, -3.f, 0.f);
         pGround->setScale(10.f, 0.5f, 10.f);
-        pGround->setActive(true);
+        pGround->setActive(false);
         pWorldScene->addNode(pGround);
     }
 

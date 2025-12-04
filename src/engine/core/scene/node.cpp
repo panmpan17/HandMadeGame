@@ -1,5 +1,6 @@
 #include "node.h"
 #include <iostream>
+#include "world.h"
 #include "../debug_macro.h"
 #include "../serialization/serializer.h"
 #include "../math/random.h"
@@ -81,6 +82,34 @@ void Node::onFinishedDeserialization()
         if (pComponent)
         {
             pComponent->onNodeFinishedDeserialization();
+        }
+    }
+}
+
+void Node::onAddToWorldScene()
+{
+    // TODO: Improve this lifecycle management
+    if (m_bIsActive)
+    {
+        int nSize = m_oComponentArray.getSize();
+        for (int i = 0; i < nSize; ++i)
+        {
+            Component* pComponent = m_oComponentArray.getElement(i);
+            if (pComponent && pComponent->isIDrawable() )
+            {
+                IDrawable* const pDrawable = static_cast<IDrawable*>(pComponent);
+                WorldScene::current->addDrawable(pDrawable);
+            }
+        }
+
+        nSize = m_oChildNodeArray.getSize();
+        for (int i = 0; i < nSize; ++i)
+        {
+            Node* pChildNode = m_oChildNodeArray.getElement(i);
+            if (pChildNode)
+            {
+                pChildNode->onAddToWorldScene();
+            }
         }
     }
 }

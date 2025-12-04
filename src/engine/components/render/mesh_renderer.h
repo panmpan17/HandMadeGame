@@ -41,8 +41,6 @@ public:
 private:
     std::shared_ptr<Mesh> m_pMesh = nullptr;
 
-    std::shared_ptr<Material> m_pMaterial = nullptr;
-
     GLuint m_nVertexArray = 0;
     GLuint m_nVertexBuffer = 0;
     GLuint m_nIndexBuffer = 0;
