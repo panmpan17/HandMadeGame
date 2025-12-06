@@ -38,7 +38,15 @@ void IRenderProcess::initializeRenderTextureAndFBO(GLuint& nFBO, GLuint& nTextur
     glBindTexture(GL_TEXTURE_2D, nTexture);
 
     // Set the texture's format and size to match your window
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, nWidth, nHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+    if (RenderProcessQueue::sm_bAllowHDR)
+    {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, nWidth, nHeight, 0, GL_RGB, GL_FLOAT, NULL);
+    }
+    else
+    {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, nWidth, nHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+    }
+
     // Set texture parameters for correct filtering and wrapping
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -155,11 +163,19 @@ void RenderProcessQueue::initializeOriginalFBO(bool bGenFramebuffer/* = true*/)
     glGenTextures(1, &m_nRenderTexture_original);
     glBindTexture(GL_TEXTURE_2D, m_nRenderTexture_original);
 
-    // Set the texture's format and size to match your window
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_nRenderWidth, m_nRenderHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+    if (sm_bAllowHDR)
+    {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, m_nRenderWidth, m_nRenderHeight, 0, GL_RGB, GL_FLOAT, NULL);
+    }
+    else
+    {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_nRenderWidth, m_nRenderHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+    }
+
     // Set texture parameters for correct filtering and wrapping
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
     // Attach the texture to the FBO's color attachment
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_nRenderTexture_original, 0);
 

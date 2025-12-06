@@ -35,7 +35,7 @@ int main(int nArgumentCount, char* arrArguments[])
         window.setupManagers();
         window.setupGameEngineRelatedObject();
 
-        // setupPostProcess();
+        setupPostProcess();
         // createDemo1();
         // createVisualEffectDemo();
         createLightingShadowDemo();

@@ -39,6 +39,7 @@ protected:
 class RenderProcessQueue
 {
 public:
+    static inline bool sm_bAllowHDR = true;
     static RenderProcessQueue* ins;
 
     RenderProcessQueue(Window* pWindow);

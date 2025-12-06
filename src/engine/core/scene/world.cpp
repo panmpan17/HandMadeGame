@@ -143,6 +143,8 @@ void WorldScene::render()
         m_pSkybox->draw();
     }
 
+    glEnable(GL_BLEND);
+
     int nTransparentSize = m_oTransparentDrawableArray.getCount();
     for (int i = 0; i < nTransparentSize; ++i)
     {
@@ -153,6 +155,7 @@ void WorldScene::render()
         }
     }
 
+    glDisable(GL_BLEND);
     glDepthMask(GL_TRUE);
 }
 
