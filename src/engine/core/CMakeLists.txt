@@ -2,6 +2,7 @@ list(APPEND SOURCES
     ${CMAKE_CURRENT_LIST_DIR}/camera.cpp
     ${CMAKE_CURRENT_LIST_DIR}/camera.h
     ${CMAKE_CURRENT_LIST_DIR}/debug_macro.h
+    ${CMAKE_CURRENT_LIST_DIR}/debug_macro.cpp
     ${CMAKE_CURRENT_LIST_DIR}/engine_event_dispatcher.h
     ${CMAKE_CURRENT_LIST_DIR}/error_handler.cpp
     ${CMAKE_CURRENT_LIST_DIR}/error_handler.h

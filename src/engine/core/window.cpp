@@ -33,6 +33,9 @@
 #include "imgui_impl_opengl3.h"
 
 
+inline constexpr std::string_view PROFILER_TAG_WINDOW_INITIALIZATION = "WindowInitialization";
+#define DEBUG_WINDOW_INIT_TIMER(strMsg) PROFILER_END_TIMER(PROFILER_TAG_WINDOW_INITIALIZATION, strMsg)
+
 Window* Window::ins = nullptr;
 
 Window::Window()
@@ -102,6 +105,8 @@ void APIENTRY glDebugOutput(GLenum source, GLenum type, unsigned int id, GLenum 
 
 bool Window::configureAndCreateWindow()
 {
+    PROFILER_START_TIMER();
+
     // Configure GL version
 #if __APPLE__
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -181,6 +186,8 @@ bool Window::configureAndCreateWindow()
 
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+    DEBUG_WINDOW_INIT_TIMER("Window configured");
+
     return true;
 }
 
@@ -196,16 +203,29 @@ void Window::setWindowSize(int nWidth, int nHeight)
 
 void Window::setupManagers()
 {
+    PROFILER_START_TIMER();
+
     TimeManager::Initialize();
+    PROFILER_END_TIMER("Initialization", "TimeManager setup");
     ImageLoader::Initialize();
+    PROFILER_END_TIMER("Initialization", "Image setup");
     LightManager::Initialize();
-    ShaderLoader::Initialize();    
+    PROFILER_END_TIMER("Initialization", "Lighting setup");
+    ShaderLoader::Initialize();
+    PROFILER_END_TIMER("Initialization", "Shader setup");
     MaterialLoader::Initialize();
+    PROFILER_END_TIMER("Initialization", "Material setup");
 
     setupInputManager();
+    PROFILER_END_TIMER("Initialization", "Input manager");
 
     m_pRenderProcessQueue = new RenderProcessQueue(this);
+
+    PROFILER_END_TIMER("Initialization", "Render process queue setup");
+
     m_pWorldScene = new WorldScene();
+
+    PROFILER_END_TIMER("Initialization", "world setup");
 }
 
 void Window::setupInputManager()
@@ -219,9 +239,15 @@ void Window::setupInputManager()
 
 void Window::setupGameEngineRelatedObject()
 {
+    PROFILER_START_TIMER();
+
     m_pWorldScene->init();
 
+    PROFILER_END_TIMER("Initialization", "World init");
+
     setupIMGUIAndEditorWindows();
+
+    PROFILER_END_TIMER("Initialization", "IMGui & editor setup");
 
     InputManager::getInstance()->registerKeyPressCallback(KeyCode::KEY_FUNCTION_3, [](bool pressed) {
         if (pressed)
@@ -230,6 +256,8 @@ void Window::setupGameEngineRelatedObject()
             Preference::setEnableIMGUI(Window::ins->m_bShowIMGUI);
         }
     });
+
+    PROFILER_END_TIMER("Initialization", "Input key setup");
 
 #if IS_DEBUG_VERSION
     m_pFileWatchDog = new FileWatchDog("assets/");
@@ -240,6 +268,8 @@ void Window::setupGameEngineRelatedObject()
         });
     });
     m_pFileWatchDog->startWatching();
+
+    PROFILER_END_TIMER("Initialization", "IMGui setup");
 #endif
 }
 

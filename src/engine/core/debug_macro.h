@@ -38,9 +38,14 @@
 //         }\
 //     } while (0)
 
-#define DEBUG_START_TIMER() std::clock_t oDebugTimedStart = std::clock();
-#define DEBUG_END_TIMER(strTag) LOGLN("{}, Time: {} ms", strTag, (std::clock() - oDebugTimedStart) / (double)(CLOCKS_PER_SEC / 1000)); oDebugTimedStart = std::clock();
-#define DEBUG_REFRESH_TIMER() oDebugTimedStart = std::clock();
+
+bool Profiler_CheckTagIsInAllow(const std::string_view& strTag);
+bool Profiler_CheckTagIsInIgnore(const std::string_view& strTag);
+
+#define PROFILER_CHECK_TAG_COULD_PRINT(strTag) (Profiler_CheckTagIsInAllow(strTag) && !Profiler_CheckTagIsInIgnore(strTag))
+#define PROFILER_START_TIMER() std::clock_t oDebugTimedStart = std::clock();
+#define PROFILER_END_TIMER(strTag, strMsg) if (PROFILER_CHECK_TAG_COULD_PRINT(strTag)) LOGLN("{}: {}, Time: {} ms", strTag, strMsg, (std::clock() - oDebugTimedStart) / (double)(CLOCKS_PER_SEC / 1000)); oDebugTimedStart = std::clock();
+#define PROFILER_FRESH_TIMER() oDebugTimedStart = std::clock();
 
 #else
 
@@ -51,8 +56,8 @@
 
 #define LOGERR(msg, ...) do {} while (0)
 
-#define DEBUG_START_TIMER() do {} while (0)
-#define DEBUG_END_TIMER(strTag) do {} while (0)
-#define DEBUG_REFRESH_TIMER() do {} while (0)
+#define PROFILER_START_TIMER() do {} while (0)
+#define PROFILER_END_TIMER(strTag) do {} while (0)
+#define PROFILER_FRESH_TIMER() do {} while (0)
 
 #endif

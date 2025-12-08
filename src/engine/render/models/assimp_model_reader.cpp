@@ -17,7 +17,7 @@
 
 Node* AssimpModelReader::loadModel()
 {
-    // DEBUG_START_TIMER();
+    // PROFILER_START_TIMER();
 
     Assimp::Importer importer;
 
@@ -35,7 +35,7 @@ Node* AssimpModelReader::loadModel()
                                    | aiProcess_CalcTangentSpace | aiProcess_GenNormals);
     }
 
-    // DEBUG_END_TIMER("Assimp Importer ReadFile");
+    // PROFILER_END_TIMER("Assimp Importer ReadFile");
 
     if (!m_pScene || m_pScene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !m_pScene->mRootNode) 
     {
@@ -113,7 +113,7 @@ Node* AssimpModelReader::loadModel()
 
 
     m_pRootNode = processNode(m_pScene->mRootNode);
-    // DEBUG_END_TIMER("Process root node done");
+    // PROFILER_END_TIMER("Process root node done");
     return m_pRootNode;
 }
 
