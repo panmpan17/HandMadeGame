@@ -7,6 +7,10 @@
 #include "../engine/core/camera.h"
 #include "../engine/core/scene/node.h"
 #include "../engine/components/component.h"
+#include "../engine/components/particle/particle_system.h"
+#include "../engine/components/transform/movement.h"
+#include "../engine/components/transform/rotate.h"
+#include "../engine/components/transform/scaling.h"
 #include "../engine/render/lighting/direction_light.h"
 
 
@@ -54,7 +58,7 @@ void NodeInspector::update()
             ImGui::Spacing();
             ImGui::Separator();
             ImGui::Spacing();
-            updateComponent(pSelectedNode, pSelectedNode->getComponent(i));
+            updateComponent(i, pSelectedNode, pSelectedNode->getComponent(i));
         }
     }
     else
@@ -93,66 +97,9 @@ void NodeInspector::updateTransform(Node* pNode)
     }
 }
 
-void NodeInspector::updateComponent(Node* pNode, Component* pComponent)
+void NodeInspector::updateComponent(int nComponentIndex, Node* pNode, Component* pComponent)
 {
     const std::string strTypeName = TypeRegistry::instance().getTitlizedName(typeid(*pComponent));
     ImGui::Text("%s", strTypeName.c_str());
-
-    if (DirectionLightComponent* const pDirLight = dynamic_cast<DirectionLightComponent*>(pComponent))
-    {
-        Vector3 vecColor = pDirLight->getColor();
-        ImGui::Text("Color");ImGui::SameLine();
-        if (ImGui::ColorEdit3("##DirectionLightColor", reinterpret_cast<float*>(&vecColor), ImGuiColorEditFlags_NoInputs))
-        {
-            pDirLight->setColor(vecColor);
-        }
-
-        float fIntensity = pDirLight->getIntensity();
-        ImGui::Text("Intensity");ImGui::SameLine();
-        if (ImGui::InputFloat("##DirectionLightIntensity", &fIntensity))
-        {
-            pDirLight->setIntensity(fIntensity);
-        }
-
-        bool bShadowsEnabled = pDirLight->getShadowsEnabled();
-        ImGui::Text("Shadows Enabled");ImGui::SameLine();
-        if (ImGui::Checkbox("##DirectionLightShadowsEnabled", &bShadowsEnabled))
-        {
-            pDirLight->setShadowsEnabled(bShadowsEnabled);
-        }
-        
-        if (bShadowsEnabled)
-        {
-            Vector3 vecShadowColor = pDirLight->getShadowColor();
-            ImGui::Text("Shadow Color"); ImGui::SameLine();
-            if (ImGui::ColorEdit3("##DirectionLightShadowColor", reinterpret_cast<float*>(&vecShadowColor), ImGuiColorEditFlags_NoInputs))
-            {
-                pDirLight->setShadowColor(vecShadowColor);
-            }
-
-            float fShadowIntensity = pDirLight->getShadowIntensity();
-            ImGui::Text("Shadow Intensity"); ImGui::SameLine();
-            if (ImGui::InputFloat("##DirectionLightShadowIntensity", &fShadowIntensity))
-            {
-                pDirLight->setShadowIntensity(fShadowIntensity);
-            }
-        }
-    }
-    else if (Camera* const pCamera = dynamic_cast<Camera*>(pComponent))
-    {
-        bool bIsMainCamera = (pCamera == Camera::main);
-        if (ImGui::Checkbox("Is Main", &bIsMainCamera))
-        {
-            if (bIsMainCamera)
-            {
-                pCamera->useAsMain();
-            }
-        }
-
-        bool bIsOrtho = pCamera->getUsingOrthoProjection();
-        if (ImGui::Checkbox("Ortho", &bIsOrtho))
-        {
-            pCamera->setUseOrthoProjection(bIsOrtho);
-        }
-    }
+    pComponent->onInspectorUI(nComponentIndex);
 }

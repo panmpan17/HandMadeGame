@@ -45,6 +45,17 @@ public:
         pNode->setScale(Vector3::lerp(m_vecStart, m_vecEnd, m_fTimer / m_fDuration));
     }
 
+    const Vector3& getStart() const { return m_vecStart; }
+    void setStart(const Vector3& vecStart) { m_vecStart = vecStart; }
+
+    const Vector3& getEnd() const { return m_vecEnd; }
+    void setEnd(const Vector3& vecEnd) { m_vecEnd = vecEnd; }
+
+    float getDuration() const { return m_fDuration; }
+    void setDuration(float duration) { m_fDuration = duration; }
+
+    virtual void onInspectorUI(int nComponentIndex) override;
+
 protected:
     Vector3 m_vecStart;
     Vector3 m_vecEnd;

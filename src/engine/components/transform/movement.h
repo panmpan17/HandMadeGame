@@ -54,6 +54,8 @@ public:
 
     virtual void update(float fDeltaTime) override;
 
+    virtual void onInspectorUI(int nComponentIndex) override;
+
 protected:
     vec3 m_vecStart;
     vec3 m_vecEnd;

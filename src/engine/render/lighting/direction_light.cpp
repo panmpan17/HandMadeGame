@@ -10,6 +10,7 @@
 #include "../../core/camera.h"
 #include "../../core/debug_macro.h"
 #include "../../core/serialization/serializer.h"
+#include "../../../editor/inspector_helper.h"
 
 
 constexpr float GIZMOS_SIZE = 2.f;
@@ -169,4 +170,17 @@ const mat4x4& DirectionLightComponent::getLightCastingMatrix()
     }
 
     return m_matLightCastingMatrix;
+}
+
+void DirectionLightComponent::onInspectorUI(int nComponentIndex)
+{
+    COLOR_FIELD(nComponentIndex, "Color", m_color);
+    FLOAT_FIELD(nComponentIndex, "Intensity", m_intensity);
+
+    BOOL_FIELD(nComponentIndex, "Shadows Enabled", m_bEnableShadows);
+    if (m_bEnableShadows)
+    {
+        COLOR_FIELD(nComponentIndex, "Shadow Color", m_shadowColor);
+        FLOAT_FIELD(nComponentIndex, "Shadow Intensity", m_fShadowIntensity);
+    }
 }

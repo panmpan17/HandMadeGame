@@ -59,6 +59,9 @@ public:
         return pNewRotate;
     }
 
+    const Vector3& getRotationSpeed() const { return m_vecCurrentEulerAngles; }
+    void setRotationSpeed(const Vector3& vecSpeed) { m_vecCurrentEulerAngles = vecSpeed; }
+
 protected:
     Vector3 m_vecCurrentEulerAngles = { 0.0f, 0.0f, 0.0f };
 

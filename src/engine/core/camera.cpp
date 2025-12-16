@@ -5,6 +5,7 @@
 #include "debug_macro.h"
 #include "scene/node.h"
 #include "../render/shader_loader.h"
+#include "../../editor/inspector_helper.h"
 
 
 Camera* Camera::main = nullptr;
@@ -148,4 +149,18 @@ void Camera::updateCameraDataBuffer()
         glBufferSubData(GL_UNIFORM_BUFFER, sizeof(mat4x4) * 2, sizeof(vec3), &camPos);
         glBindBuffer(GL_UNIFORM_BUFFER, 0);
     }
+}
+
+void Camera::onInspectorUI(int nComponentIndex)
+{
+    bool bIsMainCamera = (this == Camera::main);
+    if (ImGui::Checkbox("Is Main", &bIsMainCamera))
+    {
+        if (bIsMainCamera)
+        {
+            useAsMain();
+        }
+    }
+
+    BOOL_FIELD(nComponentIndex, "Ortho", m_bUseOrthoProjection);
 }

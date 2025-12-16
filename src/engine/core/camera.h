@@ -70,6 +70,8 @@ public:
 
     void markViewMatrixDirty();
 
+    virtual void onInspectorUI(int nComponentIndex) override;
+
 private:
     bool m_bUseOrthoProjection = false;
     bool m_bFitScreenWidth = true;

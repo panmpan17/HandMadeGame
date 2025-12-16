@@ -19,5 +19,5 @@ private:
     bool m_bCollapsed = false;
 
     void updateTransform(Node* pNode);
-    void updateComponent(Node* pNode, Component* pComponent);
+    void updateComponent(int nComponentIndex, Node* pNode, Component* pComponent);
 };

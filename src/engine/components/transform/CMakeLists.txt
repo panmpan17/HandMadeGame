@@ -4,4 +4,5 @@ list(APPEND SOURCES
     ${CMAKE_CURRENT_LIST_DIR}/rotate.cpp
     ${CMAKE_CURRENT_LIST_DIR}/rotate.h
     ${CMAKE_CURRENT_LIST_DIR}/scaling.h
+    ${CMAKE_CURRENT_LIST_DIR}/scaling.cpp
 )

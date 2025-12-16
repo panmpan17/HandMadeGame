@@ -60,6 +60,7 @@ public:
     bool isIDrawable() const override { return false; }
     bool isUpdatable() const override { return false; }
 
+    virtual void onInspectorUI(int nComponentIndex) override;
 
 private:
     Vector3 m_color;

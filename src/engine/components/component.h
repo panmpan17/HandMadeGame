@@ -32,6 +32,8 @@ public:
     virtual bool deserializeField(DataDeserializer& deserializer, const std::string_view& strFieldName, const std::string_view& strFieldValue) override;
     virtual void onNodeFinishedDeserialization() {}
 
+    virtual void onInspectorUI(int nComponentIndex) {};
+
 protected:
     Node* m_pNode = nullptr;
 
