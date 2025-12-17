@@ -26,8 +26,8 @@ public:
     virtual Component* clone() const override
     {
         MeshRenderer* pNewMeshRenderer = new MeshRenderer();
-        pNewMeshRenderer->setMesh(m_pMesh);
-        pNewMeshRenderer->setMaterial(m_pMaterial);
+        if (m_pMesh) pNewMeshRenderer->setMesh(m_pMesh);
+        if (m_pMaterial) pNewMeshRenderer->setMaterial(m_pMaterial);
         return pNewMeshRenderer;
     }
 

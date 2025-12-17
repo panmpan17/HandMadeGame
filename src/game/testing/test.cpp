@@ -236,7 +236,7 @@ void createVisualEffectDemo()
     {
         std::shared_ptr<Material> pMaterial = MaterialLoader::getInstance()->getMaterial("assets/materials/box.yaml");
         AssimpModelReader oModelReader("assets/models/box.obj", { pMaterial });
-        Node* pBackPackObj = oModelReader.loadModel();
+        Node* pBackPackObj = oModelReader.instantiateCloneNode();
         pBackPackObj->setPosition(-2.f, 0.f, 0.f);
         pWorldScene->addNode(pBackPackObj);
     }
@@ -244,7 +244,7 @@ void createVisualEffectDemo()
     {
         std::shared_ptr<Material> pMaterial = MaterialLoader::getInstance()->getMaterial("assets/materials/backpack.yaml");
         AssimpModelReader oModelReader("assets/models/back_pack.fbx", { pMaterial });
-        Node* pBackPackFbx = oModelReader.loadModel();
+        Node* pBackPackFbx = oModelReader.instantiateCloneNode();
         pBackPackFbx->setScale(0.01f);
         pBackPackFbx->setPosition(2.f, 0.f, 0.f);
         pWorldScene->addNode(pBackPackFbx);
@@ -371,7 +371,6 @@ void createLightingShadowDemo()
     std::shared_ptr<Material> pDefaultMaterial = MaterialLoader::getInstance()->getMaterial("assets/materials/default.yaml");
 
     AssimpModelReader oBoxModelReader("assets/models/box.obj", { pDefaultMaterial });
-    oBoxModelReader.loadModel();
 
     {
         Node* pGround = oBoxModelReader.instantiateCloneNode();
@@ -391,7 +390,7 @@ void createLightingShadowDemo()
     {
         std::shared_ptr<Material> pMaterial = MaterialLoader::getInstance()->getMaterial("assets/materials/backpack.yaml");
         AssimpModelReader oModelReader("assets/models/back_pack.fbx", { pMaterial });
-        Node* pBackPackFbx = oModelReader.loadModel();
+        Node* pBackPackFbx = oModelReader.instantiateCloneNode();
         pBackPackFbx->setScale(0.01f);
         pBackPackFbx->setPosition(2.f, 0.f, 0.f);
         pBackPackFbx->setRotationQuaternion(Quaternion::fromEulerAngles({0.f, -105.f, 0.f}));
@@ -460,8 +459,8 @@ void sceneTest()
     std::shared_ptr<Material> pDefaultMaterial = MaterialLoader::getInstance()->getMaterial("assets/materials/default.yaml");
 
     {
-        AssimpModelReader oModelReader("assets/models/toilet.glb", { pDefaultMaterial });
-        Node* pBackPackFbx = oModelReader.loadModel();
+        AssimpModelReader oModelReader("assets/models/toilet.glb");
+        Node* pBackPackFbx = oModelReader.instantiateCloneNode();
         pBackPackFbx->setScale(1.f);
         pBackPackFbx->setPosition(0.f, 0.f, 0.f);
         pWorldScene->addNode(pBackPackFbx);
@@ -522,7 +521,7 @@ void serializationTest()
     {
         std::shared_ptr<Material> pMaterial = MaterialLoader::getInstance()->getMaterial("assets/materials/backpack.yaml");
         AssimpModelReader oModelReader("assets/models/back_pack.fbx", { pMaterial });
-        Node* pBackPackFbx = oModelReader.loadModel();
+        Node* pBackPackFbx = oModelReader.instantiateCloneNode();
         pBackPackFbx->setScale(0.01f);
         pBackPackFbx->setPosition(2.f, 0.f, 0.f);
         pBackPackFbx->setRotationQuaternion(Quaternion::fromEulerAngles({0.f, -105.f, 0.f}));
@@ -580,7 +579,7 @@ void createProfolioSceneDemo()
         std::shared_ptr<Material> pMaterial = MaterialLoader::getInstance()->getMaterial("assets/models/ground/grass.yaml");
 
         AssimpModelReader oModelReader("assets/models/ground/ground.fbx", { pMaterial });
-        auto pGround = oModelReader.loadModel();
+        auto pGround = oModelReader.instantiateCloneNode();
         pGround->setPosition(5.f, -10.f, 10.f);
         pGround->setScale(.002f);
         pWorldScene->addNode(pGround);
@@ -589,7 +588,6 @@ void createProfolioSceneDemo()
 
     std::shared_ptr<Material> pRockMaterial = MaterialLoader::getInstance()->getMaterial("assets/models/rock/rock.yaml");
     AssimpModelReader oRockModelReader("assets/models/rock/rock.fbx", { pRockMaterial });
-    oRockModelReader.loadModel();
 
     {
         auto pRock = oRockModelReader.instantiateCloneNode();
@@ -612,7 +610,7 @@ void createProfolioSceneDemo()
     {
         std::shared_ptr<Material> pMaterial = MaterialLoader::getInstance()->getMaterial("assets/materials/backpack.yaml");
         AssimpModelReader oModelReader("assets/models/back_pack.fbx", { pMaterial });
-        Node* pBackPackFbx = oModelReader.loadModel();
+        Node* pBackPackFbx = oModelReader.instantiateCloneNode();
         pBackPackFbx->setName("BackPack");
         pBackPackFbx->setScale(0.01f);
         pBackPackFbx->setPosition(10.f, -8.f, 11.f);

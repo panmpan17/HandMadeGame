@@ -6,7 +6,8 @@
 #include <assimp/cimport.h>
 
 #include "../image.h"
-#include "../material.h"
+#include "../material_loader.h"
+#include "../shader_loader.h"
 #include "../../core/debug_macro.h"
 #include "../../core/scene/node.h"
 #include "../../core/math/vector.h"
@@ -15,7 +16,13 @@
 #include "../../../utils/filesystem.h"
 
 
-Node* AssimpModelReader::loadModel()
+AssimpModelReader::~AssimpModelReader()
+{
+    if (m_pRootNode) { delete m_pRootNode; }
+}
+
+
+void AssimpModelReader::loadModel()
 {
     // PROFILER_START_TIMER();
 
@@ -40,15 +47,29 @@ Node* AssimpModelReader::loadModel()
     if (!m_pScene || m_pScene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !m_pScene->mRootNode) 
     {
         LOGLN( "Error loading model: {}", importer.GetErrorString() );
-        return nullptr;
+        return;
     }
 
-    /*
-    for (unsigned int i = 0; i < pScene->mNumMaterials; i++)
-    {
-        std::shared_ptr<Material> pNewMaterial = std::make_shared<Material>(pMaterial->getShader());
+    loadSceneMaterials();
 
-        const aiMaterial* const pAiMaterial = pScene->mMaterials[i];
+    m_pRootNode = processNode(m_pScene->mRootNode);
+    // PROFILER_END_TIMER("Process root node done");
+}
+
+void AssimpModelReader::loadSceneMaterials()
+{
+    if (!m_pScene)
+    {
+        return;
+    }
+
+    Shader* pDefaultShader = ShaderLoader::getInstance()->getShader("3d_lit_default");
+
+    for (unsigned int i = 0; i < m_pScene->mNumMaterials; i++)
+    {
+        std::shared_ptr<Material> pNewMaterial = std::make_shared<Material>(pDefaultShader);
+
+        const aiMaterial* const pAiMaterial = m_pScene->mMaterials[i];
 
         // LOGLN("Material {} has {} DIFFUSE, {} SPECULAR, {} AMBIENT, {} EMISSIVE, {} HEIGHT, {} NORMALS, {} SHININESS, {} OPACITY, {} DISPLACEMENT, {} LIGHTMAP, {} REFLECTION, {} BASE_COLOR, {} NORMAL_CAMERA, {} EMISSION_COLOR, {} METALNESS, {} DIFFUSE_ROUGHNESS, {} AMBIENT_OCCLUSION, {} UNKNOWN, {} SHEEN, {} CLEARCOAT, {} TRANSMISSION, {} MAYA_BASE, {} MAYA_SPECULAR, {} MAYA_SPECULAR_COLOR, {} MAYA_SPECULAR_ROUGHNESS, {} ANISOTROPY, {} GLTF_METALLIC_ROUGHNES",
         //     pAiMaterial->GetName().C_Str(),
@@ -87,10 +108,10 @@ Node* AssimpModelReader::loadModel()
             aiString strTexturePath;
             if (pAiMaterial->GetTexture(aiTextureType_DIFFUSE, j, &strTexturePath) == AI_SUCCESS)
             {
-                const aiTexture* pAiTexture = pScene->GetEmbeddedTexture(strTexturePath.C_Str());
+                const aiTexture* pAiTexture = m_pScene->GetEmbeddedTexture(strTexturePath.C_Str());
                 Image* pDiffuseImage = new Image(pAiTexture);
                 pDiffuseImage->loadTextureToGL();
-                pNewMaterial->setAlbedoMap(pDiffuseImage);
+                pNewMaterial->bindTextureWithImage("u_tex0", pDiffuseImage);
             }
         }
 
@@ -100,21 +121,39 @@ Node* AssimpModelReader::loadModel()
             aiString strTexturePath;
             if (pAiMaterial->GetTexture(aiTextureType_NORMALS, j, &strTexturePath) == AI_SUCCESS)
             {
-                const aiTexture* pAiTexture = pScene->GetEmbeddedTexture(strTexturePath.C_Str());
+                const aiTexture* pAiTexture = m_pScene->GetEmbeddedTexture(strTexturePath.C_Str());
                 Image* pNormalImage = new Image(pAiTexture);
                 pNormalImage->loadTextureToGL();
-                pNewMaterial->setNormalMap(pNormalImage);
+                pNewMaterial->bindTextureWithImage("u_tex2", pNormalImage);
             }
         }
 
-        arrMaterials.push_back(pNewMaterial);
+        m_vecSceneMaterials.push_back(pNewMaterial);
     }
-    */
+}
 
-
-    m_pRootNode = processNode(m_pScene->mRootNode);
-    // PROFILER_END_TIMER("Process root node done");
-    return m_pRootNode;
+std::shared_ptr<Material> AssimpModelReader::getDefaultMaterial()
+{
+    if (!m_pDefaultMaterial)
+    {
+        if (m_vecOverrideMaterials.size() > m_vecSceneMaterials.size())
+        {
+            m_pDefaultMaterial = m_vecOverrideMaterials.back();
+        }
+        else if (m_vecOverrideMaterials.size() < m_vecSceneMaterials.size())
+        {
+            m_pDefaultMaterial = m_vecSceneMaterials.back();
+        }
+        else if (m_vecOverrideMaterials.size() > 0)
+        {
+            m_pDefaultMaterial = m_vecOverrideMaterials.back();
+        }
+        else
+        {
+            m_pDefaultMaterial = MaterialLoader::getInstance()->getMaterial("assets/materials/default.yaml");
+        }
+    }
+    return m_pDefaultMaterial;
 }
 
 Node* AssimpModelReader::processNode(const aiNode* pAiNode)
@@ -146,6 +185,10 @@ Node* AssimpModelReader::processNode(const aiNode* pAiNode)
         else if (nMaterialIndex < m_vecSceneMaterials.size())
         {
             pMeshRenderer->setMaterial(m_vecSceneMaterials.at(nMaterialIndex));
+        }
+        else
+        {
+            pMeshRenderer->setMaterial(getDefaultMaterial());
         }
 
         m_mapMeshToMaterialIndex[pMeshRenderer] = nMaterialIndex;

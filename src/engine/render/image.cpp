@@ -125,6 +125,10 @@ void Image::loadTextureToGL()
     {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_nWidth, m_nHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, m_pData);
     }
+    else if (m_nChannels == 2)
+    {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RG, m_nWidth, m_nHeight, 0, GL_RG, GL_UNSIGNED_BYTE, m_pData);
+    }
     else if (m_nChannels == 1)
     {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, m_nWidth, m_nHeight, 0, GL_RED, GL_UNSIGNED_BYTE, m_pData);

@@ -4,6 +4,7 @@
 #include <unordered_map>
 #include <string>
 #include "../../utils/file_watch_dog.h"
+#include "shader.h"
 
 
 class Shader;
