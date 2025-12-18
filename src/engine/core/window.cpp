@@ -23,6 +23,7 @@
 #include "../render/lighting/light_manager.h"
 #include "../render/lighting/direction_light.h"
 #include "../misc/preference.h"
+#include "../../editor/gizmos.h"
 #include "../../editor/node_inspector.h"
 #include "../../editor/hierarchy_view.h"
 #include "../../editor/post_process_inspector.h"
@@ -215,6 +216,8 @@ void Window::setupManagers()
     PROFILER_END_TIMER("Initialization", "Shader setup");
     MaterialLoader::Initialize();
     PROFILER_END_TIMER("Initialization", "Material setup");
+    GizmosManager::Initialize();
+    PROFILER_END_TIMER("Initialization", "Gizmos setup");
 
     setupInputManager();
     PROFILER_END_TIMER("Initialization", "Input manager");
@@ -432,6 +435,8 @@ void Window::drawFrame()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         m_pWorldScene->render();
     }
+
+    m_pWorldScene->drawGizmos();
 
     if (m_bShowIMGUI)
     {

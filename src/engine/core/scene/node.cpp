@@ -311,3 +311,26 @@ Node* Node::clone() const
 
     return pNewNode;
 }
+
+void Node::drawGizmos()
+{
+    int nCount = m_oComponentArray.getCount();
+    for (int i = 0; i < nCount; ++i)
+    {
+        Component* pComponent = m_oComponentArray.getElement(i);
+        if (pComponent)
+        {
+            pComponent->onDrawGizmos();
+        }
+    }
+
+    nCount = m_oChildNodeArray.getCount();
+    for (int i = 0; i < nCount; ++i)
+    {
+        Node* pChildNode = this->m_oChildNodeArray.getElement(i);
+        if (pChildNode)
+        {
+            pChildNode->drawGizmos();
+        }
+    }
+}

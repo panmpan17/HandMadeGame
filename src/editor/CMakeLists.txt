@@ -3,6 +3,8 @@ list(APPEND SOURCES
     ${CMAKE_CURRENT_LIST_DIR}/camera_inspector.h
     ${CMAKE_CURRENT_LIST_DIR}/editor.h
     ${CMAKE_CURRENT_LIST_DIR}/editor_window.h
+    ${CMAKE_CURRENT_LIST_DIR}/gizmos.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/gizmos.h
     ${CMAKE_CURRENT_LIST_DIR}/hierarchy_view.cpp
     ${CMAKE_CURRENT_LIST_DIR}/hierarchy_view.h
     ${CMAKE_CURRENT_LIST_DIR}/inspector_helper.h

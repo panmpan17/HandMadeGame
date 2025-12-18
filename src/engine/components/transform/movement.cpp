@@ -149,5 +149,5 @@ void TwoPointsMovement::onInspectorUI(int nComponentIndex)
 {
     VECTOR3_FIELD(nComponentIndex, "Start", m_vecStart);
     VECTOR3_FIELD(nComponentIndex, "End", m_vecEnd);
-    FLOAT_FIELD(nComponentIndex, "Duration", m_fDuration);
+    inspectorFloatField(nComponentIndex, "Duration", m_fDuration);
 }

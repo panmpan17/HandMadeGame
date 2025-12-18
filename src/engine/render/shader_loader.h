@@ -7,9 +7,6 @@
 #include "shader.h"
 
 
-class Shader;
-
-
 class ShaderLoader
 {
 public:

@@ -8,6 +8,7 @@
 #include "../../render/skybox.h"
 #include "../../components/input/first_person_free_control_camera.h"
 #include "../../components/drawable_interface.h"
+#include "../../../editor/gizmos.h"
 
 WorldScene* WorldScene::current = nullptr;
 
@@ -174,6 +175,23 @@ void WorldScene::renderDepth()
     }
 
     glCullFace(GL_BACK);
+}
+
+void WorldScene::drawGizmos()
+{
+    GizmosManager::getInstance()->clearAllGizmos();
+    
+    int nCount = m_oNodeArray.getCount();
+    for (int i = 0; i < nCount; ++i)
+    {
+        Node* pNode = m_oNodeArray.getElement(i);
+        if (pNode && pNode->isActive())
+        {
+            pNode->drawGizmos();
+        }
+    }
+
+    GizmosManager::getInstance()->drawAllGizmos();
 }
 
 void WorldScene::addNode(Node* pNode)

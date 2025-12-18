@@ -11,9 +11,9 @@
 #include "../../core/debug_macro.h"
 #include "../../core/serialization/serializer.h"
 #include "../../../editor/inspector_helper.h"
+#include "../../../editor/gizmos.h"
 
 
-constexpr float GIZMOS_SIZE = 2.f;
 
 Image* pDirectionLightGizmosImage = nullptr;
 
@@ -35,19 +35,6 @@ void DirectionLightComponent::onStart()
     }
 
     m_pNode->registerOnRotationChangedListener(std::bind(&DirectionLightComponent::markLightDataDirty, this));
-
-    m_pShader = ShaderLoader::getInstance()->getShader("simple_gizmos");
-    m_pPositionUniform = m_pShader->getUniformHandle("u_WorldPosition");
-    m_pColorUniform = m_pShader->getUniformHandle("u_imageColor");
-    m_pTextureUniform = m_pShader->getUniformHandle(SHADER_UNIFORM_TEXTURE_0);
-    m_pUseTextureUniform = m_pShader->getUniformHandle("u_useTexture");
-
-    registerBuffer();
-
-    if (!pDirectionLightGizmosImage)
-    {
-        pDirectionLightGizmosImage = ImageLoader::getInstance()->getImageByPath("assets/gizmos/direction_light.png");
-    }
 }
 
 
@@ -73,71 +60,6 @@ void DirectionLightComponent::serializeToWrapper(DataSerializer& serializer) con
     serializer.ADD_ATTRIBUTES(m_fShadowIntensity);
 }
 
-void DirectionLightComponent::registerBuffer()
-{
-    glGenBuffers(1, &m_nVertexBuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, m_nVertexBuffer);
-
-    float fStartX = -GIZMOS_SIZE / 2.0f;
-    float fStartY = -GIZMOS_SIZE / 2.0f;
-    VertexWUV arrVertices[4];
-    arrVertices[0] = { { fStartX, fStartY }, { 0, 0}  }; // Bottom left
-    arrVertices[2] = { { fStartX, fStartY + GIZMOS_SIZE }, { 0, 1 } }; // Top right
-    arrVertices[1] = { { fStartX + GIZMOS_SIZE, fStartY }, { 1, 0 } }; // Bottom right
-    arrVertices[3] = { { fStartX + GIZMOS_SIZE, fStartY + GIZMOS_SIZE }, { 1, 1 } }; // Top left
-    glBufferData(GL_ARRAY_BUFFER, sizeof(arrVertices), arrVertices, GL_STATIC_DRAW);
-
-    GLuint nVPosAttr = m_pShader->getAttributeLocation("a_vPos");
-    GLuint nUVAttr = m_pShader->getAttributeLocation("a_vUV");
-
-    glGenVertexArrays(1, &m_nVertexArray);
-    glBindVertexArray(m_nVertexArray);
-    glEnableVertexAttribArray(nVPosAttr);
-    glVertexAttribPointer(nVPosAttr, 2, GL_FLOAT, GL_FALSE, sizeof(VertexWUV), (void*)offsetof(VertexWUV, pos));
-    glEnableVertexAttribArray(nUVAttr);
-    glVertexAttribPointer(nUVAttr, 2, GL_FLOAT, GL_FALSE, sizeof(VertexWUV), (void*)offsetof(VertexWUV, uv));
-
-    // Unbind
-    glBindVertexArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-}
-
-// void DirectionLightComponent::draw()
-// {
-//     ASSERT(m_pShader, "Shader must be set before drawing the quad");
-
-//     // TODO: Move this part into gizmos renderer
-//     const mat4x4& matModel = m_pNode->getWorldMatrix();
-
-//     glUseProgram(m_pShader->getProgram());
-//     if (m_pPositionUniform)
-//     {
-//         const Vector3& worldPos = m_pNode->getPositionInWorld();
-//         glUniform3f(m_pPositionUniform->m_nLocation, worldPos.x, worldPos.y, worldPos.z);
-//     }
-//     if (m_pColorUniform)
-//     {
-//         glUniform4f(m_pColorUniform->m_nLocation, m_color.x, m_color.y, m_color.z, 1);
-//     }
-//     if (m_pUseTextureUniform)
-//     {
-//         glUniform1i(m_pUseTextureUniform->m_nLocation, pDirectionLightGizmosImage ? 1 : 0); // true
-//     }
-//     if (m_pTextureUniform && pDirectionLightGizmosImage)
-//     {
-//         glActiveTexture(GL_TEXTURE0);
-//         glBindTexture(GL_TEXTURE_2D, pDirectionLightGizmosImage->getTextureID());
-//         glUniform1i(m_pTextureUniform->m_nLocation, 0);
-//     }
-
-//     glBindVertexArray(m_nVertexArray);
-//     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4); // Draw the quad using triangle strip
-//     INCREASE_DRAW_CALL_COUNT();
-
-//     glBindTexture(GL_TEXTURE_2D, 0); // Unbind the texture
-//     glBindVertexArray(0); // Unbind the vertex array
-//     glUseProgram(0);
-// }
 
 const mat4x4& DirectionLightComponent::getLightCastingMatrix()
 {
@@ -174,13 +96,27 @@ const mat4x4& DirectionLightComponent::getLightCastingMatrix()
 
 void DirectionLightComponent::onInspectorUI(int nComponentIndex)
 {
-    COLOR_FIELD(nComponentIndex, "Color", m_color);
-    FLOAT_FIELD(nComponentIndex, "Intensity", m_intensity);
+    bool bModified = false;
+    bModified |= inspectorColorField(nComponentIndex, "Color", m_color);
+    bModified |= inspectorFloatField(nComponentIndex, "Intensity", m_intensity);
 
     BOOL_FIELD(nComponentIndex, "Shadows Enabled", m_bEnableShadows);
     if (m_bEnableShadows)
     {
-        COLOR_FIELD(nComponentIndex, "Shadow Color", m_shadowColor);
-        FLOAT_FIELD(nComponentIndex, "Shadow Intensity", m_fShadowIntensity);
+        inspectorColorField(nComponentIndex, "Shadow Color", m_shadowColor);
+        inspectorFloatField(nComponentIndex, "Shadow Intensity", m_fShadowIntensity);
     }
+
+    if (bModified)
+    {
+        m_bLightDataDirty = true;
+    }
+}
+
+constexpr float DIRECTION_LIGHT_GIZMOS_SIZE = 1.f;
+inline constexpr std::string_view DIRECTION_LIGHT_GIZMOS_IMAGE = "assets/gizmos/direction_light.png";
+
+void DirectionLightComponent::onDrawGizmos()
+{
+    GizmosManager::getInstance()->addGizmos(m_pNode->getPositionInWorld(), DIRECTION_LIGHT_GIZMOS_IMAGE, DIRECTION_LIGHT_GIZMOS_SIZE, m_color);
 }

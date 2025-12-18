@@ -26,6 +26,7 @@ public:
     void update(float fDeltatime);
     void render();
     void renderDepth();
+    void drawGizmos();
 
     inline int getNodeCount() const { return m_oNodeArray.getCount(); }
     inline Node* getNode(int nIndex) const { return m_oNodeArray.getElement(nIndex); }
