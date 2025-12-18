@@ -113,10 +113,9 @@ void DirectionLightComponent::onInspectorUI(int nComponentIndex)
     }
 }
 
-constexpr float DIRECTION_LIGHT_GIZMOS_SIZE = 1.f;
 inline constexpr std::string_view DIRECTION_LIGHT_GIZMOS_IMAGE = "assets/gizmos/direction_light.png";
 
 void DirectionLightComponent::onDrawGizmos()
 {
-    GizmosManager::getInstance()->addGizmos(m_pNode->getPositionInWorld(), DIRECTION_LIGHT_GIZMOS_IMAGE, DIRECTION_LIGHT_GIZMOS_SIZE, m_color);
+    GizmosManager::getInstance()->addGizmos(this, m_pNode->getPositionInWorld(), DIRECTION_LIGHT_GIZMOS_IMAGE, m_color);
 }

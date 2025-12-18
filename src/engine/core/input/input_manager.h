@@ -56,6 +56,14 @@ public:
     //     m_arrMouseMoveEvent.remove(callback);
     // }
 
+    void registerMouseButtonCallback(MouseButton eButton, std::function<void(bool)> callback)
+    {
+        if (eButton >= MouseButton::BUTTON_LEFT && eButton < MouseButton::MAX_BUTTONS)
+        {
+            m_arrMouseButtonEvent[static_cast<int>(eButton)].add(callback);
+        }
+    }
+
     inline bool isKeyPressed(KeyCode key) const
     {
         if (key > KeyCode::KEY_UNKNOWN && key < KeyCode::MAX_KEY_CODE)

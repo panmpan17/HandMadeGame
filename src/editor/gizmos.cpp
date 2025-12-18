@@ -1,11 +1,26 @@
 #include "gizmos.h"
 
 #include <glad/gl.h>
+#include <imgui.h>
 #include "../engine/core/debug_macro.h"
+#include "../engine/core/input/input_manager.h"
 #include "../engine/render/shader_loader.h"
 #include "../engine/render/image_loader.h"
 #include "../engine/render/vertex.h"
 
+
+GizmosManager::GizmosManager()
+{
+    registerBuffer();
+
+    InputManager::getInstance()->registerMouseButtonCallback(MouseButton::BUTTON_LEFT, std::bind(&GizmosManager::onMouseClickCheck, this, std::placeholders::_1));
+}
+
+GizmosManager::~GizmosManager()
+{
+    glDeleteBuffers(1, &m_nVertexBuffer);
+    glDeleteVertexArrays(1, &m_nVertexArray);
+}
 
 void GizmosManager::registerBuffer()
 {
@@ -48,48 +63,45 @@ void GizmosManager::clearAllGizmos()
     m_nImageGizmosSize = 0;
 }
 
-void GizmosManager::addGizmos(const Vector3& vecPosition, const std::string_view& m_strImagePath, float fScale)
+const Vector3 DEFAULT_GIZMOS_COLOR = Vector3(1, 1, 1);
+
+void GizmosManager::addGizmos(Component* const pComponent, const Vector3& vecPosition, const std::string_view& m_strImagePath)
 {
     if (m_nImageGizmosSize + 1 < m_vecImageGizmos.size())
     {
         ImageGizmosData& oData = m_vecImageGizmos.at(m_nImageGizmosSize++);
         oData.m_vecPosition = vecPosition;
-        oData.m_fScale = fScale;
         oData.m_strImagePath = m_strImagePath;
-        oData.m_vecColor = Vector3(1, 1, 1);
-        LOGLN("Color: change to 1");
+        oData.m_vecColor = DEFAULT_GIZMOS_COLOR;
+        oData.m_pAttachedComponent = pComponent;
         return;
     }
 
     m_vecImageGizmos.push_back(ImageGizmosData {
         .m_vecPosition = vecPosition,
-        .m_vecColor = Vector3(1, 1, 1),
-        .m_fScale = fScale,
+        .m_vecColor = DEFAULT_GIZMOS_COLOR,
         .m_strImagePath = m_strImagePath,
+        .m_pAttachedComponent = pComponent,
     });
 }
 
-void GizmosManager::addGizmos(const Vector3& vecPosition, const std::string_view& m_strImagePath, float fScale, const Vector3& vecColor)
+void GizmosManager::addGizmos(Component* const pComponent, const Vector3& vecPosition, const std::string_view& m_strImagePath, const Vector3& vecColor)
 {
     if (m_nImageGizmosSize + 1 < m_vecImageGizmos.size())
     {
         ImageGizmosData& oData = m_vecImageGizmos.at(m_nImageGizmosSize++);
-        oData.m_vecPosition.x = vecPosition.x;
-        oData.m_vecPosition.y = vecPosition.y;
-        oData.m_vecPosition.z = vecPosition.z;
-        oData.m_fScale = fScale;
+        oData.m_vecPosition = vecPosition;
         oData.m_strImagePath = m_strImagePath;
-        oData.m_vecColor.x = vecColor.x;
-        oData.m_vecColor.y = vecColor.y;
-        oData.m_vecColor.z = vecColor.z;
+        oData.m_vecColor = vecColor;
+        oData.m_pAttachedComponent = pComponent;
         return;
     }
 
     m_vecImageGizmos.push_back(ImageGizmosData {
         .m_vecPosition = vecPosition,
         .m_vecColor = vecColor,
-        .m_fScale = fScale,
         .m_strImagePath = m_strImagePath,
+        .m_pAttachedComponent = pComponent,
     });
 }
 
@@ -122,4 +134,18 @@ void GizmosManager::drawAllGizmos()
 
     glBindVertexArray(0); // Unbind the vertex array
     glUseProgram(0);
+}
+
+void GizmosManager::onMouseClickCheck(bool bPressed)
+{
+    if (!bPressed) return;
+
+    ImGuiIO& io = ImGui::GetIO();
+    if (io.WantCaptureMouse) return;
+
+    InputManager* pInput = InputManager::getInstance();
+    float x, y;
+    pInput->getMousePosition(x, y);
+
+    // TODO: Add gizmo selection logic here
 }

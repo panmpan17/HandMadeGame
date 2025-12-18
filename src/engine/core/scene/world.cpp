@@ -191,7 +191,13 @@ void WorldScene::drawGizmos()
         }
     }
 
+    glEnable(GL_BLEND);
+    glDepthMask(GL_FALSE);
+
     GizmosManager::getInstance()->drawAllGizmos();
+
+    glDisable(GL_BLEND);
+    glDepthMask(GL_TRUE);
 }
 
 void WorldScene::addNode(Node* pNode)

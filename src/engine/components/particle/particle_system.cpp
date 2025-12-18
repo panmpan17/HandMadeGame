@@ -13,6 +13,7 @@
 #include "../../core/math/random.h"
 #include "../../core/serialization/serializer.h"
 #include "../../../utils/platform.h"
+#include "../../../editor/gizmos.h"
 
 
 #define SWAP_PARTICLE_POSITION(i, j) \
@@ -495,4 +496,12 @@ void ParticleSystem::onNodeFinishedDeserialization()
         setMaterial(m_pMaterial);
         registerBuffer();
     }
+}
+
+inline const Vector3 PARTICLE_SYSTEM_GIZMOS_COLOR = Vector3(1, 1, 1);
+inline constexpr std::string_view PARTICLE_SYSTEM_GIZMOS_IMAGE = "assets/gizmos/particle.png";
+
+void ParticleSystem::onDrawGizmos()
+{
+    GizmosManager::getInstance()->addGizmos(this, m_pNode->getPositionInWorld(), PARTICLE_SYSTEM_GIZMOS_IMAGE, PARTICLE_SYSTEM_GIZMOS_COLOR);
 }

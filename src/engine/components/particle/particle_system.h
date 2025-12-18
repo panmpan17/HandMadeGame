@@ -141,6 +141,8 @@ public:
 
     void setIsLooping(bool bLooping) { m_bIsLooping = bLooping; }
 
+    virtual void onDrawGizmos() override;
+
 private:
     ParticleGPUInstance* m_arrParticlesGPU = nullptr;
     ParticleCPUInstance* m_arrParticlesCPU = nullptr;

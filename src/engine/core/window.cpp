@@ -216,11 +216,12 @@ void Window::setupManagers()
     PROFILER_END_TIMER("Initialization", "Shader setup");
     MaterialLoader::Initialize();
     PROFILER_END_TIMER("Initialization", "Material setup");
-    GizmosManager::Initialize();
-    PROFILER_END_TIMER("Initialization", "Gizmos setup");
 
     setupInputManager();
     PROFILER_END_TIMER("Initialization", "Input manager");
+
+    GizmosManager::Initialize();
+    PROFILER_END_TIMER("Initialization", "Gizmos setup");
 
     m_pRenderProcessQueue = new RenderProcessQueue(this);
 

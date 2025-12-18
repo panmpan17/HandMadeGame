@@ -1,5 +1,6 @@
 #include "first_person_free_control_camera.h"
 
+#include <imgui.h>
 #include "../../core/camera.h"
 #include "../../core/scene/node.h"
 #include "../../core/input/input_manager.h"
@@ -13,10 +14,7 @@ FirstPersonFreeControlCamera::FirstPersonFreeControlCamera(Node* pCameraNode /*=
 {
     InputManager* pInput = InputManager::getInstance();
 
-    // pInput->registerKeyPressCallback(KeyCode::KEY_W, BIND_CALLBACK_1(onKeyboardW));
-    // pInput->registerKeyPressCallback(KeyCode::KEY_S, BIND_CALLBACK_1(onKeyboardS));
-    // pInput->registerKeyPressCallback(KeyCode::KEY_A, BIND_CALLBACK_1(onKeyboardA));
-    // pInput->registerKeyPressCallback(KeyCode::KEY_D, BIND_CALLBACK_1(onKeyboardD));
+    pInput->registerMouseButtonCallback(MouseButton::BUTTON_RIGHT, BIND_CALLBACK_1(onCameraMovementToggle));
     pInput->registerMouseMoveCallback(BIND_CALLBACK_2(onMouseMove));
     pInput->registerKeyPressCallback(KeyCode::KEY_R, BIND_CALLBACK_1(onResetRotationKeyDown));
     pInput->registerKeyPressCallback(KeyCode::KEY_LEFT_SHIFT, BIND_CALLBACK_1(onSpeedModifierKeyDown));
@@ -77,6 +75,18 @@ void FirstPersonFreeControlCamera::update(float fDeltaTime)
 
         m_fMouseDeltaX = 0.0f;
         m_fMouseDeltaY = 0.0f;
+    }
+}
+
+void FirstPersonFreeControlCamera::onCameraMovementToggle(bool bPressed)
+{
+    InputManager* pInput = InputManager::getInstance();
+    if (bPressed)
+    {
+        ImGui::SetWindowFocus(NULL);
+    }
+    else
+    {
     }
 }
 

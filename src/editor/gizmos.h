@@ -4,6 +4,7 @@
 #include "../engine/core/math/vector.h"
 
 
+class Component;
 class Shader;
 class ShaderUniformHandle;
 
@@ -14,8 +15,8 @@ struct ImageGizmosData
 {
     Vector3 m_vecPosition;
     Vector3 m_vecColor;
-    float m_fScale;
     std::string_view m_strImagePath;
+    Component* m_pAttachedComponent = nullptr; // Optional: to link gizmo to a specific component
 };
 
 
@@ -33,13 +34,14 @@ public:
     }
 
     void clearAllGizmos();
-    void addGizmos(const Vector3& vecPosition, const std::string_view& m_strImagePath, float fScale = 1);
-    void addGizmos(const Vector3& vecPosition, const std::string_view& m_strImagePath, float fScale, const Vector3& vecColor);
+    void addGizmos(Component* const pComponent, const Vector3& vecPosition, const std::string_view& m_strImagePath);
+    void addGizmos(Component* const pComponent, const Vector3& vecPosition, const std::string_view& m_strImagePath, const Vector3& vecColor);
 
     void drawAllGizmos();
 
 private:
-    GizmosManager() { registerBuffer(); }
+    GizmosManager();
+    ~GizmosManager();
 
     static inline GizmosManager* ins = nullptr;
 
@@ -56,4 +58,6 @@ private:
     GLuint m_nVertexArray = 0;
 
     void registerBuffer();
+
+    void onMouseClickCheck(bool bPressed);
 };

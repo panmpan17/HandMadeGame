@@ -31,6 +31,7 @@ private:
     // void onKeyboardS(bool bPressed);
     // void onKeyboardA(bool bPressed);
     // void onKeyboardD(bool bPressed);
+    void onCameraMovementToggle(bool bPressed);
     void onMouseMove(float fDeltaX, float fDeltaY);
     void onResetRotationKeyDown(bool bPressed);
     void onSpeedModifierKeyDown(bool bPressed);
