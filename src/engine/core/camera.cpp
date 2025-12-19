@@ -151,6 +151,31 @@ void Camera::updateCameraDataBuffer()
     }
 }
 
+Vector3 Camera::worldPositionToScreenPosition(const Vector3& worldPos)
+{
+    const mat4x4& viewProj = getViewProjectionMatrix();
+
+    vec4 inPos = { worldPos.x, worldPos.y, worldPos.z, 1.0f };
+    vec4 clipPos;
+    mat4x4_mul_vec4(clipPos, viewProj, inPos);
+
+    if (clipPos[3] != 0.0f)
+    {
+        clipPos[0] /= clipPos[3];
+        clipPos[1] /= clipPos[3];
+        clipPos[2] /= clipPos[3];
+    }
+
+    // Convert from NDC to screen space
+    int nWindowWidth = Window::ins->GetActualWidth();
+    int nWindowHeight = Window::ins->GetActualHeight();
+
+    float screenX = (clipPos[0] * 0.5f + 0.5f) * nWindowWidth;
+    float screenY = (1.0f - (clipPos[1] * 0.5f + 0.5f)) * nWindowHeight; // Invert Y for screen space
+
+    return Vector3(screenX, screenY, clipPos[3]);
+}
+
 void Camera::onInspectorUI(int nComponentIndex)
 {
     bool bIsMainCamera = (this == Camera::main);

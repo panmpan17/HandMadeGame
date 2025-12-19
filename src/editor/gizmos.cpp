@@ -2,7 +2,11 @@
 
 #include <glad/gl.h>
 #include <imgui.h>
+
+#include "editor.h"
 #include "../engine/core/debug_macro.h"
+#include "../engine/core/camera.h"
+#include "../engine/core/scene/node.h"
 #include "../engine/core/input/input_manager.h"
 #include "../engine/render/shader_loader.h"
 #include "../engine/render/image_loader.h"
@@ -144,8 +148,29 @@ void GizmosManager::onMouseClickCheck(bool bPressed)
     if (io.WantCaptureMouse) return;
 
     InputManager* pInput = InputManager::getInstance();
-    float x, y;
-    pInput->getMousePosition(x, y);
+    Vector2 oScreenPos;
+    pInput->getMousePosition(oScreenPos.x, oScreenPos.y);
 
-    // TODO: Add gizmo selection logic here
+    Camera* pMainCamera = Camera::main;
+
+    for (int i = 0; i < m_nImageGizmosSize; ++i)
+    {
+        ImageGizmosData& oData = m_vecImageGizmos.at(i);
+        Vector3 oGizmosScreenPos = pMainCamera->worldPositionToScreenPosition(oData.m_vecPosition);
+
+        if (oGizmosScreenPos.z < 0)
+            continue; // Behind camera
+
+        const float fXDelta = std::abs(oScreenPos.x - oGizmosScreenPos.x);
+        const float fYDelta = std::abs(oScreenPos.y - oGizmosScreenPos.y);
+        const float fSize = 30 / oGizmosScreenPos.z;
+
+        if (fXDelta < fSize && fYDelta < fSize)
+        {
+            if (oData.m_pAttachedComponent && oData.m_pAttachedComponent->getNode())
+            {
+                Editor::setSelectedNode(oData.m_pAttachedComponent->getNode());
+            }
+        }
+    }
 }

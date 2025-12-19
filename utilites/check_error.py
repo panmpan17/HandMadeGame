@@ -15,6 +15,7 @@ EXECUTABLE_PATH = "MichaelHandMadeGame"
 
 @dataclass
 class CrashLog:
+    crash_reason: str
     timestamp: int
     atos_line: str
 
@@ -57,6 +58,9 @@ def pretty_print_crash_trace(trace: str):
 
 
 def parse_log_content(content: str) -> CrashLog:
+    crash_reason_index = content.find("Crash Backtrace (")
+    crash_reason = content[crash_reason_index + len("Crash Backtrace ("): content.find(")", crash_reason_index)].strip()
+
     timestamp_index = content.find("Timestamp(")
     atos_index = content.find("atos -o ")
 
@@ -66,7 +70,7 @@ def parse_log_content(content: str) -> CrashLog:
     timestamp = int(content[timestamp_index + len("Timestamp("):content.find(")", timestamp_index)])
     atos_line = content[atos_index:].strip()
 
-    return CrashLog(timestamp=timestamp, atos_line=atos_line)
+    return CrashLog(crash_reason=crash_reason, timestamp=timestamp, atos_line=atos_line)
 
 def parse_logs(log_file_path) -> List[CrashLog]:
     crash_logs = []
@@ -92,6 +96,6 @@ if __name__ == "__main__":
         exit(0)
     
     crash_logs = parse_logs(args.crash_log)
-    print(f"Found {len(crash_logs)} crash logs.")
     if len(crash_logs) > 0:
+        print(Terminal.RED + crash_logs[-1].crash_reason + Terminal.END)
         crash_logs[-1].run_atos(os.path.join(args.execute_folder, EXECUTABLE_PATH))

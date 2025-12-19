@@ -72,6 +72,8 @@ public:
 
     virtual void onInspectorUI(int nComponentIndex) override;
 
+    Vector3 worldPositionToScreenPosition(const Vector3& worldPos);
+
 private:
     bool m_bUseOrthoProjection = false;
     bool m_bFitScreenWidth = true;

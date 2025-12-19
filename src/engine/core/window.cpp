@@ -310,13 +310,13 @@ void Window::setupIMGUIAndEditorWindows()
 void Window::beforeLoop()
 {
     m_fRatio = m_oActualSize.x / (float) m_oActualSize.y;
+
+    TimeManager::getInstance()->onWindowStart();
 }
 
 void Window::mainLoop()
 {
     beforeLoop();
-
-    TimeManager::getInstance()->onWindowStart();
 
     while (!glfwWindowShouldClose(m_pWindow))
     {

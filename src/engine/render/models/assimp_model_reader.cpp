@@ -108,10 +108,12 @@ void AssimpModelReader::loadSceneMaterials()
             aiString strTexturePath;
             if (pAiMaterial->GetTexture(aiTextureType_DIFFUSE, j, &strTexturePath) == AI_SUCCESS)
             {
-                const aiTexture* pAiTexture = m_pScene->GetEmbeddedTexture(strTexturePath.C_Str());
-                Image* pDiffuseImage = new Image(pAiTexture);
-                pDiffuseImage->loadTextureToGL();
-                pNewMaterial->bindTextureWithImage("u_tex0", pDiffuseImage);
+                if (const aiTexture* const pAiTexture = m_pScene->GetEmbeddedTexture(strTexturePath.C_Str()); pAiTexture != nullptr)
+                {
+                    Image* pDiffuseImage = new Image(pAiTexture, strTexturePath.C_Str());
+                    pDiffuseImage->loadTextureToGL();
+                    pNewMaterial->bindTextureWithImage("u_tex0", pDiffuseImage);
+                }
             }
         }
 
@@ -121,10 +123,12 @@ void AssimpModelReader::loadSceneMaterials()
             aiString strTexturePath;
             if (pAiMaterial->GetTexture(aiTextureType_NORMALS, j, &strTexturePath) == AI_SUCCESS)
             {
-                const aiTexture* pAiTexture = m_pScene->GetEmbeddedTexture(strTexturePath.C_Str());
-                Image* pNormalImage = new Image(pAiTexture);
-                pNormalImage->loadTextureToGL();
-                pNewMaterial->bindTextureWithImage("u_tex2", pNormalImage);
+                if (const aiTexture* const pAiTexture = m_pScene->GetEmbeddedTexture(strTexturePath.C_Str()); pAiTexture != nullptr)
+                {
+                    Image* pNormalImage = new Image(pAiTexture, strTexturePath.C_Str());
+                    pNormalImage->loadTextureToGL();
+                    pNewMaterial->bindTextureWithImage("u_tex2", pNormalImage);
+                }
             }
         }
 

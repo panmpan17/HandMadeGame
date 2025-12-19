@@ -63,11 +63,11 @@ Image::Image(const std::string_view& strPath, bool flipVertically/* = true */)
 
 }
 
-Image::Image(const aiTexture* pAiTexture, bool flipVertically/* = true */)
+Image::Image(const aiTexture* pAiTexture, const char* strName, bool flipVertically/* = true */)
 {
     stbi_set_flip_vertically_on_load(flipVertically);
 
-    m_strPath = "<embedded_texture>";
+    m_strPath = strName ? strName : "<embedded_texture>";
 
     if (pAiTexture->mHeight == 0)
     {
