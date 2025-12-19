@@ -2,10 +2,12 @@
 
 #include <imgui.h>
 
-#define BOOL_FIELD(nComponentIndex, label, value) \
-    ImGui::Text(label); \
-    ImGui::SameLine(); \
-    ImGui::Checkbox(("##Component" + std::to_string(nComponentIndex) + label).c_str(), &value);
+inline bool inspectorBoolField(int nComponentIndex, const char* strLabel, bool& outValue)
+{
+    ImGui::Text(strLabel, "");
+    ImGui::SameLine();
+    return ImGui::Checkbox(("##Component" + std::to_string(nComponentIndex) + strLabel).c_str(), &outValue);
+}
 
 inline bool inspectorFloatField(int nComponentIndex, const char* strLabel, float& outFloat)
 {
@@ -14,10 +16,19 @@ inline bool inspectorFloatField(int nComponentIndex, const char* strLabel, float
     return ImGui::InputFloat(("##Component" + std::to_string(nComponentIndex) + strLabel).c_str(), &outFloat);
 }
 
-#define VECTOR3_FIELD(nComponentIndex, label, vec) \
-    ImGui::Text(label); \
-    ImGui::SameLine(); \
-    ImGui::InputFloat3(("##Component" + std::to_string(nComponentIndex) + label).c_str(), reinterpret_cast<float*>(&vec));
+inline bool inspectorVector2Field(int nComponentIndex, const char* strLabel, Vector2& outVec)
+{
+    ImGui::Text(strLabel, "");
+    ImGui::SameLine();
+    return ImGui::InputFloat2(("##Component" + std::to_string(nComponentIndex) + strLabel).c_str(), reinterpret_cast<float*>(&outVec));
+}
+
+inline bool inspectorVector3Field(int nComponentIndex, const char* strLabel, Vector3& outVec)
+{
+    ImGui::Text(strLabel, "");
+    ImGui::SameLine();
+    return ImGui::InputFloat3(("##Component" + std::to_string(nComponentIndex) + strLabel).c_str(), reinterpret_cast<float*>(&outVec));
+}
 
 inline bool inspectorColorField(int nComponentIndex, const char* strLabel, Vector3& outVec)
 {

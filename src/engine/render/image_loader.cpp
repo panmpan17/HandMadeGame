@@ -32,39 +32,12 @@ ImageLoader::~ImageLoader()
     m_mapLoadedImages.clear();
 }
 
-void ImageLoader::registerImage(const std::string_view& strName, const std::string_view& strPath)
-{
-    auto iterFind = m_mapLoadedImages.find(strName);
-    if (iterFind == m_mapLoadedImages.end())
-    {
-        auto pImage = new Image(strPath);
-        if (pImage->isCPULoaded())
-        {
-            pImage->loadTextureToGL();
-            pImage->freeCPUData();
-        }
-        m_mapLoadedImages[strName] = pImage;
-    }
-}
-
-Image* ImageLoader::getImage(const std::string_view& strName)
-{
-    auto iterFind = m_mapLoadedImages.find(strName);
-    if (iterFind != m_mapLoadedImages.end())
-    {
-        return iterFind->second;
-    }
-    return nullptr;
-}
-
 Image* ImageLoader::getImageByPath(const std::string_view& strPath)
 {
-    for (const auto& pair : m_mapLoadedImages)
+    auto it = m_mapLoadedImages.find(strPath);
+    if (it != m_mapLoadedImages.end())
     {
-        if (pair.second && pair.second->getPath() == strPath)
-        {
-            return pair.second;
-        }
+        return it->second;;
     }
 
     auto pImage = new Image(strPath);

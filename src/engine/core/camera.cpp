@@ -187,5 +187,5 @@ void Camera::onInspectorUI(int nComponentIndex)
         }
     }
 
-    BOOL_FIELD(nComponentIndex, "Ortho", m_bUseOrthoProjection);
+    inspectorBoolField(nComponentIndex, "Ortho", m_bUseOrthoProjection);
 }

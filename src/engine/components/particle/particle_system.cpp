@@ -503,5 +503,5 @@ inline constexpr std::string_view PARTICLE_SYSTEM_GIZMOS_IMAGE = "assets/gizmos/
 
 void ParticleSystem::onDrawGizmos()
 {
-    GizmosManager::getInstance()->addGizmos(this, m_pNode->getPositionInWorld(), PARTICLE_SYSTEM_GIZMOS_IMAGE, PARTICLE_SYSTEM_GIZMOS_COLOR);
+    GizmosManager::getInstance()->addImageGizmos(this, m_pNode->getPositionInWorld(), PARTICLE_SYSTEM_GIZMOS_IMAGE, PARTICLE_SYSTEM_GIZMOS_COLOR);
 }

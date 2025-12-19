@@ -67,29 +67,14 @@ void GizmosManager::clearAllGizmos()
     m_nImageGizmosSize = 0;
 }
 
-const Vector3 DEFAULT_GIZMOS_COLOR = Vector3(1, 1, 1);
+const Vector3 DEFAULT_IMAGE_GIZMOS_COLOR = Vector3(1, 1, 1);
 
-void GizmosManager::addGizmos(Component* const pComponent, const Vector3& vecPosition, const std::string_view& m_strImagePath)
+void GizmosManager::addImageGizmos(Component* const pComponent, const Vector3& vecPosition, const std::string_view& m_strImagePath)
 {
-    if (m_nImageGizmosSize + 1 < m_vecImageGizmos.size())
-    {
-        ImageGizmosData& oData = m_vecImageGizmos.at(m_nImageGizmosSize++);
-        oData.m_vecPosition = vecPosition;
-        oData.m_strImagePath = m_strImagePath;
-        oData.m_vecColor = DEFAULT_GIZMOS_COLOR;
-        oData.m_pAttachedComponent = pComponent;
-        return;
-    }
-
-    m_vecImageGizmos.push_back(ImageGizmosData {
-        .m_vecPosition = vecPosition,
-        .m_vecColor = DEFAULT_GIZMOS_COLOR,
-        .m_strImagePath = m_strImagePath,
-        .m_pAttachedComponent = pComponent,
-    });
+    addImageGizmos(pComponent, vecPosition, m_strImagePath, DEFAULT_IMAGE_GIZMOS_COLOR);
 }
 
-void GizmosManager::addGizmos(Component* const pComponent, const Vector3& vecPosition, const std::string_view& m_strImagePath, const Vector3& vecColor)
+void GizmosManager::addImageGizmos(Component* const pComponent, const Vector3& vecPosition, const std::string_view& m_strImagePath, const Vector3& vecColor)
 {
     if (m_nImageGizmosSize + 1 < m_vecImageGizmos.size())
     {
@@ -109,8 +94,71 @@ void GizmosManager::addGizmos(Component* const pComponent, const Vector3& vecPos
     });
 }
 
+const Color DEFAULT_GIZMOS_COLOR = Color(1, 1, 1, .5f);
+
+void GizmosManager::addSphereGizmos(const Vector3& vecPosition, float fRadius)
+{
+    addSphereGizmos(vecPosition, fRadius, DEFAULT_GIZMOS_COLOR);
+}
+void GizmosManager::addSphereGizmos(const Vector3& vecPosition, float fRadius, const Color& vecColor)
+{
+    if (m_nSphereGizmosSize + 1 < m_vecSphereGizmos.size())
+    {
+        SphereGizmosData& oData = m_vecSphereGizmos.at(m_nSphereGizmosSize++);
+        oData.m_vecPosition = vecPosition;
+        oData.m_fRadius = fRadius;
+        oData.m_color = vecColor;
+        return;
+    }
+
+    m_vecSphereGizmos.push_back(SphereGizmosData {
+        .m_vecPosition = vecPosition,
+        .m_fRadius = fRadius,
+        .m_color = vecColor,
+    });
+}
+
+void GizmosManager::addCubeGizmos(const Vector3& vecPosition, const Vector3& vecSize)
+{
+    addCubeGizmos(vecPosition, vecSize, DEFAULT_GIZMOS_COLOR);
+}
+void GizmosManager::addCubeGizmos(const Vector3& vecPosition, const Vector3& vecSize, const Color& vecColor)
+{
+    if (m_nCubeGizmosSize + 1 < m_vecCubeGizmos.size())
+    {
+        CubeGizmosData& oData = m_vecCubeGizmos.at(m_nCubeGizmosSize++);
+        oData.m_vecPosition = vecPosition;
+        oData.m_vecSize = vecSize;
+        oData.m_color = vecColor;
+        return;
+    }
+
+    m_vecCubeGizmos.push_back(CubeGizmosData {
+        .m_vecPosition = vecPosition,
+        .m_vecSize = vecSize,
+        .m_color = vecColor,
+    });
+}
+
 
 void GizmosManager::drawAllGizmos()
+{
+    drawSphereGizmos();
+    drawCubeGizmos();
+    drawImageGizmos();
+}
+
+void GizmosManager::drawSphereGizmos()
+{
+    // TODO: Implementation for drawing sphere gizmos goes here
+}
+
+void GizmosManager::drawCubeGizmos()
+{
+    // TODO: Implementation for drawing cube gizmos goes here
+}
+
+void GizmosManager::drawImageGizmos()
 {
     glUseProgram(m_pImageGizmosShader->getProgram());
     glBindVertexArray(m_nVertexArray);

@@ -100,7 +100,7 @@ void DirectionLightComponent::onInspectorUI(int nComponentIndex)
     bModified |= inspectorColorField(nComponentIndex, "Color", m_color);
     bModified |= inspectorFloatField(nComponentIndex, "Intensity", m_intensity);
 
-    BOOL_FIELD(nComponentIndex, "Shadows Enabled", m_bEnableShadows);
+    inspectorBoolField(nComponentIndex, "Shadows Enabled", m_bEnableShadows);
     if (m_bEnableShadows)
     {
         inspectorColorField(nComponentIndex, "Shadow Color", m_shadowColor);
@@ -117,5 +117,5 @@ inline constexpr std::string_view DIRECTION_LIGHT_GIZMOS_IMAGE = "assets/gizmos/
 
 void DirectionLightComponent::onDrawGizmos()
 {
-    GizmosManager::getInstance()->addGizmos(this, m_pNode->getPositionInWorld(), DIRECTION_LIGHT_GIZMOS_IMAGE, m_color);
+    GizmosManager::getInstance()->addImageGizmos(this, m_pNode->getPositionInWorld(), DIRECTION_LIGHT_GIZMOS_IMAGE, m_color);
 }
