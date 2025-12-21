@@ -167,11 +167,10 @@ Vector3 Camera::worldPositionToScreenPosition(const Vector3& worldPos)
     }
 
     // Convert from NDC to screen space
-    int nWindowWidth = Window::ins->GetActualWidth();
-    int nWindowHeight = Window::ins->GetActualHeight();
+    const Vector2i& oWindowSize = Window::ins->getWindowSize();
 
-    float screenX = (clipPos[0] * 0.5f + 0.5f) * nWindowWidth;
-    float screenY = (1.0f - (clipPos[1] * 0.5f + 0.5f)) * nWindowHeight; // Invert Y for screen space
+    float screenX = (clipPos[0] * 0.5f + 0.5f) * oWindowSize.x;
+    float screenY = (1.0f - (clipPos[1] * 0.5f + 0.5f)) * oWindowSize.y; // Invert Y for screen space
 
     return Vector3(screenX, screenY, clipPos[3]);
 }

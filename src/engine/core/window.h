@@ -25,10 +25,12 @@ public:
     inline void setKeepRatio(bool keepRatio) { m_bKeepRatio = keepRatio; }
     inline float getWindowRatio() { return m_fRatio; }
 
-    inline Vector2i& getActualSize() { return m_oActualSize; }
+    inline const Vector2i& getActualSize() const { return m_oActualSize; }
     inline int GetActualWidth() const { return m_oActualSize.x; }
     inline int GetActualHeight() const { return m_oActualSize.y; }
-    void setWindowSize(int nWidth, int nHeight);    
+
+    void setWindowSize(int nWidth, int nHeight);
+    inline const Vector2i& getWindowSize() const { return m_oWindowSize; }
 
     inline bool isPostProcessEnabled() const { return m_bEnablePostProcess; }
     inline void setPostProcessEnabled(bool enabled) { m_bEnablePostProcess = enabled; }

@@ -4,6 +4,7 @@
 #include <imgui.h>
 
 #include "editor.h"
+#include "../engine/core/window.h"
 #include "../engine/core/debug_macro.h"
 #include "../engine/core/camera.h"
 #include "../engine/core/scene/node.h"
@@ -199,24 +200,31 @@ void GizmosManager::onMouseClickCheck(bool bPressed)
     Vector2 oScreenPos;
     pInput->getMousePosition(oScreenPos.x, oScreenPos.y);
 
+    // LOGLN("Mouse Click at: {} {}", oScreenPos.x, oScreenPos.y);
+
     Camera* pMainCamera = Camera::main;
+
+    const float GizmosWidth = Window::ins->GetActualWidth() / 10;
+    const float GizmosHeight = Window::ins->GetActualHeight() / 10;
 
     for (int i = 0; i < m_nImageGizmosSize; ++i)
     {
         ImageGizmosData& oData = m_vecImageGizmos.at(i);
         Vector3 oGizmosScreenPos = pMainCamera->worldPositionToScreenPosition(oData.m_vecPosition);
 
+        // LOGLN("Gizmos Screen Pos: {} {} {}", oGizmosScreenPos.x, oGizmosScreenPos.y, oGizmosScreenPos.z);
+
         if (oGizmosScreenPos.z < 0)
             continue; // Behind camera
 
         const float fXDelta = std::abs(oScreenPos.x - oGizmosScreenPos.x);
         const float fYDelta = std::abs(oScreenPos.y - oGizmosScreenPos.y);
-        const float fSize = 30 / oGizmosScreenPos.z;
 
-        if (fXDelta < fSize && fYDelta < fSize)
+        if (fXDelta < (GizmosWidth / oGizmosScreenPos.z) && fYDelta < (GizmosHeight / oGizmosScreenPos.z))
         {
             if (oData.m_pAttachedComponent && oData.m_pAttachedComponent->getNode())
             {
+                // LOGLN("Gizmos Clicked! Select Node: {}", oData.m_pAttachedComponent->getNode()->getName());
                 Editor::setSelectedNode(oData.m_pAttachedComponent->getNode());
             }
         }
