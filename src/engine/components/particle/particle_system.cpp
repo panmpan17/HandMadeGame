@@ -319,12 +319,14 @@ void ParticleSystem::spawnNewParticles(int nSpawnCount/* = 1*/)
                     break;
 
                 case eParticleSpawnShape::BOX:
-                    float fHalfWidth = m_vecSpawnShapeSize.x * 0.5f;
-                    float fHalfHeight = m_vecSpawnShapeSize.y * 0.5f;
-                    float fHalfDepth = m_vecSpawnShapeSize.z * 0.5f;
-                    m_arrParticlesGPU[i].m_vecPosition[0] = randomFloat(-fHalfWidth, fHalfWidth) + vecBasePositionX;
-                    m_arrParticlesGPU[i].m_vecPosition[1] = randomFloat(-fHalfHeight, fHalfHeight) + vecBasePositionY;
-                    m_arrParticlesGPU[i].m_vecPosition[2] = randomFloat(-fHalfDepth, fHalfDepth) + vecBasePositionZ;
+                    Vector3 oChildPos = Vector3(
+                        (randomFloat(-m_vecSpawnShapeSize.x * 0.5f, m_vecSpawnShapeSize.x * 0.5f)),
+                        (randomFloat(-m_vecSpawnShapeSize.y * 0.5f, m_vecSpawnShapeSize.y * 0.5f)),
+                        (randomFloat(-m_vecSpawnShapeSize.z * 0.5f, m_vecSpawnShapeSize.z * 0.5f)));
+                    Vector3 oParentPos = m_pNode->transformPoint(oChildPos);
+                    m_arrParticlesGPU[i].m_vecPosition[0] = oParentPos.x;
+                    m_arrParticlesGPU[i].m_vecPosition[1] = oParentPos.y;
+                    m_arrParticlesGPU[i].m_vecPosition[2] = oParentPos.z;
                     break;
             }
 
@@ -518,6 +520,7 @@ void ParticleSystem::onDrawGizmos(bool bIsSelected)
         case eParticleSpawnShape::RECTANGLE:
             break;
         case eParticleSpawnShape::BOX:
+            // TODO: the shape size might need to be adjusted based on the node's scale
             GizmosManager::getInstance()->addCubeGizmos(m_pNode->getPositionInWorld(), m_pNode->getWorldRotationQuaternion(), m_vecSpawnShapeSize, PARTICLE_SYSTEM_SPAWN_SHAPE_COLOR);
             break;
     }

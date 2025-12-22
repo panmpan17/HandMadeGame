@@ -32,6 +32,7 @@ struct CubeGizmosData
 {
     Vector3 m_vecPosition;
     Vector3 m_vecSize;
+    Quaternion m_oRotation;
     Color m_color;
 };
 
@@ -103,8 +104,7 @@ private:
     int m_nCubeGizmosSize = 0;
 
     Shader* m_pCubeGizmosShader = nullptr;
-    const ShaderUniformHandle* m_pCubeGizmosPositionUniform = nullptr;
-    const ShaderUniformHandle* m_pCubeGizmosSizeUniform = nullptr;
+    const ShaderUniformHandle* m_pCubeGizmosModelUniform = nullptr;
     const ShaderUniformHandle* m_pCubeGizmosColorUniform = nullptr;
 
     GLuint m_nCubeGizmosVertexBuffer = 0;

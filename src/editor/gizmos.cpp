@@ -73,8 +73,7 @@ void GizmosManager::initCubeGizmosShaderAndBuffer()
 {
     m_pCubeGizmosShader = ShaderLoader::getInstance()->getShader("mesh_gizmos");
 
-    m_pCubeGizmosPositionUniform = m_pCubeGizmosShader->getUniformHandle("u_WorldPosition");
-    m_pCubeGizmosSizeUniform = m_pCubeGizmosShader->getUniformHandle("u_Scale");
+    m_pCubeGizmosModelUniform = m_pCubeGizmosShader->getUniformHandle("u_Model");
     m_pCubeGizmosColorUniform = m_pCubeGizmosShader->getUniformHandle("u_GizmosColor");
 
     glGenBuffers(1, &m_nCubeGizmosVertexBuffer);
@@ -193,6 +192,7 @@ void GizmosManager::addCubeGizmos(const Vector3& vecPosition, Quaternion rotatio
         CubeGizmosData& oData = m_vecCubeGizmos.at(m_nCubeGizmosSize++);
         oData.m_vecPosition = vecPosition;
         oData.m_vecSize = vecSize;
+        oData.m_oRotation = rotation;
         oData.m_color = vecColor;
         return;
     }
@@ -200,6 +200,7 @@ void GizmosManager::addCubeGizmos(const Vector3& vecPosition, Quaternion rotatio
     m_vecCubeGizmos.push_back(CubeGizmosData {
         .m_vecPosition = vecPosition,
         .m_vecSize = vecSize,
+        .m_oRotation = rotation,
         .m_color = vecColor,
     });
 }
@@ -228,13 +229,25 @@ void GizmosManager::drawCubeGizmos()
     glUseProgram(m_pCubeGizmosShader->getProgram());
     glBindVertexArray(m_nCubeGizmosVertexArray);
 
+    mat4x4 oScaleMatrix;
+    mat4x4 oRotationMatrix;
+    mat4x4 oModelMatrix;
+
     for (int i = 0; i < m_nCubeGizmosSize; ++i)
     {
         CubeGizmosData& oData = m_vecCubeGizmos.at(i);
 
-        glUniform3f(m_pCubeGizmosPositionUniform->m_nLocation, oData.m_vecPosition.x, oData.m_vecPosition.y, oData.m_vecPosition.z);
-        glUniform3f(m_pCubeGizmosSizeUniform->m_nLocation, oData.m_vecSize.x, oData.m_vecSize.y, oData.m_vecSize.z);
-        // TODO: Impletement rotation uniform
+        mat4x4_translate(oModelMatrix, oData.m_vecPosition.x, oData.m_vecPosition.y, oData.m_vecPosition.z);
+        
+        mat4x4_identity(oScaleMatrix);
+        mat4x4_scale_aniso(oScaleMatrix, oScaleMatrix, oData.m_vecSize.x, oData.m_vecSize.y, oData.m_vecSize.z);
+
+        oData.m_oRotation.toMat4x4(oRotationMatrix);
+
+        mat4x4_mul(oRotationMatrix, oRotationMatrix, oScaleMatrix);
+        mat4x4_mul(oModelMatrix, oModelMatrix, oRotationMatrix);
+
+        glUniformMatrix4fv(m_pCubeGizmosModelUniform->m_nLocation, 1, GL_FALSE, reinterpret_cast<const GLfloat*>(oModelMatrix));
         glUniform4f(m_pCubeGizmosColorUniform->m_nLocation, oData.m_color.r, oData.m_color.g, oData.m_color.b, oData.m_color.a);
 
         glDrawArrays(GL_TRIANGLES, 0, 36); // Assuming the cube is made of 36 vertices (12 triangles)
