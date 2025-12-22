@@ -115,7 +115,7 @@ void DirectionLightComponent::onInspectorUI(int nComponentIndex)
 
 inline constexpr std::string_view DIRECTION_LIGHT_GIZMOS_IMAGE = "assets/gizmos/direction_light.png";
 
-void DirectionLightComponent::onDrawGizmos()
+void DirectionLightComponent::onDrawGizmos(bool bIsSelected)
 {
     GizmosManager::getInstance()->addImageGizmos(this, m_pNode->getPositionInWorld(), DIRECTION_LIGHT_GIZMOS_IMAGE, m_color);
 }

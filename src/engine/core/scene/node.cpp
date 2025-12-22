@@ -6,6 +6,7 @@
 #include "../math/random.h"
 #include "../../components/component.h"
 #include "../../components/drawable_interface.h"
+#include "../../../editor/editor.h"
 
 
 Node::Node(float fX, float fY, float fZ)
@@ -314,13 +315,15 @@ Node* Node::clone() const
 
 void Node::drawGizmos()
 {
+    bool bIsSelected = Editor::getSelectedNode() == this;
+
     int nCount = m_oComponentArray.getCount();
     for (int i = 0; i < nCount; ++i)
     {
         Component* pComponent = m_oComponentArray.getElement(i);
         if (pComponent)
         {
-            pComponent->onDrawGizmos();
+            pComponent->onDrawGizmos(bIsSelected);
         }
     }
 

@@ -294,7 +294,7 @@ void ParticleSystem::spawnNewParticles(int nSpawnCount/* = 1*/)
                 case eParticleSpawnShape::CIRCLE:
                     {
                         float fAngle = randomFloat(0.0f, 2.0f * M_PI);
-                        float fRadius = randomFloat(0.0f, m_fSpawnShapeWidth);
+                        float fRadius = randomFloat(0.0f, m_vecSpawnShapeSize.x);
                         m_arrParticlesGPU[i].m_vecPosition[0] = cos(fAngle) * fRadius + vecBasePositionX;
                         m_arrParticlesGPU[i].m_vecPosition[1] = sin(fAngle) * fRadius + vecBasePositionY;
                         m_arrParticlesGPU[i].m_vecPosition[2] = vecBasePositionZ;
@@ -302,8 +302,8 @@ void ParticleSystem::spawnNewParticles(int nSpawnCount/* = 1*/)
                     break;
 
                 case eParticleSpawnShape::RECTANGLE:
-                    m_arrParticlesGPU[i].m_vecPosition[0] = randomFloat(-m_fSpawnShapeWidth, m_fSpawnShapeWidth) + vecBasePositionX;
-                    m_arrParticlesGPU[i].m_vecPosition[1] = randomFloat(-m_fSpawnShapeHeight, m_fSpawnShapeHeight) + vecBasePositionY;
+                    m_arrParticlesGPU[i].m_vecPosition[0] = randomFloat(-m_vecSpawnShapeSize.x, m_vecSpawnShapeSize.x) + vecBasePositionX;
+                    m_arrParticlesGPU[i].m_vecPosition[1] = randomFloat(-m_vecSpawnShapeSize.y, m_vecSpawnShapeSize.y) + vecBasePositionY;
                     m_arrParticlesGPU[i].m_vecPosition[2] = vecBasePositionZ;
                     break;
                 
@@ -311,7 +311,7 @@ void ParticleSystem::spawnNewParticles(int nSpawnCount/* = 1*/)
                     {
                         float fTheta = randomFloat(0.0f, 2.0f * M_PI);
                         float fPhi = randomFloat(0.0f, M_PI);
-                        float fRadius = randomFloat(0.0f, m_fSpawnShapeWidth);
+                        float fRadius = randomFloat(0.0f, m_vecSpawnShapeSize.x);
                         m_arrParticlesGPU[i].m_vecPosition[0] = fRadius * sin(fPhi) * cos(fTheta) + vecBasePositionX;
                         m_arrParticlesGPU[i].m_vecPosition[1] = fRadius * sin(fPhi) * sin(fTheta) + vecBasePositionY;
                         m_arrParticlesGPU[i].m_vecPosition[2] = fRadius * cos(fPhi) + vecBasePositionZ;
@@ -319,9 +319,12 @@ void ParticleSystem::spawnNewParticles(int nSpawnCount/* = 1*/)
                     break;
 
                 case eParticleSpawnShape::BOX:
-                    m_arrParticlesGPU[i].m_vecPosition[0] = randomFloat(-m_fSpawnShapeWidth, m_fSpawnShapeWidth) + vecBasePositionX;
-                    m_arrParticlesGPU[i].m_vecPosition[1] = randomFloat(-m_fSpawnShapeHeight, m_fSpawnShapeHeight) + vecBasePositionY;
-                    m_arrParticlesGPU[i].m_vecPosition[2] = randomFloat(-m_fSpawnShapeDepth, m_fSpawnShapeDepth) + vecBasePositionZ;
+                    float fHalfWidth = m_vecSpawnShapeSize.x * 0.5f;
+                    float fHalfHeight = m_vecSpawnShapeSize.y * 0.5f;
+                    float fHalfDepth = m_vecSpawnShapeSize.z * 0.5f;
+                    m_arrParticlesGPU[i].m_vecPosition[0] = randomFloat(-fHalfWidth, fHalfWidth) + vecBasePositionX;
+                    m_arrParticlesGPU[i].m_vecPosition[1] = randomFloat(-fHalfHeight, fHalfHeight) + vecBasePositionY;
+                    m_arrParticlesGPU[i].m_vecPosition[2] = randomFloat(-fHalfDepth, fHalfDepth) + vecBasePositionZ;
                     break;
             }
 
@@ -381,9 +384,7 @@ void ParticleSystem::serializeToWrapper(DataSerializer& serializer) const
 {
     serializer.ADD_ATTRIBUTES(m_nAllParticleCount);
     serializer.ADD_ATTRIBUTES_VALUE(m_eSpawnShape, static_cast<int>(m_eSpawnShape));
-    serializer.ADD_ATTRIBUTES(m_fSpawnShapeWidth);
-    serializer.ADD_ATTRIBUTES(m_fSpawnShapeHeight);
-    serializer.ADD_ATTRIBUTES(m_fSpawnShapeDepth);
+    serializer.ADD_ATTRIBUTES(m_vecSpawnShapeSize);
     serializer.ADD_ATTRIBUTES(m_fLifetimeMin);
     serializer.ADD_ATTRIBUTES(m_fLifetimeMax);
     serializer.ADD_ATTRIBUTES(m_fStartRotationMin);
@@ -432,9 +433,7 @@ bool ParticleSystem::deserializeField(DataDeserializer& deserializer, const std:
         return true;
     }
 
-    DESERIALIZE_FIELD(m_fSpawnShapeWidth);
-    DESERIALIZE_FIELD(m_fSpawnShapeHeight);
-    DESERIALIZE_FIELD(m_fSpawnShapeDepth);
+    DESERIALIZE_FIELD(m_vecSpawnShapeSize);
     DESERIALIZE_FIELD(m_fLifetimeMin);
     DESERIALIZE_FIELD(m_fLifetimeMax);
     DESERIALIZE_FIELD(m_fStartRotationMin);
@@ -501,7 +500,25 @@ void ParticleSystem::onNodeFinishedDeserialization()
 inline const Vector3 PARTICLE_SYSTEM_GIZMOS_COLOR = Vector3(1, 1, 1);
 inline constexpr std::string_view PARTICLE_SYSTEM_GIZMOS_IMAGE = "assets/gizmos/particle.png";
 
-void ParticleSystem::onDrawGizmos()
+inline const Color PARTICLE_SYSTEM_SPAWN_SHAPE_COLOR = Color(.45f, .58f, .75f, .5f);
+
+void ParticleSystem::onDrawGizmos(bool bIsSelected)
 {
     GizmosManager::getInstance()->addImageGizmos(this, m_pNode->getPositionInWorld(), PARTICLE_SYSTEM_GIZMOS_IMAGE, PARTICLE_SYSTEM_GIZMOS_COLOR);
+
+    switch (m_eSpawnShape)
+    {
+        case eParticleSpawnShape::DOT:
+            break;
+        case eParticleSpawnShape::CIRCLE:
+            break;
+        case eParticleSpawnShape::SPHERE:
+            GizmosManager::getInstance()->addSphereGizmos(m_pNode->getPositionInWorld(), m_pNode->getWorldRotationQuaternion(), m_vecSpawnShapeSize.x, PARTICLE_SYSTEM_SPAWN_SHAPE_COLOR);
+            break;
+        case eParticleSpawnShape::RECTANGLE:
+            break;
+        case eParticleSpawnShape::BOX:
+            GizmosManager::getInstance()->addCubeGizmos(m_pNode->getPositionInWorld(), m_pNode->getWorldRotationQuaternion(), m_vecSpawnShapeSize, PARTICLE_SYSTEM_SPAWN_SHAPE_COLOR);
+            break;
+    }
 }

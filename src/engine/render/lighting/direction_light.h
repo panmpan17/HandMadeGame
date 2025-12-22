@@ -61,7 +61,7 @@ public:
     bool isUpdatable() const override { return false; }
 
     virtual void onInspectorUI(int nComponentIndex) override;
-    virtual void onDrawGizmos() override;
+    virtual void onDrawGizmos(bool bIsSelected) override;
 
 private:
     Vector3 m_color;

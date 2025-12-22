@@ -8,7 +8,7 @@
 struct Quaternion
 {
 public:
-    // static const Quaternion Identity;
+    static const Quaternion Identity;
 
     static Quaternion fromAxisAngle(const vec3& axis, float angleDegrees)
     {
@@ -172,6 +172,6 @@ struct std::formatter<Quaternion> : std::formatter<std::string> {
 #ifndef QUATERNION_H_IMPLEMENTATION
 #define QUATERNION_H_IMPLEMENTATION
 
-// const Quaternion Quaternion::Identity = Quaternion(1, 0, 0, 0);
+inline const Quaternion Quaternion::Identity = Quaternion(1, 0, 0, 0);
 
 #endif // QUATERNION_H_IMPLEMENTATION

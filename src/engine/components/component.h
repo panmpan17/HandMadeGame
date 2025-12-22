@@ -33,7 +33,7 @@ public:
     virtual void onNodeFinishedDeserialization() {}
 
     virtual void onInspectorUI(int nComponentIndex) {};
-    virtual void onDrawGizmos() {};
+    virtual void onDrawGizmos(bool bIsSelected) {};
 
 protected:
     Node* m_pNode = nullptr;

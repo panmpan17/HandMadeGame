@@ -3,6 +3,7 @@
 // #include "../component.h"
 #include "../drawable_interface.h"
 #include "../../render/shader.h"
+#include "../../core/math/vector.h"
 #include <linmath.h>
 #include <functional>
 
@@ -110,8 +111,9 @@ public:
     void setParticleStartVelocityDirectionOverride(ParticleStartVelocityDirectionOverride funcOverride) { m_funcStartVelocityDirectionOverride = funcOverride; }
 
     void setSpawnShape(eParticleSpawnShape eShape) { m_eSpawnShape = eShape; }
-    void setSpawnShapeDimensions(float fWidth, float fHeight) { m_fSpawnShapeWidth = fWidth; m_fSpawnShapeHeight = fHeight; }
-    void setSpawnShapeDimensions(float fWidth, float fHeight, float fDepth) { m_fSpawnShapeWidth = fWidth; m_fSpawnShapeHeight = fHeight; m_fSpawnShapeDepth = fDepth; }
+    void setSpawnShapeDimensions(float fWidth, float fHeight) { m_vecSpawnShapeSize.x = fWidth; m_vecSpawnShapeSize.y = fHeight; }
+    void setSpawnShapeDimensions(float fWidth, float fHeight, float fDepth) { m_vecSpawnShapeSize.x = fWidth; m_vecSpawnShapeSize.y = fHeight; m_vecSpawnShapeSize.z = fDepth; }
+    void setSpawnShapeDiemensions(const Vector3& vecSize) { m_vecSpawnShapeSize = vecSize; }
 
     void setGravity(float fX, float fY, float fZ) { m_fGravity[0] = fX; m_fGravity[1] = fY; m_fGravity[2] = fZ; }
 
@@ -141,7 +143,7 @@ public:
 
     void setIsLooping(bool bLooping) { m_bIsLooping = bLooping; }
 
-    virtual void onDrawGizmos() override;
+    virtual void onDrawGizmos(bool bIsSelected) override;
 
 private:
     ParticleGPUInstance* m_arrParticlesGPU = nullptr;
@@ -161,9 +163,7 @@ private:
     int m_nLastAliveParticleIndex = 0;
 
     eParticleSpawnShape m_eSpawnShape = eParticleSpawnShape::DOT;
-    float m_fSpawnShapeWidth = 0.1f;
-    float m_fSpawnShapeHeight = 0.1f;
-    float m_fSpawnShapeDepth = 0.1f;
+    Vector3 m_vecSpawnShapeSize = { 0.1f, 0.1f, 0.1f };
 
     float m_fLifetimeMin = 1.0f;
     float m_fLifetimeMax = 3.0f;

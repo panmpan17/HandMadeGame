@@ -76,3 +76,8 @@
   vertex: assets/shaders/particle_instance_billboard.vert
   fragment: assets/shaders/particle_instance.frag
   cameraUBO: 0
+20:
+  name: mesh_gizmos
+  vertex: assets/shaders/3d/mesh_gizmos.vert
+  fragment: assets/shaders/3d/mesh_gizmos.frag
+  cameraUBO: 0
