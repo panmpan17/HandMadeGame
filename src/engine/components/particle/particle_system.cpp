@@ -518,10 +518,14 @@ void ParticleSystem::onDrawGizmos(bool bIsSelected)
             GizmosManager::getInstance()->addSphereGizmos(m_pNode->getPositionInWorld(), m_pNode->getWorldRotationQuaternion(), m_vecSpawnShapeSize.x, PARTICLE_SYSTEM_SPAWN_SHAPE_COLOR);
             break;
         case eParticleSpawnShape::RECTANGLE:
+            GizmosManager::getInstance()->addRectangleGizmos(
+                m_pNode->getPositionInWorld(),
+                m_pNode->getWorldRotationQuaternion(),
+                m_vecSpawnShapeSize * m_pNode->getScale(),
+                PARTICLE_SYSTEM_SPAWN_SHAPE_COLOR);
             break;
         case eParticleSpawnShape::BOX:
-            // TODO: the shape size might need to be adjusted based on the node's scale
-            GizmosManager::getInstance()->addCubeGizmos(m_pNode->getPositionInWorld(), m_pNode->getWorldRotationQuaternion(), m_vecSpawnShapeSize, PARTICLE_SYSTEM_SPAWN_SHAPE_COLOR);
+            GizmosManager::getInstance()->addCubeGizmos(m_pNode->getPositionInWorld(), m_pNode->getWorldRotationQuaternion(), m_vecSpawnShapeSize * m_pNode->getScale(), PARTICLE_SYSTEM_SPAWN_SHAPE_COLOR);
             break;
     }
 }

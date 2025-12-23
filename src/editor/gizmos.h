@@ -28,6 +28,14 @@ struct SphereGizmosData
     Color m_color;
 };
 
+struct RectangleGizmosData
+{
+    Vector3 m_vecPosition;
+    Vector2 m_vecSize;
+    Quaternion m_oRotation;
+    Color m_color;
+};
+
 struct CubeGizmosData
 {
     Vector3 m_vecPosition;
@@ -58,6 +66,9 @@ public:
     void addSphereGizmos(const Vector3& vecPosition, Quaternion rotation, float fRadius);
     void addSphereGizmos(const Vector3& vecPosition, Quaternion rotation, float fRadius, const Color& vecColor);
 
+    void addRectangleGizmos(const Vector3& vecPosition, Quaternion rotation, const Vector2& vecSize);
+    void addRectangleGizmos(const Vector3& vecPosition, Quaternion rotation, const Vector2& vecSize, const Color& vecColor);
+
     void addCubeGizmos(const Vector3& vecPosition, Quaternion rotation, const Vector3& vecSize);
     void addCubeGizmos(const Vector3& vecPosition, Quaternion rotation, const Vector3& vecSize, const Color& vecColor);
 
@@ -69,6 +80,7 @@ private:
 
     static inline GizmosManager* ins = nullptr;
 
+#pragma Image Mesh Gizmos
     /* Image Gizmos */
     std::vector<ImageGizmosData> m_vecImageGizmos;
     int m_nImageGizmosSize = 0;
@@ -84,13 +96,18 @@ private:
 
     void initImageGizmosShaderAndBuffer();
     void drawImageGizmos();
+#pragma endregion
+
+
+#pragma region Mesh Gizmos
+    Shader* m_pMeshGizmosShader = nullptr;
+    const ShaderUniformHandle* m_pMeshGizmosModelUniform = nullptr;
+    const ShaderUniformHandle* m_pMeshGizmosColorUniform = nullptr;
 
 
     /* Sphere Gizmos */
     std::vector<SphereGizmosData> m_vecSphereGizmos;
     int m_nSphereGizmosSize = 0;
-
-    Shader* m_pSphereGizmosShader = nullptr;
 
     GLuint m_nSphereGizmosVertexBuffer = 0;
     GLuint m_nSphereGizmosVertexArray = 0;
@@ -99,19 +116,27 @@ private:
     void drawSphereGizmos();
 
 
+    /* Rectangle */
+    std::vector<RectangleGizmosData> m_vecRectangleGizmos;
+    int m_nRectangleGizmosSize = 0;
+
+    GLuint m_nRectangleGizmosVertexBuffer = 0;
+    GLuint m_nRectangleGizmosVertexArray = 0;
+
+    void initRectangleGizmosShaderAndBuffer();
+    void drawRectangleGizmos();
+
+
     /* Cube Gizmos */
     std::vector<CubeGizmosData> m_vecCubeGizmos;
     int m_nCubeGizmosSize = 0;
-
-    Shader* m_pCubeGizmosShader = nullptr;
-    const ShaderUniformHandle* m_pCubeGizmosModelUniform = nullptr;
-    const ShaderUniformHandle* m_pCubeGizmosColorUniform = nullptr;
 
     GLuint m_nCubeGizmosVertexBuffer = 0;
     GLuint m_nCubeGizmosVertexArray = 0;
 
     void initCubeGizmosShaderAndBuffer();
     void drawCubeGizmos();
+#pragma endregion
 
 
     void onMouseClickCheck(bool bPressed);

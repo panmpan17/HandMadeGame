@@ -99,6 +99,9 @@ public:
     Vector3 operator*(float fMultiplier) const { return Vector3(x * fMultiplier, y * fMultiplier, z * fMultiplier); }
     Vector3& operator*=(float fMultiplier) { x *= fMultiplier; y *= fMultiplier; z *= fMultiplier; return *this; }
 
+    Vector3 operator*(const Vector3& fMultiplier) const { return Vector3(x * fMultiplier.x, y * fMultiplier.y, z * fMultiplier.z); }
+    Vector3& operator*=(const Vector3& fMultiplier) { x *= fMultiplier.x; y *= fMultiplier.y; z *= fMultiplier.z; return *this; }
+
     Vector3 operator/(float fMultiplier) const { return Vector3(x / fMultiplier, y / fMultiplier, z / fMultiplier); }
     Vector3& operator/=(float fMultiplier) { x /= fMultiplier; y /= fMultiplier; z /= fMultiplier; return *this; }
 
