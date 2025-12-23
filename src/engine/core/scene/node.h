@@ -31,7 +31,7 @@ public:
     void draw();
     void drawDepth();
 
-    inline void setActive(bool isActive) { m_bIsActive = isActive; /* TODO: Should trigger add to world scene or removal */ }
+    void setActive(bool isActive);
     inline bool isActive() const { return m_bIsActive; }
 
     inline bool getIsStarted() const { return m_bHasStarted; }
@@ -48,6 +48,8 @@ private:
     bool m_bIsActive = true;
     bool m_bShouldSerialize = true;
     bool m_bHasStarted = false;
+
+    void refreshDrawablesInWorldScene(bool bParentIsActive);
 
 #pragma endregion
 

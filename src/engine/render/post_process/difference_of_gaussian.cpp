@@ -90,7 +90,7 @@ void DifferenceOfGaussian::renderBlur1Horizontal()
 
     glBindVertexArray(m_pProcessQueue->getFullScreenVertexArray());
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4); // Draw the quad using triangle strip
-    INCREASE_DRAW_CALL_COUNT();
+    INCREASE_DRAW_CALL_COUNT(2);
 
     glBindTexture(GL_TEXTURE_2D, 0); // Unbind the texture
     glBindVertexArray(0); // Unbind the vertex array
@@ -121,7 +121,7 @@ void DifferenceOfGaussian::renderBlur1Vertical()
 
     glBindVertexArray(m_pProcessQueue->getFullScreenVertexArray());
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4); // Draw the quad using triangle strip
-    INCREASE_DRAW_CALL_COUNT();
+    INCREASE_DRAW_CALL_COUNT(2);
     glBindTexture(GL_TEXTURE_2D, 0); // Unbind the texture
 
     glBindVertexArray(0); // Unbind the vertex array
@@ -151,7 +151,7 @@ void DifferenceOfGaussian::renderBlur2Horizontal()
 
     glBindVertexArray(m_pProcessQueue->getFullScreenVertexArray());
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4); // Draw the
-    INCREASE_DRAW_CALL_COUNT();
+    INCREASE_DRAW_CALL_COUNT(2);
     glBindTexture(GL_TEXTURE_2D, 0); // Unbind the texture
 
     glBindVertexArray(0); // Unbind the vertex array
@@ -181,7 +181,7 @@ void DifferenceOfGaussian::renderBlur2Vertical()
 
     glBindVertexArray(m_pProcessQueue->getFullScreenVertexArray());
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4); // Draw the quad using triangle strip
-    INCREASE_DRAW_CALL_COUNT();
+    INCREASE_DRAW_CALL_COUNT(2);
     glBindTexture(GL_TEXTURE_2D, 0); // Unbind the texture
 
     glBindVertexArray(0); // Unbind the vertex array
@@ -214,7 +214,7 @@ void DifferenceOfGaussian::renderComposite()
 
     glBindVertexArray(m_pProcessQueue->getFullScreenVertexArray());
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4); // Draw the quad using triangle strip
-    INCREASE_DRAW_CALL_COUNT();
+    INCREASE_DRAW_CALL_COUNT(2);
 
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, 0); // Unbind the texture

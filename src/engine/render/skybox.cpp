@@ -158,7 +158,7 @@ void Skybox::draw()
 
     glBindVertexArray(m_nSkyboxVAO);
     glDrawArrays(GL_TRIANGLES, 0, 36);
-    INCREASE_DRAW_CALL_COUNT();
+    INCREASE_DRAW_CALL_COUNT(12);
     
     glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
     glBindVertexArray(0);

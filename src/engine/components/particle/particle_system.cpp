@@ -175,7 +175,7 @@ void ParticleSystem::draw()
     glBufferSubData(GL_ARRAY_BUFFER, 0, m_nAliveParticleCount * sizeof(ParticleGPUInstance), m_arrParticlesGPU);
 
     glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, m_nAliveParticleCount);
-    INCREASE_DRAW_CALL_COUNT();
+    INCREASE_DRAW_CALL_COUNT(m_nAliveParticleCount * 2);
 
     glBindTexture(GL_TEXTURE_2D, 0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);

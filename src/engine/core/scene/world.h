@@ -22,6 +22,7 @@ public:
     void clearAllNodes();
 
     void addDrawable(IDrawable* const pDrawable);
+    void removeDrawable(IDrawable* const pDrawable);
 
     void update(float fDeltatime);
     void render();

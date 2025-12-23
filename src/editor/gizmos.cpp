@@ -320,6 +320,8 @@ void GizmosManager::drawRectangleGizmos()
         glUniform4f(m_pMeshGizmosColorUniform->m_nLocation, oData.m_color.r, oData.m_color.g, oData.m_color.b, oData.m_color.a);
 
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4); // 4 vertices for rectangle
+
+        INCREASE_DRAW_CALL_COUNT(2);
     }
 
     glBindVertexArray(0);
@@ -353,6 +355,8 @@ void GizmosManager::drawCubeGizmos()
         glUniform4f(m_pMeshGizmosColorUniform->m_nLocation, oData.m_color.r, oData.m_color.g, oData.m_color.b, oData.m_color.a);
 
         glDrawArrays(GL_TRIANGLES, 0, 36); // Assuming the cube is made of 36 vertices (12 triangles)
+
+        INCREASE_DRAW_CALL_COUNT(12);
     }
 
     glBindVertexArray(0);
@@ -382,6 +386,8 @@ void GizmosManager::drawImageGizmos()
 
             glDrawArrays(GL_TRIANGLE_STRIP, 0, 4); // Draw the quad using triangle strip
             glBindTexture(GL_TEXTURE_2D, 0); // Unbind the texture
+
+            INCREASE_DRAW_CALL_COUNT(2);
         }
     }
 

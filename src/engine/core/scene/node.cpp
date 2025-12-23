@@ -92,54 +92,67 @@ void Node::onAddToWorldScene()
     // TODO: Improve this lifecycle management
     if (m_bIsActive)
     {
-        int nSize = m_oComponentArray.getSize();
-        for (int i = 0; i < nSize; ++i)
+        refreshDrawablesInWorldScene(true);
+    }
+}
+
+void Node::setActive(bool isActive)
+{
+    if (m_bIsActive == isActive)
+        return;
+
+    m_bIsActive = isActive;
+
+    refreshDrawablesInWorldScene(isActive);
+}
+
+void Node::refreshDrawablesInWorldScene(bool bParentIsActive)
+{
+    bool bShouldBeActive = bParentIsActive && m_bIsActive;
+
+    int nCount = m_oComponentArray.getCount();
+    for (int i = 0; i < nCount; ++i)
+    {
+        Component* pComponent = m_oComponentArray.getElement(i);
+        if (pComponent && pComponent->isIDrawable() )
         {
-            Component* pComponent = m_oComponentArray.getElement(i);
-            if (pComponent && pComponent->isIDrawable() )
+            IDrawable* const pDrawable = static_cast<IDrawable*>(pComponent);
+            if (bShouldBeActive)
             {
-                IDrawable* const pDrawable = static_cast<IDrawable*>(pComponent);
                 WorldScene::current->addDrawable(pDrawable);
             }
-        }
-
-        nSize = m_oChildNodeArray.getSize();
-        for (int i = 0; i < nSize; ++i)
-        {
-            Node* pChildNode = m_oChildNodeArray.getElement(i);
-            if (pChildNode)
+            else
             {
-                pChildNode->onAddToWorldScene();
+                WorldScene::current->removeDrawable(pDrawable);
             }
+        }
+    }
+
+    nCount = m_oChildNodeArray.getCount();
+    for (int i = 0; i < nCount; ++i)
+    {
+        Node* pChildNode = m_oChildNodeArray.getElement(i);
+        if (pChildNode)
+        {
+            pChildNode->refreshDrawablesInWorldScene(bShouldBeActive);
         }
     }
 }
 
 void Node::onStart()
 {
-    int nSize = m_oComponentArray.getSize();
-    for (int i = 0; i < nSize; ++i)
+    int nCount = m_oComponentArray.getCount();
+    for (int i = 0; i < nCount; ++i)
     {
         Component* pComponent = m_oComponentArray.getElement(i);
         if (pComponent)
         {
-            // try
-            // {
             pComponent->onStart();
-            // }
-            // catch (const std::runtime_error& e) {
-            //     LOGERR("Runtime error in component onStart: {}", e.what());
-            // }
-            // catch (const std::exception& e) {
-            //     LOGERR("Standard exception in component onStart: {}", e.what());
-            // }
-            // catch (...) {
-            //     LOGERR("Unknown exception in component onStart");
-            // }
         }
     }
 
-    for (int i = 0; i < m_oChildNodeArray.getSize(); ++i)
+    nCount = m_oChildNodeArray.getCount();
+    for (int i = 0; i < nCount; ++i)
     {
         Node* pChildNode = m_oChildNodeArray.getElement(i);
         if (pChildNode)

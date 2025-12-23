@@ -112,6 +112,18 @@ public:
         return pElement;
     }
 
+    T removeElement(T element)
+    {
+        int nIndex = getElementIndex(element);
+        if (nIndex == -1)
+            return nullptr;
+
+        m_pArray[nIndex] = nullptr;
+        std::rotate(m_pArray + nIndex, m_pArray + nIndex + 1, m_pArray + m_nSize);
+        --m_nCount;
+        return element;
+    }
+
     T popLastElement()
     {
         for (int i = m_nSize - 1; i >= 0; --i)

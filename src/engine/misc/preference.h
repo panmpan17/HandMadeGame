@@ -26,6 +26,9 @@ public:
     inline static int getWindowPositionY() { return getPlayerPreferenceInstance().getInt("WindowPositionY", 0); }
     inline static void setWindowPositionY(int y) { getPlayerPreferenceInstance().setInt("WindowPositionY", y); }
 
+    inline static bool getEnableGizmos() { return getPlayerPreferenceInstance().getBool("EnableGizmos", true); }
+    inline static void setEnableGizmos(bool bEnable) { getPlayerPreferenceInstance().setBool("EnableGizmos", bEnable); }
+
     static PlayerPreference& getPlayerPreferenceInstance()
     {
         static PlayerPreference instance("player_preferences.cfg");

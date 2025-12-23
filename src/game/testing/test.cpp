@@ -39,6 +39,7 @@ void setupPostProcess()
 
     auto pGammaCorrection = new GammaCorrection(pQueue);
     pGammaCorrection->setGamma(1.3f);
+    pGammaCorrection->setActive(false);
     pQueue->addProcess(pGammaCorrection);
 
     auto pDifferenceOfGaussian = new DifferenceOfGaussian(pQueue);
@@ -374,15 +375,17 @@ void createLightingShadowDemo()
 
     {
         Node* pGround = oBoxModelReader.instantiateCloneNode();
+        pGround->setName("Ground");
         pGround->setPosition(0.f, -3.f, 0.f);
         pGround->setScale(10.f, 0.5f, 10.f);
-        pGround->setActive(false);
+        pGround->setActive(true);
         pWorldScene->addNode(pGround);
     }
 
     {
         std::shared_ptr<Material> pMaterial = MaterialLoader::getInstance()->getMaterial("assets/materials/box.yaml");
         Node* pBackPackObj = oBoxModelReader.instantiateCloneNode({ pMaterial });
+        pBackPackObj->setName("Box");
         pBackPackObj->setPosition(-2.f, 0.f, 0.f);
         pWorldScene->addNode(pBackPackObj);
     }
@@ -391,6 +394,7 @@ void createLightingShadowDemo()
         std::shared_ptr<Material> pMaterial = MaterialLoader::getInstance()->getMaterial("assets/materials/backpack.yaml");
         AssimpModelReader oModelReader("assets/models/back_pack.fbx", { pMaterial });
         Node* pBackPackFbx = oModelReader.instantiateCloneNode();
+        pBackPackFbx->setName("Backpack");
         pBackPackFbx->setScale(0.01f);
         pBackPackFbx->setPosition(2.f, 0.f, 0.f);
         pBackPackFbx->setRotationQuaternion(Quaternion::fromEulerAngles({0.f, -105.f, 0.f}));
@@ -400,6 +404,7 @@ void createLightingShadowDemo()
 
     {
         Node* pDirectionLightNode = new Node(0, 10.f, 0.f);
+        pDirectionLightNode->setName("Direction Light");
         pDirectionLightNode->setRotationQuaternion(Quaternion::fromEulerAngles({-130.f, 30.f, 0.f}));
 
         DirectionLightComponent* pPointLightComp = new DirectionLightComponent();
@@ -413,6 +418,7 @@ void createLightingShadowDemo()
     {
         std::shared_ptr<Material> pMaterial = MaterialLoader::getInstance()->getMaterial("assets/materials/water.yaml");
         Node* pWater = oBoxModelReader.instantiateCloneNode({ pMaterial });
+        pWater->setName("Water");
         pWater->setPosition(10.f, -3.f, 0.f);
         pWater->setScale(10.f, 0.2f, 10.f);
         pWorldScene->addNode(pWater);
@@ -424,6 +430,8 @@ void createLightingShadowDemo()
         std::shared_ptr<Material> pMaterial = MaterialLoader::getInstance()->getMaterial("assets/materials/dust_particle.yaml");
 
         Node* pNode5 = new Node(0, 0, 0);
+        pNode5->setName("Smoke");
+
         ParticleSystem* particle = new ParticleSystem(100, false);
         // particle->setImage(pDustImage);
         // particle->setShader(pParticleShader);
@@ -448,7 +456,7 @@ void createLightingShadowDemo()
 
         pNode5->addComponent(new TwoPointsMovement({ -0.5f, 0.f, 0.f }, { 0.5f, 0.f, 0.f }, 2.0f));
 
-        pNode5->setActive(true);
+        // pNode5->setActive(false);
         pWorldScene->addNode(pNode5);
     }
 }

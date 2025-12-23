@@ -50,6 +50,7 @@ public:
     void mainLoop();
 
     inline void increaseDrawCallCount() { ++m_nDrawCallCount; }
+    inline void increaseDrawCallCount(int nTriangleCount) { ++m_nDrawCallCount; m_nTriangleCount += nTriangleCount; }
 
     inline void registerResizeListener(std::function<void(Vector2i)> funcListener) 
     { 
@@ -74,6 +75,7 @@ private:
     bool m_bResizable = false;
     bool m_bKeepRatio = false;
     int m_nDrawCallCount = 0;
+    int m_nTriangleCount = 0;
 
     bool m_bShowIMGUI = false;
     bool m_bAddGameRelatedIMGUIWindows = true;
@@ -83,6 +85,12 @@ private:
     FileWatchDog* m_pFileWatchDog = nullptr;
 
     Event<Vector2i> m_onWindowResize;
+
+#if IS_DEBUG_VERSION
+    bool m_bDrawGizmos = true;
+#else
+    bool m_bDrawGizmos = false;
+#endif
 
     void setupInputManager();
 
@@ -96,7 +104,7 @@ private:
 };
 
 #if IS_DEBUG_VERSION
-#define INCREASE_DRAW_CALL_COUNT() Window::ins->increaseDrawCallCount()
+#define INCREASE_DRAW_CALL_COUNT(n) Window::ins->increaseDrawCallCount(n)
 #else
-#define INCREASE_DRAW_CALL_COUNT() do {} while (0)
+#define INCREASE_DRAW_CALL_COUNT(n) do {} while (0)
 #endif

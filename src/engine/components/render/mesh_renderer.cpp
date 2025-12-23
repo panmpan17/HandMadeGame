@@ -184,7 +184,7 @@ void MeshRenderer::draw()
     glDrawElements(GL_TRIANGLES, m_nIndiceCount, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 
-    INCREASE_DRAW_CALL_COUNT();
+    INCREASE_DRAW_CALL_COUNT(m_nIndiceCount / 3);
 
     glUseProgram(0);
 }
@@ -211,7 +211,7 @@ void MeshRenderer::drawDepth()
     glDrawElements(GL_TRIANGLES, m_nIndiceCount, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 
-    INCREASE_DRAW_CALL_COUNT();
+    INCREASE_DRAW_CALL_COUNT(m_nIndiceCount / 3);
 
     glUseProgram(0);
 }

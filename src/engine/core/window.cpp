@@ -47,6 +47,7 @@ Window::Window()
     m_bEnablePostProcess = Preference::getEnablePostProcess();
     m_oWindowSize.x = Preference::getWindowWidth();
     m_oWindowSize.y = Preference::getWindowHeight();
+    m_bDrawGizmos = Preference::getEnableGizmos();
 
     if (!glfwInit())
     {
@@ -392,6 +393,12 @@ void Window::updateIMGUI()
             ImGui::EndMenu();
         }
 
+        if (ImGui::MenuItem("Show Gizmos", NULL, m_bDrawGizmos))
+        {
+            m_bDrawGizmos = !m_bDrawGizmos;
+            Preference::setEnableGizmos(m_bDrawGizmos);
+        }
+
         ImGui::EndMainMenuBar();
     }
 }
@@ -399,6 +406,7 @@ void Window::updateIMGUI()
 void Window::drawFrame()
 {
     m_nDrawCallCount = 0;
+    m_nTriangleCount = 0;
 
     if (Camera::main)
     {
@@ -437,7 +445,10 @@ void Window::drawFrame()
         m_pWorldScene->render();
     }
 
-    m_pWorldScene->drawGizmos();
+    if (m_bDrawGizmos)
+    {
+        m_pWorldScene->drawGizmos();
+    }
 
     if (m_bShowIMGUI)
     {
@@ -461,6 +472,6 @@ void Window::drawFrameInfo()
     ImGui::SetWindowSize(ImVec2(200, 100), ImGuiCond_Always);
     ImGui::SetWindowPos(ImVec2(0, ImGui::GetIO().DisplaySize.y - 45), ImGuiCond_Always);
     ImGui::Text("%.1f FPS (%.3f ms)", ImGui::GetIO().Framerate, 1000.0f / ImGui::GetIO().Framerate);
-    ImGui::Text("Draw Call Count: %d", m_nDrawCallCount);
+    ImGui::Text("Draw Call: %d; Triangle: %d", m_nDrawCallCount, m_nTriangleCount);
     ImGui::End();
 }

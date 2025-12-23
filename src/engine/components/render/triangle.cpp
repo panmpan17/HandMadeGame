@@ -64,7 +64,7 @@ void Triangle::draw()
     glUniformMatrix4fv(m_pMVPHandle->m_nLocation, 1, GL_FALSE, (const GLfloat*) mvp);
     glBindVertexArray(m_nVertexArray);
     glDrawArrays(GL_TRIANGLES, 0, 3);
-    INCREASE_DRAW_CALL_COUNT();
+    INCREASE_DRAW_CALL_COUNT(1);
     glUseProgram(0);
 }
 

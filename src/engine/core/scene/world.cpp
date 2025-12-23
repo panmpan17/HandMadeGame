@@ -217,3 +217,18 @@ void WorldScene::addDrawable(IDrawable* const pDrawable)
         m_oOpaqueDrawableArray.addElement(pDrawable);
     }
 }
+
+void WorldScene::removeDrawable(IDrawable* const pDrawable)
+{
+    if (pDrawable == nullptr)
+        return;
+
+    if (pDrawable->getIsTransparent())
+    {
+        m_oTransparentDrawableArray.removeElement(pDrawable);
+    }
+    else
+    {
+        m_oOpaqueDrawableArray.removeElement(pDrawable);
+    }
+}

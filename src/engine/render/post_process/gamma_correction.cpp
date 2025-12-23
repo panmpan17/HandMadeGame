@@ -56,7 +56,7 @@ void GammaCorrection::render()
 
     glBindVertexArray(m_pProcessQueue->getFullScreenVertexArray());
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4); // Draw the quad using triangle strip
-    INCREASE_DRAW_CALL_COUNT();
+    INCREASE_DRAW_CALL_COUNT(2);
 
     glBindTexture(GL_TEXTURE_2D, 0); // Unbind the texture
     glBindVertexArray(0); // Unbind the vertex array
