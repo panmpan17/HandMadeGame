@@ -2,8 +2,9 @@
 
 #include <string>
 #include <vector>
-#include "../vertex.h"
 #include "mesh.h"
+#include "../vertex.h"
+#include "../../core/math/vector.h"
 
 typedef unsigned int GLuint;
 
@@ -30,6 +31,8 @@ public:
     ~SimpleObjReader();
 
     std::shared_ptr<Mesh> loadWavefrontFile(const std::string_view& strFilename);
+
+    static void readVertexBufferFromWavefrontFile(const std::string_view& strFilename, std::vector<Vector3>& outVertices);
 
 private:
     int parseFaceVertex(std::vector<TriangleFaceVertex>& vecUniqueVertices, const std::string& strToken);

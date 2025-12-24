@@ -300,29 +300,29 @@ void ParticleSystem::spawnNewParticles(int nSpawnCount/* = 1*/)
                         m_arrParticlesGPU[i].m_vecPosition[2] = vecBasePositionZ;
                     }
                     break;
-
-                case eParticleSpawnShape::RECTANGLE:
-                    m_arrParticlesGPU[i].m_vecPosition[0] = randomFloat(-m_vecSpawnShapeSize.x, m_vecSpawnShapeSize.x) + vecBasePositionX;
-                    m_arrParticlesGPU[i].m_vecPosition[1] = randomFloat(-m_vecSpawnShapeSize.y, m_vecSpawnShapeSize.y) + vecBasePositionY;
-                    m_arrParticlesGPU[i].m_vecPosition[2] = vecBasePositionZ;
-                    break;
                 
                 case eParticleSpawnShape::SPHERE:
                     {
                         float fTheta = randomFloat(0.0f, 2.0f * M_PI);
                         float fPhi = randomFloat(0.0f, M_PI);
                         float fRadius = randomFloat(0.0f, m_vecSpawnShapeSize.x);
+                        // TODO: Apply node's scale
                         m_arrParticlesGPU[i].m_vecPosition[0] = fRadius * sin(fPhi) * cos(fTheta) + vecBasePositionX;
                         m_arrParticlesGPU[i].m_vecPosition[1] = fRadius * sin(fPhi) * sin(fTheta) + vecBasePositionY;
                         m_arrParticlesGPU[i].m_vecPosition[2] = fRadius * cos(fPhi) + vecBasePositionZ;
                     }
                     break;
 
+                case eParticleSpawnShape::RECTANGLE:
                 case eParticleSpawnShape::BOX:
                     Vector3 oChildPos = Vector3(
                         (randomFloat(-m_vecSpawnShapeSize.x * 0.5f, m_vecSpawnShapeSize.x * 0.5f)),
                         (randomFloat(-m_vecSpawnShapeSize.y * 0.5f, m_vecSpawnShapeSize.y * 0.5f)),
-                        (randomFloat(-m_vecSpawnShapeSize.z * 0.5f, m_vecSpawnShapeSize.z * 0.5f)));
+                        0);
+                    if (m_eSpawnShape == eParticleSpawnShape::BOX)
+                    {
+                        oChildPos.z = randomFloat(-m_vecSpawnShapeSize.z * 0.5f, m_vecSpawnShapeSize.z * 0.5f);
+                    }
                     Vector3 oParentPos = m_pNode->transformPoint(oChildPos);
                     m_arrParticlesGPU[i].m_vecPosition[0] = oParentPos.x;
                     m_arrParticlesGPU[i].m_vecPosition[1] = oParentPos.y;
@@ -506,16 +506,24 @@ inline const Color PARTICLE_SYSTEM_SPAWN_SHAPE_COLOR = Color(.45f, .58f, .75f, .
 
 void ParticleSystem::onDrawGizmos(bool bIsSelected)
 {
-    GizmosManager::getInstance()->addImageGizmos(this, m_pNode->getPositionInWorld(), PARTICLE_SYSTEM_GIZMOS_IMAGE, PARTICLE_SYSTEM_GIZMOS_COLOR);
+    // GizmosManager::getInstance()->addImageGizmos(this, m_pNode->getPositionInWorld(), PARTICLE_SYSTEM_GIZMOS_IMAGE, PARTICLE_SYSTEM_GIZMOS_COLOR);
 
     switch (m_eSpawnShape)
     {
         case eParticleSpawnShape::DOT:
             break;
         case eParticleSpawnShape::CIRCLE:
+            GizmosManager::getInstance()->addCircleGizmos(
+                m_pNode->getPositionInWorld(),
+                m_pNode->getWorldRotationQuaternion(),
+                m_vecSpawnShapeSize.x,
+                PARTICLE_SYSTEM_SPAWN_SHAPE_COLOR);
             break;
         case eParticleSpawnShape::SPHERE:
-            GizmosManager::getInstance()->addSphereGizmos(m_pNode->getPositionInWorld(), m_pNode->getWorldRotationQuaternion(), m_vecSpawnShapeSize.x, PARTICLE_SYSTEM_SPAWN_SHAPE_COLOR);
+            GizmosManager::getInstance()->addSphereGizmos(
+                m_pNode->getPositionInWorld(),
+                m_vecSpawnShapeSize.x,
+                PARTICLE_SYSTEM_SPAWN_SHAPE_COLOR);
             break;
         case eParticleSpawnShape::RECTANGLE:
             GizmosManager::getInstance()->addRectangleGizmos(
@@ -525,7 +533,11 @@ void ParticleSystem::onDrawGizmos(bool bIsSelected)
                 PARTICLE_SYSTEM_SPAWN_SHAPE_COLOR);
             break;
         case eParticleSpawnShape::BOX:
-            GizmosManager::getInstance()->addCubeGizmos(m_pNode->getPositionInWorld(), m_pNode->getWorldRotationQuaternion(), m_vecSpawnShapeSize * m_pNode->getScale(), PARTICLE_SYSTEM_SPAWN_SHAPE_COLOR);
+            GizmosManager::getInstance()->addCubeGizmos(
+                m_pNode->getPositionInWorld(),
+                m_pNode->getWorldRotationQuaternion(),
+                m_vecSpawnShapeSize * m_pNode->getScale(),
+                PARTICLE_SYSTEM_SPAWN_SHAPE_COLOR);
             break;
     }
 }

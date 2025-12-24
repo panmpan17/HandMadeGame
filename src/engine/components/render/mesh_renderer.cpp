@@ -11,7 +11,7 @@
 #include "../../render/material.h"
 #include "../../render/lighting/light_manager.h"
 #include "../../render/lighting/direction_light.h"
-#include "../../render/models/simple_obj_reader.h"
+#include "../../render/models/mesh.h"
 
 
 MeshRenderer::MeshRenderer()

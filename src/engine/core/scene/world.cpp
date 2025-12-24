@@ -125,6 +125,7 @@ void WorldScene::render()
 {
     glEnable(GL_DEPTH_TEST);
     glDepthMask(GL_TRUE);
+    glCullFace(GL_BACK);
 
     int nSize = m_oOpaqueDrawableArray.getCount();
     for (int i = 0; i < nSize; ++i)

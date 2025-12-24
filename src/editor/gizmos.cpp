@@ -12,12 +12,21 @@
 #include "../engine/render/shader_loader.h"
 #include "../engine/render/image_loader.h"
 #include "../engine/render/vertex.h"
+#include "../engine/render/models/simple_obj_reader.h"
 
 
 GizmosManager::GizmosManager()
 {
     initImageGizmosShaderAndBuffer();
+
+    m_pMeshGizmosShader = ShaderLoader::getInstance()->getShader("mesh_gizmos");
+
+    m_pMeshGizmosModelUniform = m_pMeshGizmosShader->getUniformHandle("u_Model");
+    m_pMeshGizmosColorUniform = m_pMeshGizmosShader->getUniformHandle("u_GizmosColor");
+
+    initCircleGizmosShaderAndBuffer();
     initSphereGizmosShaderAndBuffer();
+    initRectangleGizmosShaderAndBuffer();
     initCubeGizmosShaderAndBuffer();
 
     InputManager::getInstance()->registerMouseButtonCallback(MouseButton::BUTTON_LEFT, std::bind(&GizmosManager::onMouseClickCheck, this, std::placeholders::_1));
@@ -67,32 +76,57 @@ void GizmosManager::initImageGizmosShaderAndBuffer()
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
+void GizmosManager::initCircleGizmosShaderAndBuffer()
+{
+    glGenBuffers(1, &m_nCircleGizmosVertexBuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, m_nCircleGizmosVertexBuffer);
+
+    std::vector<Vector3> vecCircleVertices;
+    SimpleObjReader::readVertexBufferFromWavefrontFile("assets/gizmos/circle.obj", vecCircleVertices);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(Vector3) * vecCircleVertices.size(), vecCircleVertices.data(), GL_STATIC_DRAW);
+    m_nCircleGizmosVertexCount = static_cast<int>(vecCircleVertices.size());
+
+    GLuint nVPosAttr = m_pMeshGizmosShader->getAttributeLocation("a_vPos");
+
+    glGenVertexArrays(1, &m_nCircleGizmosVertexArray);
+    glBindVertexArray(m_nCircleGizmosVertexArray);
+    glEnableVertexAttribArray(nVPosAttr);
+    glVertexAttribPointer(nVPosAttr, 3, GL_FLOAT, GL_FALSE, sizeof(vec3), (void*)0);
+
+    glBindVertexArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
 void GizmosManager::initSphereGizmosShaderAndBuffer()
 {
+    glGenBuffers(1, &m_nSphereGizmosVertexBuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, m_nSphereGizmosVertexBuffer);
+
+    std::vector<Vector3> vecSphereVertices;
+    SimpleObjReader::readVertexBufferFromWavefrontFile("assets/gizmos/sphere.obj", vecSphereVertices);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(Vector3) * vecSphereVertices.size(), vecSphereVertices.data(), GL_STATIC_DRAW);
+    m_nSphereGizmosVertexCount = static_cast<int>(vecSphereVertices.size());
+
+    GLuint nVPosAttr = m_pMeshGizmosShader->getAttributeLocation("a_vPos");
+
+    glGenVertexArrays(1, &m_nSphereGizmosVertexArray);
+    glBindVertexArray(m_nSphereGizmosVertexArray);
+    glEnableVertexAttribArray(nVPosAttr);
+    glVertexAttribPointer(nVPosAttr, 3, GL_FLOAT, GL_FALSE, sizeof(vec3), (void*)0);
+
+    glBindVertexArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 void GizmosManager::initRectangleGizmosShaderAndBuffer()
 {
-    m_pMeshGizmosShader = ShaderLoader::getInstance()->getShader("mesh_gizmos");
-
-    m_pMeshGizmosModelUniform = m_pMeshGizmosShader->getUniformHandle("u_Model");
-    m_pMeshGizmosColorUniform = m_pMeshGizmosShader->getUniformHandle("u_GizmosColor");
-
     glGenBuffers(1, &m_nRectangleGizmosVertexBuffer);
     glBindBuffer(GL_ARRAY_BUFFER, m_nRectangleGizmosVertexBuffer);
 
-    float fStartX = -1 / 2.0f;
-    float fStartY = -1 / 2.0f;
-
-    // 6 vertices for 2 triangles forming a rectangle
-    vec3 arrVertices[4] = {
-        { fStartX, fStartY, 0 },
-        { fStartX + 1, fStartY, 0 },
-        { fStartX, fStartY + 1, 0 },
-        { fStartX + 1, fStartY + 1, 0 },
-    };
-
-    glBufferData(GL_ARRAY_BUFFER, sizeof(arrVertices), arrVertices, GL_STATIC_DRAW);
+    std::vector<Vector3> vecCubeVertices;
+    SimpleObjReader::readVertexBufferFromWavefrontFile("assets/gizmos/rectangle.obj", vecCubeVertices);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(Vector3) * vecCubeVertices.size(), vecCubeVertices.data(), GL_STATIC_DRAW);
+    m_nRectangleGizmosVertexCount = static_cast<int>(vecCubeVertices.size());
 
     GLuint nVPosAttr = m_pMeshGizmosShader->getAttributeLocation("a_vPos");
 
@@ -107,46 +141,13 @@ void GizmosManager::initRectangleGizmosShaderAndBuffer()
 
 void GizmosManager::initCubeGizmosShaderAndBuffer()
 {
-    m_pMeshGizmosShader = ShaderLoader::getInstance()->getShader("mesh_gizmos");
-
-    m_pMeshGizmosModelUniform = m_pMeshGizmosShader->getUniformHandle("u_Model");
-    m_pMeshGizmosColorUniform = m_pMeshGizmosShader->getUniformHandle("u_GizmosColor");
-
     glGenBuffers(1, &m_nCubeGizmosVertexBuffer);
     glBindBuffer(GL_ARRAY_BUFFER, m_nCubeGizmosVertexBuffer);
 
-    float fStartX = -1 / 2.0f;
-    float fStartY = -1 / 2.0f;
-    float fStartZ = -1 / 2.0f;
-    
-    // 36 vertices for a unit cube (6 faces * 2 triangles * 3 vertices)
-    vec3 arrVertices[36] = {
-        // Front face (Z+)
-        { fStartX, fStartY, fStartZ + 1 }, { fStartX + 1, fStartY, fStartZ + 1 }, { fStartX + 1, fStartY + 1, fStartZ + 1 },
-        { fStartX, fStartY, fStartZ + 1 }, { fStartX + 1, fStartY + 1, fStartZ + 1 }, { fStartX, fStartY + 1, fStartZ + 1 },
-        
-        // Back face (Z-)
-        { fStartX + 1, fStartY, fStartZ }, { fStartX, fStartY, fStartZ }, { fStartX, fStartY + 1, fStartZ },
-        { fStartX + 1, fStartY, fStartZ }, { fStartX, fStartY + 1, fStartZ }, { fStartX + 1, fStartY + 1, fStartZ },
-        
-        // Left face (X-)
-        { fStartX, fStartY, fStartZ }, { fStartX, fStartY, fStartZ + 1 }, { fStartX, fStartY + 1, fStartZ + 1 },
-        { fStartX, fStartY, fStartZ }, { fStartX, fStartY + 1, fStartZ + 1 }, { fStartX, fStartY + 1, fStartZ },
-        
-        // Right face (X+)
-        { fStartX + 1, fStartY, fStartZ + 1 }, { fStartX + 1, fStartY, fStartZ }, { fStartX + 1, fStartY + 1, fStartZ },
-        { fStartX + 1, fStartY, fStartZ + 1 }, { fStartX + 1, fStartY + 1, fStartZ }, { fStartX + 1, fStartY + 1, fStartZ + 1 },
-        
-        // Top face (Y+)
-        { fStartX, fStartY + 1, fStartZ + 1 }, { fStartX + 1, fStartY + 1, fStartZ + 1 }, { fStartX + 1, fStartY + 1, fStartZ },
-        { fStartX, fStartY + 1, fStartZ + 1 }, { fStartX + 1, fStartY + 1, fStartZ }, { fStartX, fStartY + 1, fStartZ },
-        
-        // Bottom face (Y-)
-        { fStartX, fStartY, fStartZ }, { fStartX + 1, fStartY, fStartZ }, { fStartX + 1, fStartY, fStartZ + 1 },
-        { fStartX, fStartY, fStartZ }, { fStartX + 1, fStartY, fStartZ + 1 }, { fStartX, fStartY, fStartZ + 1 }
-    };
-    
-    glBufferData(GL_ARRAY_BUFFER, sizeof(arrVertices), arrVertices, GL_STATIC_DRAW);
+    std::vector<Vector3> vecCubeVertices;
+    SimpleObjReader::readVertexBufferFromWavefrontFile("assets/gizmos/cube.obj", vecCubeVertices);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(Vector3) * vecCubeVertices.size(), vecCubeVertices.data(), GL_STATIC_DRAW);
+    m_nCubeGizmosVertexCount = static_cast<int>(vecCubeVertices.size());
 
     GLuint nVPosAttr = m_pMeshGizmosShader->getAttributeLocation("a_vPos");
 
@@ -167,7 +168,9 @@ void GizmosManager::initCubeGizmosShaderAndBuffer()
 void GizmosManager::clearAllGizmos()
 {
     m_nImageGizmosSize = 0;
+    m_nCircleGizmosSize = 0;
     m_nSphereGizmosSize = 0;
+    m_nRectangleGizmosSize = 0;
     m_nCubeGizmosSize = 0;
 }
 
@@ -198,13 +201,38 @@ void GizmosManager::addImageGizmos(Component* const pComponent, const Vector3& v
     });
 }
 
+
 const Color DEFAULT_GIZMOS_COLOR = Color(1, 1, 1, .5f);
 
-void GizmosManager::addSphereGizmos(const Vector3& vecPosition, Quaternion rotation, float fRadius)
+void GizmosManager::addCircleGizmos(const Vector3& vecPosition, const Quaternion& rotation, float fRadius)
 {
-    addSphereGizmos(vecPosition, rotation, fRadius, DEFAULT_GIZMOS_COLOR);
+    addCircleGizmos(vecPosition, rotation, fRadius, DEFAULT_GIZMOS_COLOR);
 }
-void GizmosManager::addSphereGizmos(const Vector3& vecPosition, Quaternion rotation, float fRadius, const Color& vecColor)
+void GizmosManager::addCircleGizmos(const Vector3& vecPosition, const Quaternion& rotation, float fRadius, const Color& vecColor)
+{
+    if (m_nCircleGizmosSize + 1 < m_vecCircleGizmos.size())
+    {
+        CircleGizmosData& oData = m_vecCircleGizmos.at(m_nCircleGizmosSize++);
+        oData.m_vecPosition = vecPosition;
+        oData.m_fRadius = fRadius;
+        oData.m_oRotation = rotation;
+        oData.m_color = vecColor;
+        return;
+    }
+
+    m_vecCircleGizmos.push_back(CircleGizmosData {
+        .m_vecPosition = vecPosition,
+        .m_fRadius = fRadius,
+        .m_oRotation = rotation,
+        .m_color = vecColor,
+    });
+}
+
+void GizmosManager::addSphereGizmos(const Vector3& vecPosition, float fRadius)
+{
+    addSphereGizmos(vecPosition, fRadius, DEFAULT_GIZMOS_COLOR);
+}
+void GizmosManager::addSphereGizmos(const Vector3& vecPosition, float fRadius, const Color& vecColor)
 {
     if (m_nSphereGizmosSize + 1 < m_vecSphereGizmos.size())
     {
@@ -222,11 +250,11 @@ void GizmosManager::addSphereGizmos(const Vector3& vecPosition, Quaternion rotat
     });
 }
 
-void GizmosManager::addRectangleGizmos(const Vector3& vecPosition, Quaternion rotation, const Vector2& vecSize)
+void GizmosManager::addRectangleGizmos(const Vector3& vecPosition, const Quaternion& rotation, const Vector2& vecSize)
 {
     addRectangleGizmos(vecPosition, rotation, vecSize, DEFAULT_GIZMOS_COLOR);
 }
-void GizmosManager::addRectangleGizmos(const Vector3& vecPosition, Quaternion rotation, const Vector2& vecSize, const Color& vecColor)
+void GizmosManager::addRectangleGizmos(const Vector3& vecPosition, const Quaternion& rotation, const Vector2& vecSize, const Color& vecColor)
 {
     if (m_nRectangleGizmosSize + 1 < m_vecRectangleGizmos.size())
     {
@@ -245,11 +273,11 @@ void GizmosManager::addRectangleGizmos(const Vector3& vecPosition, Quaternion ro
     });
 }
 
-void GizmosManager::addCubeGizmos(const Vector3& vecPosition, Quaternion rotation, const Vector3& vecSize)
+void GizmosManager::addCubeGizmos(const Vector3& vecPosition, const Quaternion& rotation, const Vector3& vecSize)
 {
     addCubeGizmos(vecPosition, rotation, vecSize, DEFAULT_GIZMOS_COLOR);
 }
-void GizmosManager::addCubeGizmos(const Vector3& vecPosition, Quaternion rotation, const Vector3& vecSize, const Color& vecColor)
+void GizmosManager::addCubeGizmos(const Vector3& vecPosition, const Quaternion& rotation, const Vector3& vecSize, const Color& vecColor)
 {
     if (m_nCubeGizmosSize + 1 < m_vecCubeGizmos.size())
     {
@@ -279,6 +307,7 @@ void GizmosManager::drawAllGizmos()
     glEnable(GL_BLEND);
     glDepthMask(GL_FALSE);
 
+    drawCircleGizmos();
     drawSphereGizmos();
     drawRectangleGizmos();
     drawCubeGizmos();
@@ -288,13 +317,85 @@ void GizmosManager::drawAllGizmos()
     glDepthMask(GL_TRUE);
 }
 
+void GizmosManager::drawCircleGizmos()
+{
+    glDisable(GL_CULL_FACE);
+
+    glUseProgram(m_pMeshGizmosShader->getProgram());
+    glBindVertexArray(m_nCircleGizmosVertexArray);
+
+    mat4x4 oScaleMatrix;
+    mat4x4 oRotationMatrix;
+    mat4x4 oModelMatrix;
+
+    for (int i = 0; i < m_nCircleGizmosSize; ++i)
+    {
+        CircleGizmosData& oData = m_vecCircleGizmos.at(i);
+
+        mat4x4_translate(oModelMatrix, oData.m_vecPosition.x, oData.m_vecPosition.y, oData.m_vecPosition.z);
+        
+        mat4x4_identity(oScaleMatrix);
+        mat4x4_scale(oScaleMatrix, oScaleMatrix, oData.m_fRadius);
+
+        oData.m_oRotation.toMat4x4(oRotationMatrix);
+
+        mat4x4_mul(oRotationMatrix, oRotationMatrix, oScaleMatrix);
+        mat4x4_mul(oModelMatrix, oModelMatrix, oRotationMatrix);
+
+        glUniformMatrix4fv(m_pMeshGizmosModelUniform->m_nLocation, 1, GL_FALSE, reinterpret_cast<const GLfloat*>(oModelMatrix));
+        glUniform4f(m_pMeshGizmosColorUniform->m_nLocation, oData.m_color.r, oData.m_color.g, oData.m_color.b, oData.m_color.a);
+
+        glDrawArrays(GL_TRIANGLES, 0, m_nCircleGizmosVertexCount);
+
+        INCREASE_DRAW_CALL_COUNT(m_nCircleGizmosVertexCount / 3);
+    }
+
+    glBindVertexArray(0);
+    glUseProgram(0);
+
+    glEnable(GL_CULL_FACE);
+}
+
 void GizmosManager::drawSphereGizmos()
 {
-    // TODO: Implementation for drawing sphere gizmos goes here
+    glUseProgram(m_pMeshGizmosShader->getProgram());
+    glBindVertexArray(m_nSphereGizmosVertexArray);
+
+    mat4x4 oScaleMatrix;
+    mat4x4 oRotationMatrix;
+    Quaternion::Identity.toMat4x4(oRotationMatrix);
+    mat4x4 oModelMatrix;
+
+    for (int i = 0; i < m_nSphereGizmosSize; ++i)
+    {
+        SphereGizmosData& oData = m_vecSphereGizmos.at(i);
+
+        mat4x4_translate(oModelMatrix, oData.m_vecPosition.x, oData.m_vecPosition.y, oData.m_vecPosition.z);
+        
+        mat4x4_identity(oScaleMatrix);
+        mat4x4_scale(oScaleMatrix, oScaleMatrix, oData.m_fRadius);
+
+        // oData.m_oRotation.toMat4x4(oRotationMatrix);
+
+        // mat4x4_mul(oRotationMatrix, oRotationMatrix, oScaleMatrix);
+        mat4x4_mul(oModelMatrix, oModelMatrix, oScaleMatrix);
+
+        glUniformMatrix4fv(m_pMeshGizmosModelUniform->m_nLocation, 1, GL_FALSE, reinterpret_cast<const GLfloat*>(oModelMatrix));
+        glUniform4f(m_pMeshGizmosColorUniform->m_nLocation, oData.m_color.r, oData.m_color.g, oData.m_color.b, oData.m_color.a);
+
+        glDrawArrays(GL_TRIANGLES, 0, m_nSphereGizmosVertexCount);
+
+        INCREASE_DRAW_CALL_COUNT(m_nSphereGizmosVertexCount / 3);
+    }
+
+    glBindVertexArray(0);
+    glUseProgram(0);
 }
 
 void GizmosManager::drawRectangleGizmos()
 {
+    glDisable(GL_CULL_FACE);
+
     glUseProgram(m_pMeshGizmosShader->getProgram());
     glBindVertexArray(m_nRectangleGizmosVertexArray);
 
@@ -319,13 +420,15 @@ void GizmosManager::drawRectangleGizmos()
         glUniformMatrix4fv(m_pMeshGizmosModelUniform->m_nLocation, 1, GL_FALSE, reinterpret_cast<const GLfloat*>(oModelMatrix));
         glUniform4f(m_pMeshGizmosColorUniform->m_nLocation, oData.m_color.r, oData.m_color.g, oData.m_color.b, oData.m_color.a);
 
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4); // 4 vertices for rectangle
+        glDrawArrays(GL_TRIANGLES, 0, m_nRectangleGizmosVertexCount);
 
-        INCREASE_DRAW_CALL_COUNT(2);
+        INCREASE_DRAW_CALL_COUNT(m_nRectangleGizmosVertexCount / 3);
     }
 
     glBindVertexArray(0);
     glUseProgram(0);
+
+    glEnable(GL_CULL_FACE);
 }
 
 void GizmosManager::drawCubeGizmos()
@@ -354,9 +457,9 @@ void GizmosManager::drawCubeGizmos()
         glUniformMatrix4fv(m_pMeshGizmosModelUniform->m_nLocation, 1, GL_FALSE, reinterpret_cast<const GLfloat*>(oModelMatrix));
         glUniform4f(m_pMeshGizmosColorUniform->m_nLocation, oData.m_color.r, oData.m_color.g, oData.m_color.b, oData.m_color.a);
 
-        glDrawArrays(GL_TRIANGLES, 0, 36); // Assuming the cube is made of 36 vertices (12 triangles)
+        glDrawArrays(GL_TRIANGLES, 0, m_nCubeGizmosVertexCount);
 
-        INCREASE_DRAW_CALL_COUNT(12);
+        INCREASE_DRAW_CALL_COUNT(m_nCubeGizmosVertexCount / 3);
     }
 
     glBindVertexArray(0);

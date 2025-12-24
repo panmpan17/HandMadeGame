@@ -191,3 +191,71 @@ std::shared_ptr<Mesh> SimpleObjReader::loadWavefrontFile(const std::string_view&
 
     return pMesh;
 }
+
+
+void SimpleObjReader::readVertexBufferFromWavefrontFile(const std::string_view& strFilename, std::vector<Vector3>& outVertices)
+{
+    auto oFileReader = FileReader(strFilename);
+    if (!oFileReader.isOpen())
+    {
+        LOGLN("Failed to open file: {}", strFilename);
+        return;
+    }
+
+    std::vector<Vector3> vecVertices;
+
+    std::string strLine;
+    while (oFileReader.readLine(strLine))
+    {
+        if (strLine.empty() || strLine[0] == '#')
+        {
+            continue;
+        }
+
+        std::vector<std::string> strTokens = splitString(strLine, ' ', true);
+        if (strTokens.empty())
+            continue;
+
+        int nSize = (int)strTokens.size();
+        if (strcmp(strTokens[0].data(), "v") == 0)
+        {
+            if (nSize < 4)
+                continue;
+
+            Vector3 vertex;
+            vertex.x = std::stof(strTokens[1]);
+            vertex.y = std::stof(strTokens[2]);
+            vertex.z = std::stof(strTokens[3]);
+            vecVertices.push_back(vertex);
+        }
+        else if (strcmp(strTokens[0].data(), "f") == 0)
+        {
+            if (nSize == 4)
+            {
+                int nVertex1 = std::stoi(strTokens[1]) - 1;
+                int nVertex2 = std::stoi(strTokens[2]) - 1;
+                int nVertex3 = std::stoi(strTokens[3]) - 1;
+
+                outVertices.push_back(vecVertices[nVertex1]);
+                outVertices.push_back(vecVertices[nVertex2]);
+                outVertices.push_back(vecVertices[nVertex3]);
+            }
+            else if (nSize == 5)
+            {
+                // Quad, need to split into two triangles
+                int nVertex1 = std::stoi(strTokens[1]) - 1;
+                int nVertex2 = std::stoi(strTokens[2]) - 1;
+                int nVertex3 = std::stoi(strTokens[3]) - 1;
+                int nVertex4 = std::stoi(strTokens[4]) - 1;
+
+                outVertices.push_back(vecVertices[nVertex1]);
+                outVertices.push_back(vecVertices[nVertex2]);
+                outVertices.push_back(vecVertices[nVertex3]);
+
+                outVertices.push_back(vecVertices[nVertex1]);
+                outVertices.push_back(vecVertices[nVertex3]);
+                outVertices.push_back(vecVertices[nVertex4]);
+            }
+        }
+    }
+}

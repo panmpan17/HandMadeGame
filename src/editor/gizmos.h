@@ -21,6 +21,14 @@ struct ImageGizmosData
     Component* m_pAttachedComponent = nullptr; // Optional: to link gizmo to a specific component
 };
 
+struct CircleGizmosData
+{
+    Vector3 m_vecPosition;
+    float m_fRadius;
+    Quaternion m_oRotation;
+    Color m_color;
+};
+
 struct SphereGizmosData
 {
     Vector3 m_vecPosition;
@@ -63,14 +71,17 @@ public:
     void addImageGizmos(Component* const pComponent, const Vector3& vecPosition, const std::string_view& m_strImagePath);
     void addImageGizmos(Component* const pComponent, const Vector3& vecPosition, const std::string_view& m_strImagePath, const Vector3& vecColor);
 
-    void addSphereGizmos(const Vector3& vecPosition, Quaternion rotation, float fRadius);
-    void addSphereGizmos(const Vector3& vecPosition, Quaternion rotation, float fRadius, const Color& vecColor);
+    void addCircleGizmos(const Vector3& vecPosition, const Quaternion& rotation, float fRadius);
+    void addCircleGizmos(const Vector3& vecPosition, const Quaternion& rotation, float fRadius, const Color& vecColor);
 
-    void addRectangleGizmos(const Vector3& vecPosition, Quaternion rotation, const Vector2& vecSize);
-    void addRectangleGizmos(const Vector3& vecPosition, Quaternion rotation, const Vector2& vecSize, const Color& vecColor);
+    void addSphereGizmos(const Vector3& vecPosition, float fRadius);
+    void addSphereGizmos(const Vector3& vecPosition, float fRadius, const Color& vecColor);
 
-    void addCubeGizmos(const Vector3& vecPosition, Quaternion rotation, const Vector3& vecSize);
-    void addCubeGizmos(const Vector3& vecPosition, Quaternion rotation, const Vector3& vecSize, const Color& vecColor);
+    void addRectangleGizmos(const Vector3& vecPosition, const Quaternion& rotation, const Vector2& vecSize);
+    void addRectangleGizmos(const Vector3& vecPosition, const Quaternion& rotation, const Vector2& vecSize, const Color& vecColor);
+
+    void addCubeGizmos(const Vector3& vecPosition, const Quaternion& rotation, const Vector3& vecSize);
+    void addCubeGizmos(const Vector3& vecPosition, const Quaternion& rotation, const Vector3& vecSize, const Color& vecColor);
 
     void drawAllGizmos();
 
@@ -105,9 +116,22 @@ private:
     const ShaderUniformHandle* m_pMeshGizmosColorUniform = nullptr;
 
 
+    /* Circle Gizmos */
+    std::vector<CircleGizmosData> m_vecCircleGizmos;
+    int m_nCircleGizmosSize = 0;
+    int m_nCircleGizmosVertexCount = 0;
+
+    GLuint m_nCircleGizmosVertexBuffer = 0;
+    GLuint m_nCircleGizmosVertexArray = 0;
+
+    void initCircleGizmosShaderAndBuffer();
+    void drawCircleGizmos();
+
+
     /* Sphere Gizmos */
     std::vector<SphereGizmosData> m_vecSphereGizmos;
     int m_nSphereGizmosSize = 0;
+    int m_nSphereGizmosVertexCount = 0;
 
     GLuint m_nSphereGizmosVertexBuffer = 0;
     GLuint m_nSphereGizmosVertexArray = 0;
@@ -119,6 +143,7 @@ private:
     /* Rectangle */
     std::vector<RectangleGizmosData> m_vecRectangleGizmos;
     int m_nRectangleGizmosSize = 0;
+    int m_nRectangleGizmosVertexCount = 0;
 
     GLuint m_nRectangleGizmosVertexBuffer = 0;
     GLuint m_nRectangleGizmosVertexArray = 0;
@@ -130,6 +155,7 @@ private:
     /* Cube Gizmos */
     std::vector<CubeGizmosData> m_vecCubeGizmos;
     int m_nCubeGizmosSize = 0;
+    int m_nCubeGizmosVertexCount = 0;
 
     GLuint m_nCubeGizmosVertexBuffer = 0;
     GLuint m_nCubeGizmosVertexArray = 0;
