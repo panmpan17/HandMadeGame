@@ -162,6 +162,8 @@ endif()
 ### General Library
 add_subdirectory( external/glfw )
 
+add_subdirectory( external/freetype )
+
 
 # Glad Library
 if (TRUE)
@@ -225,6 +227,6 @@ elseif(UNIX)
 
 endif()
 
-target_link_libraries(MichaelHandMadeGame PRIVATE glfw )
+target_link_libraries(MichaelHandMadeGame PRIVATE glfw freetype )
 target_link_libraries(imgui PRIVATE glfw)
 

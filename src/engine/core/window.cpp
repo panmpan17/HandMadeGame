@@ -22,6 +22,7 @@
 #include "../render/post_process/render_process_queue.h"
 #include "../render/lighting/light_manager.h"
 #include "../render/lighting/direction_light.h"
+#include "../render/font/font_loader.h"
 #include "../misc/preference.h"
 #include "../../editor/gizmos.h"
 #include "../../editor/node_inspector.h"
@@ -223,6 +224,9 @@ void Window::setupManagers()
 
     GizmosManager::Initialize();
     PROFILER_END_TIMER("Initialization", "Gizmos setup");
+
+    FontLoader::Initialize();
+    FontLoader::getInstance()->loadFont("assets/fonts/arial.ttf");
 
     m_pRenderProcessQueue = new RenderProcessQueue(this);
 
