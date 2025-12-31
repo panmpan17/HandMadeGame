@@ -2,6 +2,7 @@
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
+#include "font.h"
 #include "../../core/debug_macro.h"
 
 
@@ -24,67 +25,45 @@ public:
         m_bInitialized = true;
     }
     ~FontLoader()
-    {}
-
-    inline void loadFont(const std::string_view& strPath)
     {
-        if (!m_bInitialized) return;
-
-        if (FT_New_Face(m_ftLibrary, strPath.data(), 0, &m_ftFace))
+        if (m_ftLibrary)
         {
-            LOGERR("Failed to create FreeType face for path: {}", strPath);
-            return;
+            FT_Done_FreeType(m_ftLibrary);
+            m_ftLibrary = nullptr;
         }
-
-        LOGLN("Loaded font from path: {}", strPath);
-
-        if (FT_Set_Char_Size(m_ftFace,
-                             0, // 0 means same as height
-                             16 * 64, // 16pt in 1/64th of points
-                             300, 300) // Set char size to 16pt at 300x300 dpi
-            )
-        {
-            LOGERR("Failed to set char size for font: {}", strPath);
-            FT_Done_Face(m_ftFace);
-            return;
-        }
-
-        // Set pixel size instead of char size
-        // if (FT_Set_Pixel_Sizes(m_ftFace,
-        //                      0, // 0 means same as height
-        //                      16 // 16 pixels high
-        //                      )
-        //     )
-        // {
-        //     LOGERRLN_EX("Failed to set pixel size for font: {}", strPath);
-        //     FT_Done_Face(m_ftFace);
-        //     return;
-        // }
+        m_bInitialized = false;
     }
 
-    inline void test(char c)
+    inline Font* loadFont(const std::string_view& strPath)
     {
-        if (!m_bInitialized || !m_ftFace) return;
+        if (!m_bInitialized) return nullptr;
 
-        FT_UInt glyphIndex = FT_Get_Char_Index(m_ftFace, c);
-
-        if (glyphIndex == 0)
+        Font oFont;
+        if (FT_New_Face(m_ftLibrary, strPath.data(), 0, &oFont.m_ftFace))
         {
-            LOGERR("Character '{}' not found in font", c);
-            return;
+            LOGERR("Failed to create FreeType face for path: {}", strPath);
+            return nullptr;
         }
 
-        if (FT_Load_Glyph(m_ftFace, glyphIndex, FT_LOAD_DEFAULT))
-        {
-            LOGERR("Failed to load glyph for character '{}'", c);
-            return;
-        }
+        oFont.setCharSize(16, 300);
+        // oFont.setPixelSize(16);
 
-        // if (FT_Render_Glyph(m_ftFace->glyph, FT_RENDER_MODE_NORMAL))
-        // {
-        //     LOGERRLN_EX("Failed to render glyph for character '{}'", c);
-        //     return;
-        // }
+        oFont.loadAsciiCharacters();
+        oFont.unloadFontFace();
+
+        m_mapLoadedFonts.emplace(strPath, std::move(oFont));
+
+        return &m_mapLoadedFonts.at(strPath);
+    }
+
+    inline Font* getFont(const std::string_view& strPath)
+    {
+        auto it = m_mapLoadedFonts.find(strPath);
+        if (it != m_mapLoadedFonts.end())
+        {
+            return &it->second;
+        }
+        return loadFont(strPath);
     }
 
 private:
@@ -93,8 +72,7 @@ private:
     bool m_bInitialized = false;
     FT_Library m_ftLibrary = nullptr;
 
-    bool m_bFontLoaded = false;
-    FT_Face m_ftFace = nullptr;
+    std::unordered_map<std::string_view, Font> m_mapLoadedFonts;
 };
 
 FontLoader* FontLoader::ins = nullptr;
