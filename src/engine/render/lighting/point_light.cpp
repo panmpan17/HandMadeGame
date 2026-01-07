@@ -89,31 +89,3 @@ void PointLightComponent::registerBuffer()
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
-
-// void PointLightComponent::draw()
-// {
-//     ASSERT(m_pShader, "Shader must be set before drawing the quad");
-
-//     mat4x4 mvp;
-//     const mat4x4& matModel = m_pNode->getWorldMatrix();
-//     const mat4x4& cameraViewMatrix = Camera::main->getViewProjectionMatrix();
-//     mat4x4_mul(mvp, cameraViewMatrix, matModel);
-
-//     glUseProgram(m_pShader->getProgram());
-//     if (m_pMVPUniformHandle)
-//     {
-//         glUniformMatrix4fv(m_pMVPUniformHandle->m_nLocation, 1, GL_FALSE, (const GLfloat*) mvp);
-//     }
-//     if (m_pLightColorUniformHandle)
-//     {
-//         glUniform3f(m_pLightColorUniformHandle->m_nLocation, m_color[0] * m_intensity, m_color[1] * m_intensity, m_color[2] * m_intensity);
-//     }
-
-//     glBindVertexArray(m_nVertexArray);
-//     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4); // Draw the quad using triangle strip
-//     INCREASE_DRAW_CALL_COUNT();
-
-//     glBindTexture(GL_TEXTURE_2D, 0); // Unbind the texture
-//     glBindVertexArray(0); // Unbind the vertex array
-//     glUseProgram(0);
-// }
