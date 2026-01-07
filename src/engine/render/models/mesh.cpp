@@ -3,7 +3,7 @@
 #include <glad/gl.h>
 
 
-Mesh::Mesh(int nVertexCount = 0, int nIndiceCount = 0)
+Mesh::Mesh(int nVertexCount, int nIndiceCount)
         : m_nVertexCount(nVertexCount),
           m_nIndiceCount(nIndiceCount),
           m_nVertexArray(GL_INVALID_VALUE),
