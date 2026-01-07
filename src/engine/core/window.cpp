@@ -15,24 +15,24 @@
 #include "engine_event_dispatcher.h"
 #include "input/input_manager.h"
 #include "scene/world.h"
-#include "../render/image_loader.h"
+// #include "../render/image_loader.h"
 #include "../render/shader_loader.h"
-#include "../render/material_loader.h"
+// #include "../render/material_loader.h"
 #include "../render/vertex.h"
-#include "../render/post_process/render_process_queue.h"
-#include "../render/lighting/light_manager.h"
-#include "../render/lighting/direction_light.h"
+// #include "../render/post_process/render_process_queue.h"
+// #include "../render/lighting/light_manager.h"
+// #include "../render/lighting/direction_light.h"
 #include "../render/font/font_loader.h"
 #include "../misc/preference.h"
-#include "../../editor/gizmos.h"
-#include "../../editor/node_inspector.h"
-#include "../../editor/hierarchy_view.h"
-#include "../../editor/post_process_inspector.h"
+// #include "../../editor/gizmos.h"
+// #include "../../editor/node_inspector.h"
+// #include "../../editor/hierarchy_view.h"
+// #include "../../editor/post_process_inspector.h"
 #include "../../utils/file_watch_dog.h"
 
-#include "imgui.h"
-#include "imgui_impl_glfw.h"
-#include "imgui_impl_opengl3.h"
+// #include "imgui.h"
+// #include "imgui_impl_glfw.h"
+// #include "imgui_impl_opengl3.h"
 
 
 inline constexpr std::string_view PROFILER_TAG_WINDOW_INITIALIZATION = "WindowInitialization";
@@ -86,16 +86,16 @@ Window::~Window()
     }
 
     InputManager::Cleanup();
-    ImageLoader::Cleanup();
-    LightManager::Cleanup();
+    // ImageLoader::Cleanup();
+    // LightManager::Cleanup();
 
     Preference::savePreferences();
 
     glfwTerminate();
 
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplGlfw_Shutdown();
-    ImGui::DestroyContext();
+    // ImGui_ImplOpenGL3_Shutdown();
+    // ImGui_ImplGlfw_Shutdown();
+    // ImGui::DestroyContext();
 }
 
 void APIENTRY glDebugOutput(GLenum source, GLenum type, unsigned int id, GLenum severity, GLsizei length, const char* message, const void* userParam)
@@ -210,25 +210,25 @@ void Window::setupManagers()
 
     TimeManager::Initialize();
     PROFILER_END_TIMER("Initialization", "TimeManager setup");
-    ImageLoader::Initialize();
-    PROFILER_END_TIMER("Initialization", "Image setup");
-    LightManager::Initialize();
-    PROFILER_END_TIMER("Initialization", "Lighting setup");
+    // ImageLoader::Initialize();
+    // PROFILER_END_TIMER("Initialization", "Image setup");
+    // LightManager::Initialize();
+    // PROFILER_END_TIMER("Initialization", "Lighting setup");
     ShaderLoader::Initialize();
     PROFILER_END_TIMER("Initialization", "Shader setup");
-    MaterialLoader::Initialize();
-    PROFILER_END_TIMER("Initialization", "Material setup");
+    // MaterialLoader::Initialize();
+    // PROFILER_END_TIMER("Initialization", "Material setup");
 
     setupInputManager();
     PROFILER_END_TIMER("Initialization", "Input manager");
 
-    GizmosManager::Initialize();
-    PROFILER_END_TIMER("Initialization", "Gizmos setup");
+    // GizmosManager::Initialize();
+    // PROFILER_END_TIMER("Initialization", "Gizmos setup");
 
     FontLoader::Initialize();
     FontLoader::getInstance()->loadFont("assets/fonts/arial.ttf");
 
-    m_pRenderProcessQueue = new RenderProcessQueue(this);
+    // m_pRenderProcessQueue = new RenderProcessQueue(this);
 
     PROFILER_END_TIMER("Initialization", "Render process queue setup");
 
@@ -272,8 +272,8 @@ void Window::setupGameEngineRelatedObject()
     m_pFileWatchDog = new FileWatchDog("assets/");
     m_pFileWatchDog->setFileChangeCallback([](const std::string& strFilePath, eFileChangeType eType) {
         EngineEventDispatcher::getInstance().runOnMainThread([strFilePath, eType]() {
-            ShaderLoader::getInstance()->onFileChangedListener(strFilePath, eType);
-            MaterialLoader::getInstance()->onFileChangedListener(strFilePath, eType);
+            // ShaderLoader::getInstance()->onFileChangedListener(strFilePath, eType);
+            // MaterialLoader::getInstance()->onFileChangedListener(strFilePath, eType);
         });
     });
     m_pFileWatchDog->startWatching();
@@ -284,32 +284,32 @@ void Window::setupGameEngineRelatedObject()
 
 void Window::setupIMGUIAndEditorWindows()
 {
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO();
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+    // IMGUI_CHECKVERSION();
+    // ImGui::CreateContext();
+    // ImGuiIO& io = ImGui::GetIO();
+    // io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+    // io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
 
-    // Setup Platform/Renderer backends
-    ImGui_ImplGlfw_InitForOpenGL(m_pWindow, true);          // Second param install_callback=true will install GLFW callbacks and chain to existing ones.
-    ImGui_ImplOpenGL3_Init();
+    // // Setup Platform/Renderer backends
+    // ImGui_ImplGlfw_InitForOpenGL(m_pWindow, true);          // Second param install_callback=true will install GLFW callbacks and chain to existing ones.
+    // ImGui_ImplOpenGL3_Init();
 
-    if (m_bAddGameRelatedIMGUIWindows)
-    {
-        m_oEditorWindows.addElement(new NodeInspector());
-        m_oEditorWindows.addElement(new HierarchyView());
-        m_oEditorWindows.addElement(new PostProcessInspector());
-    }
+    // if (m_bAddGameRelatedIMGUIWindows)
+    // {
+    //     // m_oEditorWindows.addElement(new NodeInspector());
+    //     m_oEditorWindows.addElement(new HierarchyView());
+    //     // m_oEditorWindows.addElement(new PostProcessInspector());
+    // }
 
-    for (int i = 0; i < m_oEditorWindows.getSize(); ++i)
-    {
-        IEditorWindow* pWindow = m_oEditorWindows.getElement(i);
-        if (pWindow)
-        {
-            bool bActive = Preference::getPlayerPreferenceInstance().getBool(std::string("EditorWindow_") + typeid(*pWindow).name(), true);
-            pWindow->setActive(bActive);
-        }
-    }
+    // for (int i = 0; i < m_oEditorWindows.getSize(); ++i)
+    // {
+    //     IEditorWindow* pWindow = m_oEditorWindows.getElement(i);
+    //     if (pWindow)
+    //     {
+    //         bool bActive = Preference::getPlayerPreferenceInstance().getBool(std::string("EditorWindow_") + typeid(*pWindow).name(), true);
+    //         pWindow->setActive(bActive);
+    //     }
+    // }
 }
 
 void Window::beforeLoop()
@@ -363,48 +363,48 @@ void Window::runUpdate()
 
 void Window::updateIMGUI()
 {
-    ImGui_ImplOpenGL3_NewFrame();
-    ImGui_ImplGlfw_NewFrame();
-    ImGui::NewFrame();
+    // ImGui_ImplOpenGL3_NewFrame();
+    // ImGui_ImplGlfw_NewFrame();
+    // ImGui::NewFrame();
     
-    int nSize = m_oEditorWindows.getSize();
-    for (int i = 0; i < nSize; ++i)
-    {
-        IEditorWindow* pWindow = m_oEditorWindows.getElement(i);
-        if (pWindow && pWindow->isActive())
-        {
-            pWindow->update();
-        }
-    }
+    // int nSize = m_oEditorWindows.getSize();
+    // for (int i = 0; i < nSize; ++i)
+    // {
+    //     IEditorWindow* pWindow = m_oEditorWindows.getElement(i);
+    //     if (pWindow && pWindow->isActive())
+    //     {
+    //         pWindow->update();
+    //     }
+    // }
 
-    if (ImGui::BeginMainMenuBar())
-    {
-        if (ImGui::BeginMenu("Editor Windows"))
-        {
-            for (int i = 0; i < nSize; ++i)
-            {
-                IEditorWindow* pWindow = m_oEditorWindows.getElement(i);
-                if (pWindow)
-                {
-                    if (ImGui::MenuItem(typeid(*pWindow).name(), NULL, pWindow->isActive()))
-                    {
-                        pWindow->setActive(!pWindow->isActive());
-                        Preference::getPlayerPreferenceInstance().setBool(std::string("EditorWindow_") + typeid(*pWindow).name(), pWindow->isActive());
-                    }
-                }
-            }
+    // if (ImGui::BeginMainMenuBar())
+    // {
+    //     if (ImGui::BeginMenu("Editor Windows"))
+    //     {
+    //         for (int i = 0; i < nSize; ++i)
+    //         {
+    //             IEditorWindow* pWindow = m_oEditorWindows.getElement(i);
+    //             if (pWindow)
+    //             {
+    //                 if (ImGui::MenuItem(typeid(*pWindow).name(), NULL, pWindow->isActive()))
+    //                 {
+    //                     pWindow->setActive(!pWindow->isActive());
+    //                     Preference::getPlayerPreferenceInstance().setBool(std::string("EditorWindow_") + typeid(*pWindow).name(), pWindow->isActive());
+    //                 }
+    //             }
+    //         }
 
-            ImGui::EndMenu();
-        }
+    //         ImGui::EndMenu();
+    //     }
 
-        if (ImGui::MenuItem("Show Gizmos", NULL, m_bDrawGizmos))
-        {
-            m_bDrawGizmos = !m_bDrawGizmos;
-            Preference::setEnableGizmos(m_bDrawGizmos);
-        }
+    //     if (ImGui::MenuItem("Show Gizmos", NULL, m_bDrawGizmos))
+    //     {
+    //         m_bDrawGizmos = !m_bDrawGizmos;
+    //         Preference::setEnableGizmos(m_bDrawGizmos);
+    //     }
 
-        ImGui::EndMainMenuBar();
-    }
+    //     ImGui::EndMainMenuBar();
+    // }
 }
 
 void Window::drawFrame()
@@ -417,31 +417,31 @@ void Window::drawFrame()
         Camera::main->updateCameraDataBuffer();
     }
 
-    LightManager* const pLightManager = LightManager::getInstance();
-    pLightManager->updateLightingUBO();
+    // LightManager* const pLightManager = LightManager::getInstance();
+    // pLightManager->updateLightingUBO();
 
-    DirectionLightComponent* pMainDirLight = pLightManager->getMainDirectionLightComponent();
-    if (pMainDirLight && pMainDirLight->getShadowsEnabled())
-    {
-        glViewport(0, 0, LightManager::SHADOW_MAP_WIDTH, LightManager::SHADOW_MAP_HEIGHT);
-        glBindFramebuffer(GL_FRAMEBUFFER, pLightManager->getShadowDepthMapFBO());
-        glClear(GL_DEPTH_BUFFER_BIT);
-        m_pWorldScene->renderDepth();
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    }
+    // DirectionLightComponent* pMainDirLight = pLightManager->getMainDirectionLightComponent();
+    // if (pMainDirLight && pMainDirLight->getShadowsEnabled())
+    // {
+    //     glViewport(0, 0, LightManager::SHADOW_MAP_WIDTH, LightManager::SHADOW_MAP_HEIGHT);
+    //     glBindFramebuffer(GL_FRAMEBUFFER, pLightManager->getShadowDepthMapFBO());
+    //     glClear(GL_DEPTH_BUFFER_BIT);
+    //     m_pWorldScene->renderDepth();
+    //     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    // }
 
-    if (m_bEnablePostProcess) // Enable post process
-    {
-        m_pRenderProcessQueue->beginFrame();
-        m_pWorldScene->render();
-        m_pRenderProcessQueue->endFrame();
+    // if (m_bEnablePostProcess) // Enable post process
+    // {
+    //     // m_pRenderProcessQueue->beginFrame();
+    //     m_pWorldScene->render();
+    //     m_pRenderProcessQueue->endFrame();
 
-        glDisable(GL_DEPTH_TEST);
-        m_pRenderProcessQueue->startProcessing();
-        m_pRenderProcessQueue->renderToScreen();
-        glEnable(GL_DEPTH_TEST);
-    }
-    else
+    //     glDisable(GL_DEPTH_TEST);
+    //     m_pRenderProcessQueue->startProcessing();
+    //     m_pRenderProcessQueue->renderToScreen();
+    //     glEnable(GL_DEPTH_TEST);
+    // }
+    // else
     {
         glViewport(0, 0, m_oActualSize.x, m_oActualSize.y);
         glClearColor(0.f, 0.f, 0.f, 1.0f);
@@ -462,20 +462,20 @@ void Window::drawFrame()
             drawFrameInfo();
         }
 #endif
-        ImGui::Render();
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+        // ImGui::Render();
+        // ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     }
 }
 
 void Window::drawFrameInfo()
 {
-    ImGui::Begin("Info", nullptr,
-                 ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar
-                 | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing
-                 | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoBackground);
-    ImGui::SetWindowSize(ImVec2(200, 100), ImGuiCond_Always);
-    ImGui::SetWindowPos(ImVec2(0, ImGui::GetIO().DisplaySize.y - 45), ImGuiCond_Always);
-    ImGui::Text("%.1f FPS (%.3f ms)", ImGui::GetIO().Framerate, 1000.0f / ImGui::GetIO().Framerate);
-    ImGui::Text("Draw Call: %d; Triangle: %d", m_nDrawCallCount, m_nTriangleCount);
-    ImGui::End();
+    // ImGui::Begin("Info", nullptr,
+    //              ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar
+    //              | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing
+    //              | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoBackground);
+    // ImGui::SetWindowSize(ImVec2(200, 100), ImGuiCond_Always);
+    // ImGui::SetWindowPos(ImVec2(0, ImGui::GetIO().DisplaySize.y - 45), ImGuiCond_Always);
+    // ImGui::Text("%.1f FPS (%.3f ms)", ImGui::GetIO().Framerate, 1000.0f / ImGui::GetIO().Framerate);
+    // ImGui::Text("Draw Call: %d; Triangle: %d", m_nDrawCallCount, m_nTriangleCount);
+    // ImGui::End();
 }

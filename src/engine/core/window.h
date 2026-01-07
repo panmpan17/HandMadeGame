@@ -8,8 +8,8 @@
 typedef struct GLFWwindow GLFWwindow;
 
 class WorldScene;
-class RenderProcessQueue;
-class IEditorWindow;
+// class RenderProcessQueue;
+// class IEditorWindow;
 class FileWatchDog;
 
 typedef unsigned int GLuint;
@@ -35,10 +35,10 @@ public:
     inline bool isPostProcessEnabled() const { return m_bEnablePostProcess; }
     inline void setPostProcessEnabled(bool enabled) { m_bEnablePostProcess = enabled; }
 
-    inline RenderProcessQueue* getRenderProcessQueue() const { return m_pRenderProcessQueue; }
+    // inline RenderProcessQueue* getRenderProcessQueue() const { return m_pRenderProcessQueue; }
 
     inline void setAddGameRelatedIMGUIWindows(bool bAdd) { m_bAddGameRelatedIMGUIWindows = bAdd; }
-    inline void addEditorWindow(IEditorWindow* pWindow) { m_oEditorWindows.addElement(pWindow); }
+    // inline void addEditorWindow(IEditorWindow* pWindow) { m_oEditorWindows.addElement(pWindow); }
 
     inline void setShowFPS(bool bShow) { m_bShowFPS = bShow; }
 
@@ -59,7 +59,7 @@ public:
 
 private:
     GLFWwindow* m_pWindow = nullptr;
-    RenderProcessQueue* m_pRenderProcessQueue = nullptr;
+    // RenderProcessQueue* m_pRenderProcessQueue = nullptr;
     bool m_bEnablePostProcess = true;
 
     Vector2i m_oWindowSize;
@@ -80,7 +80,7 @@ private:
     bool m_bShowIMGUI = false;
     bool m_bAddGameRelatedIMGUIWindows = true;
     bool m_bShowFPS = true;
-    PointerExpandableArray<IEditorWindow*> m_oEditorWindows = PointerExpandableArray<IEditorWindow*>(2);
+    // PointerExpandableArray<IEditorWindow*> m_oEditorWindows = PointerExpandableArray<IEditorWindow*>(2);
 
     FileWatchDog* m_pFileWatchDog = nullptr;
 

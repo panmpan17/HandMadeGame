@@ -5,10 +5,10 @@
 #include "../camera.h"
 #include "../math/random.h"
 #include "../serialization/serializer.h"
-#include "../../render/skybox.h"
+// #include "../../render/skybox.h"
 #include "../../components/input/first_person_free_control_camera.h"
 #include "../../components/drawable_interface.h"
-#include "../../../editor/gizmos.h"
+// #include "../../../editor/gizmos.h"
 
 WorldScene* WorldScene::current = nullptr;
 
@@ -140,10 +140,10 @@ void WorldScene::render()
 
     glDepthMask(GL_FALSE);
 
-    if (m_pSkybox)
-    {
-        m_pSkybox->draw();
-    }
+    // if (m_pSkybox)
+    // {
+    //     m_pSkybox->draw();
+    // }
 
     glEnable(GL_BLEND);
 
@@ -180,19 +180,19 @@ void WorldScene::renderDepth()
 
 void WorldScene::drawGizmos()
 {
-    GizmosManager::getInstance()->clearAllGizmos();
+    // GizmosManager::getInstance()->clearAllGizmos();
     
-    int nCount = m_oNodeArray.getCount();
-    for (int i = 0; i < nCount; ++i)
-    {
-        Node* pNode = m_oNodeArray.getElement(i);
-        if (pNode && pNode->isActive())
-        {
-            pNode->drawGizmos();
-        }
-    }
+    // int nCount = m_oNodeArray.getCount();
+    // for (int i = 0; i < nCount; ++i)
+    // {
+    //     Node* pNode = m_oNodeArray.getElement(i);
+    //     if (pNode && pNode->isActive())
+    //     {
+    //         pNode->drawGizmos();
+    //     }
+    // }
 
-    GizmosManager::getInstance()->drawAllGizmos();
+    // GizmosManager::getInstance()->drawAllGizmos();
 }
 
 void WorldScene::addNode(Node* pNode)

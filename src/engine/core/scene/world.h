@@ -5,7 +5,7 @@
 
 class Node;
 class IDrawable;
-class Skybox;
+// class Skybox;
 
 class WorldScene {
 public:
@@ -32,8 +32,8 @@ public:
     inline int getNodeCount() const { return m_oNodeArray.getCount(); }
     inline Node* getNode(int nIndex) const { return m_oNodeArray.getElement(nIndex); }
 
-    inline Skybox* getSkybox() const { return m_pSkybox; }
-    inline void setSkybox(Skybox* pSkybox) { m_pSkybox = pSkybox; }
+    // inline Skybox* getSkybox() const { return m_pSkybox; }
+    // inline void setSkybox(Skybox* pSkybox) { m_pSkybox = pSkybox; }
 
     inline void setInitEditorCamera(bool bInit) { m_bInitEditorCamera = bInit; }
 
@@ -42,7 +42,7 @@ private:
     PointerExpandableArray<IDrawable*> m_oOpaqueDrawableArray = PointerExpandableArray<IDrawable*>(16);
     PointerExpandableArray<IDrawable*> m_oTransparentDrawableArray = PointerExpandableArray<IDrawable*>(16);
 
-    Skybox* m_pSkybox = nullptr;
+    // Skybox* m_pSkybox = nullptr;
 
     bool m_bInitEditorCamera = true;
 };

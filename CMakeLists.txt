@@ -189,7 +189,7 @@ if (TRUE)
 endif()
 
 # ImGui Library
-if (TRUE)
+if (OFF)
     add_library(imgui STATIC
         "external/imgui/imgui.cpp"
         "external/imgui/imgui_demo.cpp"
@@ -228,5 +228,5 @@ elseif(UNIX)
 endif()
 
 target_link_libraries(MichaelHandMadeGame PRIVATE glfw freetype )
-target_link_libraries(imgui PRIVATE glfw)
+# target_link_libraries(imgui PRIVATE glfw)
 
