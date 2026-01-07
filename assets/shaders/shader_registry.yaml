@@ -81,3 +81,7 @@
   vertex: assets/shaders/3d/mesh_gizmos.vert
   fragment: assets/shaders/3d/mesh_gizmos.frag
   cameraUBO: 0
+21:
+  name: colored_vertices
+  vertex: assets/shaders/colored_vertices.vert
+  fragment: assets/shaders/colored_vertices.frag
