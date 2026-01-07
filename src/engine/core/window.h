@@ -61,6 +61,11 @@ public:
 
 private:
     GLFWwindow* m_pWindow = nullptr;
+
+// #if __APPLE__
+    // MTL::Device* m_pDevice = nullptr;
+// #endif
+
     // RenderProcessQueue* m_pRenderProcessQueue = nullptr;
     bool m_bEnablePostProcess = true;
 
@@ -93,6 +98,8 @@ private:
 #else
     bool m_bDrawGizmos = false;
 #endif
+
+    void bindOpenGLToGlfwWindow();
 
     void setupInputManager();
 

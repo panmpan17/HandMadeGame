@@ -35,7 +35,7 @@ struct SpriteAnimationInfo
 };
 
 
-class SpriteAnimation : public Component
+class SpriteAnimation : public NodeComponent
 {
 public:
     SpriteAnimation() {}

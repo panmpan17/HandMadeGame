@@ -18,7 +18,7 @@ enum class PongState
 class ParticleSystem;
 class Quad;
 
-class Pong : public Component
+class Pong : public NodeComponent
 {
 public:
     Pong(const Box& oBox, PaddleControl* pPaddleControlLeft, PaddleControl* pPaddleControlRight, float fStartSpeed, float fMaxSpeed);

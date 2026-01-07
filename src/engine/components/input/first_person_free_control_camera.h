@@ -1,7 +1,7 @@
 #include "../component.h"
 
 
-class FirstPersonFreeControlCamera : public Component
+class FirstPersonFreeControlCamera : public NodeComponent
 {
 public:
     FirstPersonFreeControlCamera(Node* pCameraNode = nullptr);

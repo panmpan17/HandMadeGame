@@ -7,7 +7,7 @@
 typedef unsigned int GLuint;
 
 
-class Camera : public Component
+class Camera : public NodeComponent
 {
 public:
     static Camera* main;

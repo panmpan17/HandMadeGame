@@ -13,7 +13,7 @@ class Shader;
 class ShaderUniformHandle;
 
 
-class DirectionLightComponent : public Component
+class DirectionLightComponent : public NodeComponent
 {
 public:
     DirectionLightComponent();

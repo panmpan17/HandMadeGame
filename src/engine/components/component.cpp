@@ -1,7 +1,7 @@
 #include "component.h"
 #include "../core/serialization/serializer.h"
 
-void Component::serializedTo(DataSerializer& serializer) const
+void NodeComponent::serializedTo(DataSerializer& serializer) const
 {
     serializer.startClassHeader(getTypeName());
     
@@ -11,7 +11,7 @@ void Component::serializedTo(DataSerializer& serializer) const
     serializer.endClassHeader();
 }
 
-bool Component::deserializeField(DataDeserializer& deserializer, const std::string_view& strFieldName, const std::string_view& strFieldValue)
+bool NodeComponent::deserializeField(DataDeserializer& deserializer, const std::string_view& strFieldName, const std::string_view& strFieldValue)
 {
     DESERIALIZE_FIELD(m_nID);
 

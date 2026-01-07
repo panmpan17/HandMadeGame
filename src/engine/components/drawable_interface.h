@@ -7,7 +7,7 @@
 class Shader;
 class Material;
 
-class IDrawable : public Component
+class IDrawable : public NodeComponent
 {
 public:
     virtual ~IDrawable() = default;

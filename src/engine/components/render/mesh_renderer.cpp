@@ -124,7 +124,7 @@ void MeshRenderer::bindDepthVertexArray()
 
 bool MeshRenderer::deserializeField(DataDeserializer& deserializer, const std::string_view& strFieldName, const std::string_view& strFieldValue)
 {
-    if (Component::deserializeField(deserializer, strFieldName, strFieldValue)) return true;
+    if (NodeComponent::deserializeField(deserializer, strFieldName, strFieldValue)) return true;
 
     // TODO: Deserialize m_pMesh, m_pMaterial
 

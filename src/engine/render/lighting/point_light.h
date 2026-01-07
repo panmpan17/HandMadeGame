@@ -10,7 +10,7 @@
 typedef unsigned int GLuint;
 
 
-class PointLightComponent : public Component
+class PointLightComponent : public NodeComponent
 {
 public:
     PointLightComponent();

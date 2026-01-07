@@ -1,7 +1,9 @@
 // #define GLAD_GL_IMPLEMENTATION
 #include <glad/gl.h>
-// #define GLFW_INCLUDE_NONE
+#define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
+#define GLFW_EXPOSE_NATIVE_COCOA
+#include <GLFW/glfw3native.h>
 
 #define NS_PRIVATE_IMPLEMENTATION
 #define CA_PRIVATE_IMPLEMENTATION
@@ -9,6 +11,9 @@
 #include <Foundation/Foundation.hpp>
 #include <Metal/Metal.hpp>
 #include <QuartzCore/QuartzCore.hpp>
+
+#include <objc/runtime.h>
+#include <objc/message.h>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
@@ -180,22 +185,58 @@ bool Window::configureAndCreateWindow()
     return true;
 }
 
+void bindMetalToGlfwWindow(MTL::Device* const pDevice, GLFWwindow* const pWindow)
+{
+    void* pNSWindow = glfwGetCocoaWindow(pWindow);
+
+    // 2. Get the "contentView" of the window
+    // Equivalent to: NSView* view = [nsWindow contentView];
+    void* view = ((void* (*)(id, SEL))objc_msgSend)((id)pNSWindow, sel_registerName("contentView"));
+
+    // 3. Create the Metal Layer using metal-cpp
+    CA::MetalLayer* pOutLayer = CA::MetalLayer::layer();
+    pOutLayer->setDevice(pDevice);
+    pOutLayer->setPixelFormat(MTL::PixelFormat::PixelFormatBGRA8Unorm);
+    // Use the window's scale factor for Retina displays
+    pOutLayer->setDrawableSize(CGSizeMake(800 * 2, 600 * 2)); // Update this dynamically later!
+
+    // 4. Attach the Metal Layer to the View (The "Bridge")
+    // Equivalent to: [view setLayer:outLayer];
+    ((void (*)(id, SEL, id))objc_msgSend)((id)view, sel_registerName("setLayer:"), (id)pOutLayer);
+
+    // 5. Tell the view to host the layer
+    // Equivalent to: [view setWantsLayer:YES];
+    ((void (*)(id, SEL, BOOL))objc_msgSend)((id)view, sel_registerName("setWantsLayer:"), (BOOL)true);
+    
+    // 6. Set layer resizing policy (so it resizes with window)
+    // kCALayerWidthSizable | kCALayerHeightSizable = 2 | 16 = 18
+    // pOutLayer->setAutoresizingMask(18);
+}
+
 void Window::initializeGraphicsAPI()
 {
-    MTL::Device* device = MTL::CreateSystemDefaultDevice();
+#if __APPLE__
+    MTL::Device* const pDevice = MTL::CreateSystemDefaultDevice();
     
-    if (device)
+    if (pDevice)
     {
-        LOGLN("Metal Device found: {}", device->name()->utf8String());
-        device->release();
+        LOGLN("Metal Device found: {}", pDevice->name()->utf8String());
+        bindMetalToGlfwWindow(pDevice, m_pWindow);
     }
     else
     {
         LOGLN("Metal is not supported on this device.");
-        // TODO: Move open gl initialization here for non-metal devices
+        bindOpenGLToGlfwWindow();
     }
 
+#else
+    bindOpenGLToGlfwWindow();
+#endif
+    
+}
 
+void Window::bindOpenGLToGlfwWindow()
+{
     gladLoadGL(glfwGetProcAddress);
 
     glDepthFunc(GL_LESS);
@@ -235,8 +276,8 @@ void Window::setupManagers()
     // GizmosManager::Initialize();
     // PROFILER_END_TIMER("Initialization", "Gizmos setup");
 
-    FontLoader::Initialize();
-    FontLoader::getInstance()->loadFont("assets/fonts/arial.ttf");
+    // FontLoader::Initialize();
+    // FontLoader::getInstance()->loadFont("assets/fonts/arial.ttf");
 
     // m_pRenderProcessQueue = new RenderProcessQueue(this);
 
@@ -424,7 +465,7 @@ void Window::drawFrame()
 
     if (Camera::main)
     {
-        Camera::main->updateCameraDataBuffer();
+        // Camera::main->updateCameraDataBuffer();
     }
 
     // LightManager* const pLightManager = LightManager::getInstance();
@@ -453,10 +494,10 @@ void Window::drawFrame()
     // }
     // else
     {
-        glViewport(0, 0, m_oActualSize.x, m_oActualSize.y);
-        glClearColor(0.f, 0.f, 0.f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        m_pWorldScene->render();
+        // glViewport(0, 0, m_oActualSize.x, m_oActualSize.y);
+        // glClearColor(0.f, 0.f, 0.f, 1.0f);
+        // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        // m_pWorldScene->render();
     }
 
     if (m_bDrawGizmos)

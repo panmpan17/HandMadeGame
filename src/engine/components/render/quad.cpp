@@ -132,7 +132,7 @@ void Quad::serializeToWrapper(DataSerializer& serializer) const
 
 bool Quad::deserializeField(DataDeserializer& deserializer, const std::string_view& strFieldName, const std::string_view& strFieldValue)
 {
-    if (Component::deserializeField(deserializer, strFieldName, strFieldValue)) return true;
+    if (NodeComponent::deserializeField(deserializer, strFieldName, strFieldValue)) return true;
     DESERIALIZE_FIELD(m_fWidth);
     DESERIALIZE_FIELD(m_fHeight);
     DESERIALIZE_FIELD(m_color);

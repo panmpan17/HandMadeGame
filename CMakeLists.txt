@@ -219,6 +219,7 @@ if (APPLE)
     find_library(METAL_LIB Metal REQUIRED)
     find_library(FOUNDATION_LIB Foundation REQUIRED)
     find_library(QUARTZ_LIB QuartzCore REQUIRED)
+    find_library(COCOA_LIB Cocoa REQUIRED)
 
     target_include_directories(MichaelHandMadeGame PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/external/metal-cpp")
 
@@ -226,6 +227,7 @@ if (APPLE)
         ${METAL_LIB}
         ${FOUNDATION_LIB}
         ${QUARTZ_LIB}
+        ${COCOA_LIB}
     )
 
     # Compile Shaders

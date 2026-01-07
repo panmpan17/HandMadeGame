@@ -8,10 +8,10 @@
 class Node;
 
 
-class Component : public ISerializable
+class NodeComponent : public ISerializable
 {
 public:
-    virtual ~Component() = default;
+    virtual ~NodeComponent() = default;
 
     virtual bool isIDrawable() const = 0;
 
@@ -24,7 +24,7 @@ public:
 
     virtual void update(float deltaTime) = 0;
 
-    virtual Component* clone() const { return nullptr; };
+    virtual NodeComponent* clone() const { return nullptr; };
 
     virtual std::string getTypeName() const { return typeid(*this).name(); };
 

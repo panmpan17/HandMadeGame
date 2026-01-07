@@ -38,7 +38,7 @@ void Node::serializedTo(DataSerializer& serializer) const
 
     for (int i = 0; i < m_oComponentArray.getCount(); ++i)
     {
-        Component* pComponent = m_oComponentArray.getElement(i);
+        NodeComponent* pComponent = m_oComponentArray.getElement(i);
         if (pComponent)
         {
             serializer << pComponent;
@@ -79,7 +79,7 @@ void Node::onFinishedDeserialization()
     int nSize = m_oComponentArray.getSize();
     for (int i = 0; i < nSize; ++i)
     {
-        Component* pComponent = m_oComponentArray.getElement(i);
+        NodeComponent* pComponent = m_oComponentArray.getElement(i);
         if (pComponent)
         {
             pComponent->onNodeFinishedDeserialization();
@@ -113,7 +113,7 @@ void Node::refreshDrawablesInWorldScene(bool bParentIsActive)
     int nCount = m_oComponentArray.getCount();
     for (int i = 0; i < nCount; ++i)
     {
-        Component* pComponent = m_oComponentArray.getElement(i);
+        NodeComponent* pComponent = m_oComponentArray.getElement(i);
         if (pComponent && pComponent->isIDrawable() )
         {
             IDrawable* const pDrawable = static_cast<IDrawable*>(pComponent);
@@ -144,7 +144,7 @@ void Node::onStart()
     int nCount = m_oComponentArray.getCount();
     for (int i = 0; i < nCount; ++i)
     {
-        Component* pComponent = m_oComponentArray.getElement(i);
+        NodeComponent* pComponent = m_oComponentArray.getElement(i);
         if (pComponent)
         {
             pComponent->onStart();
@@ -170,7 +170,7 @@ void Node::update(float deltaTime)
     int nSize = m_oComponentArray.getSize();
     for (int i = 0; i < nSize; ++i)
     {
-        Component* pComponent = m_oComponentArray.getElement(i);
+        NodeComponent* pComponent = m_oComponentArray.getElement(i);
         if (pComponent && pComponent->isUpdatable())
         {
             try
@@ -205,7 +205,7 @@ void Node::draw()
     int nSize = m_oComponentArray.getSize();
     for (int i = 0; i < nSize; ++i)
     {
-        Component* pComponent = m_oComponentArray.getElement(i);
+        NodeComponent* pComponent = m_oComponentArray.getElement(i);
         if (pComponent && pComponent->isIDrawable())
         {
             try
@@ -242,7 +242,7 @@ void Node::drawDepth()
     int nSize = m_oComponentArray.getSize();
     for (int i = 0; i < nSize; ++i)
     {
-        Component* pComponent = m_oComponentArray.getElement(i);
+        NodeComponent* pComponent = m_oComponentArray.getElement(i);
         if (pComponent && pComponent->isIDrawable())
         {
             try
@@ -273,7 +273,7 @@ void Node::drawDepth()
     m_bChildMatrixDirty = false;
 }
 
-void Node::addComponent(Component* pComponent)
+void Node::addComponent(NodeComponent* pComponent)
 {
     if (pComponent == nullptr) return;
     m_oComponentArray.addElement(pComponent);
@@ -293,10 +293,10 @@ Node* Node::clone() const
     int nComponentCount = this->m_oComponentArray.getCount();
     for (int i = 0; i < nComponentCount; ++i)
     {
-        Component* pComponent = this->m_oComponentArray.getElement(i);
+        NodeComponent* pComponent = this->m_oComponentArray.getElement(i);
         if (pComponent)
         {
-            Component* pClonedComponent = pComponent->clone();
+            NodeComponent* pClonedComponent = pComponent->clone();
             if (pClonedComponent)
             {
                 pNewNode->addComponent(pClonedComponent);
@@ -333,7 +333,7 @@ void Node::drawGizmos()
     int nCount = m_oComponentArray.getCount();
     for (int i = 0; i < nCount; ++i)
     {
-        Component* pComponent = m_oComponentArray.getElement(i);
+        NodeComponent* pComponent = m_oComponentArray.getElement(i);
         if (pComponent)
         {
             pComponent->onDrawGizmos(bIsSelected);

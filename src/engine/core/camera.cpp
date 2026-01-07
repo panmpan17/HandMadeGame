@@ -20,10 +20,10 @@ Camera::Camera()
         m_bCameraUBODirty = true;
     });
 
-    glGenBuffers(1, &m_nCameraUBO);
-    glBindBuffer(GL_UNIFORM_BUFFER, m_nCameraUBO);
-    glBufferData(GL_UNIFORM_BUFFER, sizeof(mat4x4) * 2 + sizeof(vec4), nullptr, GL_DYNAMIC_DRAW);
-    glBindBuffer(GL_UNIFORM_BUFFER, 0);
+    // glGenBuffers(1, &m_nCameraUBO);
+    // glBindBuffer(GL_UNIFORM_BUFFER, m_nCameraUBO);
+    // glBufferData(GL_UNIFORM_BUFFER, sizeof(mat4x4) * 2 + sizeof(vec4), nullptr, GL_DYNAMIC_DRAW);
+    // glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
 Camera::~Camera()

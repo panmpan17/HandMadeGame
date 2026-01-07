@@ -23,7 +23,7 @@ public:
     virtual void draw() override;
     virtual void drawDepth() override;
 
-    virtual Component* clone() const override
+    virtual NodeComponent* clone() const override
     {
         MeshRenderer* pNewMeshRenderer = new MeshRenderer();
         if (m_pMesh) pNewMeshRenderer->setMesh(m_pMesh);

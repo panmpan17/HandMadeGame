@@ -8,10 +8,10 @@
 
 TimeManager::TimeManager()
 {
-    glGenBuffers(1, &m_nTimeUBO);
-    glBindBuffer(GL_UNIFORM_BUFFER, m_nTimeUBO);
-    glBufferData(GL_UNIFORM_BUFFER, sizeof(float) + 4, nullptr, GL_DYNAMIC_DRAW);
-    glBindBuffer(GL_UNIFORM_BUFFER, 0);
+    // glGenBuffers(1, &m_nTimeUBO);
+    // glBindBuffer(GL_UNIFORM_BUFFER, m_nTimeUBO);
+    // glBufferData(GL_UNIFORM_BUFFER, sizeof(float) + 4, nullptr, GL_DYNAMIC_DRAW);
+    // glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
 void TimeManager::onWindowStart()
@@ -29,10 +29,10 @@ float TimeManager::preUpdate()
     m_fTotalTime += m_fDeltaTime;
     // LOG("Delta Time: {}, Total Time: {}\r", m_fDeltaTime, m_fTotalTime);
 
-    glBindBuffer(GL_UNIFORM_BUFFER, m_nTimeUBO);
-    glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(float), &m_fTotalTime);
-    // glBufferSubData(GL_UNIFORM_BUFFER, sizeof(float), sizeof(float), &m_fDeltaTime);
-    glBindBuffer(GL_UNIFORM_BUFFER, 0);
+    // glBindBuffer(GL_UNIFORM_BUFFER, m_nTimeUBO);
+    // glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(float), &m_fTotalTime);
+    // // glBufferSubData(GL_UNIFORM_BUFFER, sizeof(float), sizeof(float), &m_fDeltaTime);
+    // glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
     return m_fDeltaTime;
 }

@@ -8,7 +8,7 @@
 #include "../../../utils/expandable_array.h"
 
 
-class Component;
+class NodeComponent;
 class DataSerializer;
 class DataDeserializer;
 
@@ -229,14 +229,14 @@ public:
 
 
     inline int getComponentCount() const { return m_oComponentArray.getCount(); }
-    inline Component* getComponent(int nIndex) const { return m_oComponentArray.getElement(nIndex); }
+    inline NodeComponent* getComponent(int nIndex) const { return m_oComponentArray.getElement(nIndex); }
 
     // inline void setComponent(Component* pComponent) { m_pComponent = pComponent; m_pComponent->setNode(this); }
-    void addComponent(Component* pComponent);
+    void addComponent(NodeComponent* pComponent);
     // inline Component* getComponent() const { return m_pComponent; }
 
 private:
-    PointerExpandableArray<Component*> m_oComponentArray = PointerExpandableArray<Component*>(5);
+    PointerExpandableArray<NodeComponent*> m_oComponentArray = PointerExpandableArray<NodeComponent*>(5);
 
     Node* m_pParentNode = nullptr;
     PointerExpandableArray<Node*> m_oChildNodeArray = PointerExpandableArray<Node*>(4);

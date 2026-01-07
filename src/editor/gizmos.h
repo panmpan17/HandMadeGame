@@ -6,7 +6,7 @@
 #include "../engine/core/math/quaternion.h"
 
 
-class Component;
+class NodeComponent;
 class Shader;
 class ShaderUniformHandle;
 
@@ -18,7 +18,7 @@ struct ImageGizmosData
     Vector3 m_vecPosition;
     Vector3 m_vecColor;
     std::string_view m_strImagePath;
-    Component* m_pAttachedComponent = nullptr; // Optional: to link gizmo to a specific component
+    NodeComponent* m_pAttachedComponent = nullptr; // Optional: to link gizmo to a specific component
 };
 
 struct CircleGizmosData
@@ -68,8 +68,8 @@ public:
 
     void clearAllGizmos();
 
-    void addImageGizmos(Component* const pComponent, const Vector3& vecPosition, const std::string_view& m_strImagePath);
-    void addImageGizmos(Component* const pComponent, const Vector3& vecPosition, const std::string_view& m_strImagePath, const Vector3& vecColor);
+    void addImageGizmos(NodeComponent* const pComponent, const Vector3& vecPosition, const std::string_view& m_strImagePath);
+    void addImageGizmos(NodeComponent* const pComponent, const Vector3& vecPosition, const std::string_view& m_strImagePath, const Vector3& vecColor);
 
     void addCircleGizmos(const Vector3& vecPosition, const Quaternion& rotation, float fRadius);
     void addCircleGizmos(const Vector3& vecPosition, const Quaternion& rotation, float fRadius, const Color& vecColor);

@@ -22,7 +22,7 @@ ShaderLoader::ShaderLoader()
 {
     ins = this;
 
-    readRegistryFromFile();
+    // readRegistryFromFile();
 }
 
 ShaderLoader::~ShaderLoader()

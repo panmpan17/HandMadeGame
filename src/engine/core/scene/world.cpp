@@ -76,7 +76,7 @@ void WorldScene::readFromFiles(const std::string_view& strFilePath)
                 addNode(pNode);
             }
         }
-        else if (Component* pComponent = dynamic_cast<Component*>(pObject))
+        else if (NodeComponent* pComponent = dynamic_cast<NodeComponent*>(pObject))
         {
             pCurrentNode->addComponent(pComponent);
         }

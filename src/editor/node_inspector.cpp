@@ -97,7 +97,7 @@ void NodeInspector::updateTransform(Node* pNode)
     }
 }
 
-void NodeInspector::updateComponent(int nComponentIndex, Node* pNode, Component* pComponent)
+void NodeInspector::updateComponent(int nComponentIndex, Node* pNode, NodeComponent* pComponent)
 {
     const std::string strTypeName = TypeRegistry::instance().getTitlizedName(typeid(*pComponent));
     ImGui::Text("%s", strTypeName.c_str());

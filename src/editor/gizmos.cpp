@@ -176,12 +176,12 @@ void GizmosManager::clearAllGizmos()
 
 const Vector3 DEFAULT_IMAGE_GIZMOS_COLOR = Vector3(1, 1, 1);
 
-void GizmosManager::addImageGizmos(Component* const pComponent, const Vector3& vecPosition, const std::string_view& m_strImagePath)
+void GizmosManager::addImageGizmos(NodeComponent* const pComponent, const Vector3& vecPosition, const std::string_view& m_strImagePath)
 {
     addImageGizmos(pComponent, vecPosition, m_strImagePath, DEFAULT_IMAGE_GIZMOS_COLOR);
 }
 
-void GizmosManager::addImageGizmos(Component* const pComponent, const Vector3& vecPosition, const std::string_view& m_strImagePath, const Vector3& vecColor)
+void GizmosManager::addImageGizmos(NodeComponent* const pComponent, const Vector3& vecPosition, const std::string_view& m_strImagePath, const Vector3& vecColor)
 {
     if (m_nImageGizmosSize + 1 < m_vecImageGizmos.size())
     {
