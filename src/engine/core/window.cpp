@@ -3,6 +3,13 @@
 // #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
+#define NS_PRIVATE_IMPLEMENTATION
+#define CA_PRIVATE_IMPLEMENTATION
+#define MTL_PRIVATE_IMPLEMENTATION
+#include <Foundation/Foundation.hpp>
+#include <Metal/Metal.hpp>
+#include <QuartzCore/QuartzCore.hpp>
+
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
@@ -164,34 +171,37 @@ bool Window::configureAndCreateWindow()
 
     // glfwSetWindowMonitor(m_pWindow, pPrimaryMonitor, 0, 0, pVideoMode->width, pVideoMode->height, pVideoMode->refreshRate);
 
-#if !__APPLE__
-    // GLint flags;
-    // glGetIntegerv(GL_CONTEXT_FLAGS, &flags);
-    // if (flags & GL_CONTEXT_FLAG_DEBUG_BIT)
-    // {
-    //     glEnable(GL_DEBUG_OUTPUT);
-    //     glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-    //     glDebugMessageCallback(glDebugOutput, nullptr);
-    //     glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
-    // }
-#endif
-
     // glfwSetWindowOpacity(m_pWindow, 0.5f); // Fun
     glfwMakeContextCurrent(m_pWindow);
     glfwSwapInterval(1); // Enable vsync
 
+    DEBUG_WINDOW_INIT_TIMER("Window configured");
 
-    // Set up GLAD
+    return true;
+}
+
+void Window::initializeGraphicsAPI()
+{
+    MTL::Device* device = MTL::CreateSystemDefaultDevice();
+    
+    if (device)
+    {
+        LOGLN("Metal Device found: {}", device->name()->utf8String());
+        device->release();
+    }
+    else
+    {
+        LOGLN("Metal is not supported on this device.");
+        // TODO: Move open gl initialization here for non-metal devices
+    }
+
+
     gladLoadGL(glfwGetProcAddress);
 
     glDepthFunc(GL_LESS);
     glEnable(GL_CULL_FACE);
 
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-    DEBUG_WINDOW_INIT_TIMER("Window configured");
-
-    return true;
 }
 
 void Window::setWindowSize(int nWidth, int nHeight)

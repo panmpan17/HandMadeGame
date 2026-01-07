@@ -21,7 +21,7 @@ struct VoidEvent
 };
 
 template<typename... Args>
-struct Event
+struct CustomEvent
 {
     std::vector<std::function<void(Args...)>> listeners;
 

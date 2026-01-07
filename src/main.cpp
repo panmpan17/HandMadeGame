@@ -34,6 +34,7 @@ int main(int nArgumentCount, char* arrArguments[])
             return -1; // Initialization failed
         }
 
+        window.initializeGraphicsAPI();
         window.setupManagers();
         window.setupGameEngineRelatedObject();
 

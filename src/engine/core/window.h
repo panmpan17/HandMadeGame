@@ -44,6 +44,8 @@ public:
 
     bool configureAndCreateWindow();
 
+    void initializeGraphicsAPI();
+
     void setupManagers();
     void setupGameEngineRelatedObject();
 
@@ -84,7 +86,7 @@ private:
 
     FileWatchDog* m_pFileWatchDog = nullptr;
 
-    Event<Vector2i> m_onWindowResize;
+    CustomEvent<Vector2i> m_onWindowResize;
 
 #if IS_DEBUG_VERSION
     bool m_bDrawGizmos = true;

@@ -215,6 +215,38 @@ if (APPLE)
     add_library(mac_frameworks INTERFACE)
     target_link_libraries(MichaelHandMadeGame PRIVATE mac_frameworks)
 
+    # Add Metal framework
+    find_library(METAL_LIB Metal REQUIRED)
+    find_library(FOUNDATION_LIB Foundation REQUIRED)
+    find_library(QUARTZ_LIB QuartzCore REQUIRED)
+
+    target_include_directories(MichaelHandMadeGame PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/external/metal-cpp")
+
+    target_link_libraries(MichaelHandMadeGame PRIVATE
+        ${METAL_LIB}
+        ${FOUNDATION_LIB}
+        ${QUARTZ_LIB}
+    )
+
+    # Compile Shaders
+    # set(SHADER_SRC "${CMAKE_CURRENT_SOURCE_DIR}/src/Shaders.metal")
+    # set(SHADER_LIB "${CMAKE_CURRENT_BINARY_DIR}/default.metallib")
+
+    # add_custom_command(
+    #     OUTPUT ${SHADER_LIB}
+    #     COMMAND xcrun -sdk macosx metal -c ${SHADER_SRC} -o ${CMAKE_CURRENT_BINARY_DIR}/Shaders.air
+    #     COMMAND xcrun -sdk macosx metal-ar r ${CMAKE_CURRENT_BINARY_DIR}/Shaders.metalar ${CMAKE_CURRENT_BINARY_DIR}/Shaders.air
+    #     COMMAND xcrun -sdk macosx metallib ${CMAKE_CURRENT_BINARY_DIR}/Shaders.metalar -o ${SHADER_LIB}
+    #     DEPENDS ${SHADER_SRC}
+    #     COMMENT "Compiling Metal Shaders"
+    # )
+
+    # # Add the compiled library to the executable so it triggers the build
+    # target_sources(MichaelHandMadeGame PRIVATE ${SHADER_LIB})
+
+    # # Copy the .metallib file into the App Bundle Resources folder automatically
+    # set_source_files_properties(${SHADER_LIB} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
+
     # Properly set rpath for macOS
     set_target_properties(MichaelHandMadeGame PROPERTIES
         BUILD_RPATH "@loader_path/lib"
