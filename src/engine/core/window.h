@@ -5,6 +5,12 @@
 #include "math/vector.h"
 #include "../../utils/expandable_array.h"
 
+#if __APPLE__
+#include <Foundation/Foundation.hpp>
+#include <Metal/Metal.hpp>
+#include <QuartzCore/QuartzCore.hpp>
+#endif // __APPLE__
+
 typedef struct GLFWwindow GLFWwindow;
 
 class WorldScene;
@@ -62,9 +68,10 @@ public:
 private:
     GLFWwindow* m_pWindow = nullptr;
 
-// #if __APPLE__
-    // MTL::Device* m_pDevice = nullptr;
-// #endif
+#if __APPLE__
+    MTL::Device* m_pMetalDevice = nullptr;
+    CA::MetalLayer* m_pMetalLayer = nullptr;
+#endif // __APPLE__
 
     // RenderProcessQueue* m_pRenderProcessQueue = nullptr;
     bool m_bEnablePostProcess = true;
@@ -97,9 +104,10 @@ private:
     bool m_bDrawGizmos = true;
 #else
     bool m_bDrawGizmos = false;
-#endif
+#endif // IS_DEBUG_VERSION
 
     void bindOpenGLToGlfwWindow();
+    void bindMetalToGlfwWindow();
 
     void setupInputManager();
 
@@ -116,4 +124,4 @@ private:
 #define INCREASE_DRAW_CALL_COUNT(n) Window::ins->increaseDrawCallCount(n)
 #else
 #define INCREASE_DRAW_CALL_COUNT(n) do {} while (0)
-#endif
+#endif // IS_DEBUG_VERSION

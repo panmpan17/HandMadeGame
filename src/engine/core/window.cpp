@@ -5,13 +5,6 @@
 #define GLFW_EXPOSE_NATIVE_COCOA
 #include <GLFW/glfw3native.h>
 
-#define NS_PRIVATE_IMPLEMENTATION
-#define CA_PRIVATE_IMPLEMENTATION
-#define MTL_PRIVATE_IMPLEMENTATION
-#include <Foundation/Foundation.hpp>
-#include <Metal/Metal.hpp>
-#include <QuartzCore/QuartzCore.hpp>
-
 #include <objc/runtime.h>
 #include <objc/message.h>
 
@@ -91,6 +84,20 @@ Window::~Window()
 
         glfwDestroyWindow(m_pWindow);
     }
+
+#if __APPLE__
+    if (m_pMetalLayer)
+    {
+        m_pMetalLayer->release();
+        m_pMetalLayer = nullptr;
+    }
+    if (m_pMetalDevice)
+    {
+        m_pMetalDevice->release();
+        m_pMetalDevice = nullptr;
+    }
+#endif // __APPLE__
+
     if (m_pWorldScene)
     {
         delete m_pWorldScene;
@@ -129,7 +136,7 @@ bool Window::configureAndCreateWindow()
 #else
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
-#endif
+#endif // __APPLE__
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     glfwWindowHint(GLFW_RESIZABLE, m_bResizable ? GLFW_TRUE : GLFW_FALSE);
@@ -140,7 +147,7 @@ bool Window::configureAndCreateWindow()
 
 #if IS_DEBUG_VERSION
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
-#endif
+#endif // IS_DEBUG_VERSION
 
     // GLFWmonitor* pPrimaryMonitor = glfwGetPrimaryMonitor();
     // const GLFWvidmode* pVideoMode = glfwGetVideoMode(pPrimaryMonitor);
@@ -185,43 +192,15 @@ bool Window::configureAndCreateWindow()
     return true;
 }
 
-void bindMetalToGlfwWindow(MTL::Device* const pDevice, GLFWwindow* const pWindow)
-{
-    void* pNSWindow = glfwGetCocoaWindow(pWindow);
-
-    // 2. Get the "contentView" of the window
-    // Equivalent to: NSView* view = [nsWindow contentView];
-    void* view = ((void* (*)(id, SEL))objc_msgSend)((id)pNSWindow, sel_registerName("contentView"));
-
-    // 3. Create the Metal Layer using metal-cpp
-    CA::MetalLayer* pOutLayer = CA::MetalLayer::layer();
-    pOutLayer->setDevice(pDevice);
-    pOutLayer->setPixelFormat(MTL::PixelFormat::PixelFormatBGRA8Unorm);
-    // Use the window's scale factor for Retina displays
-    pOutLayer->setDrawableSize(CGSizeMake(800 * 2, 600 * 2)); // Update this dynamically later!
-
-    // 4. Attach the Metal Layer to the View (The "Bridge")
-    // Equivalent to: [view setLayer:outLayer];
-    ((void (*)(id, SEL, id))objc_msgSend)((id)view, sel_registerName("setLayer:"), (id)pOutLayer);
-
-    // 5. Tell the view to host the layer
-    // Equivalent to: [view setWantsLayer:YES];
-    ((void (*)(id, SEL, BOOL))objc_msgSend)((id)view, sel_registerName("setWantsLayer:"), (BOOL)true);
-    
-    // 6. Set layer resizing policy (so it resizes with window)
-    // kCALayerWidthSizable | kCALayerHeightSizable = 2 | 16 = 18
-    // pOutLayer->setAutoresizingMask(18);
-}
-
 void Window::initializeGraphicsAPI()
 {
 #if __APPLE__
-    MTL::Device* const pDevice = MTL::CreateSystemDefaultDevice();
+    m_pMetalDevice = MTL::CreateSystemDefaultDevice();
     
-    if (pDevice)
+    if (m_pMetalDevice)
     {
-        LOGLN("Metal Device found: {}", pDevice->name()->utf8String());
-        bindMetalToGlfwWindow(pDevice, m_pWindow);
+        LOGLN("Metal Device found: {}", m_pMetalDevice->name()->utf8String());
+        bindMetalToGlfwWindow();
     }
     else
     {
@@ -231,8 +210,7 @@ void Window::initializeGraphicsAPI()
 
 #else
     bindOpenGLToGlfwWindow();
-#endif
-    
+#endif // __APPLE__
 }
 
 void Window::bindOpenGLToGlfwWindow()
@@ -243,6 +221,39 @@ void Window::bindOpenGLToGlfwWindow()
     glEnable(GL_CULL_FACE);
 
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+}
+
+void Window::bindMetalToGlfwWindow()
+{
+    void* pNSWindow = glfwGetCocoaWindow(m_pWindow);
+
+    // 2. Get the "contentView" of the window
+    // Equivalent to: NSView* view = [nsWindow contentView];
+    void* view = ((void* (*)(id, SEL))objc_msgSend)((id)pNSWindow, sel_registerName("contentView"));
+
+    // TODO: maybe need to device->newCommandQueue() here?
+
+    // 3. Create the Metal Layer using metal-cpp
+    m_pMetalLayer = CA::MetalLayer::layer();
+    m_pMetalLayer->setDevice(m_pMetalDevice);
+    m_pMetalLayer->setPixelFormat(MTL::PixelFormat::PixelFormatBGRA8Unorm);
+    // Use the window's scale factor for Retina displays
+    m_pMetalLayer->setDrawableSize(CGSizeMake(800 * 2, 600 * 2)); // Update this dynamically later!
+
+    // 4. Attach the Metal Layer to the View (The "Bridge")
+    // Equivalent to: [view setLayer:outLayer];
+    ((void (*)(id, SEL, id))objc_msgSend)((id)view, sel_registerName("setLayer:"), (id)m_pMetalLayer);
+
+    // 5. Tell the view to host the layer
+    // Equivalent to: [view setWantsLayer:YES];
+    ((void (*)(id, SEL, BOOL))objc_msgSend)((id)view, sel_registerName("setWantsLayer:"), (BOOL)true);
+
+    // TODO: setOpaque true?
+    ((void (*)(id, SEL, BOOL))objc_msgSend)((id)view, sel_registerName("setOpaque:"), (BOOL)true);
+    
+    // 6. Set layer resizing policy (so it resizes with window)
+    // kCALayerWidthSizable | kCALayerHeightSizable = 2 | 16 = 18
+    // m_pMetalLayer->setAutoresizingMask(18);
 }
 
 void Window::setWindowSize(int nWidth, int nHeight)
@@ -390,10 +401,29 @@ void Window::mainLoop()
             glfwGetWindowSize(m_pWindow, &m_oWindowSize.x, &m_oWindowSize.y);
         }
 
+        if (m_pMetalDevice)
+        {
+            NS::AutoreleasePool* pPool = NS::AutoreleasePool::alloc()->init();
+
+            CA::MetalDrawable* pDrawable = m_pMetalLayer->nextDrawable();
+
+            if (pDrawable)
+            {
+                MTL::Texture* pTexture = pDrawable->texture();
+                LOGLN("Got Metal Drawable: ID {}, {}, {}", pDrawable->drawableID(), std::time(nullptr), (void*)pTexture);
+                // Use pDrawable for rendering
+            }
+
+            pPool->release();
+        }
+
         runUpdate();
         drawFrame();
 
-        glfwSwapBuffers(m_pWindow);
+        if (!m_pMetalDevice)
+        {
+            glfwSwapBuffers(m_pWindow);
+        }
     }
 }
 
