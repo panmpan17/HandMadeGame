@@ -6,9 +6,13 @@
                 "${workspaceFolder}/**",
                 "${workspaceFolder}/include",
                 "${workspaceFolder}/external/imgui",
-                "${workspaceFolder}/external/imgui/backends"
+                "${workspaceFolder}/external/imgui/backends",
+                "${workspaceFolder}/external/metal-cpp"
             ],
-            "defines": [],
+            "defines": [
+                "__APPLE__",
+                "VSCODE_ONLY"
+            ],
             "compilerPath": "/usr/bin/g++",
             "cStandard": "c23",
             "cppStandard": "c++23",

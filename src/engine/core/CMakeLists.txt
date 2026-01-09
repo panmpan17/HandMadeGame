@@ -12,14 +12,12 @@ list(APPEND SOURCES
     ${CMAKE_CURRENT_LIST_DIR}/time.h
 )
 
-if (APPLE)
-    list(APPEND SOURCES
-        ${CMAKE_CURRENT_LIST_DIR}/metal_include_implementation.cpp
-    )
-endif()
-
 # Include sub-directory CMakeLists
 include(${CMAKE_CURRENT_LIST_DIR}/input/CMakeLists.txt)
 include(${CMAKE_CURRENT_LIST_DIR}/serialization/CMakeLists.txt)
 include(${CMAKE_CURRENT_LIST_DIR}/math/CMakeLists.txt)
 include(${CMAKE_CURRENT_LIST_DIR}/scene/CMakeLists.txt)
+
+if (APPLE)
+    include(${CMAKE_CURRENT_LIST_DIR}/metal/CMakeLists.txt)
+endif()

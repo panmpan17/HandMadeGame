@@ -39,9 +39,20 @@
 // #include "imgui_impl_glfw.h"
 // #include "imgui_impl_opengl3.h"
 
+#if __APPLE__
+#include "metal/helper.h"
+#endif // __APPLE__
+
 
 inline constexpr std::string_view PROFILER_TAG_WINDOW_INITIALIZATION = "WindowInitialization";
 #define DEBUG_WINDOW_INIT_TIMER(strMsg) PROFILER_END_TIMER(PROFILER_TAG_WINDOW_INITIALIZATION, strMsg)
+
+
+// This is a workaround for Metal PixelFormat enum not being properly recognized in VSCode intellisense.
+#if VSCODE_ONLY
+namespace MTL { enum PixelFormat : NS::UInteger { PixelFormatBGRA8Unorm = 80 }; }
+#endif // VSCODE_ONLY
+
 
 Window* Window::ins = nullptr;
 
@@ -201,6 +212,9 @@ void Window::initializeGraphicsAPI()
     {
         LOGLN("Metal Device found: {}", m_pMetalDevice->name()->utf8String());
         bindMetalToGlfwWindow();
+        
+        MTL::Library* pLibrary = loadLibraryFromPath(m_pMetalDevice, "assets/metal_shaders.metallib");
+        LOGLN("Metal loaded: {}", pLibrary != nullptr ? "Success" : "Failed");
     }
     else
     {
@@ -236,7 +250,10 @@ void Window::bindMetalToGlfwWindow()
     // 3. Create the Metal Layer using metal-cpp
     m_pMetalLayer = CA::MetalLayer::layer();
     m_pMetalLayer->setDevice(m_pMetalDevice);
+
+    // the PixelFormat is defined in MTLPixelFormat.hpp, for some reason the enum type is not compiled correctly
     m_pMetalLayer->setPixelFormat(MTL::PixelFormat::PixelFormatBGRA8Unorm);
+
     // Use the window's scale factor for Retina displays
     m_pMetalLayer->setDrawableSize(CGSizeMake(800 * 2, 600 * 2)); // Update this dynamically later!
 
@@ -410,7 +427,6 @@ void Window::mainLoop()
             if (pDrawable)
             {
                 MTL::Texture* pTexture = pDrawable->texture();
-                LOGLN("Got Metal Drawable: ID {}, {}, {}", pDrawable->drawableID(), std::time(nullptr), (void*)pTexture);
                 // Use pDrawable for rendering
             }
 
