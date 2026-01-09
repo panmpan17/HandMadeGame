@@ -65,6 +65,8 @@ public:
         m_onWindowResize.add(funcListener); 
     }
 
+    inline MTL::Device* getMetalDevice() const { return m_pMetalDevice; }
+
 private:
     GLFWwindow* m_pWindow = nullptr;
 

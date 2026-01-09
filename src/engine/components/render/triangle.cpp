@@ -22,7 +22,8 @@ Triangle::~Triangle()
 void Triangle::setShader(Shader* pShader)
 {
     m_pShader = pShader;
-    m_pMVPHandle = m_pShader->getUniformHandle(SHADER_UNIFORM_MVP);
+    // m_pMVPHandle = m_pShader->getUniformHandle(SHADER_UNIFORM_MVP);
+    // TODO: What to do if GL is metal
 }
 
 void Triangle::registerBuffer()

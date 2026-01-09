@@ -100,6 +100,45 @@ Shader::Shader(int nId, const std::string& strShaderName, const std::string &str
     glLinkProgram(m_nProgram);
 }
 
+#if __APPLE__
+Shader* Shader::loadFromMetalShader(MTL::Library* const pLibrary, MTL::Device* const pDevice,
+                                  int nId, const std::string& strShaderName, const std::string& strMetalShaderPrefix)
+{
+    MTL::Function* pVertexFunction = pLibrary->newFunction(NS::String::string("vertexMain", NS::UTF8StringEncoding));
+    MTL::Function* pFragmentFunction = pLibrary->newFunction(NS::String::string("fragmentMain", NS::UTF8StringEncoding));
+
+    if (!pVertexFunction || !pFragmentFunction)
+    {
+        LOGLN("Failed to load Metal shader functions.");
+        return nullptr;
+    }
+
+    MTL::RenderPipelineDescriptor* psoDesc = MTL::RenderPipelineDescriptor::alloc()->init();
+    psoDesc->setVertexFunction(pVertexFunction);
+    psoDesc->setFragmentFunction(pFragmentFunction);
+    psoDesc->colorAttachments()->object(0)->setPixelFormat(MTL::PixelFormatBGRA8Unorm);
+
+    Shader* pShader = new Shader;
+
+    NS::Error* pError = nullptr;
+    auto m_pPSO = pDevice->newRenderPipelineState(psoDesc, &pError);
+    if (!m_pPSO)
+    {
+        // std::cerr << "Failed to create PSO: " << pError->localizedDescription()->utf8String() << std::endl;
+        LOGLN("Failed to create PSO: {}", pError->localizedDescription()->utf8String());
+        return nullptr;
+    }
+
+    pShader->m_strName = strShaderName;
+
+    pVertexFunction->release();
+    pFragmentFunction->release();
+    psoDesc->release();
+
+    return pShader;
+}
+#endif // __APPLE__
+
 Shader::~Shader()
 {
     if (m_nProgram)

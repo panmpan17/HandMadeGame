@@ -12,7 +12,7 @@ struct VertexOut {
 };
 
 
-vertex VertexOut vertexMain(uint vertexID [[vertex_id]],
+vertex VertexOut coloredVertices_vertexMain(uint vertexID [[vertex_id]],
                             constant float2* positions [[buffer(0)]],
                             constant float3* colors [[buffer(1)]]) {
     VertexOut out;
@@ -21,7 +21,7 @@ vertex VertexOut vertexMain(uint vertexID [[vertex_id]],
     return out;
 }
 
-fragment float4 fragmentMain(VertexOut in [[stage_in]]) {
+fragment float4 coloredVertices_fragmentMain(VertexOut in [[stage_in]]) {
     return float4(in.color, 1.0);
 }
 

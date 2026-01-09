@@ -85,3 +85,4 @@
   name: colored_vertices
   vertex: assets/shaders/colored_vertices.vert
   fragment: assets/shaders/colored_vertices.frag
+  metal_prefix: coloredVertices

@@ -3,14 +3,19 @@
 #include "../core/debug_macro.h"
 #include "../../utils/file_utils.h"
 #include "../../utils/platform.h"
+#include "../core/window.h"
 
-#if IS_PLATFORM_MACOS
+#if __APPLE__
+
+#include "../core/metal/helper.h"
+
 #elif IS_PLATFORM_WINDOWS
 #include <cstring>
 #endif
 #include <functional>
 
 constexpr std::string_view SHADER_REGISTRY_FILE = "assets/shaders/shader_registry.yaml";
+constexpr std::string_view SHADER_METAL_LIB_FILE = "assets/metal_shaders.metallib";
 
 
 #define GL_INVALID_INDEX 0xFFFFFFFF
@@ -22,7 +27,7 @@ ShaderLoader::ShaderLoader()
 {
     ins = this;
 
-    // readRegistryFromFile();
+    readRegistryFromFile();
 }
 
 ShaderLoader::~ShaderLoader()
@@ -47,8 +52,30 @@ void ShaderLoader::readRegistryFromFile()
     GLuint nLightUBOIndex = GL_INVALID_INDEX;
     GLuint nTimeDataUBOIndex = GL_INVALID_INDEX;
     std::string strCurrentShaderName, strCurrentVertexPath, strCurrentFragmentPath;
+    std::string strMetalShaderPrefix;
 
-    std::function funcCreateShader = [this, &nCurrentShaderId, &nCameraUBOIndex, &nLightUBOIndex, &nTimeDataUBOIndex, &strCurrentShaderName, &strCurrentVertexPath, &strCurrentFragmentPath]()
+#if __APPLE__
+    MTL::Device* pMetalDevice = Window::ins->getMetalDevice();
+    MTL::Library* pLibrary = nullptr;
+    std::function<void()> funcCreateMetalShader = nullptr;
+
+    if (pMetalDevice)
+    {
+        pLibrary = loadLibraryFromPath(pMetalDevice, SHADER_METAL_LIB_FILE.data());
+        funcCreateMetalShader = [this, &nCurrentShaderId, &strCurrentShaderName, &strMetalShaderPrefix, &pLibrary, &pMetalDevice]()
+        {
+            auto pShader = Shader::loadFromMetalShader(
+                pLibrary,
+                pMetalDevice,
+                nCurrentShaderId,
+                strCurrentShaderName,
+                strMetalShaderPrefix);
+            m_mapShaders[nCurrentShaderId] = pShader;
+        };
+    }
+#endif // __APPLE__
+
+    std::function funcCreateOpenGLShader = [this, &nCurrentShaderId, &nCameraUBOIndex, &nLightUBOIndex, &nTimeDataUBOIndex, &strCurrentShaderName, &strCurrentVertexPath, &strCurrentFragmentPath]()
     {
         auto pShader = new Shader(nCurrentShaderId, strCurrentShaderName, strCurrentVertexPath, strCurrentFragmentPath);
         if (nCameraUBOIndex != GL_INVALID_INDEX)
@@ -77,9 +104,23 @@ void ShaderLoader::readRegistryFromFile()
 
         if (strLine.front() != ' ')
         {
-            if (nCurrentShaderId != -1 && !strCurrentShaderName.empty() && !strCurrentVertexPath.empty() && !strCurrentFragmentPath.empty())
+            if (nCurrentShaderId != -1 && !strCurrentShaderName.empty())
             {
-                funcCreateShader();
+#if __APPLE__
+                if (funcCreateMetalShader)
+                {
+                    if (!strMetalShaderPrefix.empty())
+                    {
+                        funcCreateMetalShader();
+                    }
+                }
+                else
+#endif
+                if (!strCurrentVertexPath.empty() && !strCurrentFragmentPath.empty())
+                {
+                    funcCreateOpenGLShader();
+                }
+
                 strCurrentShaderName = "";
                 strCurrentVertexPath = "";
                 strCurrentFragmentPath = "";
@@ -115,11 +156,29 @@ void ShaderLoader::readRegistryFromFile()
         {
             nTimeDataUBOIndex = std::stoi(strLine.substr(2 + 9));
         }
+        else if (memcmp(strLine.data() + 2, "metal_prefix", 12) == 0)
+        {
+            strMetalShaderPrefix = strLine.substr(2 + 14);
+        }
     }
 
-    if (nCurrentShaderId != -1)
+    LOGLN("nCurrentShaderId: {}, strCurrentShaderName: {}, funcCreateMetalShader: {}, strMetalShaderPrefix: {}", nCurrentShaderId, strCurrentShaderName, funcCreateMetalShader != nullptr, strMetalShaderPrefix);
+    if (nCurrentShaderId != -1 && !strCurrentShaderName.empty())
     {
-        funcCreateShader();
+#if __APPLE__
+        if (funcCreateMetalShader)
+        {
+            if (!strMetalShaderPrefix.empty())
+            {
+                funcCreateMetalShader();
+            }
+        }
+        else
+#endif
+        if (!strCurrentVertexPath.empty() && !strCurrentFragmentPath.empty())
+        {
+            funcCreateOpenGLShader();
+        }
     }
 }
 
@@ -133,10 +192,11 @@ Shader* ShaderLoader::getShader(int nId) const
     return nullptr;
 }
 
-Shader* ShaderLoader::getShader(const std::string_view& strName) const
+Shader* ShaderLoader::getShader(const std::string& strName) const
 {
     for (const auto& pair : m_mapShaders)
     {
+        // LOGLN("Checking shader: {}, {}", pair.second->getName(), strName);
         if (pair.second->getName() == strName)
         {
             return pair.second;

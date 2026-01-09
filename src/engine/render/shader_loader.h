@@ -15,7 +15,7 @@ public:
     inline static void Initialize() { if (!ins) ins = new ShaderLoader(); }
 
     Shader* getShader(int nId) const;
-    Shader* getShader(const std::string_view& strName) const;
+    Shader* getShader(const std::string& strName) const;
 
     void reloadAllShaders();
 

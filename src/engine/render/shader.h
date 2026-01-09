@@ -17,6 +17,12 @@ inline constexpr std::string_view SHADER_GLOBAL_UNIFORM_CAMERA_MATRICES = "Camer
 inline constexpr std::string_view SHADER_GLOBAL_UNIFORM_LIGHTING_DATA = "LightData";
 inline constexpr std::string_view SHADER_GLOBAL_UNIFORM_TIME_DATA = "TimeData";
 
+#if __APPLE__
+#include <Foundation/Foundation.hpp>
+#include <Metal/Metal.hpp>
+#include <QuartzCore/QuartzCore.hpp>
+#endif
+
 
 class Image;
 
@@ -36,9 +42,14 @@ struct ShaderUniformHandle
 class Shader
 {
 public:
+#if __APPLE__
+    static Shader* loadFromMetalShader(MTL::Library* const pLibrary, MTL::Device* const pDevice,
+                                     int nId, const std::string& strShaderName, const std::string& strMetalShaderPrefix);
+#endif // __APPLE__
+
     // Shader(const std::string_view& strShaderName, const std::string_view &strVertexShaderPath, const std::string_view &strFragmentShaderPath);
     Shader(int nId, const std::string& strShaderName, const std::string &strVertexShaderPath, const std::string &strFragmentShaderPath);
-    Shader();
+    Shader() {}
     ~Shader();
 
     inline const std::string& getName() const { return m_strName; }
@@ -64,6 +75,10 @@ public:
     void reloadTimeDataUBOBinding();
 
 protected:
+#if __APPLE__
+    MTL::RenderPipelineState* m_pPSO = nullptr;
+#endif // __APPLE__
+
     GLuint m_nProgram;
     GLuint m_nVertexShader;
     GLuint m_nFragmentShader;

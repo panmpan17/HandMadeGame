@@ -212,9 +212,6 @@ void Window::initializeGraphicsAPI()
     {
         LOGLN("Metal Device found: {}", m_pMetalDevice->name()->utf8String());
         bindMetalToGlfwWindow();
-        
-        MTL::Library* pLibrary = loadLibraryFromPath(m_pMetalDevice, "assets/metal_shaders.metallib");
-        LOGLN("Metal loaded: {}", pLibrary != nullptr ? "Success" : "Failed");
     }
     else
     {
