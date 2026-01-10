@@ -121,8 +121,8 @@ Shader* Shader::loadFromMetalShader(MTL::Library* const pLibrary, MTL::Device* c
     Shader* pShader = new Shader;
 
     NS::Error* pError = nullptr;
-    auto m_pPSO = pDevice->newRenderPipelineState(psoDesc, &pError);
-    if (!m_pPSO)
+    pShader->m_pPSO = pDevice->newRenderPipelineState(psoDesc, &pError);
+    if (!pShader->m_pPSO)
     {
         // std::cerr << "Failed to create PSO: " << pError->localizedDescription()->utf8String() << std::endl;
         LOGLN("Failed to create PSO: {}", pError->localizedDescription()->utf8String());

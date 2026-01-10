@@ -123,9 +123,9 @@ void WorldScene::update(float fDeltatime)
 
 void WorldScene::render()
 {
-    glEnable(GL_DEPTH_TEST);
-    glDepthMask(GL_TRUE);
-    glCullFace(GL_BACK);
+    // glEnable(GL_DEPTH_TEST);
+    // glDepthMask(GL_TRUE);
+    // glCullFace(GL_BACK);
 
     int nSize = m_oOpaqueDrawableArray.getCount();
     for (int i = 0; i < nSize; ++i)
@@ -138,14 +138,14 @@ void WorldScene::render()
     }
 
 
-    glDepthMask(GL_FALSE);
+    // glDepthMask(GL_FALSE);
 
     // if (m_pSkybox)
     // {
     //     m_pSkybox->draw();
     // }
 
-    glEnable(GL_BLEND);
+    // glEnable(GL_BLEND);
 
     int nTransparentSize = m_oTransparentDrawableArray.getCount();
     for (int i = 0; i < nTransparentSize; ++i)
@@ -157,8 +157,8 @@ void WorldScene::render()
         }
     }
 
-    glDisable(GL_BLEND);
-    glDepthMask(GL_TRUE);
+    // glDisable(GL_BLEND);
+    // glDepthMask(GL_TRUE);
 }
 
 void WorldScene::renderDepth()

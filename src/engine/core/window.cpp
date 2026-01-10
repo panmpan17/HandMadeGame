@@ -242,8 +242,6 @@ void Window::bindMetalToGlfwWindow()
     // Equivalent to: NSView* view = [nsWindow contentView];
     void* view = ((void* (*)(id, SEL))objc_msgSend)((id)pNSWindow, sel_registerName("contentView"));
 
-    // TODO: maybe need to device->newCommandQueue() here?
-
     // 3. Create the Metal Layer using metal-cpp
     m_pMetalLayer = CA::MetalLayer::layer();
     m_pMetalLayer->setDevice(m_pMetalDevice);
@@ -252,7 +250,7 @@ void Window::bindMetalToGlfwWindow()
     m_pMetalLayer->setPixelFormat(MTL::PixelFormat::PixelFormatBGRA8Unorm);
 
     // Use the window's scale factor for Retina displays
-    m_pMetalLayer->setDrawableSize(CGSizeMake(800 * 2, 600 * 2)); // Update this dynamically later!
+    m_pMetalLayer->setDrawableSize(CGSizeMake(m_oActualSize.x, m_oActualSize.y)); // TODO: Should this be m_oActualSize or m_oWindowSize?
 
     // 4. Attach the Metal Layer to the View (The "Bridge")
     // Equivalent to: [view setLayer:outLayer];
@@ -262,12 +260,14 @@ void Window::bindMetalToGlfwWindow()
     // Equivalent to: [view setWantsLayer:YES];
     ((void (*)(id, SEL, BOOL))objc_msgSend)((id)view, sel_registerName("setWantsLayer:"), (BOOL)true);
 
-    // TODO: setOpaque true?
-    ((void (*)(id, SEL, BOOL))objc_msgSend)((id)view, sel_registerName("setOpaque:"), (BOOL)true);
+    // // TODO: setOpaque true?
+    // ((void (*)(id, SEL, BOOL))objc_msgSend)((id)view, sel_registerName("setOpaque:"), (BOOL)true);
     
     // 6. Set layer resizing policy (so it resizes with window)
     // kCALayerWidthSizable | kCALayerHeightSizable = 2 | 16 = 18
     // m_pMetalLayer->setAutoresizingMask(18);
+
+    m_pMetalCommandQueue = m_pMetalDevice->newCommandQueue();
 }
 
 void Window::setWindowSize(int nWidth, int nHeight)
@@ -413,7 +413,11 @@ void Window::mainLoop()
             m_onWindowResize.invoke(m_oActualSize);
 
             glfwGetWindowSize(m_pWindow, &m_oWindowSize.x, &m_oWindowSize.y);
+
+            m_pMetalLayer->setDrawableSize(CGSizeMake(m_oActualSize.x, m_oActualSize.y));
         }
+
+        runUpdate();
 
         if (m_pMetalDevice)
         {
@@ -423,18 +427,33 @@ void Window::mainLoop()
 
             if (pDrawable)
             {
-                MTL::Texture* pTexture = pDrawable->texture();
-                // Use pDrawable for rendering
+                MTL::CommandBuffer* pCommandBuffer = m_pMetalCommandQueue->commandBuffer();
+
+                MTL::RenderPassDescriptor* pRenderPassDescriptor = MTL::RenderPassDescriptor::alloc()->init();
+                MTL::RenderPassColorAttachmentDescriptor* pColorAttachment = pRenderPassDescriptor->colorAttachments()->object(0);
+
+                pColorAttachment->setTexture(pDrawable->texture());
+                pColorAttachment->setLoadAction(MTL::LoadActionClear);
+                pColorAttachment->setClearColor(MTL::ClearColor::Make(0.0, 0.0, 0.0, 1.0));
+                pColorAttachment->setStoreAction(MTL::StoreActionStore);
+
+                m_pCurrentFrameRenderEncoder = pCommandBuffer->renderCommandEncoder(pRenderPassDescriptor);
+
+                drawFrame();
+
+                m_pCurrentFrameRenderEncoder->endEncoding();
+
+                pCommandBuffer->presentDrawable(pDrawable);
+                pCommandBuffer->commit();
+
+                pRenderPassDescriptor->release();
             }
 
             pPool->release();
         }
-
-        runUpdate();
-        drawFrame();
-
-        if (!m_pMetalDevice)
+        else
         {
+            drawFrame();
             glfwSwapBuffers(m_pWindow);
         }
     }
@@ -540,7 +559,7 @@ void Window::drawFrame()
         // glViewport(0, 0, m_oActualSize.x, m_oActualSize.y);
         // glClearColor(0.f, 0.f, 0.f, 1.0f);
         // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        // m_pWorldScene->render();
+        m_pWorldScene->render();
     }
 
     if (m_bDrawGizmos)

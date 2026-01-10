@@ -28,6 +28,26 @@ void Triangle::setShader(Shader* pShader)
 
 void Triangle::registerBuffer()
 {
+    MTL::Device* pDevice = Window::ins->getMetalDevice();
+
+    if (pDevice)
+    {
+        const float positions[] = {
+            -0.6f, -0.4f,
+            0.6f, -0.4f,
+            0.f,  0.6f
+        };
+        const float colors[] = {
+            1.f, 0.f, 0.f,
+            0.f, 1.f, 0.f,
+            0.f, 0.f, 1.f,
+        };
+
+        m_pPosBuffer = pDevice->newBuffer(positions, sizeof(positions), MTL::ResourceStorageModeShared);
+        m_pColBuffer = pDevice->newBuffer(colors, sizeof(colors), MTL::ResourceStorageModeShared);
+    }
+    else
+    {
     glGenBuffers(1, &m_nVertexBuffer);
     glBindBuffer(GL_ARRAY_BUFFER, m_nVertexBuffer);
 
@@ -50,23 +70,34 @@ void Triangle::registerBuffer()
     // Unbind
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
+    }
 }
 
 void Triangle::draw()
 {
     ASSERT(m_pShader, "Shader must be set before drawing the triangle");
 
-    mat4x4 mvp;
-    const mat4x4& matModel = m_pNode->getWorldMatrix();
-    const mat4x4& cameraViewMatrix = Camera::main->getViewProjectionMatrix();
-    mat4x4_mul(mvp, cameraViewMatrix, matModel);
+    // mat4x4 mvp;
+    // const mat4x4& matModel = m_pNode->getWorldMatrix();
+    // const mat4x4& cameraViewMatrix = Camera::main->getViewProjectionMatrix();
+    // mat4x4_mul(mvp, cameraViewMatrix, matModel);
 
-    glUseProgram(m_pShader->getProgram());
-    glUniformMatrix4fv(m_pMVPHandle->m_nLocation, 1, GL_FALSE, (const GLfloat*) mvp);
-    glBindVertexArray(m_nVertexArray);
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+    // glUseProgram(m_pShader->getProgram());
+    // glUniformMatrix4fv(m_pMVPHandle->m_nLocation, 1, GL_FALSE, (const GLfloat*) mvp);
+    // glBindVertexArray(m_nVertexArray);
+    // glDrawArrays(GL_TRIANGLES, 0, 3);
+    // INCREASE_DRAW_CALL_COUNT(1);
+    // glUseProgram(0);
+
+    MTL::RenderCommandEncoder* pRenderCommandEncoder = Window::ins->getCurrentFrameRenderEncoder();
+
+    MTL::RenderPipelineState* pPSO = m_pShader->getMetalPipelineState();
+
+    pRenderCommandEncoder->setRenderPipelineState(pPSO);
+    pRenderCommandEncoder->setVertexBuffer(m_pPosBuffer, 0, 0);
+    pRenderCommandEncoder->setVertexBuffer(m_pColBuffer, 0, 1);
+    pRenderCommandEncoder->drawPrimitives(MTL::PrimitiveType::PrimitiveTypeTriangle, (NS::UInteger)0, (NS::UInteger)3);
     INCREASE_DRAW_CALL_COUNT(1);
-    glUseProgram(0);
 }
 
 void Triangle::serializeToWrapper(DataSerializer& serializer) const

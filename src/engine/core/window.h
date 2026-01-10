@@ -66,6 +66,7 @@ public:
     }
 
     inline MTL::Device* getMetalDevice() const { return m_pMetalDevice; }
+    inline MTL::RenderCommandEncoder* getCurrentFrameRenderEncoder() const { return m_pCurrentFrameRenderEncoder; }
 
 private:
     GLFWwindow* m_pWindow = nullptr;
@@ -73,6 +74,8 @@ private:
 #if __APPLE__
     MTL::Device* m_pMetalDevice = nullptr;
     CA::MetalLayer* m_pMetalLayer = nullptr;
+    MTL::CommandQueue* m_pMetalCommandQueue = nullptr;
+    MTL::RenderCommandEncoder* m_pCurrentFrameRenderEncoder = nullptr;
 #endif // __APPLE__
 
     // RenderProcessQueue* m_pRenderProcessQueue = nullptr;

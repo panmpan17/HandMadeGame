@@ -75,9 +75,6 @@ public:
     void reloadTimeDataUBOBinding();
 
 protected:
-#if __APPLE__
-    MTL::RenderPipelineState* m_pPSO = nullptr;
-#endif // __APPLE__
 
     GLuint m_nProgram;
     GLuint m_nVertexShader;
@@ -97,4 +94,12 @@ protected:
     int m_nUniformHandleCount = 0;
 
     GLuint getUniformLocation(const std::string& name) const;
+
+#if __APPLE__
+public:
+    inline MTL::RenderPipelineState* getMetalPipelineState() const { return m_pPSO; }
+
+protected:
+    MTL::RenderPipelineState* m_pPSO = nullptr;
+#endif // __APPLE__
 };

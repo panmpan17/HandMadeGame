@@ -23,13 +23,13 @@ void firstTriangeTest()
 
         auto pTriangle = new Triangle();
         pTriangle->setShader(pColorShared);
-        // pTriangle->registerBuffer();
-        // pNode->addComponent(pTriangle);
+        pTriangle->registerBuffer();
+        pNode->addComponent(pTriangle);
 
-        // pNode->addComponent(new Rotate3D(0, 0, -10.0f));
+        pNode->addComponent(new Rotate3D(0, 0, -10.0f));
 
-        // pNode->addComponent(new Movement(1.0f)); // Add movement component with speed 1.0f
+        pNode->addComponent(new Movement(1.0f)); // Add movement component with speed 1.0f
 
-        // pWorldScene->addNode(pNode);
+        pWorldScene->addNode(pNode);
     }
 }

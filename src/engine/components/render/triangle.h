@@ -7,6 +7,8 @@
 typedef unsigned int GLuint;
 
 
+namespace MTL { class Buffer; }
+
 
 class Triangle : public IDrawable
 {
@@ -22,6 +24,9 @@ public:
 
 private:
     Shader* m_pShader = nullptr;
+
+    MTL::Buffer* m_pPosBuffer = nullptr;
+    MTL::Buffer* m_pColBuffer = nullptr;
 
     GLuint m_nVertexBuffer, m_nVertexArray;
     const ShaderUniformHandle* m_pMVPHandle = nullptr;
