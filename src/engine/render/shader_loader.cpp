@@ -70,7 +70,14 @@ void ShaderLoader::readRegistryFromFile()
                 nCurrentShaderId,
                 strCurrentShaderName,
                 strMetalShaderPrefix);
-            m_mapShaders[nCurrentShaderId] = pShader;
+
+            if (!pShader)
+            {
+                LOGLN("Failed to load Metal shader: {} with prefix: {}", strCurrentShaderName, strMetalShaderPrefix);
+                return;
+            }
+
+            m_mapShaders.insert({ nCurrentShaderId, pShader });
         };
     }
 #endif // __APPLE__
@@ -90,7 +97,7 @@ void ShaderLoader::readRegistryFromFile()
         {
             pShader->setTimeDataUBOBindingPoint(nTimeDataUBOIndex);
         }
-        m_mapShaders[nCurrentShaderId] = pShader;
+        m_mapShaders.insert({ nCurrentShaderId, pShader });
     };
 
     // Read shader paths from the registry file

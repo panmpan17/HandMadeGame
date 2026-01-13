@@ -14,7 +14,7 @@ struct VertexOut {
 
 vertex VertexOut coloredVertices_vertexMain(uint vertexID [[vertex_id]],
                             constant float2* positions [[buffer(0)]],
-                            constant float3* colors [[buffer(1)]]) {
+                            constant packed_float3* colors [[buffer(1)]]) {
     VertexOut out;
     out.position = float4(positions[vertexID], 0.0, 1.0);
     out.color = colors[vertexID];

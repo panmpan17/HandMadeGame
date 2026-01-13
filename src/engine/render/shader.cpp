@@ -104,9 +104,11 @@ Shader::Shader(int nId, const std::string& strShaderName, const std::string &str
 Shader* Shader::loadFromMetalShader(MTL::Library* const pLibrary, MTL::Device* const pDevice,
                                   int nId, const std::string& strShaderName, const std::string& strMetalShaderPrefix)
 {
-    MTL::Function* pVertexFunction = pLibrary->newFunction(NS::String::string("vertexMain", NS::UTF8StringEncoding));
-    MTL::Function* pFragmentFunction = pLibrary->newFunction(NS::String::string("fragmentMain", NS::UTF8StringEncoding));
+    std::string strFullVertexName = strMetalShaderPrefix + "_vertexMain";
+    std::string strFullFragmentName = strMetalShaderPrefix + "_fragmentMain";
 
+    MTL::Function* pVertexFunction = pLibrary->newFunction(NS::String::string(strFullVertexName.c_str(), NS::UTF8StringEncoding));
+    MTL::Function* pFragmentFunction = pLibrary->newFunction(NS::String::string(strFullFragmentName.c_str(), NS::UTF8StringEncoding));
     if (!pVertexFunction || !pFragmentFunction)
     {
         LOGLN("Failed to load Metal shader functions.");
