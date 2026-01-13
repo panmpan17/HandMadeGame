@@ -31,8 +31,7 @@ endif()
 include(src/CMakeLists.txt)
 
 
-file(GLOB_RECURSE ASSETS "${CMAKE_SOURCE_DIR}/assets/*")
-file(GLOB_RECURSE ASSETS_RELATIVE RELATIVE "${CMAKE_SOURCE_DIR}/assets" "${CMAKE_SOURCE_DIR}/assets/*")
+
 
 
 set(DO_COPY_ASSETS_CUSTOM_COMMAND ON)
@@ -143,19 +142,16 @@ else()
 endif()
 
 
+# Assets handling
+include(CMake/assets.cmake)
+
+if (APPLE)
+    ADD_COMPILE_METAL_SHADERS_COMMAND(MichaelHandMadeGame)
+endif()
+
 # Assets files
 if (DO_COPY_ASSETS_CUSTOM_COMMAND)
-    # Copy assets files
-    add_custom_command(
-        OUTPUT ${CMAKE_BINARY_DIR}/assets.timestamp
-        COMMAND ${CMAKE_COMMAND} -E copy_directory
-            ${CMAKE_SOURCE_DIR}/assets
-            ${ASSET_BUILD_TARGET_FOLDER}
-        COMMAND ${CMAKE_COMMAND} -E touch ${CMAKE_BINARY_DIR}/assets.timestamp
-        DEPENDS ${ASSETS}
-    )
-    add_custom_target(copy_assets ALL DEPENDS ${CMAKE_BINARY_DIR}/assets.timestamp)
-    add_dependencies(MichaelHandMadeGame copy_assets)
+    ADD_COPY_ASSETS_COMMAND(MichaelHandMadeGame ${ASSET_BUILD_TARGET_FOLDER})
 endif()
 
 
@@ -229,25 +225,6 @@ if (APPLE)
         ${QUARTZ_LIB}
         ${COCOA_LIB}
     )
-
-    # Compile Shaders
-    # set(SHADER_SRC "${CMAKE_CURRENT_SOURCE_DIR}/src/Shaders.metal")
-    # set(SHADER_LIB "${CMAKE_CURRENT_BINARY_DIR}/default.metallib")
-
-    # add_custom_command(
-    #     OUTPUT ${SHADER_LIB}
-    #     COMMAND xcrun -sdk macosx metal -c ${SHADER_SRC} -o ${CMAKE_CURRENT_BINARY_DIR}/Shaders.air
-    #     COMMAND xcrun -sdk macosx metal-ar r ${CMAKE_CURRENT_BINARY_DIR}/Shaders.metalar ${CMAKE_CURRENT_BINARY_DIR}/Shaders.air
-    #     COMMAND xcrun -sdk macosx metallib ${CMAKE_CURRENT_BINARY_DIR}/Shaders.metalar -o ${SHADER_LIB}
-    #     DEPENDS ${SHADER_SRC}
-    #     COMMENT "Compiling Metal Shaders"
-    # )
-
-    # # Add the compiled library to the executable so it triggers the build
-    # target_sources(MichaelHandMadeGame PRIVATE ${SHADER_LIB})
-
-    # # Copy the .metallib file into the App Bundle Resources folder automatically
-    # set_source_files_properties(${SHADER_LIB} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
 
     # Properly set rpath for macOS
     set_target_properties(MichaelHandMadeGame PROPERTIES

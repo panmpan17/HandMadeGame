@@ -38,7 +38,7 @@ int main(int nArgumentCount, char* arrArguments[])
         window.setupManagers();
         window.setupGameEngineRelatedObject();
 
-        PROFILER_START_TIMER()
+        PROFILER_START_TIMER();
         // setupPostProcess();
         PROFILER_END_TIMER("World", "Setup post process");
         // createDemo1();
@@ -50,7 +50,7 @@ int main(int nArgumentCount, char* arrArguments[])
         // colorPicker.pickerMain();
         // serializationTest();
         firstTriangeTest();
-        PROFILER_END_TIMER("World", "Init")
+        PROFILER_END_TIMER("World", "Init");
 
         window.mainLoop();
     }
