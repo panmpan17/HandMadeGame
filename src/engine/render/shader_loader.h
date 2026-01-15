@@ -6,6 +6,35 @@
 #include "../../utils/file_watch_dog.h"
 #include "shader.h"
 
+#define GL_INVALID_INDEX 0xFFFFFFFF
+
+struct ShaderRegisteryData
+{
+    int nCurrentShaderId = -1;
+    std::string m_strName;
+
+    // OpenGL
+    std::string m_strVertexPath;
+    std::string m_strFragmentPath;
+    GLuint nCameraUBOIndex = GL_INVALID_INDEX;
+    GLuint nLightUBOIndex = GL_INVALID_INDEX;
+    GLuint nTimeDataUBOIndex = GL_INVALID_INDEX;
+
+    // Metal
+    std::string m_strMetalShaderPrefix;
+
+    void reset()
+    {
+        nCurrentShaderId = -1;
+        m_strName.clear();
+        m_strVertexPath.clear();
+        m_strFragmentPath.clear();
+        nCameraUBOIndex = GL_INVALID_INDEX;
+        nLightUBOIndex = GL_INVALID_INDEX;
+        nTimeDataUBOIndex = GL_INVALID_INDEX;
+    }
+};
+
 
 class ShaderLoader
 {

@@ -24,6 +24,7 @@ inline constexpr std::string_view SHADER_GLOBAL_UNIFORM_TIME_DATA = "TimeData";
 #endif
 
 
+struct ShaderRegisteryData;
 class Image;
 
 
@@ -42,14 +43,13 @@ struct ShaderUniformHandle
 class Shader
 {
 public:
+    static Shader* loadFromOpenGLShader(const ShaderRegisteryData& pData);
+
 #if __APPLE__
     static Shader* loadFromMetalShader(MTL::Library* const pLibrary, MTL::Device* const pDevice,
                                      int nId, const std::string& strShaderName, const std::string& strMetalShaderPrefix);
 #endif // __APPLE__
 
-    // Shader(const std::string_view& strShaderName, const std::string_view &strVertexShaderPath, const std::string_view &strFragmentShaderPath);
-    Shader(int nId, const std::string& strShaderName, const std::string &strVertexShaderPath, const std::string &strFragmentShaderPath);
-    Shader() {}
     ~Shader();
 
     inline const std::string& getName() const { return m_strName; }
@@ -75,10 +75,11 @@ public:
     void reloadTimeDataUBOBinding();
 
 protected:
+    Shader() {}
 
-    GLuint m_nProgram = 0;
-    GLuint m_nVertexShader = 0;
-    GLuint m_nFragmentShader = 0;
+    GLuint m_nProgram = GL_INVALID_INDEX;
+    GLuint m_nVertexShader = GL_INVALID_INDEX;
+    GLuint m_nFragmentShader = GL_INVALID_INDEX;
 
     GLuint m_nCameraUBOBindingPoint = GL_INVALID_INDEX;
     GLuint m_nLightUBOBindingPoint = GL_INVALID_INDEX;
