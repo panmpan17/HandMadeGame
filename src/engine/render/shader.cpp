@@ -145,11 +145,10 @@ void metalShaderAddFloatAttribute(MTL::VertexDescriptor* const pVertexDesc, int 
     pLayout0->setStepFunction(MTL::VertexStepFunctionPerVertex);
 }
 
-Shader* Shader::loadFromMetalShader(MTL::Library* const pLibrary, MTL::Device* const pDevice,
-                                  int nId, const std::string& strShaderName, const std::string& strMetalShaderPrefix)
+Shader* Shader::loadFromMetalShader(MTL::Library* const pLibrary, MTL::Device* const pDevice, const ShaderRegisteryData& oData)
 {
-    std::string strFullVertexName = strMetalShaderPrefix + "_vertexMain";
-    std::string strFullFragmentName = strMetalShaderPrefix + "_fragmentMain";
+    std::string strFullVertexName = oData.m_strMetalShaderPrefix + "_vertexMain";
+    std::string strFullFragmentName = oData.m_strMetalShaderPrefix + "_fragmentMain";
 
     MTL::Function* pVertexFunction = pLibrary->newFunction(NS::String::string(strFullVertexName.c_str(), NS::UTF8StringEncoding));
     MTL::Function* pFragmentFunction = pLibrary->newFunction(NS::String::string(strFullFragmentName.c_str(), NS::UTF8StringEncoding));
@@ -181,7 +180,7 @@ Shader* Shader::loadFromMetalShader(MTL::Library* const pLibrary, MTL::Device* c
         return nullptr;
     }
 
-    pShader->m_strName = strShaderName;
+    pShader->m_strName = oData.m_strName;
 
     pVertexFunction->release();
     pFragmentFunction->release();

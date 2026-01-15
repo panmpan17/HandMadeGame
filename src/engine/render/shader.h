@@ -46,8 +46,7 @@ public:
     static Shader* loadFromOpenGLShader(const ShaderRegisteryData& pData);
 
 #if __APPLE__
-    static Shader* loadFromMetalShader(MTL::Library* const pLibrary, MTL::Device* const pDevice,
-                                     int nId, const std::string& strShaderName, const std::string& strMetalShaderPrefix);
+    static Shader* loadFromMetalShader(MTL::Library* const pLibrary, MTL::Device* const pDevice, const ShaderRegisteryData& oData);
 #endif // __APPLE__
 
     ~Shader();

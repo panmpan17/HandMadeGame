@@ -60,9 +60,7 @@ void ShaderLoader::readRegistryFromFile()
             auto pShader = Shader::loadFromMetalShader(
                 pLibrary,
                 pMetalDevice,
-                oCurrentShaderData.nCurrentShaderId,
-                oCurrentShaderData.m_strName,
-                oCurrentShaderData.m_strMetalShaderPrefix);
+                oCurrentShaderData);
 
             if (!pShader)
             {
