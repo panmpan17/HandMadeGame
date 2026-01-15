@@ -6,6 +6,7 @@ set(METAL_SHADER_COMPILED_FOLDER "${CMAKE_BINARY_DIR}/metal_shaders")
 
 file(GLOB_RECURSE METAL_SHADER_SRC_ABS "${METAL_SHADER_FOLDER}/*.metal")
 file(GLOB_RECURSE METAL_SHADER_SRC RELATIVE "${METAL_SHADER_FOLDER}" "${METAL_SHADER_FOLDER}/*.metal")
+set(METAL_SHADER_ARCHIVE_FILE "${METAL_SHADER_COMPILED_FOLDER}/metal_shaders.metalar")
 set(METAL_SHADER_LIB "${ASSET_SOURCE_FOLDER}/metal_shaders.metallib")
 
 function(ADD_COMPILE_METAL_SHADERS_COMMAND applicationName)
@@ -15,22 +16,23 @@ function(ADD_COMPILE_METAL_SHADERS_COMMAND applicationName)
         DEPENDS ${METAL_SHADER_SRC_ABS}
     )
 
+    set(METAL_COMPILED_FILES "")
     foreach (shaderFile ${METAL_SHADER_SRC})
+        get_filename_component(OUT_DIR "${METAL_SHADER_COMPILED_FOLDER}/${shaderFile}" DIRECTORY)
+
         add_custom_command(
             OUTPUT ${METAL_SHADER_LIB}
+            COMMAND ${CMAKE_COMMAND} -E make_directory ${OUT_DIR}
             APPEND COMMAND xcrun -sdk macosx metal -o ${METAL_SHADER_COMPILED_FOLDER}/${shaderFile}.ir -c ${METAL_SHADER_FOLDER}/${shaderFile}
         )
+
+        list(APPEND METAL_COMPILED_FILES "${METAL_SHADER_COMPILED_FOLDER}/${shaderFile}.ir")
     endforeach()
 
-    # TODO: First remove the .metalar, then for loop link the .ir files into a .metalar, then compile that into a .metallib
-    # xcrun -sdk macosx metal-ar -q "output.metalar" "input1.ir"
-    # xcrun -sdk macosx metal-ar -q "output.metalar" "input2.ir"
-    foreach (shaderFile ${METAL_SHADER_SRC})
-        add_custom_command(
-            OUTPUT ${METAL_SHADER_LIB}
-            APPEND COMMAND xcrun -sdk macosx metal -o ${METAL_SHADER_LIB} ${METAL_SHADER_COMPILED_FOLDER}/${shaderFile}.ir
-        )
-    endforeach()
+    add_custom_command(
+        OUTPUT ${METAL_SHADER_LIB}
+        APPEND COMMAND xcrun -sdk macosx metal -o ${METAL_SHADER_LIB} ${METAL_COMPILED_FILES}
+    )
 
     add_custom_target(copy_metal_lib ALL DEPENDS ${METAL_SHADER_LIB})
     add_dependencies(${applicationName} copy_metal_lib)
