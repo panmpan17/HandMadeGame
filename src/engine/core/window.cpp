@@ -68,6 +68,16 @@ Window::Window()
 
 #if __APPLE__
     m_pMetalDevice = MTL::CreateSystemDefaultDevice();
+    if (m_pMetalDevice)
+    {
+        m_eGraphicAPI = GraphicAPI::Metal;
+    }
+    else
+    {
+        m_eGraphicAPI = GraphicAPI::OpenGL;
+    }
+#else
+    m_eGraphicAPI = GraphicAPI::OpenGL;
 #endif
 
     if (!glfwInit())
@@ -149,7 +159,7 @@ bool Window::configureAndCreateWindow()
     glfwWindowHint(GLFW_DEPTH_BITS, 24);
 
 #if __APPLE__
-    if (m_pMetalDevice)
+    if (isUsingMetal())
     {
         configureGLFWWithMetal();
     }
@@ -227,7 +237,7 @@ void Window::configureGLFWWithMetal()
 void Window::initializeGraphicsAPI()
 {
 #if __APPLE__
-    if (m_pMetalDevice)
+    if (isUsingMetal())
     {
         LOGLN("Metal Device found: {}", m_pMetalDevice->name()->utf8String());
         bindMetalToGlfwWindow();
@@ -443,7 +453,7 @@ void Window::mainLoop()
 
         runUpdate();
 
-        if (m_pMetalDevice)
+        if (isUsingMetal())
         {
             NS::AutoreleasePool* pPool = NS::AutoreleasePool::alloc()->init();
 
@@ -477,6 +487,10 @@ void Window::mainLoop()
         }
         else
         {
+            glViewport(0, 0, m_oActualSize.x, m_oActualSize.y);
+            glClearColor(0.f, 0.f, 0.f, 1.0f);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
             drawFrame();
             glfwSwapBuffers(m_pWindow);
         }
@@ -580,9 +594,6 @@ void Window::drawFrame()
     // }
     // else
     {
-        // glViewport(0, 0, m_oActualSize.x, m_oActualSize.y);
-        // glClearColor(0.f, 0.f, 0.f, 1.0f);
-        // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         m_pWorldScene->render();
     }
 

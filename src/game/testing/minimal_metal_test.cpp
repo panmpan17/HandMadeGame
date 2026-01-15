@@ -16,7 +16,6 @@ void firstTriangeTest()
 
     { // Triangle
         Shader* const pColorShared = ShaderLoader::getInstance()->getShader("colored_vertices");
-        LOGLN("Shader loaded: {}", (void*)pColorShared);
 
         auto pNode = new Node(0.f, 0.f, 0.f);
         pNode->setRotationQuaternion(Quaternion::fromEulerAngles({0.f, 0.f, 0.f}));

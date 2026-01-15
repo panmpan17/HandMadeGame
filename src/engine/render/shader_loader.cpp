@@ -55,12 +55,13 @@ void ShaderLoader::readRegistryFromFile()
     std::string strMetalShaderPrefix;
 
 #if __APPLE__
-    MTL::Device* pMetalDevice = Window::ins->getMetalDevice();
-    MTL::Library* pLibrary = nullptr;
     std::function<void()> funcCreateMetalShader = nullptr;
 
-    if (pMetalDevice)
+    if (Window::ins->isUsingMetal())
     {
+        MTL::Device* pMetalDevice = Window::ins->getMetalDevice();
+        MTL::Library* pLibrary = nullptr;
+
         pLibrary = loadLibraryFromPath(pMetalDevice, SHADER_METAL_LIB_FILE.data());
         funcCreateMetalShader = [this, &nCurrentShaderId, &strCurrentShaderName, &strMetalShaderPrefix, &pLibrary, &pMetalDevice]()
         {
@@ -169,7 +170,6 @@ void ShaderLoader::readRegistryFromFile()
         }
     }
 
-    LOGLN("nCurrentShaderId: {}, strCurrentShaderName: {}, funcCreateMetalShader: {}, strMetalShaderPrefix: {}", nCurrentShaderId, strCurrentShaderName, funcCreateMetalShader != nullptr, strMetalShaderPrefix);
     if (nCurrentShaderId != -1 && !strCurrentShaderName.empty())
     {
 #if __APPLE__

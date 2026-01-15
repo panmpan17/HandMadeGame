@@ -76,9 +76,9 @@ public:
 
 protected:
 
-    GLuint m_nProgram;
-    GLuint m_nVertexShader;
-    GLuint m_nFragmentShader;
+    GLuint m_nProgram = 0;
+    GLuint m_nVertexShader = 0;
+    GLuint m_nFragmentShader = 0;
 
     GLuint m_nCameraUBOBindingPoint = GL_INVALID_INDEX;
     GLuint m_nLightUBOBindingPoint = GL_INVALID_INDEX;

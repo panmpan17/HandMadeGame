@@ -22,16 +22,19 @@ Triangle::~Triangle()
 void Triangle::setShader(Shader* pShader)
 {
     m_pShader = pShader;
-    // m_pMVPHandle = m_pShader->getUniformHandle(SHADER_UNIFORM_MVP);
-    // TODO: What to do if GL is metal
+
+    if (Window::ins->isUsingOpenGL())
+    {
+        m_pMVPHandle = m_pShader->getUniformHandle(SHADER_UNIFORM_MVP);
+    }
 }
 
 void Triangle::registerBuffer()
 {
-    MTL::Device* pDevice = Window::ins->getMetalDevice();
-
-    if (pDevice)
+    if (Window::ins->isUsingMetal())
     {
+        MTL::Device* pDevice = Window::ins->getMetalDevice();
+
         const float positions[] = {
             -0.6f, -0.4f,
             0.6f, -0.4f,
@@ -77,27 +80,33 @@ void Triangle::draw()
 {
     ASSERT(m_pShader, "Shader must be set before drawing the triangle");
 
-    // mat4x4 mvp;
-    // const mat4x4& matModel = m_pNode->getWorldMatrix();
-    // const mat4x4& cameraViewMatrix = Camera::main->getViewProjectionMatrix();
-    // mat4x4_mul(mvp, cameraViewMatrix, matModel);
+    if (Window::ins->isUsingMetal())
+    {
+        MTL::RenderCommandEncoder* pRenderCommandEncoder = Window::ins->getCurrentFrameRenderEncoder();
 
-    // glUseProgram(m_pShader->getProgram());
-    // glUniformMatrix4fv(m_pMVPHandle->m_nLocation, 1, GL_FALSE, (const GLfloat*) mvp);
-    // glBindVertexArray(m_nVertexArray);
-    // glDrawArrays(GL_TRIANGLES, 0, 3);
-    // INCREASE_DRAW_CALL_COUNT(1);
-    // glUseProgram(0);
+        MTL::RenderPipelineState* pPSO = m_pShader->getMetalPipelineState();
 
-    MTL::RenderCommandEncoder* pRenderCommandEncoder = Window::ins->getCurrentFrameRenderEncoder();
+        pRenderCommandEncoder->setRenderPipelineState(pPSO);
+        pRenderCommandEncoder->setVertexBuffer(m_pPosBuffer, 0, 0);
+        pRenderCommandEncoder->setVertexBuffer(m_pColBuffer, 0, 1);
+        pRenderCommandEncoder->drawPrimitives(MTL::PrimitiveType::PrimitiveTypeTriangle, (NS::UInteger)0, (NS::UInteger)3);
+        INCREASE_DRAW_CALL_COUNT(1);
+    }
+    else
+    {
+        mat4x4 mvp;
+        const mat4x4& matModel = m_pNode->getWorldMatrix();
+        const mat4x4& cameraViewMatrix = Camera::main->getViewProjectionMatrix();
+        mat4x4_mul(mvp, cameraViewMatrix, matModel);
 
-    MTL::RenderPipelineState* pPSO = m_pShader->getMetalPipelineState();
-
-    pRenderCommandEncoder->setRenderPipelineState(pPSO);
-    pRenderCommandEncoder->setVertexBuffer(m_pPosBuffer, 0, 0);
-    pRenderCommandEncoder->setVertexBuffer(m_pColBuffer, 0, 1);
-    pRenderCommandEncoder->drawPrimitives(MTL::PrimitiveType::PrimitiveTypeTriangle, (NS::UInteger)0, (NS::UInteger)3);
-    INCREASE_DRAW_CALL_COUNT(1);
+        // LOGLN("m_pShader Program ID: {}", m_pShader->getProgram());
+        glUseProgram(m_pShader->getProgram());
+        glUniformMatrix4fv(m_pMVPHandle->m_nLocation, 1, GL_FALSE, (const GLfloat*) mvp);
+        glBindVertexArray(m_nVertexArray);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+        INCREASE_DRAW_CALL_COUNT(1);
+        glUseProgram(0);
+    }
 }
 
 void Triangle::serializeToWrapper(DataSerializer& serializer) const

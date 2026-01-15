@@ -20,6 +20,12 @@ class FileWatchDog;
 
 typedef unsigned int GLuint;
 
+enum class GraphicAPI
+{
+    OpenGL,
+    Metal
+};
+
 class Window {
 public:
     static Window* ins;
@@ -70,8 +76,13 @@ public:
     inline MTL::Device* getMetalDevice() const { return m_pMetalDevice; }
     inline MTL::RenderCommandEncoder* getCurrentFrameRenderEncoder() const { return m_pCurrentFrameRenderEncoder; }
 
+    inline bool isUsingMetal() const { return m_eGraphicAPI == GraphicAPI::Metal; }
+    inline bool isUsingOpenGL() const { return m_eGraphicAPI == GraphicAPI::OpenGL; }
+
 private:
     GLFWwindow* m_pWindow = nullptr;
+
+    GraphicAPI m_eGraphicAPI = GraphicAPI::OpenGL;
 
 #if __APPLE__
     MTL::Device* m_pMetalDevice = nullptr;
