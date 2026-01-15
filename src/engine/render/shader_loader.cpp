@@ -13,9 +13,6 @@
 constexpr std::string_view SHADER_REGISTRY_FILE = "assets/shaders/shader_registry.yaml";
 
 
-#define GL_INVALID_INDEX 0xFFFFFFFF
-
-
 ShaderLoader* ShaderLoader::ins = nullptr;
 
 ShaderLoader::ShaderLoader()
@@ -42,29 +39,7 @@ void ShaderLoader::readRegistryFromFile()
         throw std::runtime_error("Failed to open shader registry file: " + std::string(SHADER_REGISTRY_FILE));
     }
 
-    int nCurrentShaderId = -1;
-    GLuint nCameraUBOIndex = GL_INVALID_INDEX;
-    GLuint nLightUBOIndex = GL_INVALID_INDEX;
-    GLuint nTimeDataUBOIndex = GL_INVALID_INDEX;
-    std::string strCurrentShaderName, strCurrentVertexPath, strCurrentFragmentPath;
-
-    std::function funcCreateShader = [this, &nCurrentShaderId, &nCameraUBOIndex, &nLightUBOIndex, &nTimeDataUBOIndex, &strCurrentShaderName, &strCurrentVertexPath, &strCurrentFragmentPath]()
-    {
-        auto pShader = new Shader(nCurrentShaderId, strCurrentShaderName, strCurrentVertexPath, strCurrentFragmentPath);
-        if (nCameraUBOIndex != GL_INVALID_INDEX)
-        {
-            pShader->setCameraUBOBindingPoint(nCameraUBOIndex);
-        }
-        if (nLightUBOIndex != GL_INVALID_INDEX)
-        {
-            pShader->setLightUBOBindingPoint(nLightUBOIndex);
-        }
-        if (nTimeDataUBOIndex != GL_INVALID_INDEX)
-        {
-            pShader->setTimeDataUBOBindingPoint(nTimeDataUBOIndex);
-        }
-        m_mapShaders[nCurrentShaderId] = pShader;
-    };
+    ShaderRegisteryData oCurrentShaderData;
 
     // Read shader paths from the registry file
     std::string strLine;
@@ -77,49 +52,44 @@ void ShaderLoader::readRegistryFromFile()
 
         if (strLine.front() != ' ')
         {
-            if (nCurrentShaderId != -1 && !strCurrentShaderName.empty() && !strCurrentVertexPath.empty() && !strCurrentFragmentPath.empty())
+            if (oCurrentShaderData.nCurrentShaderId != -1 && !oCurrentShaderData.m_strName.empty() && !oCurrentShaderData.m_strVertexPath.empty() && !oCurrentShaderData.m_strFragmentPath.empty())
             {
-                funcCreateShader();
-                strCurrentShaderName = "";
-                strCurrentVertexPath = "";
-                strCurrentFragmentPath = "";
-                nCameraUBOIndex = GL_INVALID_INDEX;
-                nLightUBOIndex = GL_INVALID_INDEX;
-                nTimeDataUBOIndex = GL_INVALID_INDEX;
+                m_mapShaders.insert({oCurrentShaderData.nCurrentShaderId, Shader::loadFromOpenGLShader(oCurrentShaderData)});
+                oCurrentShaderData.reset();
             }
 
             // Id of the shader
-            nCurrentShaderId = std::stoi(strLine.substr(0, strLine.length() - 1));
+            oCurrentShaderData.nCurrentShaderId = std::stoi(strLine.substr(0, strLine.length() - 1));
         }
         else if (memcmp(strLine.data() + 2, "name", 4) == 0)
         {
-            strCurrentShaderName = strLine.substr(2 + 6);
+            oCurrentShaderData.m_strName = strLine.substr(2 + 6);
         }
         else if (memcmp(strLine.data() + 2, "vertex", 6) == 0)
         {
-            strCurrentVertexPath = strLine.substr(2 + 8);
+            oCurrentShaderData.m_strVertexPath = strLine.substr(2 + 8);
         }
         else if (memcmp(strLine.data() + 2, "fragment", 8) == 0)
         {
-            strCurrentFragmentPath = strLine.substr(2 + 10);
+            oCurrentShaderData.m_strFragmentPath = strLine.substr(2 + 10);
         }
         else if (memcmp(strLine.data() + 2, "cameraUBO", 9) == 0)
         {
-            nCameraUBOIndex = std::stoi(strLine.substr(2 + 11));
+            oCurrentShaderData.nCameraUBOIndex = std::stoi(strLine.substr(2 + 11));
         }
         else if (memcmp(strLine.data() + 2, "lightUBO", 8) == 0)
         {
-            nLightUBOIndex = std::stoi(strLine.substr(2 + 10));
+            oCurrentShaderData.nLightUBOIndex = std::stoi(strLine.substr(2 + 10));
         }
         else if (memcmp(strLine.data() + 2, "timeUBO", 7) == 0)
         {
-            nTimeDataUBOIndex = std::stoi(strLine.substr(2 + 9));
+            oCurrentShaderData.nTimeDataUBOIndex = std::stoi(strLine.substr(2 + 9));
         }
     }
 
-    if (nCurrentShaderId != -1)
+    if (oCurrentShaderData.nCurrentShaderId != -1)
     {
-        funcCreateShader();
+        m_mapShaders.insert({oCurrentShaderData.nCurrentShaderId, Shader::loadFromOpenGLShader(oCurrentShaderData)});
     }
 }
 

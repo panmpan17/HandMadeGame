@@ -18,6 +18,7 @@ inline constexpr std::string_view SHADER_GLOBAL_UNIFORM_LIGHTING_DATA = "LightDa
 inline constexpr std::string_view SHADER_GLOBAL_UNIFORM_TIME_DATA = "TimeData";
 
 
+struct ShaderRegisteryData;
 class Image;
 
 
@@ -36,9 +37,8 @@ struct ShaderUniformHandle
 class Shader
 {
 public:
-    // Shader(const std::string_view& strShaderName, const std::string_view &strVertexShaderPath, const std::string_view &strFragmentShaderPath);
-    Shader(int nId, const std::string& strShaderName, const std::string &strVertexShaderPath, const std::string &strFragmentShaderPath);
-    Shader();
+    static Shader* loadFromOpenGLShader(const ShaderRegisteryData& pData);
+
     ~Shader();
 
     inline const std::string& getName() const { return m_strName; }
@@ -64,9 +64,11 @@ public:
     void reloadTimeDataUBOBinding();
 
 protected:
-    GLuint m_nProgram;
-    GLuint m_nVertexShader;
-    GLuint m_nFragmentShader;
+    Shader() {}
+
+    GLuint m_nProgram = GL_INVALID_INDEX;
+    GLuint m_nVertexShader = GL_INVALID_INDEX;
+    GLuint m_nFragmentShader = GL_INVALID_INDEX;
 
     GLuint m_nCameraUBOBindingPoint = GL_INVALID_INDEX;
     GLuint m_nLightUBOBindingPoint = GL_INVALID_INDEX;

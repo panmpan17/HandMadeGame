@@ -5,7 +5,7 @@
 #include <sstream>
 
 #include "vertex.h"
-#include "shader.h"
+#include "shader_loader.h"
 #include "image.h"
 #include "lighting/light_manager.h"
 #include "../core/debug_macro.h"
@@ -83,21 +83,36 @@ GLuint loadShaderFileIntoGPU(std::string strFolderPath, bool isVertexShader)
     return nShader;
 }
 
-Shader::Shader(int nId, const std::string& strShaderName, const std::string &strVertexShaderPath, const std::string &strFragmentShaderPath)
+Shader* Shader::loadFromOpenGLShader(const ShaderRegisteryData& pData)
 {
-    m_nId = nId;
-    m_strName = strShaderName;
+    Shader* pShader = new Shader();
+    pShader->m_nId = pData.nCurrentShaderId;
+    pShader->m_strName = pData.m_strName;
 
-    m_strVertexShaderPath = strVertexShaderPath;
-    m_strFragmentShaderPath = strFragmentShaderPath;
+    pShader->m_strVertexShaderPath = pData.m_strVertexPath;
+    pShader->m_strFragmentShaderPath = pData.m_strFragmentPath;
+    pShader->m_nVertexShader = loadShaderFileIntoGPU(pShader->m_strVertexShaderPath, true);
+    pShader->m_nFragmentShader = loadShaderFileIntoGPU(pShader->m_strFragmentShaderPath, false);
 
-    m_nVertexShader = loadShaderFileIntoGPU(strVertexShaderPath, true);
-    m_nFragmentShader = loadShaderFileIntoGPU(strFragmentShaderPath, false);
+    pShader->m_nProgram = glCreateProgram();
+    glAttachShader(pShader->m_nProgram, pShader->m_nVertexShader);
+    glAttachShader(pShader->m_nProgram, pShader->m_nFragmentShader);
+    glLinkProgram(pShader->m_nProgram);
 
-    m_nProgram = glCreateProgram();
-    glAttachShader(m_nProgram, m_nVertexShader);
-    glAttachShader(m_nProgram, m_nFragmentShader);
-    glLinkProgram(m_nProgram);
+    if (pData.nCameraUBOIndex != GL_INVALID_INDEX)
+    {
+        pShader->setCameraUBOBindingPoint(pData.nCameraUBOIndex);
+    }
+    if (pData.nLightUBOIndex != GL_INVALID_INDEX)
+    {
+        pShader->setLightUBOBindingPoint(pData.nLightUBOIndex);
+    }
+    if (pData.nTimeDataUBOIndex != GL_INVALID_INDEX)
+    {
+        pShader->setTimeDataUBOBindingPoint(pData.nTimeDataUBOIndex);
+    }
+
+    return pShader;
 }
 
 Shader::~Shader()
