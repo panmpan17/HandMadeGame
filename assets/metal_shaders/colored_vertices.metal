@@ -6,15 +6,19 @@ struct VertexIn {
     float3 color [[attribute(1)]];
 };
 
+struct Uniforms {
+    float4x4 MVPMatrix;
+};
+
 struct VertexOut {
     float4 position [[position]];
     float3 color;
 };
 
 
-vertex VertexOut coloredVertices_vertexMain(VertexIn in [[stage_in]]) {
+vertex VertexOut coloredVertices_vertexMain(VertexIn in [[stage_in]], constant Uniforms& uniforms [[buffer(2)]]) {
     VertexOut out;
-    out.position = float4(in.position, 0.0, 1.0);
+    out.position = uniforms.MVPMatrix * float4(in.position, 0.0, 1.0);
     out.color = in.color;
     return out;
 }

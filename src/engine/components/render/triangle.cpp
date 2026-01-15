@@ -80,26 +80,24 @@ void Triangle::draw()
 {
     ASSERT(m_pShader, "Shader must be set before drawing the triangle");
 
+    mat4x4 mvp;
+    const mat4x4& matModel = m_pNode->getWorldMatrix();
+    const mat4x4& cameraViewMatrix = Camera::main->getViewProjectionMatrix();
+    mat4x4_mul(mvp, cameraViewMatrix, matModel);
+
     if (Window::ins->isUsingMetal())
     {
         MTL::RenderCommandEncoder* pRenderCommandEncoder = Window::ins->getCurrentFrameRenderEncoder();
 
-        MTL::RenderPipelineState* pPSO = m_pShader->getMetalPipelineState();
-
-        pRenderCommandEncoder->setRenderPipelineState(pPSO);
+        pRenderCommandEncoder->setRenderPipelineState(m_pShader->getMetalPipelineState());
         pRenderCommandEncoder->setVertexBuffer(m_pPosBuffer, 0, 0);
         pRenderCommandEncoder->setVertexBuffer(m_pColBuffer, 0, 1);
+        pRenderCommandEncoder->setVertexBytes(&mvp, sizeof(mat4x4), 2);
         pRenderCommandEncoder->drawPrimitives(MTL::PrimitiveType::PrimitiveTypeTriangle, (NS::UInteger)0, (NS::UInteger)3);
         INCREASE_DRAW_CALL_COUNT(1);
     }
     else
     {
-        mat4x4 mvp;
-        const mat4x4& matModel = m_pNode->getWorldMatrix();
-        const mat4x4& cameraViewMatrix = Camera::main->getViewProjectionMatrix();
-        mat4x4_mul(mvp, cameraViewMatrix, matModel);
-
-        // LOGLN("m_pShader Program ID: {}", m_pShader->getProgram());
         glUseProgram(m_pShader->getProgram());
         glUniformMatrix4fv(m_pMVPHandle->m_nLocation, 1, GL_FALSE, (const GLfloat*) mvp);
         glBindVertexArray(m_nVertexArray);
