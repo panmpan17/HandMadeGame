@@ -101,6 +101,35 @@ Shader::Shader(int nId, const std::string& strShaderName, const std::string &str
 }
 
 #if __APPLE__
+void metalShaderAddFloatAttribute(MTL::VertexDescriptor* const pVertexDesc, int nAttributeIndex, int nFloatCount)
+{
+    MTL::VertexAttributeDescriptor* const pAttrib0 = pVertexDesc->attributes()->object(nAttributeIndex);
+    switch (nFloatCount)
+    {
+        case 1:
+            pAttrib0->setFormat(MTL::VertexFormatFloat);
+            break;
+        case 2:
+            pAttrib0->setFormat(MTL::VertexFormatFloat2);
+            break;
+        case 3:
+            pAttrib0->setFormat(MTL::VertexFormatFloat3);
+            break;
+        case 4:
+            pAttrib0->setFormat(MTL::VertexFormatFloat4);
+            break;
+        default:
+            throw std::runtime_error("Unsupported float count for vertex attribute in Metal shader");
+    }
+    pAttrib0->setOffset(0);
+    pAttrib0->setBufferIndex(nAttributeIndex);
+
+    MTL::VertexBufferLayoutDescriptor* pLayout0 = pVertexDesc->layouts()->object(nAttributeIndex);
+    pLayout0->setStride(sizeof(float) * nFloatCount); // Jump 8 bytes per vertex
+    pLayout0->setStepRate(1);
+    pLayout0->setStepFunction(MTL::VertexStepFunctionPerVertex);
+}
+
 Shader* Shader::loadFromMetalShader(MTL::Library* const pLibrary, MTL::Device* const pDevice,
                                   int nId, const std::string& strShaderName, const std::string& strMetalShaderPrefix)
 {
@@ -119,6 +148,12 @@ Shader* Shader::loadFromMetalShader(MTL::Library* const pLibrary, MTL::Device* c
     psoDesc->setVertexFunction(pVertexFunction);
     psoDesc->setFragmentFunction(pFragmentFunction);
     psoDesc->colorAttachments()->object(0)->setPixelFormat(MTL::PixelFormatBGRA8Unorm);
+
+    // !Temp Attributes setup, please remove later
+    MTL::VertexDescriptor* pVertexDesc = MTL::VertexDescriptor::alloc()->init();
+    metalShaderAddFloatAttribute(pVertexDesc, 0, 2); // position
+    metalShaderAddFloatAttribute(pVertexDesc, 1, 3); // color
+    psoDesc->setVertexDescriptor(pVertexDesc);
 
     Shader* pShader = new Shader;
 
