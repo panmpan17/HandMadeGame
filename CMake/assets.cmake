@@ -22,6 +22,9 @@ function(ADD_COMPILE_METAL_SHADERS_COMMAND applicationName)
         )
     endforeach()
 
+    # TODO: First remove the .metalar, then for loop link the .ir files into a .metalar, then compile that into a .metallib
+    # xcrun -sdk macosx metal-ar -q "output.metalar" "input1.ir"
+    # xcrun -sdk macosx metal-ar -q "output.metalar" "input2.ir"
     foreach (shaderFile ${METAL_SHADER_SRC})
         add_custom_command(
             OUTPUT ${METAL_SHADER_LIB}

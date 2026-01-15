@@ -32,6 +32,8 @@ struct ShaderRegisteryData
         nCameraUBOIndex = GL_INVALID_INDEX;
         nLightUBOIndex = GL_INVALID_INDEX;
         nTimeDataUBOIndex = GL_INVALID_INDEX;
+
+        m_strMetalShaderPrefix.clear();
     }
 };
 

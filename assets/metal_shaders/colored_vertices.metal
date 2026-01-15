@@ -1,29 +1,29 @@
 #include <metal_stdlib>
 using namespace metal;
 
-struct VertexIn {
+struct coloredVertices_VertexIn {
     float2 position [[attribute(0)]];
     float3 color [[attribute(1)]];
 };
 
-struct Uniforms {
+struct coloredVertices_Uniforms {
     float4x4 MVPMatrix;
 };
 
-struct VertexOut {
+struct coloredVertices_VertexOut {
     float4 position [[position]];
     float3 color;
 };
 
 
-vertex VertexOut coloredVertices_vertexMain(VertexIn in [[stage_in]], constant Uniforms& uniforms [[buffer(2)]]) {
-    VertexOut out;
+vertex coloredVertices_VertexOut coloredVertices_vertexMain(coloredVertices_VertexIn in [[stage_in]], constant coloredVertices_Uniforms& uniforms [[buffer(2)]]) {
+    coloredVertices_VertexOut out;
     out.position = uniforms.MVPMatrix * float4(in.position, 0.0, 1.0);
     out.color = in.color;
     return out;
 }
 
-fragment float4 coloredVertices_fragmentMain(VertexOut in [[stage_in]]) {
+fragment float4 coloredVertices_fragmentMain(coloredVertices_VertexOut in [[stage_in]]) {
     return float4(in.color, 1.0);
 }
 

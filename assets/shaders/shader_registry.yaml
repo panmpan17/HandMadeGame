@@ -2,6 +2,7 @@
   name: image
   vertex: assets/shaders/2d/image.vert
   fragment: assets/shaders/2d/image.frag
+  metal_prefix: image
 3:
   name: particle_instance
   vertex: assets/shaders/particle_instance.vert

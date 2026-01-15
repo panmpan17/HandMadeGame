@@ -100,9 +100,9 @@ void ShaderLoader::readRegistryFromFile()
                 {
                     m_mapShaders.insert({oCurrentShaderData.nCurrentShaderId, Shader::loadFromOpenGLShader(oCurrentShaderData)});
                 }
-
-                oCurrentShaderData.reset();
             }
+
+            oCurrentShaderData.reset();
 
             // Id of the shader
             oCurrentShaderData.nCurrentShaderId = std::stoi(strLine.substr(0, strLine.length() - 1));
