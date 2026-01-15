@@ -49,6 +49,8 @@ public:
     inline void setShowFPS(bool bShow) { m_bShowFPS = bShow; }
 
     bool configureAndCreateWindow();
+    void configureGLFWWithOpenGL();
+    void configureGLFWWithMetal();
 
     void initializeGraphicsAPI();
 

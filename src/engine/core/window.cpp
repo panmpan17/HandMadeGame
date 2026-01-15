@@ -66,6 +66,10 @@ Window::Window()
     m_oWindowSize.y = Preference::getWindowHeight();
     m_bDrawGizmos = Preference::getEnableGizmos();
 
+#if __APPLE__
+    m_pMetalDevice = MTL::CreateSystemDefaultDevice();
+#endif
+
     if (!glfwInit())
     {
         LOGLN("Failed to initialize GLFW");
@@ -140,21 +144,22 @@ bool Window::configureAndCreateWindow()
 {
     PROFILER_START_TIMER();
 
-    // Configure GL version
-#if __APPLE__
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
-#else
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
-#endif // __APPLE__
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
     glfwWindowHint(GLFW_RESIZABLE, m_bResizable ? GLFW_TRUE : GLFW_FALSE);
 
     glfwWindowHint(GLFW_DEPTH_BITS, 24);
 
-    glfwSwapInterval(1);
+#if __APPLE__
+    if (m_pMetalDevice)
+    {
+        configureGLFWWithMetal();
+    }
+    else
+    {
+        configureGLFWWithOpenGL();
+    }
+#else
+    configureGLFWWithOpenGL();
+#endif
 
 #if IS_DEBUG_VERSION
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
@@ -195,19 +200,33 @@ bool Window::configureAndCreateWindow()
     // glfwSetWindowMonitor(m_pWindow, pPrimaryMonitor, 0, 0, pVideoMode->width, pVideoMode->height, pVideoMode->refreshRate);
 
     // glfwSetWindowOpacity(m_pWindow, 0.5f); // Fun
-    glfwMakeContextCurrent(m_pWindow);
-    glfwSwapInterval(1); // Enable vsync
 
     DEBUG_WINDOW_INIT_TIMER("Window configured");
 
     return true;
 }
 
+void Window::configureGLFWWithOpenGL()
+{
+    LOGLN("Configuring GLFW with OpenGL");
+#if __APPLE__
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+#else
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
+#endif // __APPLE__
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+}
+
+void Window::configureGLFWWithMetal()
+{
+    glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+}
+
 void Window::initializeGraphicsAPI()
 {
 #if __APPLE__
-    m_pMetalDevice = MTL::CreateSystemDefaultDevice();
-    
     if (m_pMetalDevice)
     {
         LOGLN("Metal Device found: {}", m_pMetalDevice->name()->utf8String());
@@ -226,6 +245,9 @@ void Window::initializeGraphicsAPI()
 
 void Window::bindOpenGLToGlfwWindow()
 {
+    glfwMakeContextCurrent(m_pWindow);
+    glfwSwapInterval(1); // Enable vsync
+
     gladLoadGL(glfwGetProcAddress);
 
     glDepthFunc(GL_LESS);
@@ -236,6 +258,8 @@ void Window::bindOpenGLToGlfwWindow()
 
 void Window::bindMetalToGlfwWindow()
 {
+    glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+
     void* pNSWindow = glfwGetCocoaWindow(m_pWindow);
 
     // 2. Get the "contentView" of the window
