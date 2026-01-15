@@ -4,8 +4,10 @@
 #include "../../engine/core/scene/node.h"
 #include "../../engine/core/scene/world.h"
 #include "../../engine/components/render/triangle.h"
+#include "../../engine/components/render/quad.h"
 #include "../../engine/render/shader.h"
 #include "../../engine/render/shader_loader.h"
+#include "../../engine/render/image_loader.h"
 #include "../../engine/components/transform/rotate.h"
 #include "../../engine/components/transform/movement.h"
 
@@ -30,5 +32,23 @@ void firstTriangeTest()
         pNode->addComponent(new Movement(1.0f)); // Add movement component with speed 1.0f
 
         pWorldScene->addNode(pNode);
+    }
+
+    { // Quad with Image
+        // Shader* const pImageShader = ShaderLoader::getInstance()->getShader("image");
+        Image* pTestImage = ImageLoader::getInstance()->getImageByPath("assets/images/test.png");
+
+        // auto pNode2 = new Node(0.5f, 0.5f, 0.f);
+
+        // vec4 red = {1.f, 0.f, 0.f, 1.f}; // Red color for the quad
+        // auto pQuad = new Quad(0.5f, 0.5f, red);
+        // pQuad->setShader(pImageShader);
+        // pQuad->setImage(pTestImage);
+        // pQuad->registerBuffer();
+        // pNode2->addComponent(pQuad);
+
+        // pNode2->addComponent(new Rotate3D(0, 0, 1.0f));
+
+        // pWorldScene->addNode(pNode2);
     }
 }

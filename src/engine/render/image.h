@@ -3,6 +3,10 @@
 #include <string>
 #include <unordered_map>
 
+#if __APPLE__
+#include <Metal/Metal.hpp>
+#endif // __APPLE__
+
 typedef unsigned int GLuint;
 
 class aiTexture;
@@ -27,6 +31,10 @@ public:
     inline const std::string& getPath() const { return m_strPath; }
 
     void loadTextureToGL();
+#if __APPLE__
+    void loadTextureToMetal();
+#endif
+
     void freeCPUData();
 
 private:
@@ -34,6 +42,9 @@ private:
     int m_nHeight;
     int m_nChannels;
     unsigned char* m_pData;
+
     GLuint m_nTextureID = 0; // Texture ID for OpenGL texture binding
+    MTL::Texture* m_pMetalTexture = nullptr; // Texture for Metal
+
     std::string m_strPath;
 };

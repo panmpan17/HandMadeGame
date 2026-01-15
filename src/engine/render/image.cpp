@@ -5,6 +5,8 @@
 #include <GLFW/glfw3.h>
 #include <assimp/scene.h>
 
+#include "../core/window.h"
+
 #include "../../utils/filesystem.h"
 #include "../../utils/file_utils.h"
 #include "../core/debug_macro.h"
@@ -20,6 +22,7 @@ Image::Image(const std::string& strPath, bool flipVertically/* = true */)
     {
         std::string strFullPath = fs::path(FileUtils::getResourcesPath()).append(strPath).string();
 
+        // TODO: force 4 channels for metal if channel is 3
         m_pData = stbi_load(strFullPath.c_str(), &m_nWidth, &m_nHeight, &m_nChannels, 0);
         if (!m_pData)
         {
@@ -28,6 +31,7 @@ Image::Image(const std::string& strPath, bool flipVertically/* = true */)
     }
     else
     {
+        // TODO: force 4 channels for metal if channel is 3
         m_pData = stbi_load(strPath.c_str(), &m_nWidth, &m_nHeight, &m_nChannels, 0);
         if (!m_pData)
         {
@@ -46,6 +50,7 @@ Image::Image(const std::string_view& strPath, bool flipVertically/* = true */)
     {
         std::string strFullPath = fs::path(FileUtils::getResourcesPath()).append(strPath).string();
 
+        // TODO: force 4 channels for metal if channel is 3
         m_pData = stbi_load(strFullPath.c_str(), &m_nWidth, &m_nHeight, &m_nChannels, 0);
         if (!m_pData)
         {
@@ -54,6 +59,7 @@ Image::Image(const std::string_view& strPath, bool flipVertically/* = true */)
     }
     else
     {
+        // TODO: force 4 channels for metal if channel is 3
         m_pData = stbi_load(strPath.data(), &m_nWidth, &m_nHeight, &m_nChannels, 0);
         if (!m_pData)
         {
@@ -140,6 +146,45 @@ void Image::loadTextureToGL()
     
     glBindTexture(GL_TEXTURE_2D, 0); // Unbind the texture
 }
+
+#if __APPLE__
+void Image::loadTextureToMetal()
+{
+    MTL::PixelFormat pixelFormat = MTL::PixelFormatInvalid;
+
+    switch (m_nChannels)
+    {
+        case 4:
+            pixelFormat = MTL::PixelFormat::PixelFormatRGBA8Unorm;
+            break;
+        case 3:
+            LOGERR("Metal does not support 3-channel textures directly. Please convert to 4 channels.");
+            return;
+        case 2:
+            pixelFormat = MTL::PixelFormat::PixelFormatRG8Unorm;
+            break;
+        case 1:
+            pixelFormat = MTL::PixelFormat::PixelFormatR8Unorm;
+            break;
+        default:
+            LOGERR("Unsupported number of channels ({}) in image: {}", m_nChannels, m_strPath);
+            return;
+    }
+
+    MTL::TextureDescriptor* pTextureDescriptor = MTL::TextureDescriptor::alloc()->init();
+    pTextureDescriptor->setPixelFormat(pixelFormat);
+    pTextureDescriptor->setWidth(static_cast<NS::UInteger>(m_nWidth));
+    pTextureDescriptor->setHeight(static_cast<NS::UInteger>(m_nHeight));
+    pTextureDescriptor->setUsage(MTL::TextureUsageShaderRead);
+
+    m_pMetalTexture = Window::ins->getMetalDevice()->newTexture(pTextureDescriptor);
+
+    MTL::Region region = MTL::Region::Make2D(0, 0, static_cast<NS::UInteger>(m_nWidth), static_cast<NS::UInteger>(m_nHeight));
+    m_pMetalTexture->replaceRegion(region, 0, m_pData, static_cast<NS::UInteger>(m_nWidth * m_nChannels));
+
+    pTextureDescriptor->release();
+}
+#endif
 
 void Image::freeCPUData()
 {

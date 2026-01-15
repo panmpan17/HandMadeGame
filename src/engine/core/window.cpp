@@ -20,7 +20,8 @@
 #include "engine_event_dispatcher.h"
 #include "input/input_manager.h"
 #include "scene/world.h"
-// #include "../render/image_loader.h"
+#include "../render/renderer.h"
+#include "../render/image_loader.h"
 #include "../render/shader_loader.h"
 // #include "../render/material_loader.h"
 #include "../render/vertex.h"
@@ -130,7 +131,7 @@ Window::~Window()
     }
 
     InputManager::Cleanup();
-    // ImageLoader::Cleanup();
+    ImageLoader::Cleanup();
     // LightManager::Cleanup();
 
     Preference::savePreferences();
@@ -319,8 +320,11 @@ void Window::setupManagers()
     PROFILER_START_TIMER();
 
     TimeManager::Initialize();
+
+    Renderer::initializeSamplers(m_pMetalDevice);
+
     PROFILER_END_TIMER("Initialization", "TimeManager setup");
-    // ImageLoader::Initialize();
+    ImageLoader::Initialize();
     // PROFILER_END_TIMER("Initialization", "Image setup");
     // LightManager::Initialize();
     // PROFILER_END_TIMER("Initialization", "Lighting setup");

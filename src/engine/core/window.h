@@ -76,6 +76,7 @@ public:
     inline MTL::Device* getMetalDevice() const { return m_pMetalDevice; }
     inline MTL::RenderCommandEncoder* getCurrentFrameRenderEncoder() const { return m_pCurrentFrameRenderEncoder; }
 
+    inline GraphicAPI getGraphicAPI() const { return m_eGraphicAPI; }
     inline bool isUsingMetal() const { return m_eGraphicAPI == GraphicAPI::Metal; }
     inline bool isUsingOpenGL() const { return m_eGraphicAPI == GraphicAPI::OpenGL; }
 
