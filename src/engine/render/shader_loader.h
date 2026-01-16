@@ -22,6 +22,7 @@ struct ShaderRegisteryData
 
     // Metal
     std::string m_strMetalShaderPrefix;
+    std::vector<int> m_metalAttributeSizes;
 
     void reset()
     {
@@ -34,6 +35,7 @@ struct ShaderRegisteryData
         nTimeDataUBOIndex = GL_INVALID_INDEX;
 
         m_strMetalShaderPrefix.clear();
+        m_metalAttributeSizes.clear();
     }
 };
 

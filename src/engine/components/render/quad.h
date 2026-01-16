@@ -6,6 +6,10 @@
 #include "../../render/shader.h"
 #include "../../render/vertex.h"
 
+#if __APPLE__
+#include <Metal/Metal.hpp>
+#endif // __APPLE__
+
 typedef unsigned int GLuint;
 
 class Image;
@@ -32,6 +36,9 @@ protected:
     virtual void predrawSetShaderUniforms();
 
     GLuint m_nVertexBuffer, m_nVertexArray;
+
+    MTL::Buffer* m_pPosBuffer = nullptr;
+    MTL::Buffer* m_pUVBuffer = nullptr;
 
     const ShaderUniformHandle* m_pMVPHandle = nullptr;
     const ShaderUniformHandle* m_pColorHandle = nullptr;

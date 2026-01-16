@@ -67,6 +67,68 @@ static std::vector<std::string> splitString(const std::string& strData, const ch
     return vet;
 }
 
+static void splitStringPush(std::vector<std::string>& vec, const std::string& strData, char chr, bool bSkipEmpty = false)
+{
+    if (strData.empty())
+    {
+        return;
+    }
+
+    int nBegin = 0;
+    int nEnd = (int)strData.find(chr);
+
+    while (nEnd >= 0)
+    {
+        if (bSkipEmpty && strData.substr(nBegin, nEnd - nBegin).empty())
+        {
+            nBegin = nEnd + 1;
+            nEnd = (int)strData.find(chr, nBegin);
+            continue;
+        }
+
+        vec.push_back(strData.substr(nBegin, nEnd - nBegin).c_str());
+        nBegin = nEnd + 1;
+        nEnd = (int)strData.find(chr, nBegin);
+    }
+
+    if (!bSkipEmpty || !strData.substr(nBegin, strData.length() - nBegin).empty())
+    {
+        vec.push_back(strData.substr(nBegin, strData.length() - nBegin));
+    }
+    return;
+}
+
+static void splitStringPush(std::vector<int>& vec, const std::string& strData, char chr, bool bSkipEmpty = false)
+{
+    if (strData.empty())
+    {
+        return;
+    }
+
+    int nBegin = 0;
+    int nEnd = (int)strData.find(chr);
+
+    while (nEnd >= 0)
+    {
+        if (bSkipEmpty && strData.substr(nBegin, nEnd - nBegin).empty())
+        {
+            nBegin = nEnd + 1;
+            nEnd = (int)strData.find(chr, nBegin);
+            continue;
+        }
+
+        vec.push_back(std::atoi(strData.substr(nBegin, nEnd - nBegin).c_str()));
+        nBegin = nEnd + 1;
+        nEnd = (int)strData.find(chr, nBegin);
+    }
+
+    if (!bSkipEmpty || !strData.substr(nBegin, strData.length() - nBegin).empty())
+    {
+        vec.push_back(std::atoi(strData.substr(nBegin, strData.length() - nBegin).c_str()));
+    }
+    return;
+}
+
 static std::string joinString(const std::vector<std::string>& vecStr, const char* const chr)
 {
     std::ostringstream strResult;

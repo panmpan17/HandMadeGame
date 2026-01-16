@@ -12,19 +12,22 @@ struct image_Uniforms {
 
 struct image_VertexOut {
     float4 position [[position]];
-    float4 color;
+    float2 texCoord;
 };
 
 
-vertex image_VertexOut image_vertexMain(image_VertexIn in [[stage_in]], constant image_Uniforms& uniforms [[buffer(2)]]) {
+vertex image_VertexOut image_vertexMain(image_VertexIn in [[stage_in]],
+                                        constant image_Uniforms& uniforms [[buffer(2)]]) {
     image_VertexOut out;
     out.position = uniforms.MVPMatrix * float4(in.position, 0.0, 1.0);
-    out.color = float4(in.texCoord, 0.0, 1.0);
+    out.texCoord = in.texCoord;
     return out;
 }
 
-fragment float4 image_fragmentMain(image_VertexOut in [[stage_in]]) {
-    return in.color;
+fragment float4 image_fragmentMain(image_VertexOut in [[stage_in]],
+                                   texture2d<float> colorTexture [[texture(0)]],
+                                   sampler textureSampler [[sampler(0)]]) {
+    return colorTexture.sample(textureSampler, in.texCoord);
 }
 
 //  xcrun -sdk macosx metal -o assets/metal_shaders/colored_vertices.ir  -c assets/metal_shaders/colored_vertices.metal

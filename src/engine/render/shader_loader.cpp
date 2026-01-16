@@ -3,6 +3,7 @@
 #include "../core/debug_macro.h"
 #include "../../utils/file_utils.h"
 #include "../../utils/platform.h"
+#include "../../utils/string_handle.h"
 #include "../core/window.h"
 
 #if __APPLE__
@@ -134,6 +135,12 @@ void ShaderLoader::readRegistryFromFile()
         else if (memcmp(strLine.data() + 2, "metal_prefix", 12) == 0)
         {
             oCurrentShaderData.m_strMetalShaderPrefix = strLine.substr(2 + 14);
+        }
+        else if (memcmp(strLine.data() + 2, "metal_attribute_size", 20) == 0)
+        {
+            std::string strSizes = strLine.substr(2 + 22);
+            oCurrentShaderData.m_metalAttributeSizes.clear();
+            splitStringPush(oCurrentShaderData.m_metalAttributeSizes, strSizes, ',', true);
         }
     }
 

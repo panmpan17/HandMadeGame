@@ -163,11 +163,17 @@ Shader* Shader::loadFromMetalShader(MTL::Library* const pLibrary, MTL::Device* c
     psoDesc->setFragmentFunction(pFragmentFunction);
     psoDesc->colorAttachments()->object(0)->setPixelFormat(MTL::PixelFormatBGRA8Unorm);
 
-    // !Temp Attributes setup, please remove later
-    MTL::VertexDescriptor* pVertexDesc = MTL::VertexDescriptor::alloc()->init();
-    metalShaderAddFloatAttribute(pVertexDesc, 0, 2); // position
-    metalShaderAddFloatAttribute(pVertexDesc, 1, 3); // color
-    psoDesc->setVertexDescriptor(pVertexDesc);
+    int nSize = static_cast<int>(oData.m_metalAttributeSizes.size());
+    if (nSize > 0)
+    {
+        MTL::VertexDescriptor* pVertexDesc = MTL::VertexDescriptor::alloc()->init();
+        for (int i = 0; i < nSize; ++i)
+        {
+            metalShaderAddFloatAttribute(pVertexDesc, i, oData.m_metalAttributeSizes[i]);
+        }
+        psoDesc->setVertexDescriptor(pVertexDesc);
+        pVertexDesc->release();
+    }
 
     Shader* pShader = new Shader;
 

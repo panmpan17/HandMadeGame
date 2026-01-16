@@ -35,20 +35,21 @@ void firstTriangeTest()
     }
 
     { // Quad with Image
-        // Shader* const pImageShader = ShaderLoader::getInstance()->getShader("image");
+        Shader* const pImageShader = ShaderLoader::getInstance()->getShader("image");
         Image* pTestImage = ImageLoader::getInstance()->getImageByPath("assets/images/test.png");
 
-        // auto pNode2 = new Node(0.5f, 0.5f, 0.f);
+        auto pNode2 = new Node(0.5f, 0.5f, 0.f);
+        pNode2->setScale(2);
 
-        // vec4 red = {1.f, 0.f, 0.f, 1.f}; // Red color for the quad
-        // auto pQuad = new Quad(0.5f, 0.5f, red);
-        // pQuad->setShader(pImageShader);
-        // pQuad->setImage(pTestImage);
-        // pQuad->registerBuffer();
-        // pNode2->addComponent(pQuad);
+        vec4 red = {1.f, 0.f, 0.f, 1.f}; // Red color for the quad
+        auto pQuad = new Quad(0.5f, 0.5f, red);
+        pQuad->setShader(pImageShader);
+        pQuad->setImage(pTestImage);
+        pQuad->registerBuffer();
+        pNode2->addComponent(pQuad);
 
         // pNode2->addComponent(new Rotate3D(0, 0, 1.0f));
 
-        // pWorldScene->addNode(pNode2);
+        pWorldScene->addNode(pNode2);
     }
 }

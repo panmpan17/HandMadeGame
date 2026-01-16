@@ -17,6 +17,11 @@ Triangle::Triangle()
 
 Triangle::~Triangle()
 {
+    if (Window::ins->isUsingOpenGL())
+    {
+        glDeleteBuffers(1, &m_nVertexBuffer);
+        glDeleteVertexArrays(1, &m_nVertexArray);
+    }
 }
 
 void Triangle::setShader(Shader* pShader)

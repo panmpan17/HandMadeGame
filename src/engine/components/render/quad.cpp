@@ -13,6 +13,7 @@
 #include "../../core/math/random.h"
 #include "../../render/shader.h"
 #include "../../render/shader_loader.h"
+#include "../../render/renderer.h"
 
 
 inline constexpr std::string_view SHADER_UNIFORM_COLOR = "u_imageColor";
@@ -31,51 +32,81 @@ Quad::Quad(float fWidth, float fHeight, vec4 color) : m_fWidth(fWidth), m_fHeigh
 
 Quad::~Quad()
 {
-    glDeleteBuffers(1, &m_nVertexBuffer);
-    glDeleteVertexArrays(1, &m_nVertexArray);
+    if (Window::ins->isUsingOpenGL())
+    {
+        glDeleteBuffers(1, &m_nVertexBuffer);
+        glDeleteVertexArrays(1, &m_nVertexArray);
+    }
 }
 
 void Quad::setShader(Shader* pShader)
 {
     m_pShader = pShader;
 
-    m_pMVPHandle = m_pShader->getUniformHandle(SHADER_UNIFORM_MVP);
-    m_pColorHandle = m_pShader->getUniformHandle(SHADER_UNIFORM_COLOR);
-    m_pTextureHandle = m_pShader->getUniformHandle(SHADER_UNIFORM_TEXTURE_0);
-    m_pUseTextureHandle = m_pShader->getUniformHandle(SHADER_UNIFORM_USE_TEXTURE);
+    if (Window::ins->isUsingOpenGL())
+    {
+        m_pMVPHandle = m_pShader->getUniformHandle(SHADER_UNIFORM_MVP);
+        m_pColorHandle = m_pShader->getUniformHandle(SHADER_UNIFORM_COLOR);
+        m_pTextureHandle = m_pShader->getUniformHandle(SHADER_UNIFORM_TEXTURE_0);
+        m_pUseTextureHandle = m_pShader->getUniformHandle(SHADER_UNIFORM_USE_TEXTURE);
 
-    m_pSpriteSheetXCountHandle = m_pShader->getUniformHandle(SHADER_UNIFORM_SPRITE_SHEET_X_COUNT);
-    m_pSpriteSheetYCountHandle = m_pShader->getUniformHandle(SHADER_UNIFORM_SPRITE_SHEET_Y_COUNT);
-    m_pUVOffsetHandle = m_pShader->getUniformHandle(SHADER_UNIFORM_UV_OFFSET);
+        m_pSpriteSheetXCountHandle = m_pShader->getUniformHandle(SHADER_UNIFORM_SPRITE_SHEET_X_COUNT);
+        m_pSpriteSheetYCountHandle = m_pShader->getUniformHandle(SHADER_UNIFORM_SPRITE_SHEET_Y_COUNT);
+        m_pUVOffsetHandle = m_pShader->getUniformHandle(SHADER_UNIFORM_UV_OFFSET);
+    }
 }
 
 void Quad::registerBuffer()
 {
-    glGenBuffers(1, &m_nVertexBuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, m_nVertexBuffer);
+    const float fStartX = -m_fWidth / 2.0f;
+    const float fStartY = -m_fHeight / 2.0f;
 
-    float fStartX = -m_fWidth / 2.0f;
-    float fStartY = -m_fHeight / 2.0f;
-    VertexWUV arrVertices[4];
-    arrVertices[0] = { { fStartX, fStartY }, { 0.0f, 0.0f } }; // Bottom left
-    arrVertices[1] = { { fStartX + m_fWidth, fStartY }, { 1.0f, 0.0f } }; // Bottom right
-    arrVertices[2] = { { fStartX, fStartY + m_fHeight }, { 0.0f, 1.0f } }; // Top right
-    arrVertices[3] = { { fStartX + m_fWidth, fStartY + m_fHeight }, { 1.0f, 1.0f } }; // Top left
-    glBufferData(GL_ARRAY_BUFFER, sizeof(arrVertices), arrVertices, GL_STATIC_DRAW);
+    if (Window::ins->isUsingMetal())
+    {
+        MTL::Device* pDevice = Window::ins->getMetalDevice();
 
-    GLuint nVPosAttr = m_pShader->getAttributeLocation("a_vPos");
-    GLuint nVUVAttr = m_pShader->getAttributeLocation("a_vUV");
+        const float positions[] = {
+            fStartX, fStartY,
+            fStartX + m_fWidth, fStartY,
+            fStartX, fStartY + m_fHeight,
+            fStartX + m_fWidth, fStartY + m_fHeight,
+        };
+        const float uv[] = {
+            0.f, 0.f,
+            1.f, 0.f,
+            0.f, 1.f,
+            1.f, 1.f,
+        };
 
-    glGenVertexArrays(1, &m_nVertexArray);
-    glBindVertexArray(m_nVertexArray);
-    glEnableVertexAttribArray(nVPosAttr);
-    glVertexAttribPointer(nVPosAttr, 2, GL_FLOAT, GL_FALSE, sizeof(VertexWUV), (void*)offsetof(VertexWUV, pos));
-    glEnableVertexAttribArray(nVUVAttr);
-    glVertexAttribPointer(nVUVAttr, 2, GL_FLOAT, GL_FALSE, sizeof(VertexWUV), (void*)offsetof(VertexWUV, uv));
+        m_pPosBuffer = pDevice->newBuffer(positions, sizeof(positions), MTL::ResourceStorageModeShared);
+        m_pUVBuffer = pDevice->newBuffer(uv, sizeof(uv), MTL::ResourceStorageModeShared);
+    }
+    else
+    {
+        glGenBuffers(1, &m_nVertexBuffer);
+        glBindBuffer(GL_ARRAY_BUFFER, m_nVertexBuffer);
 
-    // Unbind
-    glBindVertexArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
+        VertexWUV arrVertices[4];
+        arrVertices[0] = { { fStartX, fStartY }, { 0.0f, 0.0f } }; // Bottom left
+        arrVertices[1] = { { fStartX + m_fWidth, fStartY }, { 1.0f, 0.0f } }; // Bottom right
+        arrVertices[2] = { { fStartX, fStartY + m_fHeight }, { 0.0f, 1.0f } }; // Top right
+        arrVertices[3] = { { fStartX + m_fWidth, fStartY + m_fHeight }, { 1.0f, 1.0f } }; // Top left
+        glBufferData(GL_ARRAY_BUFFER, sizeof(arrVertices), arrVertices, GL_STATIC_DRAW);
+
+        GLuint nVPosAttr = m_pShader->getAttributeLocation("a_vPos");
+        GLuint nVUVAttr = m_pShader->getAttributeLocation("a_vUV");
+
+        glGenVertexArrays(1, &m_nVertexArray);
+        glBindVertexArray(m_nVertexArray);
+        glEnableVertexAttribArray(nVPosAttr);
+        glVertexAttribPointer(nVPosAttr, 2, GL_FLOAT, GL_FALSE, sizeof(VertexWUV), (void*)offsetof(VertexWUV, pos));
+        glEnableVertexAttribArray(nVUVAttr);
+        glVertexAttribPointer(nVUVAttr, 2, GL_FLOAT, GL_FALSE, sizeof(VertexWUV), (void*)offsetof(VertexWUV, uv));
+
+        // Unbind
+        glBindVertexArray(0);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+    }
 }
 
 void Quad::draw()
@@ -87,31 +118,49 @@ void Quad::draw()
     const mat4x4& cameraViewMatrix = Camera::main->getViewProjectionMatrix();
     mat4x4_mul(mvp, cameraViewMatrix, matModel);
 
-    glUseProgram(m_pShader->getProgram());
-    glUniformMatrix4fv(m_pMVPHandle->m_nLocation, 1, GL_FALSE, (const GLfloat*) mvp);
-    glUniform4f(m_pColorHandle->m_nLocation, m_color[0], m_color[1], m_color[2], 1);
-    predrawSetShaderUniforms();
-
-    if (m_pImage)
+    if (Window::ins->isUsingMetal())
     {
-        glUniform1i(m_pUseTextureHandle->m_nLocation, 1);
-        glUniform1i(m_pTextureHandle->m_nLocation, 0); // Texture unit 0
+        MTL::RenderCommandEncoder* pRenderCommandEncoder = Window::ins->getCurrentFrameRenderEncoder();
 
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, m_pImage ? m_pImage->getTextureID() : 0);
+        pRenderCommandEncoder->setRenderPipelineState(m_pShader->getMetalPipelineState());
+        pRenderCommandEncoder->setVertexBuffer(m_pPosBuffer, 0, 0);
+        pRenderCommandEncoder->setVertexBuffer(m_pUVBuffer, 0, 1);
+        pRenderCommandEncoder->setVertexBytes(&mvp, sizeof(mat4x4), 2);
+
+        pRenderCommandEncoder->setFragmentTexture(m_pImage ? m_pImage->getMetalTexture() : nullptr, 0);
+        pRenderCommandEncoder->setFragmentSamplerState(Renderer::m_pLinearSampler, 0);
+
+        pRenderCommandEncoder->drawPrimitives(MTL::PrimitiveType::PrimitiveTypeTriangleStrip, (NS::UInteger)0, (NS::UInteger)4);
+        INCREASE_DRAW_CALL_COUNT(1);
     }
-    else
+    else if (Window::ins->isUsingOpenGL())
     {
-        glUniform1i(m_pUseTextureHandle->m_nLocation, 0);
+        glUseProgram(m_pShader->getProgram());
+        glUniformMatrix4fv(m_pMVPHandle->m_nLocation, 1, GL_FALSE, (const GLfloat*) mvp);
+        glUniform4f(m_pColorHandle->m_nLocation, m_color[0], m_color[1], m_color[2], 1);
+        predrawSetShaderUniforms();
+
+        if (m_pImage)
+        {
+            glUniform1i(m_pUseTextureHandle->m_nLocation, 1);
+            glUniform1i(m_pTextureHandle->m_nLocation, 0); // Texture unit 0
+
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, m_pImage ? m_pImage->getTextureID() : 0);
+        }
+        else
+        {
+            glUniform1i(m_pUseTextureHandle->m_nLocation, 0);
+        }
+
+        glBindVertexArray(m_nVertexArray);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4); // Draw the quad using triangle strip
+        INCREASE_DRAW_CALL_COUNT(2);
+
+        glBindTexture(GL_TEXTURE_2D, 0); // Unbind the texture
+        glBindVertexArray(0); // Unbind the vertex array
+        glUseProgram(0);
     }
-
-    glBindVertexArray(m_nVertexArray);
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4); // Draw the quad using triangle strip
-    INCREASE_DRAW_CALL_COUNT(2);
-
-    glBindTexture(GL_TEXTURE_2D, 0); // Unbind the texture
-    glBindVertexArray(0); // Unbind the vertex array
-    glUseProgram(0);
 }
 
 void Quad::predrawSetShaderUniforms()

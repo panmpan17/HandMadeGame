@@ -24,6 +24,7 @@ public:
     inline int getHeight() const { return m_nHeight; }
     inline unsigned char* getData() const { return m_pData; }
     inline GLuint getTextureID() const { return m_nTextureID; }
+    inline MTL::Texture* getMetalTexture() const { return m_pMetalTexture; }
 
     inline bool isCPULoaded() const { return m_pData != nullptr; }
     inline bool isGPULoaded() const { return m_nTextureID != 0; }
