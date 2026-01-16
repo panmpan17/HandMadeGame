@@ -125,9 +125,19 @@ void Quad::draw()
         pRenderCommandEncoder->setRenderPipelineState(m_pShader->getMetalPipelineState());
         pRenderCommandEncoder->setVertexBuffer(m_pPosBuffer, 0, 0);
         pRenderCommandEncoder->setVertexBuffer(m_pUVBuffer, 0, 1);
-        pRenderCommandEncoder->setVertexBytes(&mvp, sizeof(mat4x4), 2);
 
-        pRenderCommandEncoder->setFragmentTexture(m_pImage ? m_pImage->getMetalTexture() : nullptr, 0);
+        struct
+        {
+            mat4x4 mvp;
+            vec4 color;
+        } uniforms;
+        mat4x4_dup(uniforms.mvp, mvp);
+        vec4_dup(uniforms.color, m_color);
+
+        pRenderCommandEncoder->setVertexBytes(&uniforms, sizeof(uniforms), 2);
+        pRenderCommandEncoder->setFragmentBytes(&uniforms, sizeof(uniforms), 2);
+
+        pRenderCommandEncoder->setFragmentTexture(m_pImage ? m_pImage->getMetalTexture() : ImageLoader::getInstance()->getPureWhite1by1Image()->getMetalTexture(), 0);
         pRenderCommandEncoder->setFragmentSamplerState(Renderer::m_pLinearSampler, 0);
 
         pRenderCommandEncoder->drawPrimitives(MTL::PrimitiveType::PrimitiveTypeTriangleStrip, (NS::UInteger)0, (NS::UInteger)4);
@@ -137,7 +147,7 @@ void Quad::draw()
     {
         glUseProgram(m_pShader->getProgram());
         glUniformMatrix4fv(m_pMVPHandle->m_nLocation, 1, GL_FALSE, (const GLfloat*) mvp);
-        glUniform4f(m_pColorHandle->m_nLocation, m_color[0], m_color[1], m_color[2], 1);
+        glUniform4f(m_pColorHandle->m_nLocation, m_color[0], m_color[1], m_color[2], m_color[3]);
         predrawSetShaderUniforms();
 
         if (m_pImage)

@@ -103,6 +103,11 @@ Image::Image(const aiTexture* pAiTexture, const char* strName, bool flipVertical
     }
 }
 
+Image::Image(int nWidth, int nHeight, int nChannels, unsigned char* pData)
+    : m_nWidth(nWidth), m_nHeight(nHeight), m_nChannels(nChannels), m_pData(pData)
+{
+}
+
 Image::~Image()
 {
     freeCPUData();

@@ -22,7 +22,18 @@ void ImageLoader::Cleanup()
 
 ImageLoader::ImageLoader()
 {
+    m_pPureWhite1by1Image = new Image(1, 1, 4, new unsigned char[4]{255, 255, 255, 255});
 
+    if (Window::ins->isUsingOpenGL())
+    {
+        m_pPureWhite1by1Image->loadTextureToGL();
+    }
+#if __APPLE__
+    else if (Window::ins->isUsingMetal())
+    {
+        m_pPureWhite1by1Image->loadTextureToMetal();
+    }
+#endif
 }
 
 ImageLoader::~ImageLoader()

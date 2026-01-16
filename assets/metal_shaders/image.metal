@@ -8,6 +8,7 @@ struct image_VertexIn {
 
 struct image_Uniforms {
     float4x4 MVPMatrix;
+    float4 color;
 };
 
 struct image_VertexOut {
@@ -26,8 +27,9 @@ vertex image_VertexOut image_vertexMain(image_VertexIn in [[stage_in]],
 
 fragment float4 image_fragmentMain(image_VertexOut in [[stage_in]],
                                    texture2d<float> colorTexture [[texture(0)]],
-                                   sampler textureSampler [[sampler(0)]]) {
-    return colorTexture.sample(textureSampler, in.texCoord);
+                                   sampler textureSampler [[sampler(0)]],
+                                   constant image_Uniforms& uniforms [[buffer(2)]]) {
+    return colorTexture.sample(textureSampler, in.texCoord) * uniforms.color;
 }
 
 //  xcrun -sdk macosx metal -o assets/metal_shaders/colored_vertices.ir  -c assets/metal_shaders/colored_vertices.metal
