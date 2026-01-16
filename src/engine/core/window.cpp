@@ -159,18 +159,16 @@ bool Window::configureAndCreateWindow()
 
     glfwWindowHint(GLFW_DEPTH_BITS, 24);
 
-#if __APPLE__
-    if (isUsingMetal())
-    {
-        configureGLFWWithMetal();
-    }
-    else
+    if (isUsingOpenGL())
     {
         configureGLFWWithOpenGL();
     }
-#else
-    configureGLFWWithOpenGL();
-#endif
+#if __APPLE__
+    else if (isUsingMetal())
+    {
+        configureGLFWWithMetal();
+    }
+#endif // __APPLE__
 
 #if IS_DEBUG_VERSION
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
@@ -237,20 +235,17 @@ void Window::configureGLFWWithMetal()
 
 void Window::initializeGraphicsAPI()
 {
-#if __APPLE__
-    if (isUsingMetal())
-    {
-        LOGLN("Metal Device found: {}", m_pMetalDevice->name()->utf8String());
-        bindMetalToGlfwWindow();
-    }
-    else
+    if (isUsingOpenGL())
     {
         LOGLN("Metal is not supported on this device.");
         bindOpenGLToGlfwWindow();
     }
-
-#else
-    bindOpenGLToGlfwWindow();
+#if __APPLE__
+    else if (isUsingMetal())
+    {
+        LOGLN("Metal Device found: {}", m_pMetalDevice->name()->utf8String());
+        bindMetalToGlfwWindow();
+    }
 #endif // __APPLE__
 }
 
@@ -457,7 +452,17 @@ void Window::mainLoop()
 
         runUpdate();
 
-        if (isUsingMetal())
+        if (isUsingOpenGL())
+        {
+            glViewport(0, 0, m_oActualSize.x, m_oActualSize.y);
+            glClearColor(0.f, 0.f, 0.f, 1.0f);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+            drawFrame();
+            glfwSwapBuffers(m_pWindow);
+        }
+#if __APPLE__
+        else if (isUsingMetal())
         {
             NS::AutoreleasePool* pPool = NS::AutoreleasePool::alloc()->init();
 
@@ -489,15 +494,7 @@ void Window::mainLoop()
 
             pPool->release();
         }
-        else
-        {
-            glViewport(0, 0, m_oActualSize.x, m_oActualSize.y);
-            glClearColor(0.f, 0.f, 0.f, 1.0f);
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-            drawFrame();
-            glfwSwapBuffers(m_pWindow);
-        }
+#endif // __APPLE__
     }
 }
 

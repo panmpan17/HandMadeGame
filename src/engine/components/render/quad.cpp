@@ -61,27 +61,7 @@ void Quad::registerBuffer()
     const float fStartX = -m_fWidth / 2.0f;
     const float fStartY = -m_fHeight / 2.0f;
 
-    if (Window::ins->isUsingMetal())
-    {
-        MTL::Device* pDevice = Window::ins->getMetalDevice();
-
-        const float positions[] = {
-            fStartX, fStartY,
-            fStartX + m_fWidth, fStartY,
-            fStartX, fStartY + m_fHeight,
-            fStartX + m_fWidth, fStartY + m_fHeight,
-        };
-        const float uv[] = {
-            0.f, 0.f,
-            1.f, 0.f,
-            0.f, 1.f,
-            1.f, 1.f,
-        };
-
-        m_pPosBuffer = pDevice->newBuffer(positions, sizeof(positions), MTL::ResourceStorageModeShared);
-        m_pUVBuffer = pDevice->newBuffer(uv, sizeof(uv), MTL::ResourceStorageModeShared);
-    }
-    else
+    if (Window::ins->isUsingOpenGL())
     {
         glGenBuffers(1, &m_nVertexBuffer);
         glBindBuffer(GL_ARRAY_BUFFER, m_nVertexBuffer);
@@ -107,6 +87,28 @@ void Quad::registerBuffer()
         glBindVertexArray(0);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
+#if __APPLE__
+    else if (Window::ins->isUsingMetal())
+    {
+        MTL::Device* pDevice = Window::ins->getMetalDevice();
+
+        const float positions[] = {
+            fStartX, fStartY,
+            fStartX + m_fWidth, fStartY,
+            fStartX, fStartY + m_fHeight,
+            fStartX + m_fWidth, fStartY + m_fHeight,
+        };
+        const float uv[] = {
+            0.f, 0.f,
+            1.f, 0.f,
+            0.f, 1.f,
+            1.f, 1.f,
+        };
+
+        m_pPosBuffer = pDevice->newBuffer(positions, sizeof(positions), MTL::ResourceStorageModeShared);
+        m_pUVBuffer = pDevice->newBuffer(uv, sizeof(uv), MTL::ResourceStorageModeShared);
+    }
+#endif // __APPLE__
 }
 
 void Quad::draw()
@@ -118,32 +120,7 @@ void Quad::draw()
     const mat4x4& cameraViewMatrix = Camera::main->getViewProjectionMatrix();
     mat4x4_mul(mvp, cameraViewMatrix, matModel);
 
-    if (Window::ins->isUsingMetal())
-    {
-        MTL::RenderCommandEncoder* pRenderCommandEncoder = Window::ins->getCurrentFrameRenderEncoder();
-
-        pRenderCommandEncoder->setRenderPipelineState(m_pShader->getMetalPipelineState());
-        pRenderCommandEncoder->setVertexBuffer(m_pPosBuffer, 0, 0);
-        pRenderCommandEncoder->setVertexBuffer(m_pUVBuffer, 0, 1);
-
-        struct
-        {
-            mat4x4 mvp;
-            vec4 color;
-        } uniforms;
-        mat4x4_dup(uniforms.mvp, mvp);
-        vec4_dup(uniforms.color, m_color);
-
-        pRenderCommandEncoder->setVertexBytes(&uniforms, sizeof(uniforms), 2);
-        pRenderCommandEncoder->setFragmentBytes(&uniforms, sizeof(uniforms), 2);
-
-        pRenderCommandEncoder->setFragmentTexture(m_pImage ? m_pImage->getMetalTexture() : ImageLoader::getInstance()->getPureWhite1by1Image()->getMetalTexture(), 0);
-        pRenderCommandEncoder->setFragmentSamplerState(Renderer::m_pLinearSampler, 0);
-
-        pRenderCommandEncoder->drawPrimitives(MTL::PrimitiveType::PrimitiveTypeTriangleStrip, (NS::UInteger)0, (NS::UInteger)4);
-        INCREASE_DRAW_CALL_COUNT(1);
-    }
-    else if (Window::ins->isUsingOpenGL())
+    if (Window::ins->isUsingOpenGL())
     {
         glUseProgram(m_pShader->getProgram());
         glUniformMatrix4fv(m_pMVPHandle->m_nLocation, 1, GL_FALSE, (const GLfloat*) mvp);
@@ -171,6 +148,33 @@ void Quad::draw()
         glBindVertexArray(0); // Unbind the vertex array
         glUseProgram(0);
     }
+#if __APPLE__
+    else if (Window::ins->isUsingMetal())
+    {
+        MTL::RenderCommandEncoder* pRenderCommandEncoder = Window::ins->getCurrentFrameRenderEncoder();
+
+        pRenderCommandEncoder->setRenderPipelineState(m_pShader->getMetalPipelineState());
+        pRenderCommandEncoder->setVertexBuffer(m_pPosBuffer, 0, 0);
+        pRenderCommandEncoder->setVertexBuffer(m_pUVBuffer, 0, 1);
+
+        struct
+        {
+            mat4x4 mvp;
+            vec4 color;
+        } uniforms;
+        mat4x4_dup(uniforms.mvp, mvp);
+        vec4_dup(uniforms.color, m_color);
+
+        pRenderCommandEncoder->setVertexBytes(&uniforms, sizeof(uniforms), 2);
+        pRenderCommandEncoder->setFragmentBytes(&uniforms, sizeof(uniforms), 2);
+
+        pRenderCommandEncoder->setFragmentTexture(m_pImage ? m_pImage->getMetalTexture() : ImageLoader::getInstance()->getPureWhite1by1Image()->getMetalTexture(), 0);
+        pRenderCommandEncoder->setFragmentSamplerState(Renderer::m_pLinearSampler, 0);
+
+        pRenderCommandEncoder->drawPrimitives(MTL::PrimitiveType::PrimitiveTypeTriangleStrip, (NS::UInteger)0, (NS::UInteger)4);
+        INCREASE_DRAW_CALL_COUNT(1);
+    }
+#endif // __APPLE__
 }
 
 void Quad::predrawSetShaderUniforms()

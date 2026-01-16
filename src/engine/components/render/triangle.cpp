@@ -36,7 +36,34 @@ void Triangle::setShader(Shader* pShader)
 
 void Triangle::registerBuffer()
 {
-    if (Window::ins->isUsingMetal())
+    
+    if (Window::ins->isUsingOpenGL())
+    {
+        glGenBuffers(1, &m_nVertexBuffer);
+        glBindBuffer(GL_ARRAY_BUFFER, m_nVertexBuffer);
+
+        VertexWColor arrVertices[3];
+        arrVertices[0] = { { -0.6f, -0.4f }, { 1.f, 0.f, 0.f } };
+        arrVertices[1] = { {  0.6f, -0.4f }, { 0.f, 1.f, 0.f } };
+        arrVertices[2] = { {   0.f,  0.6f }, { 0.f, 0.f, 1.f } };
+        glBufferData(GL_ARRAY_BUFFER, sizeof(arrVertices), arrVertices, GL_STATIC_DRAW);
+
+        GLuint nVPosAttr =  m_pShader->getAttributeLocation("a_vPos");
+        GLuint nVColAttr =  m_pShader->getAttributeLocation("a_vCol");
+
+        glGenVertexArrays(1, &m_nVertexArray);
+        glBindVertexArray(m_nVertexArray);
+        glEnableVertexAttribArray(nVPosAttr);
+        glVertexAttribPointer(nVPosAttr, 2, GL_FLOAT, GL_FALSE, sizeof(VertexWColor), (void*)offsetof(VertexWColor, pos));
+        glEnableVertexAttribArray(nVColAttr);
+        glVertexAttribPointer(nVColAttr, 3, GL_FLOAT, GL_FALSE, sizeof(VertexWColor), (void*)offsetof(VertexWColor, col));
+
+        // Unbind
+        glBindVertexArray(0);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+    }
+#if __APPLE__
+    else if (Window::ins->isUsingMetal())
     {
         MTL::Device* pDevice = Window::ins->getMetalDevice();
 
@@ -54,31 +81,7 @@ void Triangle::registerBuffer()
         m_pPosBuffer = pDevice->newBuffer(positions, sizeof(positions), MTL::ResourceStorageModeShared);
         m_pColBuffer = pDevice->newBuffer(colors, sizeof(colors), MTL::ResourceStorageModeShared);
     }
-    else
-    {
-    glGenBuffers(1, &m_nVertexBuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, m_nVertexBuffer);
-
-    VertexWColor arrVertices[3];
-    arrVertices[0] = { { -0.6f, -0.4f }, { 1.f, 0.f, 0.f } };
-    arrVertices[1] = { {  0.6f, -0.4f }, { 0.f, 1.f, 0.f } };
-    arrVertices[2] = { {   0.f,  0.6f }, { 0.f, 0.f, 1.f } };
-    glBufferData(GL_ARRAY_BUFFER, sizeof(arrVertices), arrVertices, GL_STATIC_DRAW);
-
-    GLuint nVPosAttr =  m_pShader->getAttributeLocation("a_vPos");
-    GLuint nVColAttr =  m_pShader->getAttributeLocation("a_vCol");
-
-    glGenVertexArrays(1, &m_nVertexArray);
-    glBindVertexArray(m_nVertexArray);
-    glEnableVertexAttribArray(nVPosAttr);
-    glVertexAttribPointer(nVPosAttr, 2, GL_FLOAT, GL_FALSE, sizeof(VertexWColor), (void*)offsetof(VertexWColor, pos));
-    glEnableVertexAttribArray(nVColAttr);
-    glVertexAttribPointer(nVColAttr, 3, GL_FLOAT, GL_FALSE, sizeof(VertexWColor), (void*)offsetof(VertexWColor, col));
-
-    // Unbind
-    glBindVertexArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    }
+#endif // __APPLE__
 }
 
 void Triangle::draw()
@@ -90,7 +93,17 @@ void Triangle::draw()
     const mat4x4& cameraViewMatrix = Camera::main->getViewProjectionMatrix();
     mat4x4_mul(mvp, cameraViewMatrix, matModel);
 
-    if (Window::ins->isUsingMetal())
+    if (Window::ins->isUsingOpenGL())
+    {
+        glUseProgram(m_pShader->getProgram());
+        glUniformMatrix4fv(m_pMVPHandle->m_nLocation, 1, GL_FALSE, (const GLfloat*) mvp);
+        glBindVertexArray(m_nVertexArray);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+        INCREASE_DRAW_CALL_COUNT(1);
+        glUseProgram(0);
+    }
+#if __APPLE__
+    else if (Window::ins->isUsingMetal())
     {
         MTL::RenderCommandEncoder* pRenderCommandEncoder = Window::ins->getCurrentFrameRenderEncoder();
 
@@ -101,15 +114,7 @@ void Triangle::draw()
         pRenderCommandEncoder->drawPrimitives(MTL::PrimitiveType::PrimitiveTypeTriangle, (NS::UInteger)0, (NS::UInteger)3);
         INCREASE_DRAW_CALL_COUNT(1);
     }
-    else
-    {
-        glUseProgram(m_pShader->getProgram());
-        glUniformMatrix4fv(m_pMVPHandle->m_nLocation, 1, GL_FALSE, (const GLfloat*) mvp);
-        glBindVertexArray(m_nVertexArray);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
-        INCREASE_DRAW_CALL_COUNT(1);
-        glUseProgram(0);
-    }
+#endif // __APPLE__
 }
 
 void Triangle::serializeToWrapper(DataSerializer& serializer) const

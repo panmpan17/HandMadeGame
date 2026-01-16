@@ -87,20 +87,22 @@ void ShaderLoader::readRegistryFromFile()
         {
             if (oCurrentShaderData.nCurrentShaderId != -1 && !oCurrentShaderData.m_strName.empty())
             {
+                if (Window::ins->isUsingOpenGL())
+                {
+                    if (!oCurrentShaderData.m_strVertexPath.empty() && !oCurrentShaderData.m_strFragmentPath.empty())
+                    {
+                        m_mapShaders.insert({oCurrentShaderData.nCurrentShaderId, Shader::loadFromOpenGLShader(oCurrentShaderData)});
+                    }
+                }
 #if __APPLE__
-                if (funcCreateMetalShader)
+                else if (Window::ins->isUsingMetal())
                 {
                     if (!oCurrentShaderData.m_strMetalShaderPrefix.empty())
                     {
                         funcCreateMetalShader();
                     }
                 }
-                else
 #endif
-                if (!oCurrentShaderData.m_strVertexPath.empty() && !oCurrentShaderData.m_strFragmentPath.empty())
-                {
-                    m_mapShaders.insert({oCurrentShaderData.nCurrentShaderId, Shader::loadFromOpenGLShader(oCurrentShaderData)});
-                }
             }
 
             oCurrentShaderData.reset();
