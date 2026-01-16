@@ -9,6 +9,7 @@
 #include "../../core/debug_macro.h"
 #include "../../core/scene/node.h"
 #include "../../core/serialization/serializer.h"
+#include "../../../editor/gizmos.h"
 
 
 Triangle::Triangle()
@@ -135,4 +136,15 @@ void Triangle::onNodeFinishedDeserialization()
         setShader(m_pShader);
         registerBuffer();
     }
+}
+
+inline constexpr std::string_view GIZMOS_IMAGE = "assets/gizmos/particle.png";
+
+void Triangle::onDrawGizmos(bool bIsSelected)
+{
+    GizmosManager::getInstance()->addImageGizmos(this, m_pNode->getPositionInWorld(), GIZMOS_IMAGE,
+                                                 Vector3(1, 0, 0));
+    // GizmosManager::getInstance()->addSphereGizmos(
+    //             m_pNode->getPositionInWorld(),
+    //             1);
 }

@@ -4,6 +4,10 @@
 #include "math/vector.h"
 #include "../components/component.h"
 
+#if __APPLE__
+#include <Metal/Metal.hpp>
+#endif // __APPLE__
+
 typedef unsigned int GLuint;
 
 
@@ -67,6 +71,9 @@ public:
 
     void updateCameraDataBuffer();
     inline GLuint getCameraUBO() const { return m_nCameraUBO; }
+#if __APPLE__
+    inline MTL::Buffer* getCameraMetalUBO() const { return m_pCameraMetalUBO; }
+#endif // __APPLE__
 
     void markViewMatrixDirty();
 
@@ -97,4 +104,8 @@ private:
 
     bool m_bCameraUBODirty = true;
     GLuint m_nCameraUBO = 0;
+
+#if __APPLE__
+    MTL::Buffer* m_pCameraMetalUBO = nullptr;
+#endif // __APPLE__
 };

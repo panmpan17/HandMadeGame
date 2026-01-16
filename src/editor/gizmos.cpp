@@ -1,7 +1,7 @@
 #include "gizmos.h"
 
 #include <glad/gl.h>
-#include <imgui.h>
+// #include <imgui.h>
 
 #include "editor.h"
 #include "../engine/core/window.h"
@@ -12,6 +12,7 @@
 #include "../engine/render/shader_loader.h"
 #include "../engine/render/image_loader.h"
 #include "../engine/render/vertex.h"
+#include "../engine/render/renderer.h"
 #include "../engine/render/models/simple_obj_reader.h"
 
 
@@ -21,13 +22,16 @@ GizmosManager::GizmosManager()
 
     m_pMeshGizmosShader = ShaderLoader::getInstance()->getShader("mesh_gizmos");
 
-    m_pMeshGizmosModelUniform = m_pMeshGizmosShader->getUniformHandle("u_Model");
-    m_pMeshGizmosColorUniform = m_pMeshGizmosShader->getUniformHandle("u_GizmosColor");
+    if (Window::ins->isUsingOpenGL())
+    {
+        m_pMeshGizmosModelUniform = m_pMeshGizmosShader->getUniformHandle("u_Model");
+        m_pMeshGizmosColorUniform = m_pMeshGizmosShader->getUniformHandle("u_GizmosColor");
+    }
 
-    initCircleGizmosShaderAndBuffer();
-    initSphereGizmosShaderAndBuffer();
-    initRectangleGizmosShaderAndBuffer();
-    initCubeGizmosShaderAndBuffer();
+    // initCircleGizmosShaderAndBuffer();
+    // initSphereGizmosShaderAndBuffer();
+    // initRectangleGizmosShaderAndBuffer();
+    // initCubeGizmosShaderAndBuffer();
 
     InputManager::getInstance()->registerMouseButtonCallback(MouseButton::BUTTON_LEFT, std::bind(&GizmosManager::onMouseClickCheck, this, std::placeholders::_1));
 }
@@ -43,37 +47,62 @@ GizmosManager::~GizmosManager()
 void GizmosManager::initImageGizmosShaderAndBuffer()
 {
     m_pImageGizmosShader = ShaderLoader::getInstance()->getShader("simple_gizmos");
+    constexpr float fStartX = -1 / 2.0f;
+    constexpr float fStartY = -1 / 2.0f;
 
-    m_pImageGizmosPositionUniform = m_pImageGizmosShader->getUniformHandle("u_WorldPosition");
-    m_pImageGizmosColorUniform = m_pImageGizmosShader->getUniformHandle("u_imageColor");
-    m_pImageGizmosTextureUniform = m_pImageGizmosShader->getUniformHandle(SHADER_UNIFORM_TEXTURE_0);
-    m_pImageGizmosUseTextureUniform = m_pImageGizmosShader->getUniformHandle("u_useTexture");
+    if (Window::ins->isUsingOpenGL())
+    {
+        m_pImageGizmosPositionUniform = m_pImageGizmosShader->getUniformHandle("u_WorldPosition");
+        m_pImageGizmosColorUniform = m_pImageGizmosShader->getUniformHandle("u_imageColor");
+        m_pImageGizmosTextureUniform = m_pImageGizmosShader->getUniformHandle(SHADER_UNIFORM_TEXTURE_0);
+        m_pImageGizmosUseTextureUniform = m_pImageGizmosShader->getUniformHandle("u_useTexture");
 
-    glGenBuffers(1, &m_nImageGizmosVertexBuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, m_nImageGizmosVertexBuffer);
+        glGenBuffers(1, &m_nImageGizmosVertexBuffer);
+        glBindBuffer(GL_ARRAY_BUFFER, m_nImageGizmosVertexBuffer);
 
-    float fStartX = -1 / 2.0f;
-    float fStartY = -1 / 2.0f;
-    VertexWUV arrVertices[4];
-    arrVertices[0] = { { fStartX, fStartY }, { 0, 0}  }; // Bottom left
-    arrVertices[2] = { { fStartX, fStartY + 1 }, { 0, 1 } }; // Top right
-    arrVertices[1] = { { fStartX + 1, fStartY }, { 1, 0 } }; // Bottom right
-    arrVertices[3] = { { fStartX + 1, fStartY + 1 }, { 1, 1 } }; // Top left
-    glBufferData(GL_ARRAY_BUFFER, sizeof(arrVertices), arrVertices, GL_STATIC_DRAW);
+        VertexWUV arrVertices[4];
+        arrVertices[0] = { { fStartX, fStartY }, { 0, 0}  }; // Bottom left
+        arrVertices[2] = { { fStartX, fStartY + 1 }, { 0, 1 } }; // Top right
+        arrVertices[1] = { { fStartX + 1, fStartY }, { 1, 0 } }; // Bottom right
+        arrVertices[3] = { { fStartX + 1, fStartY + 1 }, { 1, 1 } }; // Top left
+        glBufferData(GL_ARRAY_BUFFER, sizeof(arrVertices), arrVertices, GL_STATIC_DRAW);
 
-    GLuint nVPosAttr = m_pImageGizmosShader->getAttributeLocation("a_vPos");
-    GLuint nUVAttr = m_pImageGizmosShader->getAttributeLocation("a_vUV");
+        GLuint nVPosAttr = m_pImageGizmosShader->getAttributeLocation("a_vPos");
+        GLuint nUVAttr = m_pImageGizmosShader->getAttributeLocation("a_vUV");
 
-    glGenVertexArrays(1, &m_nImageGizmosVertexArray);
-    glBindVertexArray(m_nImageGizmosVertexArray);
-    glEnableVertexAttribArray(nVPosAttr);
-    glVertexAttribPointer(nVPosAttr, 2, GL_FLOAT, GL_FALSE, sizeof(VertexWUV), (void*)offsetof(VertexWUV, pos));
-    glEnableVertexAttribArray(nUVAttr);
-    glVertexAttribPointer(nUVAttr, 2, GL_FLOAT, GL_FALSE, sizeof(VertexWUV), (void*)offsetof(VertexWUV, uv));
+        glGenVertexArrays(1, &m_nImageGizmosVertexArray);
+        glBindVertexArray(m_nImageGizmosVertexArray);
+        glEnableVertexAttribArray(nVPosAttr);
+        glVertexAttribPointer(nVPosAttr, 2, GL_FLOAT, GL_FALSE, sizeof(VertexWUV), (void*)offsetof(VertexWUV, pos));
+        glEnableVertexAttribArray(nUVAttr);
+        glVertexAttribPointer(nUVAttr, 2, GL_FLOAT, GL_FALSE, sizeof(VertexWUV), (void*)offsetof(VertexWUV, uv));
 
-    // Unbind
-    glBindVertexArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
+        // Unbind
+        glBindVertexArray(0);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+    }
+#if __APPLE__
+    else if (Window::ins->isUsingMetal())
+    {
+        MTL::Device* pDevice = Window::ins->getMetalDevice();
+
+        const float positions[] = {
+            fStartX, fStartY,
+            fStartX + 1, fStartY,
+            fStartX, fStartY + 1,
+            fStartX + 1, fStartY + 1,
+        };
+        const float uv[] = {
+            0.f, 0.f,
+            1.f, 0.f,
+            0.f, 1.f,
+            1.f, 1.f,
+        };
+
+        m_pImageGizmosMetalVertexBuffer = pDevice->newBuffer(positions, sizeof(positions), MTL::ResourceStorageModeShared);
+        m_pImageGizmosMetalUVBuffer = pDevice->newBuffer(uv, sizeof(uv), MTL::ResourceStorageModeShared);
+    }
+#endif // __APPLE__
 }
 
 void GizmosManager::initCircleGizmosShaderAndBuffer()
@@ -304,17 +333,17 @@ void GizmosManager::addCubeGizmos(const Vector3& vecPosition, const Quaternion& 
 
 void GizmosManager::drawAllGizmos()
 {
-    glEnable(GL_BLEND);
-    glDepthMask(GL_FALSE);
+    // glEnable(GL_BLEND);
+    // glDepthMask(GL_FALSE);
 
-    drawCircleGizmos();
-    drawSphereGizmos();
-    drawRectangleGizmos();
-    drawCubeGizmos();
+    // drawCircleGizmos();
+    // drawSphereGizmos();
+    // drawRectangleGizmos();
+    // drawCubeGizmos();
     drawImageGizmos();
 
-    glDisable(GL_BLEND);
-    glDepthMask(GL_TRUE);
+    // glDisable(GL_BLEND);
+    // glDepthMask(GL_TRUE);
 }
 
 void GizmosManager::drawCircleGizmos()
@@ -468,34 +497,87 @@ void GizmosManager::drawCubeGizmos()
 
 void GizmosManager::drawImageGizmos()
 {
-    glUseProgram(m_pImageGizmosShader->getProgram());
-    glBindVertexArray(m_nImageGizmosVertexArray);
-
-    for (int i = 0; i < m_nImageGizmosSize; ++i)
+    if (Window::ins->isUsingOpenGL())
     {
-        ImageGizmosData& oData = m_vecImageGizmos.at(i);
+        glUseProgram(m_pImageGizmosShader->getProgram());
+        glBindVertexArray(m_nImageGizmosVertexArray);
 
-        if (Image* pImage = ImageLoader::getInstance()->getImageByPath(oData.m_strImagePath); pImage != nullptr)
+        for (int i = 0; i < m_nImageGizmosSize; ++i)
         {
-            glUniform3f(m_pImageGizmosPositionUniform->m_nLocation, oData.m_vecPosition.x, oData.m_vecPosition.y, oData.m_vecPosition.z);
+            ImageGizmosData& oData = m_vecImageGizmos.at(i);
 
-            // LOGLN("Color: {} {} {}", oData.m_vecColor.x, oData.m_vecColor.y, oData.m_vecColor.z);
-            glUniform4f(m_pImageGizmosColorUniform->m_nLocation, oData.m_vecColor.x, oData.m_vecColor.y, oData.m_vecColor.z, 1);
-            glUniform1i(m_pImageGizmosUseTextureUniform->m_nLocation, 1);
+            if (Image* pImage = ImageLoader::getInstance()->getImageByPath(oData.m_strImagePath); pImage != nullptr)
+            {
+                glUniform3f(m_pImageGizmosPositionUniform->m_nLocation, oData.m_vecPosition.x, oData.m_vecPosition.y, oData.m_vecPosition.z);
 
-            glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, pImage->getTextureID());
-            glUniform1i(m_pImageGizmosTextureUniform->m_nLocation, 0);
+                // LOGLN("Color: {} {} {}", oData.m_vecColor.x, oData.m_vecColor.y, oData.m_vecColor.z);
+                glUniform4f(m_pImageGizmosColorUniform->m_nLocation, oData.m_vecColor.x, oData.m_vecColor.y, oData.m_vecColor.z, 1);
+                glUniform1i(m_pImageGizmosUseTextureUniform->m_nLocation, 1);
 
-            glDrawArrays(GL_TRIANGLE_STRIP, 0, 4); // Draw the quad using triangle strip
-            glBindTexture(GL_TEXTURE_2D, 0); // Unbind the texture
+                glActiveTexture(GL_TEXTURE0);
+                glBindTexture(GL_TEXTURE_2D, pImage->getTextureID());
+                glUniform1i(m_pImageGizmosTextureUniform->m_nLocation, 0);
 
-            INCREASE_DRAW_CALL_COUNT(2);
+                glDrawArrays(GL_TRIANGLE_STRIP, 0, 4); // Draw the quad using triangle strip
+                glBindTexture(GL_TEXTURE_2D, 0); // Unbind the texture
+
+                INCREASE_DRAW_CALL_COUNT(2);
+            }
+        }
+
+        glBindVertexArray(0); // Unbind the vertex array
+        glUseProgram(0);
+    }
+#if __APPLE__
+    else if (Window::ins->isUsingMetal())
+    {
+        MTL::RenderCommandEncoder* pRenderCommandEncoder = Window::ins->getCurrentFrameRenderEncoder();
+
+        pRenderCommandEncoder->setRenderPipelineState(m_pImageGizmosShader->getMetalPipelineState());
+        pRenderCommandEncoder->setVertexBuffer(m_pImageGizmosMetalVertexBuffer, 0, 0);
+        pRenderCommandEncoder->setVertexBuffer(m_pImageGizmosMetalUVBuffer, 0, 1);
+        pRenderCommandEncoder->setVertexBuffer(Camera::main->getCameraMetalUBO(), 0, 3);
+        pRenderCommandEncoder->setFragmentBuffer(Camera::main->getCameraMetalUBO(), 0, 3);
+
+        for (int i = 0; i < m_nImageGizmosSize; ++i)
+        {
+            ImageGizmosData& oData = m_vecImageGizmos.at(i);
+
+            if (Image* pImage = ImageLoader::getInstance()->getImageByPath(oData.m_strImagePath); pImage != nullptr)
+            {
+                // mat4x4 mvp;
+                // mat4x4 matModel;
+                // mat4x4_translate(matModel, oData.m_vecPosition.x, oData.m_vecPosition.y, oData.m_vecPosition.z);
+                // const mat4x4& cameraViewMatrix = Camera::main->getViewProjectionMatrix();
+                // mat4x4_mul(mvp, cameraViewMatrix, matModel);
+
+                struct
+                {
+                    // mat4x4 mvp;
+                    Vector3 position;
+                    Color color;
+                } uniforms;
+                uniforms.position = oData.m_vecPosition;
+                uniforms.color.r = oData.m_vecColor.x;
+                uniforms.color.g = oData.m_vecColor.y;
+                uniforms.color.b = oData.m_vecColor.z;
+                uniforms.color.a = 1.0f;
+
+                // LOGLN("Drawing Image Gizmos at Position: {:.2f} {:.2f} {:.2f}", uniforms.position.x, uniforms.position.y, uniforms.position.z);
+
+                pRenderCommandEncoder->setVertexBytes(&uniforms, sizeof(uniforms), 2);
+                pRenderCommandEncoder->setFragmentBytes(&uniforms, sizeof(uniforms), 2);
+
+                MTL::Texture* pTexture = pImage ? pImage->getMetalTexture() : ImageLoader::getInstance()->getPureWhite1by1Image()->getMetalTexture();
+                pRenderCommandEncoder->setFragmentTexture(pTexture, 0);
+                pRenderCommandEncoder->setFragmentSamplerState(Renderer::m_pLinearSampler, 0);
+
+                pRenderCommandEncoder->drawPrimitives(MTL::PrimitiveType::PrimitiveTypeTriangleStrip, (NS::UInteger)0, (NS::UInteger)4);
+                INCREASE_DRAW_CALL_COUNT(1);
+            }
         }
     }
-
-    glBindVertexArray(0); // Unbind the vertex array
-    glUseProgram(0);
+#endif // __APPLE__
 }
 
 #pragma endregion
@@ -504,8 +586,8 @@ void GizmosManager::onMouseClickCheck(bool bPressed)
 {
     if (!bPressed) return;
 
-    ImGuiIO& io = ImGui::GetIO();
-    if (io.WantCaptureMouse) return;
+    // ImGuiIO& io = ImGui::GetIO();
+    // if (io.WantCaptureMouse) return;
 
     InputManager* pInput = InputManager::getInstance();
     Vector2 oScreenPos;

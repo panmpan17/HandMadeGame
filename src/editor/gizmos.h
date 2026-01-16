@@ -5,6 +5,10 @@
 #include "../engine/core/math/color.h"
 #include "../engine/core/math/quaternion.h"
 
+#if __APPLE__
+#include <Metal/Metal.hpp>
+#endif // __APPLE__
+
 
 class NodeComponent;
 class Shader;
@@ -104,6 +108,9 @@ private:
 
     GLuint m_nImageGizmosVertexBuffer = 0;
     GLuint m_nImageGizmosVertexArray = 0;
+
+    MTL::Buffer* m_pImageGizmosMetalVertexBuffer = nullptr;
+    MTL::Buffer* m_pImageGizmosMetalUVBuffer = nullptr;
 
     void initImageGizmosShaderAndBuffer();
     void drawImageGizmos();

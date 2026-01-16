@@ -30,7 +30,7 @@
 // #include "../render/lighting/direction_light.h"
 #include "../render/font/font_loader.h"
 #include "../misc/preference.h"
-// #include "../../editor/gizmos.h"
+#include "../../editor/gizmos.h"
 // #include "../../editor/node_inspector.h"
 // #include "../../editor/hierarchy_view.h"
 // #include "../../editor/post_process_inspector.h"
@@ -331,8 +331,8 @@ void Window::setupManagers()
     setupInputManager();
     PROFILER_END_TIMER("Initialization", "Input manager");
 
-    // GizmosManager::Initialize();
-    // PROFILER_END_TIMER("Initialization", "Gizmos setup");
+    GizmosManager::Initialize();
+    PROFILER_END_TIMER("Initialization", "Gizmos setup");
 
     // FontLoader::Initialize();
     // FontLoader::getInstance()->loadFont("assets/fonts/arial.ttf");
@@ -566,7 +566,7 @@ void Window::drawFrame()
 
     if (Camera::main)
     {
-        // Camera::main->updateCameraDataBuffer();
+        Camera::main->updateCameraDataBuffer();
     }
 
     // LightManager* const pLightManager = LightManager::getInstance();

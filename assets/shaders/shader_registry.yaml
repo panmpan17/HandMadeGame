@@ -73,6 +73,8 @@
   vertex: assets/shaders/3d/billboard.vert
   fragment: assets/shaders/2d/image.frag
   cameraUBO: 0
+  metal_prefix: imageGizmos
+  metal_attribute_size: 2,2
 19:
   name: particle_instance_billboard
   vertex: assets/shaders/particle_instance_billboard.vert

@@ -6,4 +6,4 @@ list(APPEND SOURCES
 include(${CMAKE_CURRENT_LIST_DIR}/utils/CMakeLists.txt)
 include(${CMAKE_CURRENT_LIST_DIR}/game/CMakeLists.txt)
 include(${CMAKE_CURRENT_LIST_DIR}/engine/CMakeLists.txt)
-# include(${CMAKE_CURRENT_LIST_DIR}/editor/CMakeLists.txt)
+include(${CMAKE_CURRENT_LIST_DIR}/editor/CMakeLists.txt)

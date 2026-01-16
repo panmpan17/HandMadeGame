@@ -24,6 +24,8 @@ public:
 
     void setShader(Shader* pShader) override;
 
+    virtual void onDrawGizmos(bool bIsSelected) override;
+
 private:
     Shader* m_pShader = nullptr;
 
