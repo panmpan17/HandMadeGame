@@ -25,7 +25,9 @@ public:
     inline int getHeight() const { return m_nHeight; }
     inline unsigned char* getData() const { return m_pData; }
     inline GLuint getTextureID() const { return m_nTextureID; }
+#if __APPLE__
     inline MTL::Texture* getMetalTexture() const { return m_pMetalTexture; }
+#endif
 
     inline bool isCPULoaded() const { return m_pData != nullptr; }
     inline bool isGPULoaded() const { return m_nTextureID != 0; }
@@ -46,7 +48,9 @@ private:
     unsigned char* m_pData;
 
     GLuint m_nTextureID = 0; // Texture ID for OpenGL texture binding
+#if __APPLE__
     MTL::Texture* m_pMetalTexture = nullptr; // Texture for Metal
+#endif
 
     std::string m_strPath;
 };

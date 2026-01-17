@@ -37,8 +37,10 @@ protected:
 
     GLuint m_nVertexBuffer, m_nVertexArray;
 
+#if __APPLE__
     MTL::Buffer* m_pPosBuffer = nullptr;
     MTL::Buffer* m_pUVBuffer = nullptr;
+#endif // __APPLE__
 
     const ShaderUniformHandle* m_pMVPHandle = nullptr;
     const ShaderUniformHandle* m_pColorHandle = nullptr;

@@ -73,8 +73,10 @@ public:
         m_onWindowResize.add(funcListener); 
     }
 
+#if __APPLE__
     inline MTL::Device* getMetalDevice() const { return m_pMetalDevice; }
     inline MTL::RenderCommandEncoder* getCurrentFrameRenderEncoder() const { return m_pCurrentFrameRenderEncoder; }
+#endif // __APPLE__
 
     inline GraphicAPI getGraphicAPI() const { return m_eGraphicAPI; }
     inline bool isUsingMetal() const { return m_eGraphicAPI == GraphicAPI::Metal; }
@@ -126,7 +128,9 @@ private:
 #endif // IS_DEBUG_VERSION
 
     void bindOpenGLToGlfwWindow();
+#if __APPLE__
     void bindMetalToGlfwWindow();
+#endif // __APPLE__
 
     void setupInputManager();
 

@@ -2,11 +2,14 @@
 #include <glad/gl.h>
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
+
+#if __APPLE__
 #define GLFW_EXPOSE_NATIVE_COCOA
 #include <GLFW/glfw3native.h>
 
 #include <objc/runtime.h>
 #include <objc/message.h>
+#endif // __APPLE__
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
@@ -262,6 +265,7 @@ void Window::bindOpenGLToGlfwWindow()
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
+#if __APPLE__
 void Window::bindMetalToGlfwWindow()
 {
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
@@ -299,6 +303,7 @@ void Window::bindMetalToGlfwWindow()
 
     m_pMetalCommandQueue = m_pMetalDevice->newCommandQueue();
 }
+#endif
 
 void Window::setWindowSize(int nWidth, int nHeight)
 {
@@ -316,7 +321,9 @@ void Window::setupManagers()
 
     TimeManager::Initialize();
 
+#if __APPLE__
     Renderer::initializeSamplers(m_pMetalDevice);
+#endif // __APPLE__
 
     PROFILER_END_TIMER("Initialization", "TimeManager setup");
     ImageLoader::Initialize();
@@ -447,7 +454,9 @@ void Window::mainLoop()
 
             glfwGetWindowSize(m_pWindow, &m_oWindowSize.x, &m_oWindowSize.y);
 
+#if __APPLE__
             m_pMetalLayer->setDrawableSize(CGSizeMake(m_oActualSize.x, m_oActualSize.y));
+#endif // __APPLE__
         }
 
         runUpdate();
