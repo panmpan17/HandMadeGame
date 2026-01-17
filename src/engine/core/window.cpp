@@ -481,15 +481,19 @@ void Window::mainLoop()
             {
                 MTL::CommandBuffer* pCommandBuffer = m_pMetalCommandQueue->commandBuffer();
 
-                MTL::RenderPassDescriptor* pRenderPassDescriptor = MTL::RenderPassDescriptor::alloc()->init();
-                MTL::RenderPassColorAttachmentDescriptor* pColorAttachment = pRenderPassDescriptor->colorAttachments()->object(0);
+                { // Clear screen
+                    MTL::RenderPassDescriptor* pRenderPassDescriptor = MTL::RenderPassDescriptor::alloc()->init();
+                    MTL::RenderPassColorAttachmentDescriptor* pColorAttachment = pRenderPassDescriptor->colorAttachments()->object(0);
 
-                pColorAttachment->setTexture(pDrawable->texture());
-                pColorAttachment->setLoadAction(MTL::LoadActionClear);
-                pColorAttachment->setClearColor(MTL::ClearColor::Make(0.0, 0.0, 0.0, 1.0));
-                pColorAttachment->setStoreAction(MTL::StoreActionStore);
+                    pColorAttachment->setTexture(pDrawable->texture());
+                    pColorAttachment->setLoadAction(MTL::LoadActionClear);
+                    pColorAttachment->setClearColor(MTL::ClearColor::Make(0.0, 0.0, 0.0, 1.0));
+                    pColorAttachment->setStoreAction(MTL::StoreActionStore);
 
-                m_pCurrentFrameRenderEncoder = pCommandBuffer->renderCommandEncoder(pRenderPassDescriptor);
+                    m_pCurrentFrameRenderEncoder = pCommandBuffer->renderCommandEncoder(pRenderPassDescriptor);
+
+                    pRenderPassDescriptor->release();
+                }
 
                 drawFrame();
 
@@ -498,7 +502,6 @@ void Window::mainLoop()
                 pCommandBuffer->presentDrawable(pDrawable);
                 pCommandBuffer->commit();
 
-                pRenderPassDescriptor->release();
             }
 
             pPool->release();

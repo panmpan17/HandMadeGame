@@ -362,8 +362,11 @@ void GizmosManager::addCubeGizmos(const Vector3& vecPosition, const Quaternion& 
 
 void GizmosManager::drawAllGizmos()
 {
-    // glEnable(GL_BLEND);
-    // glDepthMask(GL_FALSE);
+    if (Window::ins->isUsingOpenGL())
+    {
+        glEnable(GL_BLEND);
+        glDepthMask(GL_FALSE);
+    }
 
     drawCircleGizmos();
     drawSphereGizmos();
@@ -371,22 +374,25 @@ void GizmosManager::drawAllGizmos()
     drawCubeGizmos();
     drawImageGizmos();
 
-    // glDisable(GL_BLEND);
-    // glDepthMask(GL_TRUE);
+    if (Window::ins->isUsingOpenGL())
+    {
+        glDisable(GL_BLEND);
+        glDepthMask(GL_TRUE);
+    }
 }
 
 void GizmosManager::drawCircleGizmos()
 {
+    mat4x4 oScaleMatrix;
+    mat4x4 oRotationMatrix;
+    mat4x4 oModelMatrix;
+
     if (Window::ins->isUsingOpenGL())
     {
         glDisable(GL_CULL_FACE);
 
         glUseProgram(m_pMeshGizmosShader->getProgram());
         glBindVertexArray(m_nCircleGizmosVertexArray);
-
-        mat4x4 oScaleMatrix;
-        mat4x4 oRotationMatrix;
-        mat4x4 oModelMatrix;
 
         for (int i = 0; i < m_nCircleGizmosSize; ++i)
         {
@@ -418,6 +424,32 @@ void GizmosManager::drawCircleGizmos()
 #if __APPLE__
     else if (Window::ins->isUsingMetal())
     {
+        MTL::RenderCommandEncoder* pRenderCommandEncoder = Window::ins->getCurrentFrameRenderEncoder();
+
+        pRenderCommandEncoder->setRenderPipelineState(m_pMeshGizmosShader->getMetalPipelineState());
+        pRenderCommandEncoder->setVertexBuffer(m_pCircleGizmosMetalVertexBuffer, 0, 0);
+        pRenderCommandEncoder->setVertexBuffer(Camera::main->getCameraMetalUBO(), 0, 1);
+
+        for (int i = 0; i < m_nCircleGizmosSize; ++i)
+        {
+            CircleGizmosData& oData = m_vecCircleGizmos.at(i);
+
+            mat4x4_translate(oModelMatrix, oData.m_vecPosition.x, oData.m_vecPosition.y, oData.m_vecPosition.z);
+            
+            mat4x4_identity(oScaleMatrix);
+            mat4x4_scale(oScaleMatrix, oScaleMatrix, oData.m_fRadius);
+
+            oData.m_oRotation.toMat4x4(oRotationMatrix);
+
+            mat4x4_mul(oRotationMatrix, oRotationMatrix, oScaleMatrix);
+            mat4x4_mul(oModelMatrix, oModelMatrix, oRotationMatrix);
+
+            pRenderCommandEncoder->setVertexBytes(&oModelMatrix, sizeof(oModelMatrix), 2);
+            pRenderCommandEncoder->setFragmentBytes(&oData.m_color, sizeof(Color), 0);
+
+            pRenderCommandEncoder->drawPrimitives(MTL::PrimitiveType::PrimitiveTypeTriangle, NS_INT(0), NS_INT(m_nCircleGizmosVertexCount));
+            INCREASE_DRAW_CALL_COUNT(m_nCircleGizmosVertexCount / 3);
+        }
     }
 #endif // __APPLE__
 }
@@ -488,16 +520,16 @@ void GizmosManager::drawSphereGizmos()
 
 void GizmosManager::drawRectangleGizmos()
 {
+    mat4x4 oScaleMatrix;
+    mat4x4 oRotationMatrix;
+    mat4x4 oModelMatrix;
+
     if (Window::ins->isUsingOpenGL())
     {
         glDisable(GL_CULL_FACE);
 
         glUseProgram(m_pMeshGizmosShader->getProgram());
         glBindVertexArray(m_nRectangleGizmosVertexArray);
-
-        mat4x4 oScaleMatrix;
-        mat4x4 oRotationMatrix;
-        mat4x4 oModelMatrix;
 
         for (int i = 0; i < m_nRectangleGizmosSize; ++i)
         {
@@ -529,20 +561,46 @@ void GizmosManager::drawRectangleGizmos()
 #if __APPLE__
     else if (Window::ins->isUsingMetal())
     {
+        MTL::RenderCommandEncoder* pRenderCommandEncoder = Window::ins->getCurrentFrameRenderEncoder();
+
+        pRenderCommandEncoder->setRenderPipelineState(m_pMeshGizmosShader->getMetalPipelineState());
+        pRenderCommandEncoder->setVertexBuffer(m_pRectangleGizmosMetalVertexBuffer, 0, 0);
+        pRenderCommandEncoder->setVertexBuffer(Camera::main->getCameraMetalUBO(), 0, 1);
+
+        for (int i = 0; i < m_nRectangleGizmosSize; ++i)
+        {
+            RectangleGizmosData& oData = m_vecRectangleGizmos.at(i);
+
+            mat4x4_translate(oModelMatrix, oData.m_vecPosition.x, oData.m_vecPosition.y, oData.m_vecPosition.z);
+            
+            mat4x4_identity(oScaleMatrix);
+            mat4x4_scale_aniso(oScaleMatrix, oScaleMatrix, oData.m_vecSize.x, oData.m_vecSize.y, 1.0f);
+
+            oData.m_oRotation.toMat4x4(oRotationMatrix);
+
+            mat4x4_mul(oRotationMatrix, oRotationMatrix, oScaleMatrix);
+            mat4x4_mul(oModelMatrix, oModelMatrix, oRotationMatrix);
+
+            pRenderCommandEncoder->setVertexBytes(&oModelMatrix, sizeof(oModelMatrix), 2);
+            pRenderCommandEncoder->setFragmentBytes(&oData.m_color, sizeof(Color), 0);
+
+            pRenderCommandEncoder->drawPrimitives(MTL::PrimitiveType::PrimitiveTypeTriangle, NS_INT(0), NS_INT(m_nRectangleGizmosVertexCount));
+            INCREASE_DRAW_CALL_COUNT(m_nRectangleGizmosVertexCount / 3);
+        }
     }
 #endif // __APPLE__
 }
 
 void GizmosManager::drawCubeGizmos()
 {
+    mat4x4 oScaleMatrix;
+    mat4x4 oRotationMatrix;
+    mat4x4 oModelMatrix;
+
     if (Window::ins->isUsingOpenGL())
     {
         glUseProgram(m_pMeshGizmosShader->getProgram());
         glBindVertexArray(m_nCubeGizmosVertexArray);
-
-        mat4x4 oScaleMatrix;
-        mat4x4 oRotationMatrix;
-        mat4x4 oModelMatrix;
 
         for (int i = 0; i < m_nCubeGizmosSize; ++i)
         {
@@ -572,6 +630,32 @@ void GizmosManager::drawCubeGizmos()
 #if __APPLE__
     else if (Window::ins->isUsingMetal())
     {
+        MTL::RenderCommandEncoder* pRenderCommandEncoder = Window::ins->getCurrentFrameRenderEncoder();
+
+        pRenderCommandEncoder->setRenderPipelineState(m_pMeshGizmosShader->getMetalPipelineState());
+        pRenderCommandEncoder->setVertexBuffer(m_pCubeGizmosMetalVertexBuffer, 0, 0);
+        pRenderCommandEncoder->setVertexBuffer(Camera::main->getCameraMetalUBO(), 0, 1);
+
+        for (int i = 0; i < m_nCubeGizmosSize; ++i)
+        {
+            CubeGizmosData& oData = m_vecCubeGizmos.at(i);
+
+            mat4x4_translate(oModelMatrix, oData.m_vecPosition.x, oData.m_vecPosition.y, oData.m_vecPosition.z);
+            
+            mat4x4_identity(oScaleMatrix);
+            mat4x4_scale_aniso(oScaleMatrix, oScaleMatrix, oData.m_vecSize.x, oData.m_vecSize.y, oData.m_vecSize.z);
+
+            oData.m_oRotation.toMat4x4(oRotationMatrix);
+
+            mat4x4_mul(oRotationMatrix, oRotationMatrix, oScaleMatrix);
+            mat4x4_mul(oModelMatrix, oModelMatrix, oRotationMatrix);
+
+            pRenderCommandEncoder->setVertexBytes(&oModelMatrix, sizeof(oModelMatrix), 2);
+            pRenderCommandEncoder->setFragmentBytes(&oData.m_color, sizeof(Color), 0);
+
+            pRenderCommandEncoder->drawPrimitives(MTL::PrimitiveType::PrimitiveTypeTriangle, NS_INT(0), NS_INT(m_nCubeGizmosVertexCount));
+            INCREASE_DRAW_CALL_COUNT(m_nCubeGizmosVertexCount / 3);
+        }
     }
 #endif // __APPLE__
 }

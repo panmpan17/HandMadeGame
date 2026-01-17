@@ -161,7 +161,23 @@ Shader* Shader::loadFromMetalShader(MTL::Library* const pLibrary, MTL::Device* c
     MTL::RenderPipelineDescriptor* psoDesc = MTL::RenderPipelineDescriptor::alloc()->init();
     psoDesc->setVertexFunction(pVertexFunction);
     psoDesc->setFragmentFunction(pFragmentFunction);
-    psoDesc->colorAttachments()->object(0)->setPixelFormat(MTL::PixelFormatBGRA8Unorm);
+
+    MTL::RenderPipelineColorAttachmentDescriptor* pColorAttachment = psoDesc->colorAttachments()->object(0);
+    pColorAttachment->setPixelFormat(MTL::PixelFormatBGRA8Unorm);
+
+    if (oData.m_bTransparent)
+    {
+        pColorAttachment->setBlendingEnabled(true);
+
+        pColorAttachment->setRgbBlendOperation(MTL::BlendOperationAdd);
+        pColorAttachment->setSourceRGBBlendFactor(MTL::BlendFactorSourceAlpha);
+        pColorAttachment->setDestinationRGBBlendFactor(MTL::BlendFactorOneMinusSourceAlpha);
+
+        pColorAttachment->setAlphaBlendOperation(MTL::BlendOperationAdd);
+        pColorAttachment->setSourceAlphaBlendFactor(MTL::BlendFactorSourceAlpha);
+        pColorAttachment->setDestinationAlphaBlendFactor(MTL::BlendFactorOneMinusSourceAlpha);
+    }
+
 
     int nSize = static_cast<int>(oData.m_metalAttributeSizes.size());
     if (nSize > 0)

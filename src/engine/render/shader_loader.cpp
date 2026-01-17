@@ -144,6 +144,10 @@ void ShaderLoader::readRegistryFromFile()
             oCurrentShaderData.m_metalAttributeSizes.clear();
             splitStringPush(oCurrentShaderData.m_metalAttributeSizes, strSizes, ',', true);
         }
+        else if (memcmp(strLine.data() + 2, "transparency", 12) == 0)
+        {
+            oCurrentShaderData.m_bTransparent = (strLine.substr(2 + 14) == "1");
+        }
     }
 
     if (oCurrentShaderData.nCurrentShaderId != -1 && !oCurrentShaderData.m_strName.empty())

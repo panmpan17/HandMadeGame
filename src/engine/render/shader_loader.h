@@ -12,6 +12,7 @@ struct ShaderRegisteryData
 {
     int nCurrentShaderId = -1;
     std::string m_strName;
+    bool m_bTransparent = false;
 
     // OpenGL
     std::string m_strVertexPath;
@@ -28,6 +29,8 @@ struct ShaderRegisteryData
     {
         nCurrentShaderId = -1;
         m_strName.clear();
+        m_bTransparent = false;
+
         m_strVertexPath.clear();
         m_strFragmentPath.clear();
         nCameraUBOIndex = GL_INVALID_INDEX;

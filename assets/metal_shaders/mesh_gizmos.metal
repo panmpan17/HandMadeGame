@@ -23,6 +23,6 @@ vertex meshGizmos_VertexOut meshGizmos_vertexMain(meshGizmos_VertexIn in [[stage
     return out;
 }
 
-fragment metal::float4 meshGizmos_fragmentMain(constant metal::float3& in [[buffer(0)]]) {
-    return metal::float4(in, 1.0);
+fragment metal::float4 meshGizmos_fragmentMain(constant metal::float4& color [[buffer(0)]]) {
+    return color;
 }
