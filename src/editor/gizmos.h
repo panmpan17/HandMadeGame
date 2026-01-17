@@ -109,8 +109,10 @@ private:
     GLuint m_nImageGizmosVertexBuffer = 0;
     GLuint m_nImageGizmosVertexArray = 0;
 
+#if __APPLE__
     MTL::Buffer* m_pImageGizmosMetalVertexBuffer = nullptr;
     MTL::Buffer* m_pImageGizmosMetalUVBuffer = nullptr;
+#endif // __APPLE__
 
     void initImageGizmosShaderAndBuffer();
     void drawImageGizmos();
@@ -131,6 +133,10 @@ private:
     GLuint m_nCircleGizmosVertexBuffer = 0;
     GLuint m_nCircleGizmosVertexArray = 0;
 
+#if __APPLE__
+    MTL::Buffer* m_pCircleGizmosMetalVertexBuffer = nullptr;
+#endif // __APPLE__
+
     void initCircleGizmosShaderAndBuffer();
     void drawCircleGizmos();
 
@@ -142,6 +148,10 @@ private:
 
     GLuint m_nSphereGizmosVertexBuffer = 0;
     GLuint m_nSphereGizmosVertexArray = 0;
+
+#if __APPLE__
+    MTL::Buffer* m_pSphereGizmosMetalVertexBuffer = nullptr;
+#endif // __APPLE__
 
     void initSphereGizmosShaderAndBuffer();
     void drawSphereGizmos();
@@ -155,6 +165,10 @@ private:
     GLuint m_nRectangleGizmosVertexBuffer = 0;
     GLuint m_nRectangleGizmosVertexArray = 0;
 
+#if __APPLE__
+    MTL::Buffer* m_pRectangleGizmosMetalVertexBuffer = nullptr;
+#endif // __APPLE__
+
     void initRectangleGizmosShaderAndBuffer();
     void drawRectangleGizmos();
 
@@ -167,10 +181,19 @@ private:
     GLuint m_nCubeGizmosVertexBuffer = 0;
     GLuint m_nCubeGizmosVertexArray = 0;
 
+#if __APPLE__
+    MTL::Buffer* m_pCubeGizmosMetalVertexBuffer = nullptr;
+#endif // __APPLE__
+
     void initCubeGizmosShaderAndBuffer();
     void drawCubeGizmos();
 #pragma endregion
 
 
     void onMouseClickCheck(bool bPressed);
+
+    void initMeshBufferUsingOpenGL(const std::string_view& strFilePath, int& nVertexCount, GLuint& nVertexBuffer, GLuint& nVertxArray);
+#if __APPLE__
+    void initMeshBufferUsingMetal(const std::string_view& strFilePath, int& nVertexCount, MTL::Buffer*& pMetalVertexBuffer);
+#endif // __APPLE__
 };

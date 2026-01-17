@@ -85,6 +85,8 @@
   vertex: assets/shaders/3d/mesh_gizmos.vert
   fragment: assets/shaders/3d/mesh_gizmos.frag
   cameraUBO: 0
+  metal_prefix: meshGizmos
+  metal_attribute_size: 3
 21:
   name: colored_vertices
   vertex: assets/shaders/colored_vertices.vert

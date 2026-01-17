@@ -29,11 +29,6 @@ vertex imageGizmos_VertexOut imageGizmos_vertexMain(imageGizmos_VertexIn in [[st
     metal::float3 worldPosition = uniforms.worldPosition +
                                   billboardRotation * metal::float3(in.position, 0.0);
 
-    metal::float4x4 model = metal::float4x4(0, 0, 0, uniforms.worldPosition.x,
-                                            0, 0, 0, uniforms.worldPosition.y,
-                                            0, 0, 0, uniforms.worldPosition.z,
-                                            0, 0, 0, 0);
-
     imageGizmos_VertexOut out;
     out.position = cameraMatrices.projection * cameraMatrices.view * metal::float4(worldPosition, 1.0);
     out.texCoord = in.texCoord;
@@ -43,7 +38,6 @@ vertex imageGizmos_VertexOut imageGizmos_vertexMain(imageGizmos_VertexIn in [[st
 fragment metal::float4 imageGizmos_fragmentMain(imageGizmos_VertexOut in [[stage_in]],
                                    metal::texture2d<float> colorTexture [[texture(0)]],
                                    metal::sampler textureSampler [[sampler(0)]],
-                                   constant imageGizmos_Uniforms& uniforms [[buffer(2)]],
-                                   constant CameraMatrices& cameraMatrices [[buffer(3)]]) {
+                                   constant imageGizmos_Uniforms& uniforms [[buffer(2)]]) {
     return colorTexture.sample(textureSampler, in.texCoord) * uniforms.color;
 }
