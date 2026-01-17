@@ -4,6 +4,7 @@
 #include "input/event.h"
 #include "math/vector.h"
 #include "../../utils/expandable_array.h"
+// #include "../../editor/editor_window.h"
 
 #if __APPLE__
 #include <Foundation/Foundation.hpp>
@@ -15,7 +16,6 @@ typedef struct GLFWwindow GLFWwindow;
 
 class WorldScene;
 // class RenderProcessQueue;
-// class IEditorWindow;
 class FileWatchDog;
 
 typedef unsigned int GLuint;

@@ -2,6 +2,7 @@
 
 #include "../../../utils/expandable_array.h"
 #include "node.h"
+#include "../../components/drawable_interface.h"
 
 class Node;
 class IDrawable;
