@@ -217,14 +217,14 @@ void createVisualEffectDemo()
 
     {
         Skybox* pSkybox = new Skybox();
-        pSkybox->loadSkyboxCubmaps(
+        pSkybox->loadSkyboxCubmaps({
             "assets/images/skybox/right.jpg",
             "assets/images/skybox/left.jpg",
             "assets/images/skybox/top.jpg",
             "assets/images/skybox/bottom.jpg",
             "assets/images/skybox/front.jpg",
             "assets/images/skybox/back.jpg"
-        );
+        });
         pWorldScene->setSkybox(pSkybox);
     }
 
@@ -358,14 +358,14 @@ void createLightingShadowDemo()
 
     {
         Skybox* pSkybox = new Skybox();
-        pSkybox->loadSkyboxCubmaps(
+        pSkybox->loadSkyboxCubmaps({
             "assets/images/skybox/right.jpg",
             "assets/images/skybox/left.jpg",
             "assets/images/skybox/top.jpg",
             "assets/images/skybox/bottom.jpg",
             "assets/images/skybox/front.jpg",
             "assets/images/skybox/back.jpg"
-        );
+        });
         pWorldScene->setSkybox(pSkybox);
     }
 
@@ -570,14 +570,14 @@ void createProfolioSceneDemo()
 
     {
         Skybox* pSkybox = new Skybox();
-        pSkybox->loadSkyboxCubmaps(
+        pSkybox->loadSkyboxCubmaps({
             "assets/images/skybox/right.jpg",
             "assets/images/skybox/left.jpg",
             "assets/images/skybox/top.jpg",
             "assets/images/skybox/bottom.jpg",
             "assets/images/skybox/front.jpg",
             "assets/images/skybox/back.jpg"
-        );
+        });
         pWorldScene->setSkybox(pSkybox);
     }
 

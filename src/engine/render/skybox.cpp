@@ -84,10 +84,14 @@ void Skybox::bindVertexArray()
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void Skybox::loadSkyboxCubmaps(const std::string_view& strRight, const std::string_view& strLeft,
-                               const std::string_view& strTop, const std::string_view& strBottom,
-                               const std::string_view& strFront, const std::string_view& strBack)
+void Skybox::loadSkyboxCubmaps(std::initializer_list<std::string_view> strImages)
 {
+    if (static_cast<int>(strImages.size()) != 6)
+    {
+        LOGERR("Skybox requires 6 images for cubemap");
+        return;
+    }
+
     glGenTextures(1, &m_nSkyboxTextureID);
     glBindTexture(GL_TEXTURE_CUBE_MAP, m_nSkyboxTextureID);
 
@@ -97,51 +101,12 @@ void Skybox::loadSkyboxCubmaps(const std::string_view& strRight, const std::stri
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
+    for (int i = 0; i < 6; ++i)
     {
-        Image oRightImage(strRight, false);
-        if (oRightImage.isCPULoaded())
+        Image oImage(*(strImages.begin() + i), false);
+        if (oImage.isCPULoaded())
         {
-            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, GL_RGB, oRightImage.getWidth(), oRightImage.getHeight(), 0, GL_RGB, GL_UNSIGNED_BYTE, oRightImage.getData());
-        }
-    }
-
-    {
-        Image oLeftImage(strLeft, false);
-        if (oLeftImage.isCPULoaded())
-        {
-            glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_X, 0, GL_RGB, oLeftImage.getWidth(), oLeftImage.getHeight(), 0, GL_RGB, GL_UNSIGNED_BYTE, oLeftImage.getData());
-        }
-    }
-
-    {
-        Image oTopImage(strTop, false);
-        if (oTopImage.isCPULoaded())
-        {
-            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Y, 0, GL_RGB, oTopImage.getWidth(), oTopImage.getHeight(), 0, GL_RGB, GL_UNSIGNED_BYTE, oTopImage.getData());
-        }
-    }
-
-    {
-        Image oBottomImage(strBottom, false);
-        if (oBottomImage.isCPULoaded())
-        {
-            glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, 0, GL_RGB, oBottomImage.getWidth(), oBottomImage.getHeight(), 0, GL_RGB, GL_UNSIGNED_BYTE, oBottomImage.getData());
-        }
-    }
-
-    {
-        Image oFrontImage(strFront, false);
-        if (oFrontImage.isCPULoaded())
-        {
-            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Z, 0, GL_RGB, oFrontImage.getWidth(), oFrontImage.getHeight(), 0, GL_RGB, GL_UNSIGNED_BYTE, oFrontImage.getData());
-        }
-    }
-
-    {
-        Image oBackImage(strBack, false);
-        if (oBackImage.isCPULoaded())
-        {
-            glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, GL_RGB, oBackImage.getWidth(), oBackImage.getHeight(), 0, GL_RGB, GL_UNSIGNED_BYTE, oBackImage.getData());
+            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, oImage.getWidth(), oImage.getHeight(), 0, GL_RGB, GL_UNSIGNED_BYTE, oImage.getData());
         }
     }
 
