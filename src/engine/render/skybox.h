@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string_view>
+#include <initializer_list>
 
 
 class Shader;
@@ -13,9 +14,7 @@ public:
     Skybox();
     ~Skybox();
 
-    void loadSkyboxCubmaps(const std::string_view& strRight, const std::string_view& strLeft,
-                           const std::string_view& strTop, const std::string_view& strBottom,
-                           const std::string_view& strFront, const std::string_view& strBack);
+    void loadSkyboxCubmaps(std::initializer_list<std::string_view> strImages);
 
     void draw();
 
