@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 #include "../components/component.h"
 #include "../render/material.h"
 

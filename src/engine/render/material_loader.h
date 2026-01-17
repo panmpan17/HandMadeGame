@@ -2,6 +2,7 @@
 
 #include <unordered_map>
 #include <string>
+#include <memory>
 #include "material.h"
 #include "../../utils/file_watch_dog.h"
 
