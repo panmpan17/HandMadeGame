@@ -40,8 +40,57 @@ GizmosManager::GizmosManager()
 
 GizmosManager::~GizmosManager()
 {
-    glDeleteBuffers(1, &m_nImageGizmosVertexBuffer);
-    glDeleteVertexArrays(1, &m_nImageGizmosVertexArray);
+    if (Window::ins->isUsingOpenGL())
+    {
+        glDeleteBuffers(1, &m_nCircleGizmosVertexBuffer);
+        glDeleteVertexArrays(1, &m_nCircleGizmosVertexArray);
+
+        glDeleteBuffers(1, &m_nSphereGizmosVertexBuffer);
+        glDeleteVertexArrays(1, &m_nSphereGizmosVertexArray);
+
+        glDeleteBuffers(1, &m_nRectangleGizmosVertexBuffer);
+        glDeleteVertexArrays(1, &m_nRectangleGizmosVertexArray);
+
+        glDeleteBuffers(1, &m_nCubeGizmosVertexBuffer);
+        glDeleteVertexArrays(1, &m_nCubeGizmosVertexArray);
+
+        glDeleteBuffers(1, &m_nImageGizmosVertexBuffer);
+        glDeleteVertexArrays(1, &m_nImageGizmosVertexArray);
+    }
+#if __APPLE__
+    else if (Window::ins->isUsingMetal())
+    {
+        if (m_pCircleGizmosMetalVertexBuffer)
+        {
+            m_pCircleGizmosMetalVertexBuffer->release();
+            m_pCircleGizmosMetalVertexBuffer = nullptr;
+        }
+
+        if (m_pSphereGizmosMetalVertexBuffer)
+        {
+            m_pSphereGizmosMetalVertexBuffer->release();
+            m_pSphereGizmosMetalVertexBuffer = nullptr;
+        }
+
+        if (m_pRectangleGizmosMetalVertexBuffer)
+        {
+            m_pRectangleGizmosMetalVertexBuffer->release();
+            m_pRectangleGizmosMetalVertexBuffer = nullptr;
+        }
+
+        if (m_pImageGizmosMetalVertexBuffer)
+        {
+            m_pImageGizmosMetalVertexBuffer->release();
+            m_pImageGizmosMetalVertexBuffer = nullptr;
+        }
+
+        if (m_pImageGizmosMetalUVBuffer)
+        {
+            m_pImageGizmosMetalUVBuffer->release();
+            m_pImageGizmosMetalUVBuffer = nullptr;
+        }
+    }
+#endif // __APPLE__
 }
 
 #pragma region Initialize Gizmos Required Resources

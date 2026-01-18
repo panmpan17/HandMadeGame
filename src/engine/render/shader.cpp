@@ -11,6 +11,7 @@
 #include "../core/debug_macro.h"
 #include "../core/camera.h"
 #include "../core/time.h"
+#include "../core/window.h"
 #include "../../utils/file_utils.h"
 
 
@@ -216,10 +217,23 @@ Shader* Shader::loadFromMetalShader(MTL::Library* const pLibrary, MTL::Device* c
 
 Shader::~Shader()
 {
-    if (m_nProgram)
+    if (Window::ins->isUsingOpenGL())
     {
-        glDeleteShader(m_nProgram);
+        if (m_nProgram != GL_INVALID_INDEX)
+        {
+            glDeleteShader(m_nProgram);
+        }
     }
+#if __APPLE__
+    else if (Window::ins->isUsingMetal())
+    {
+        if (m_pPSO)
+        {
+            m_pPSO->release();
+            m_pPSO = nullptr;
+        }
+    }
+#endif // __APPLE__
 }
 
 bool Shader::getIsUsingFile(const std::string& strFilePath) const

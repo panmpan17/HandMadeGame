@@ -30,6 +30,10 @@ class Window {
 public:
     static Window* ins;
 
+#if IS_DEBUG_VERSION
+    static inline bool sm_bRestartRequested = false;
+#endif // IS_DEBUG_VERSION
+
     Window();
     ~Window();
 

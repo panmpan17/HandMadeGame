@@ -69,6 +69,14 @@ public:
             ins = new GizmosManager();
         }
     }
+    static void Cleanup()
+    {
+        if (ins)
+        {
+            delete ins;
+            ins = nullptr;
+        }
+    }
 
     void clearAllGizmos();
 

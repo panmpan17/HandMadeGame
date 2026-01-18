@@ -49,6 +49,7 @@ public:
     inline static ShaderLoader* getInstance() { return ins; }
 
     inline static void Initialize() { if (!ins) ins = new ShaderLoader(); }
+    static void Cleanup() { if (ins) { delete ins; ins = nullptr; } }
 
     Shader* getShader(int nId) const;
     Shader* getShader(const std::string& strName) const;

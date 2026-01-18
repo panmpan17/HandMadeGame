@@ -21,38 +21,45 @@ int main(int nArgumentCount, char* arrArguments[])
 #endif
 
     registerSignalHandlers();
-
-    Window window;
     // ColorPicker colorPicker;
 
     try
     {
-        window.setResizable(true);
-        // colorPicker.preconfigureWindowObject(&window);
-        if (!window.configureAndCreateWindow())
+        do
         {
-            return -1; // Initialization failed
+            Window window;
+            window.setResizable(true);
+            // colorPicker.preconfigureWindowObject(&window);
+            if (!window.configureAndCreateWindow())
+            {
+                return -1; // Initialization failed
+            }
+    
+            window.initializeGraphicsAPI();
+            window.setupManagers();
+            window.setupGameEngineRelatedObject();
+    
+            PROFILER_START_TIMER();
+            // setupPostProcess();
+            PROFILER_END_TIMER("World", "Setup post process");
+            // createDemo1();
+            // createVisualEffectDemo();
+            // createLightingShadowDemo();
+            // createPingPongGame();
+            // sceneTest();
+            // createProfolioSceneDemo();
+            // colorPicker.pickerMain();
+            // serializationTest();
+            firstTriangeTest();
+            PROFILER_END_TIMER("World", "Init");
+    
+            window.mainLoop();
         }
-
-        window.initializeGraphicsAPI();
-        window.setupManagers();
-        window.setupGameEngineRelatedObject();
-
-        PROFILER_START_TIMER();
-        // setupPostProcess();
-        PROFILER_END_TIMER("World", "Setup post process");
-        // createDemo1();
-        // createVisualEffectDemo();
-        // createLightingShadowDemo();
-        // createPingPongGame();
-        // sceneTest();
-        // createProfolioSceneDemo();
-        // colorPicker.pickerMain();
-        // serializationTest();
-        firstTriangeTest();
-        PROFILER_END_TIMER("World", "Init");
-
-        window.mainLoop();
+#if IS_DEBUG_VERSION
+        while (Window::sm_bRestartRequested);
+#else
+        while (false);
+#endif
     }
     catch (const std::exception& e)
     {

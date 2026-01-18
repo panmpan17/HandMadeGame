@@ -64,6 +64,10 @@ Window::Window()
 {
     ins = this;
 
+#if IS_DEBUG_VERSION
+    sm_bRestartRequested = false;
+#endif // IS_DEBUG_VERSION
+
     m_bShowIMGUI = Preference::getEnableIMGUI();
     m_bEnablePostProcess = Preference::getEnablePostProcess();
     m_oWindowSize.x = Preference::getWindowWidth();
@@ -71,7 +75,10 @@ Window::Window()
     m_bDrawGizmos = Preference::getEnableGizmos();
 
 #if __APPLE__
-    m_pMetalDevice = MTL::CreateSystemDefaultDevice();
+    if (!Preference::getForceOpenGLOnMac())
+    {
+        m_pMetalDevice = MTL::CreateSystemDefaultDevice();
+    }
     if (m_pMetalDevice)
     {
         m_eGraphicAPI = GraphicAPI::Metal;
@@ -136,6 +143,8 @@ Window::~Window()
     InputManager::Cleanup();
     ImageLoader::Cleanup();
     // LightManager::Cleanup();
+    ShaderLoader::Cleanup();
+    GizmosManager::Cleanup();
 
     Preference::savePreferences();
 
@@ -144,6 +153,8 @@ Window::~Window()
     // ImGui_ImplOpenGL3_Shutdown();
     // ImGui_ImplGlfw_Shutdown();
     // ImGui::DestroyContext();
+
+    ins = nullptr;
 }
 
 void APIENTRY glDebugOutput(GLenum source, GLenum type, unsigned int id, GLenum severity, GLsizei length, const char* message, const void* userParam)
@@ -382,6 +393,16 @@ void Window::setupGameEngineRelatedObject()
         }
     });
 
+#if IS_DEBUG_VERSION
+    InputManager::getInstance()->registerKeyPressCallback(KeyCode::KEY_FUNCTION_4, [](bool pressed) {
+        if (pressed)
+        {
+            Preference::setForceOpenGLOnMac(!Preference::getForceOpenGLOnMac());
+            Window::ins->sm_bRestartRequested = true;
+        }
+    });
+#endif // IS_DEBUG_VERSION
+
     PROFILER_END_TIMER("Initialization", "Input key setup");
 
 #if IS_DEBUG_VERSION
@@ -439,7 +460,11 @@ void Window::mainLoop()
 {
     beforeLoop();
 
+#if IS_DEBUG_VERSION
+    while (!glfwWindowShouldClose(m_pWindow) && !sm_bRestartRequested)
+#else
     while (!glfwWindowShouldClose(m_pWindow))
+#endif
     {
         glfwPollEvents();
 
