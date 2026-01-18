@@ -174,7 +174,9 @@ void WorldScene::renderTransparentObjects()
 #if __APPLE__
     else if (bUsingMetal)
     {
-        // TODO: Metal turn off depth write
+        MTL::RenderCommandEncoder* pRenderEncoder = Window::ins->getCurrentFrameRenderEncoder();
+        pRenderEncoder->setDepthStencilState(Renderer::m_pDepthOffStencilState);
+
     }
 #endif // __APPLE__
 
@@ -196,7 +198,8 @@ void WorldScene::renderTransparentObjects()
 #if __APPLE__
     else if (bUsingMetal)
     {
-        // TODO: Metal turn on depth write
+        MTL::RenderCommandEncoder* pRenderEncoder = Window::ins->getCurrentFrameRenderEncoder();
+        pRenderEncoder->setDepthStencilState(Renderer::m_pDepthOnStencilState);
     }
 #endif // __APPLE__
 }

@@ -32,6 +32,8 @@ public:
     inline void setColor(const vec4 color) { vec4_dup(m_color, color); }
     inline void setColor(float r, float g, float b, float a) { m_color[0] = r; m_color[1] = g; m_color[2] = b; m_color[3] = a; }
 
+    bool getIsTransparent() const override;
+
 protected:
     virtual void predrawSetShaderUniforms();
 

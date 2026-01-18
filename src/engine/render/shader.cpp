@@ -113,6 +113,8 @@ Shader* Shader::loadFromOpenGLShader(const ShaderRegisteryData& pData)
         pShader->setTimeDataUBOBindingPoint(pData.nTimeDataUBOIndex);
     }
 
+    pShader->m_bTransparent = pData.m_bTransparent;
+
     return pShader;
 }
 
@@ -206,6 +208,7 @@ Shader* Shader::loadFromMetalShader(MTL::Library* const pLibrary, MTL::Device* c
     }
 
     pShader->m_strName = oData.m_strName;
+    pShader->m_bTransparent = oData.m_bTransparent;
 
     pVertexFunction->release();
     pFragmentFunction->release();

@@ -73,6 +73,8 @@ public:
     void setTimeDataUBOBindingPoint(GLuint nBindingPoint);
     void reloadTimeDataUBOBinding();
 
+    inline bool isTransparent() const { return m_bTransparent; }
+
 protected:
     Shader() {}
 
@@ -94,6 +96,8 @@ protected:
     int m_nUniformHandleCount = 0;
 
     GLuint getUniformLocation(const std::string& name) const;
+
+    bool m_bTransparent = false;
 
 #if __APPLE__
 public:

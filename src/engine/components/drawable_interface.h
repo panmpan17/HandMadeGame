@@ -23,7 +23,7 @@ public:
     virtual void draw() = 0;
     virtual void drawDepth() {}
 
-    bool getIsTransparent() const
+    virtual bool getIsTransparent() const
     {
         if (m_pMaterial)
         {

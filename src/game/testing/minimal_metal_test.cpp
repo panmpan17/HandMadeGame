@@ -55,7 +55,7 @@ void firstTriangeTest()
         auto pNode2 = new Node(0.5f, 0.5f, 0.f);
         pNode2->setScale(2);
 
-        vec4 red = {1.f, 0.f, 0.f, 1.f}; // Red color for the quad
+        vec4 red = {1.f, 0.f, 0.f, .5f}; // Red color for the quad
         auto pQuad = new Quad(0.5f, 0.5f, red);
         pQuad->setShader(pImageShader);
         pQuad->setImage(pTestImage);

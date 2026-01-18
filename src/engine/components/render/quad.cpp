@@ -111,6 +111,15 @@ void Quad::registerBuffer()
 #endif // __APPLE__
 }
 
+bool Quad::getIsTransparent() const
+{
+    if (m_pShader)
+    {
+        return m_pShader->isTransparent();
+    }
+    return false;
+}
+
 void Quad::draw()
 {
     ASSERT(m_pShader, "Shader must be set before drawing the quad");
