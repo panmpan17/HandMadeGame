@@ -22,7 +22,8 @@ vertex VertexOut_CubeMap cubemap_vertexMain(VertexIn_Position in [[stage_in]],
     out.textCoord = in.position;
 
     metal::float4x4 view = mat3ToMat4(mat4ToMat3(cameraMatrices.view));
-    out.position = cameraMatrices.projection * view * metal::float4(in.position, 1.0);
+    metal::float4 pos = cameraMatrices.projection * view * metal::float4(in.position, 1.0);
+    out.position = pos.xyww;
     return out;
 }
 

@@ -191,15 +191,14 @@ void Skybox::draw()
 #if __APPLE__
     else if (bUsingMetal)
     {
-        // TODO: the depth test
         MTL::RenderCommandEncoder* pRenderEncoder = Window::ins->getCurrentFrameRenderEncoder();
-        pRenderEncoder->setDepthStencilState(Renderer::m_pDepthOffStencilState);
+        pRenderEncoder->setDepthStencilState(Renderer::m_pSkyboxStencilState);
 
         drawWithMetal();
 
         pRenderEncoder->setDepthStencilState(Renderer::m_pDepthOnStencilState);
     }
-#endif
+#endif // __APPLE__
 }
 
 void Skybox::drawWithOpenGL()

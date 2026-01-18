@@ -171,8 +171,6 @@ bool Window::configureAndCreateWindow()
 
     glfwWindowHint(GLFW_RESIZABLE, m_bResizable ? GLFW_TRUE : GLFW_FALSE);
 
-    glfwWindowHint(GLFW_DEPTH_BITS, 24);
-
     if (isUsingOpenGL())
     {
         configureGLFWWithOpenGL();
@@ -240,6 +238,8 @@ void Window::configureGLFWWithOpenGL()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
 #endif // __APPLE__
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+    glfwWindowHint(GLFW_DEPTH_BITS, 24);
 }
 
 void Window::configureGLFWWithMetal()
@@ -313,6 +313,8 @@ void Window::bindMetalToGlfwWindow()
     // m_pMetalLayer->setAutoresizingMask(18);
 
     m_pMetalCommandQueue = m_pMetalDevice->newCommandQueue();
+
+    Renderer::initMetalDepthTexture(m_pMetalDevice, m_oActualSize.x, m_oActualSize.y);
 }
 #endif
 
@@ -480,7 +482,11 @@ void Window::mainLoop()
             glfwGetWindowSize(m_pWindow, &m_oWindowSize.x, &m_oWindowSize.y);
 
 #if __APPLE__
-            m_pMetalLayer->setDrawableSize(CGSizeMake(m_oActualSize.x, m_oActualSize.y));
+            if (isUsingMetal())
+            {
+                m_pMetalLayer->setDrawableSize(CGSizeMake(m_oActualSize.x, m_oActualSize.y));
+                Renderer::initMetalDepthTexture(m_pMetalDevice, m_oActualSize.x, m_oActualSize.y);
+            }
 #endif // __APPLE__
         }
 
@@ -506,7 +512,7 @@ void Window::mainLoop()
             {
                 MTL::CommandBuffer* pCommandBuffer = m_pMetalCommandQueue->commandBuffer();
 
-                { // Clear screen
+                // { // Clear screen
                     MTL::RenderPassDescriptor* pRenderPassDescriptor = MTL::RenderPassDescriptor::alloc()->init();
                     MTL::RenderPassColorAttachmentDescriptor* pColorAttachment = pRenderPassDescriptor->colorAttachments()->object(0);
 
@@ -515,10 +521,16 @@ void Window::mainLoop()
                     pColorAttachment->setClearColor(MTL::ClearColor::Make(0.0, 0.0, 0.0, 1.0));
                     pColorAttachment->setStoreAction(MTL::StoreActionStore);
 
+                    MTL::RenderPassDepthAttachmentDescriptor* pDepthAttach = pRenderPassDescriptor->depthAttachment();
+                    pDepthAttach->setTexture(Renderer::m_pDepthTexture);
+                    pDepthAttach->setLoadAction(MTL::LoadActionClear);
+                    pDepthAttach->setClearDepth(1.0);
+                    pDepthAttach->setStoreAction(MTL::StoreActionDontCare);
+
                     m_pCurrentFrameRenderEncoder = pCommandBuffer->renderCommandEncoder(pRenderPassDescriptor);
 
-                    pRenderPassDescriptor->release();
-                }
+                    // pRenderPassDescriptor->release();
+                // }
 
                 drawFrame();
 
@@ -527,6 +539,7 @@ void Window::mainLoop()
                 pCommandBuffer->presentDrawable(pDrawable);
                 pCommandBuffer->commit();
 
+                pRenderPassDescriptor->release();
             }
 
             pPool->release();
