@@ -12,46 +12,39 @@
 #include "../core/debug_macro.h"
 
 
-Image::Image(const std::string& strPath, bool flipVertically/* = true */)
+Image::Image(const std::string& strPath, bool flipVertically/* = true */) : m_strPath(strPath)
 {
     stbi_set_flip_vertically_on_load(flipVertically);
-
-    m_strPath = strPath;
-
-    if (*strPath.begin() != '/')
-    {
-        std::string strFullPath = fs::path(FileUtils::getResourcesPath()).append(strPath).string();
-
-        // TODO: force 4 channels for metal if channel is 3
-        m_pData = stbi_load(strFullPath.c_str(), &m_nWidth, &m_nHeight, &m_nChannels, 0);
-        if (!m_pData)
-        {
-            LOGERR("Failed to load image: {}", strFullPath);
-        }
-    }
-    else
-    {
-        // TODO: force 4 channels for metal if channel is 3
-        m_pData = stbi_load(strPath.c_str(), &m_nWidth, &m_nHeight, &m_nChannels, 0);
-        if (!m_pData)
-        {
-            LOGERR("Failed to load image: {}", strPath);
-        }
-    }
+    loadFromFileToCPU();
 }
 
-Image::Image(const std::string_view& strPath, bool flipVertically/* = true */)
+Image::Image(const std::string_view& strPath, bool flipVertically/* = true */) : m_strPath(std::string(strPath))
 {
     stbi_set_flip_vertically_on_load(flipVertically);
+    loadFromFileToCPU();
+}
 
-    m_strPath = strPath;
+void Image::loadFromFileToCPU()
+{
+    int nForcedChannels = 0;
 
-    if (*strPath.begin() != '/')
+#if __APPLE__
+    if (Window::ins->isUsingMetal())
     {
-        std::string strFullPath = fs::path(FileUtils::getResourcesPath()).append(strPath).string();
+        if (memcmp(m_strPath.c_str() + m_strPath.size() - 4, ".jpg", 4) == 0
+            || memcmp(m_strPath.c_str() + m_strPath.size() - 5, ".jpeg", 5) == 0)
+        {
+            nForcedChannels = 4;
+            // LOGLN("Forcing 4 channels for JPEG image: {}", m_strPath);
+        }
+    }
+#endif
 
-        // TODO: force 4 channels for metal if channel is 3
-        m_pData = stbi_load(strFullPath.c_str(), &m_nWidth, &m_nHeight, &m_nChannels, 0);
+    if (*m_strPath.begin() != '/')
+    {
+        std::string strFullPath = fs::path(FileUtils::getResourcesPath()).append(m_strPath).string();
+
+        m_pData = stbi_load(strFullPath.c_str(), &m_nWidth, &m_nHeight, &m_nChannels, nForcedChannels);
         if (!m_pData)
         {
             LOGERR("Failed to load image: {}", strFullPath);
@@ -59,14 +52,12 @@ Image::Image(const std::string_view& strPath, bool flipVertically/* = true */)
     }
     else
     {
-        // TODO: force 4 channels for metal if channel is 3
-        m_pData = stbi_load(strPath.data(), &m_nWidth, &m_nHeight, &m_nChannels, 0);
+        m_pData = stbi_load(m_strPath.c_str(), &m_nWidth, &m_nHeight, &m_nChannels, nForcedChannels);
         if (!m_pData)
         {
-            LOGERR("Failed to load image: {}", strPath);
+            LOGERR("Failed to load image: {}", m_strPath);
         }
     }
-
 }
 
 Image::Image(const aiTexture* pAiTexture, const char* strName, bool flipVertically/* = true */)

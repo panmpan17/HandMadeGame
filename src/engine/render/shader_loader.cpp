@@ -56,6 +56,17 @@ void ShaderLoader::readRegistryFromFile()
         MTL::Library* pLibrary = nullptr;
 
         pLibrary = loadLibraryFromPath(pMetalDevice, SHADER_METAL_LIB_FILE.data());
+
+#if IS_DEBUG_VERSION
+        NS::Array* pFunctionNames = pLibrary->functionNames();
+        int count = static_cast<int>(pFunctionNames->count());
+        for (int i = 0; i < count; ++i)
+        {
+            NS::String* pFuncName = static_cast<NS::String*>(pFunctionNames->object(i));
+            LOGLN("Metal Library Function {}: {}", i, pFuncName->utf8String());
+        }
+#endif
+
         funcCreateMetalShader = [this, &oCurrentShaderData, &pLibrary, &pMetalDevice]()
         {
             auto pShader = Shader::loadFromMetalShader(

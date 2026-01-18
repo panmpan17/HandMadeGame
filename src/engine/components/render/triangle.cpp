@@ -137,3 +137,19 @@ void Triangle::onNodeFinishedDeserialization()
         registerBuffer();
     }
 }
+
+inline constexpr std::string_view GIZMOS_IMAGE = "assets/gizmos/particle.png";
+
+void Triangle::onDrawGizmos(bool bIsSelected)
+{
+    // GizmosManager::getInstance()->addImageGizmos(this, m_pNode->getPositionInWorld(), GIZMOS_IMAGE,
+    //                                              Vector3(1, 0, 0));
+    // GizmosManager::getInstance()->addSphereGizmos(
+    //             m_pNode->getPositionInWorld(),
+    //             1);
+
+    // GizmosManager::getInstance()->addCubeGizmos(
+    //             m_pNode->getPositionInWorld(),
+    //             m_pNode->getWorldRotationQuaternion(),
+    //             Vector3(1, 1, 1));
+}

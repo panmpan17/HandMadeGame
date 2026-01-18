@@ -8,6 +8,7 @@
 #include "../../engine/render/shader.h"
 #include "../../engine/render/shader_loader.h"
 #include "../../engine/render/image_loader.h"
+#include "../../engine/render/skybox.h"
 #include "../../engine/components/transform/rotate.h"
 #include "../../engine/components/transform/movement.h"
 
@@ -15,6 +16,19 @@
 void firstTriangeTest()
 {
     WorldScene* const pWorldScene = WorldScene::current;
+
+    { // Skybox
+        Skybox* pSkybox = new Skybox();
+        pSkybox->loadSkyboxCubmaps({
+            "assets/images/skybox/right.jpg",
+            "assets/images/skybox/left.jpg",
+            "assets/images/skybox/top.jpg",
+            "assets/images/skybox/bottom.jpg",
+            "assets/images/skybox/front.jpg",
+            "assets/images/skybox/back.jpg"
+        });
+        pWorldScene->setSkybox(pSkybox);
+    }
 
     { // Triangle
         Shader* const pColorShared = ShaderLoader::getInstance()->getShader("colored_vertices");

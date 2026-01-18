@@ -11,8 +11,8 @@ list(APPEND SOURCES
     ${CMAKE_CURRENT_LIST_DIR}/shader.h
     ${CMAKE_CURRENT_LIST_DIR}/shader_loader.cpp
     ${CMAKE_CURRENT_LIST_DIR}/shader_loader.h
-    # ${CMAKE_CURRENT_LIST_DIR}/skybox.cpp
-    # ${CMAKE_CURRENT_LIST_DIR}/skybox.h
+    ${CMAKE_CURRENT_LIST_DIR}/skybox.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/skybox.h
     ${CMAKE_CURRENT_LIST_DIR}/vertex.h
 )
 

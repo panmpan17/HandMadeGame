@@ -1,23 +1,11 @@
 #include <metal_stdlib>
 #include "camera_data.metal"
+#include "common.metal"
 
-struct meshGizmos_VertexIn {
-    metal::float3 position [[attribute(0)]];
-};
-
-struct meshGizmos_Uniforms {
-    metal::float4x4 modelMatrix;
-};
-
-struct meshGizmos_VertexOut {
-    metal::float4 position [[position]];
-};
-
-
-vertex meshGizmos_VertexOut meshGizmos_vertexMain(meshGizmos_VertexIn in [[stage_in]],
+vertex VertexOut_Position meshGizmos_vertexMain(VertexIn_Position in [[stage_in]],
                                         constant CameraMatrices& cameraMatrices [[buffer(1)]],
-                                        constant meshGizmos_Uniforms& uniforms [[buffer(2)]]) {
-    meshGizmos_VertexOut out;
+                                        constant Uniform_ModelMatrix& uniforms [[buffer(2)]]) {
+    VertexOut_Position out;
     metal::float4 worldPosition = uniforms.modelMatrix * metal::float4(in.position, 1.0);
     out.position = cameraMatrices.projection * cameraMatrices.view * worldPosition;
     return out;

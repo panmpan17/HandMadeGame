@@ -53,4 +53,6 @@ private:
 #endif
 
     std::string m_strPath;
+
+    void loadFromFileToCPU();
 };

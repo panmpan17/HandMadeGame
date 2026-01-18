@@ -25,8 +25,22 @@ public:
 
             pSamplerDesc->release();
         }
+
+        MTL::DepthStencilDescriptor* pOpaqueDesc = MTL::DepthStencilDescriptor::alloc()->init();
+        pOpaqueDesc->setDepthCompareFunction(MTL::CompareFunctionLess);
+        pOpaqueDesc->setDepthWriteEnabled(true);
+        m_pDepthOnStencilState = pDevice->newDepthStencilState(pOpaqueDesc);
+        pOpaqueDesc->release();
+
+        MTL::DepthStencilDescriptor* pTransDesc = MTL::DepthStencilDescriptor::alloc()->init();
+        pTransDesc->setDepthCompareFunction(MTL::CompareFunctionLess);
+        pTransDesc->setDepthWriteEnabled(false); // <--- CRITICAL
+        m_pDepthOffStencilState = pDevice->newDepthStencilState(pTransDesc);
+        pTransDesc->release();
     }
 
     static inline MTL::SamplerState* m_pLinearSampler = nullptr;
+    static inline MTL::DepthStencilState* m_pDepthOnStencilState = nullptr;
+    static inline MTL::DepthStencilState* m_pDepthOffStencilState = nullptr;
 #endif
 };

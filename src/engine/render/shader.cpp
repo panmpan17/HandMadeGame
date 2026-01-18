@@ -154,7 +154,9 @@ Shader* Shader::loadFromMetalShader(MTL::Library* const pLibrary, MTL::Device* c
     MTL::Function* pFragmentFunction = pLibrary->newFunction(NS::String::string(strFullFragmentName.c_str(), NS::UTF8StringEncoding));
     if (!pVertexFunction || !pFragmentFunction)
     {
-        LOGLN("Failed to load Metal shader functions.");
+        LOGLN("Failed to load Metal shader functions. {}: {}, {}: {}",
+            strFullVertexName, pVertexFunction ? "Loaded" : "Not Found",
+            strFullFragmentName, pFragmentFunction ? "Loaded" : "Not Found");
         return nullptr;
     }
 

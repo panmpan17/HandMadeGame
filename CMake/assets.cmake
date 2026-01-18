@@ -16,6 +16,8 @@ function(ADD_COMPILE_METAL_SHADERS_COMMAND applicationName)
         DEPENDS ${METAL_SHADER_SRC_ABS}
     )
 
+    message("All metal files: ${METAL_SHADER_SRC_ABS}")
+
     set(METAL_COMPILED_FILES "")
     foreach (shaderFile ${METAL_SHADER_SRC})
         get_filename_component(OUT_DIR "${METAL_SHADER_COMPILED_FOLDER}/${shaderFile}" DIRECTORY)

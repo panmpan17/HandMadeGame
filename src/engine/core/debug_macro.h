@@ -7,7 +7,7 @@
 #include <ctime>
 
 
-#if !defined(DEBUG_FLAG) && (__WIN32__ || __WIN64__)
+#if !defined(DEBUG_FLAG) && !(__WIN32__ || __WIN64__)
 #define DEBUG_FLAG 1
 #endif
 

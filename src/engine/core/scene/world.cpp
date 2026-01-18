@@ -3,9 +3,11 @@
 #include <glad/gl.h>
 #include "node.h"
 #include "../camera.h"
+#include "../window.h"
 #include "../math/random.h"
 #include "../serialization/serializer.h"
-// #include "../../render/skybox.h"
+#include "../../render/skybox.h"
+#include "../../render/renderer.h"
 #include "../../components/input/first_person_free_control_camera.h"
 #include "../../components/drawable_interface.h"
 #include "../../../editor/gizmos.h"
@@ -123,9 +125,23 @@ void WorldScene::update(float fDeltatime)
 
 void WorldScene::render()
 {
-    // glEnable(GL_DEPTH_TEST);
-    // glDepthMask(GL_TRUE);
-    // glCullFace(GL_BACK);
+    bool bUsingOpenGL = Window::ins->isUsingOpenGL();
+    bool bUsingMetal = Window::ins->isUsingMetal();
+
+    if (bUsingOpenGL)
+    {
+        glEnable(GL_DEPTH_TEST);
+        glDepthMask(GL_TRUE);
+        glCullFace(GL_BACK);
+    }
+#if __APPLE__
+    else if (bUsingMetal)
+    {
+        // TODO: Metal turn on depth write
+        MTL::RenderCommandEncoder* pRenderEncoder = Window::ins->getCurrentFrameRenderEncoder();
+        pRenderEncoder->setDepthStencilState(Renderer::m_pDepthOnStencilState);
+    }
+#endif // __APPLE__
 
     int nSize = m_oOpaqueDrawableArray.getCount();
     for (int i = 0; i < nSize; ++i)
@@ -137,15 +153,30 @@ void WorldScene::render()
         }
     }
 
+    if (m_pSkybox)
+    {
+        m_pSkybox->draw();
+    }
 
-    // glDepthMask(GL_FALSE);
+    renderTransparentObjects();
+}
 
-    // if (m_pSkybox)
-    // {
-    //     m_pSkybox->draw();
-    // }
+void WorldScene::renderTransparentObjects()
+{
+    bool bUsingOpenGL = Window::ins->isUsingOpenGL();
+    bool bUsingMetal = Window::ins->isUsingMetal();
 
-    // glEnable(GL_BLEND);
+    if (bUsingOpenGL)
+    {
+        glDepthMask(GL_FALSE);
+        glEnable(GL_BLEND);
+    }
+#if __APPLE__
+    else if (bUsingMetal)
+    {
+        // TODO: Metal turn off depth write
+    }
+#endif // __APPLE__
 
     int nTransparentSize = m_oTransparentDrawableArray.getCount();
     for (int i = 0; i < nTransparentSize; ++i)
@@ -157,8 +188,17 @@ void WorldScene::render()
         }
     }
 
-    // glDisable(GL_BLEND);
-    // glDepthMask(GL_TRUE);
+    if (bUsingOpenGL)
+    {
+        glDepthMask(GL_TRUE);
+        glDisable(GL_BLEND);
+    }
+#if __APPLE__
+    else if (bUsingMetal)
+    {
+        // TODO: Metal turn on depth write
+    }
+#endif // __APPLE__
 }
 
 void WorldScene::renderDepth()

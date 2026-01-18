@@ -61,6 +61,8 @@
   vertex: assets/shaders/3d/cubemap.vert
   fragment: assets/shaders/3d/cubemap.frag
   cameraUBO: 0
+  metal_prefix: cubemap
+  metal_attribute_size: 3
 16:
   name: gamma_correction
   vertex: assets/shaders/postprocess/screen_pos.vert
