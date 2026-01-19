@@ -9,6 +9,9 @@ struct image_VertexIn {
 struct image_Uniforms {
     float4x4 MVPMatrix;
     float4 color;
+    int spriteSheetCountX;
+    int spriteSheetCountY;
+    float2 uvOffset;
 };
 
 struct image_VertexOut {
@@ -21,7 +24,8 @@ vertex image_VertexOut image_vertexMain(image_VertexIn in [[stage_in]],
                                         constant image_Uniforms& uniforms [[buffer(2)]]) {
     image_VertexOut out;
     out.position = uniforms.MVPMatrix * float4(in.position, 0.0, 1.0);
-    out.texCoord = in.texCoord;
+    out.texCoord = metal::float2((in.texCoord.x / float(uniforms.spriteSheetCountX)) + uniforms.uvOffset.x,
+                                 (in.texCoord.y / float(uniforms.spriteSheetCountY)) + uniforms.uvOffset.y);
     return out;
 }
 

@@ -5,6 +5,9 @@
 #include "../../engine/core/scene/world.h"
 #include "../../engine/components/render/triangle.h"
 #include "../../engine/components/render/quad.h"
+#include "../../engine/components/render/sprite.h"
+#include "../../engine/components/render/sprite_animation.h"
+#include "../../engine/components/render/character2d.h"
 #include "../../engine/render/shader.h"
 #include "../../engine/render/shader_loader.h"
 #include "../../engine/render/image_loader.h"
@@ -16,6 +19,8 @@
 void firstTriangeTest()
 {
     WorldScene* const pWorldScene = WorldScene::current;
+
+    Shader* const pImageShader = ShaderLoader::getInstance()->getShader("image");
 
     { // Skybox
         Skybox* pSkybox = new Skybox();
@@ -49,7 +54,6 @@ void firstTriangeTest()
     }
 
     { // Quad with Image
-        Shader* const pImageShader = ShaderLoader::getInstance()->getShader("image");
         Image* pTestImage = ImageLoader::getInstance()->getImageByPath("assets/images/test.png");
 
         auto pNode2 = new Node(0.5f, 0.5f, 0.f);
@@ -65,5 +69,24 @@ void firstTriangeTest()
         // pNode2->addComponent(new Rotate3D(0, 0, 1.0f));
 
         pWorldScene->addNode(pNode2);
+    }
+
+    {
+        Image* pCharacter = ImageLoader::getInstance()->getImageByPath("assets/images/character_animation.png");
+
+        auto pPlayer = new Node(0.f, -1.f, 0.f);
+        auto pSprite = new Sprite(pCharacter, 4, 4);
+        pSprite->setShader(pImageShader);
+        pSprite->registerBuffer();
+        pPlayer->addComponent(pSprite);
+
+        auto pSpriteAnimation = new SpriteAnimation(pSprite);
+        pSpriteAnimation->openAnimationFile("assets/character_animation.yaml");
+        pPlayer->addComponent(pSpriteAnimation);
+
+        auto pCharacter2d = new Character2d(pSpriteAnimation);
+        pPlayer->addComponent(pCharacter2d);
+
+        pWorldScene->addNode(pPlayer);
     }
 }

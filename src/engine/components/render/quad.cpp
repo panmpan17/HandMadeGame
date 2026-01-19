@@ -1,7 +1,4 @@
-// #define GLAD_GL_IMPLEMENTATION
 #include <glad/gl.h>
-// #define GLFW_INCLUDE_NONE
-#include <GLFW/glfw3.h>
 
 #include "quad.h"
 #include "../../render/image_loader.h"
@@ -11,7 +8,6 @@
 #include "../../core/scene/node.h"
 #include "../../core/serialization/serializer.h"
 #include "../../core/math/random.h"
-#include "../../render/shader.h"
 #include "../../render/shader_loader.h"
 #include "../../render/renderer.h"
 
@@ -134,7 +130,10 @@ void Quad::draw()
         glUseProgram(m_pShader->getProgram());
         glUniformMatrix4fv(m_pMVPHandle->m_nLocation, 1, GL_FALSE, (const GLfloat*) mvp);
         glUniform4f(m_pColorHandle->m_nLocation, m_color[0], m_color[1], m_color[2], m_color[3]);
-        predrawSetShaderUniforms();
+
+        glUniform1i(m_pSpriteSheetXCountHandle->m_nLocation, m_vecSpriteSheetCount.x);
+        glUniform1i(m_pSpriteSheetYCountHandle->m_nLocation, m_vecSpriteSheetCount.y);
+        glUniform2f(m_pUVOffsetHandle->m_nLocation, m_vecUVOOffset[0], m_vecUVOOffset[1]);
 
         if (m_pImage)
         {
@@ -170,9 +169,15 @@ void Quad::draw()
         {
             mat4x4 mvp;
             vec4 color;
+            Vector2i spriteSheetCount;
+            vec2 uvOffset;
         } uniforms;
         mat4x4_dup(uniforms.mvp, mvp);
         vec4_dup(uniforms.color, m_color);
+
+        vec2_dup(uniforms.uvOffset, m_vecUVOOffset);
+        uniforms.spriteSheetCount.x = m_vecSpriteSheetCount.x;
+        uniforms.spriteSheetCount.y = m_vecSpriteSheetCount.y;
 
         pRenderCommandEncoder->setVertexBytes(&uniforms, sizeof(uniforms), 2);
         pRenderCommandEncoder->setFragmentBytes(&uniforms, sizeof(uniforms), 2);
@@ -184,13 +189,6 @@ void Quad::draw()
         INCREASE_DRAW_CALL_COUNT(1);
     }
 #endif // __APPLE__
-}
-
-void Quad::predrawSetShaderUniforms()
-{
-    glUniform1i(m_pSpriteSheetXCountHandle->m_nLocation, 1);
-    glUniform1i(m_pSpriteSheetYCountHandle->m_nLocation, 1);
-    glUniform2f(m_pUVOffsetHandle->m_nLocation, 0.0f, 0.0f);
 }
 
 void Quad::serializeToWrapper(DataSerializer& serializer) const
@@ -220,79 +218,4 @@ void Quad::onNodeFinishedDeserialization()
         setShader(m_pShader);
         registerBuffer();
     }
-}
-
-
-Sprite::Sprite(Image* pImage, int nPixelPerUnit/* = 100*/)
-    // : Quad(0.5f, 0.5f, {1.f, 1.f, 1.f, 1.f})
-{
-    m_nID = generateRandomUUID();
-
-    m_pImage = pImage;
-    m_fWidth = pImage->getWidth() * (1.f / nPixelPerUnit);
-    m_fHeight = pImage->getHeight() * (1.f / nPixelPerUnit);
-    m_vecUVOOffset[0] = 0;
-    m_vecUVOOffset[1] = 0;
-}
-
-Sprite::Sprite(Image* pImage, int nSpriteSheetXCount, int nSpriteSheetYCount, int nSpriteIndex/* = 0 */, int nPixelPerUnit/* = 100*/)
-{
-    m_nID = generateRandomUUID();
-    
-    m_pImage = pImage;
-    m_fWidth = (pImage->getWidth() / (float)nSpriteSheetXCount) * (1.f / nPixelPerUnit);
-    m_fHeight = (pImage->getHeight() / (float)nSpriteSheetYCount) * (1.f / nPixelPerUnit);
-    m_nSpriteSheetXCount = nSpriteSheetXCount;
-    m_nSpriteSheetYCount = nSpriteSheetYCount;
-
-    setSpriteIndex(nSpriteIndex);
-}
-
-Sprite::~Sprite()
-{
-}
-
-void Sprite::setSpriteIndex(int nIndex)
-{
-    m_nSpriteIndex = nIndex % (m_nSpriteSheetXCount * m_nSpriteSheetYCount);
-    int xIndex = m_nSpriteIndex % m_nSpriteSheetXCount;
-    int yIndex = m_nSpriteIndex / m_nSpriteSheetXCount;
-    m_vecUVOOffset[0] = xIndex / (float)m_nSpriteSheetXCount;
-    m_vecUVOOffset[1] = yIndex / (float)m_nSpriteSheetYCount;
-}
-
-void Sprite::draw()
-{
-    Quad::draw();
-}
-
-void Sprite::predrawSetShaderUniforms()
-{
-    glUniform1i(m_pSpriteSheetXCountHandle->m_nLocation, m_nSpriteSheetXCount);
-    glUniform1i(m_pSpriteSheetYCountHandle->m_nLocation, m_nSpriteSheetYCount);
-
-    glUniform2f(m_pUVOffsetHandle->m_nLocation, m_vecUVOOffset[0], m_vecUVOOffset[1]);
-}
-
-void Sprite::serializeToWrapper(DataSerializer& serializer) const
-{
-    Quad::serializeToWrapper(serializer);
-
-    serializer.ADD_ATTRIBUTES(m_nSpriteSheetXCount);
-    serializer.ADD_ATTRIBUTES(m_nSpriteSheetYCount);
-    serializer.ADD_ATTRIBUTES(m_nSpriteIndex);
-}
-
-bool Sprite::deserializeField(DataDeserializer& deserializer, const std::string_view& strFieldName, const std::string_view& strFieldValue)
-{
-    if (Quad::deserializeField(deserializer, strFieldName, strFieldValue))
-    {
-        return true;
-    }
-
-    DESERIALIZE_FIELD(m_nSpriteSheetXCount);
-    DESERIALIZE_FIELD(m_nSpriteSheetYCount);
-    DESERIALIZE_FIELD(m_nSpriteIndex);
-
-    return false;
 }

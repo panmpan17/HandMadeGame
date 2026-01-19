@@ -14,7 +14,7 @@ void Character2d::onStart()
         m_nIdleAnimationIndex = m_pAnimation->getAnimationIndexByName("idle");
         m_nWalkAnimationIndex = m_pAnimation->getAnimationIndexByName("walk");
         
-        InputManager::getInstance()->registerKeyPressCallback(KeyCode::KEY_D, [this](bool bPressed) {
+        InputManager::getInstance()->registerKeyPressCallback(KeyCode::KEY_F, [this](bool bPressed) {
             if (bPressed) {
                 m_pAnimation->playAnimationInfo(m_nWalkAnimationIndex);
             } else {

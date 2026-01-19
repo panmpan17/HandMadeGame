@@ -1,6 +1,6 @@
 #pragma once
 
-#include "quad.h"
+#include "sprite.h"
 #include "../component.h"
 #include "../../core/debug_macro.h"
 #include "../../core/scene/node.h"
