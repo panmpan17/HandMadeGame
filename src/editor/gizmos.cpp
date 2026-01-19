@@ -416,6 +416,14 @@ void GizmosManager::drawAllGizmos()
         glEnable(GL_BLEND);
         glDepthMask(GL_FALSE);
     }
+#if __APPLE__
+    else if (Window::ins->isUsingMetal())
+    {
+        MTL::RenderCommandEncoder* pRenderCommandEncoder = Window::ins->getCurrentFrameRenderEncoder();
+        pRenderCommandEncoder->setDepthStencilState(Renderer::m_pDepthOffStencilState);
+    }
+#endif
+
 
     drawCircleGizmos();
     drawSphereGizmos();
@@ -428,6 +436,13 @@ void GizmosManager::drawAllGizmos()
         glDisable(GL_BLEND);
         glDepthMask(GL_TRUE);
     }
+#if __APPLE__
+    else if (Window::ins->isUsingMetal())
+    {
+        MTL::RenderCommandEncoder* pRenderCommandEncoder = Window::ins->getCurrentFrameRenderEncoder();
+        pRenderCommandEncoder->setDepthStencilState(Renderer::m_pDepthOnStencilState);
+    }
+#endif
 }
 
 void GizmosManager::drawCircleGizmos()
@@ -761,6 +776,7 @@ void GizmosManager::drawImageGizmos()
                 struct
                 {
                     Vector3 position;
+                    float padding;
                     Color color;
                 } uniforms;
                 uniforms.position = oData.m_vecPosition;

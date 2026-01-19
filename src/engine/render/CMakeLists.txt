@@ -3,10 +3,10 @@ list(APPEND SOURCES
     ${CMAKE_CURRENT_LIST_DIR}/image.h
     ${CMAKE_CURRENT_LIST_DIR}/image_loader.cpp
     ${CMAKE_CURRENT_LIST_DIR}/image_loader.h
-    # ${CMAKE_CURRENT_LIST_DIR}/material.h
-    # ${CMAKE_CURRENT_LIST_DIR}/material.cpp
-    # ${CMAKE_CURRENT_LIST_DIR}/material_loader.h
-    # ${CMAKE_CURRENT_LIST_DIR}/material_loader.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/material.h
+    ${CMAKE_CURRENT_LIST_DIR}/material.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/material_loader.h
+    ${CMAKE_CURRENT_LIST_DIR}/material_loader.cpp
     ${CMAKE_CURRENT_LIST_DIR}/renderer.h
     ${CMAKE_CURRENT_LIST_DIR}/shader.cpp
     ${CMAKE_CURRENT_LIST_DIR}/shader.h

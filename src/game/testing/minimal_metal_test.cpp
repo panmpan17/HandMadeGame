@@ -3,17 +3,22 @@
 #include "../../engine/core/debug_macro.h"
 #include "../../engine/core/scene/node.h"
 #include "../../engine/core/scene/world.h"
+#include "../../engine/core/math/random.h"
 #include "../../engine/components/render/triangle.h"
 #include "../../engine/components/render/quad.h"
 #include "../../engine/components/render/sprite.h"
 #include "../../engine/components/render/sprite_animation.h"
 #include "../../engine/components/render/character2d.h"
+#include "../../engine/components/particle/particle_system.h"
+#include "../../engine/components/particle/particle_spawn.h"
+#include "../../engine/components/particle/particle_lifetime_change.h"
 #include "../../engine/render/shader.h"
 #include "../../engine/render/shader_loader.h"
 #include "../../engine/render/image_loader.h"
 #include "../../engine/render/skybox.h"
 #include "../../engine/components/transform/rotate.h"
 #include "../../engine/components/transform/movement.h"
+#include "../../engine/render/material_loader.h"
 
 
 void firstTriangeTest()
@@ -88,5 +93,37 @@ void firstTriangeTest()
         pPlayer->addComponent(pCharacter2d);
 
         pWorldScene->addNode(pPlayer);
+    }
+
+    { // Particle
+        std::shared_ptr<Material> pMaterial = MaterialLoader::getInstance()->getMaterial("assets/materials/dust_particle.yaml");
+
+        Node* pNode5 = new Node(0, 0, 0);
+        pNode5->setName("Smoke");
+
+        ParticleSystem* particle = new ParticleSystem(100, false);
+        particle->setMaterial(pMaterial);
+        particle->registerBuffer();
+        particle->setParticleStartColor({ 1.f, 1.f, 1.f, 1.f }, { 0.9f, 0.9f, 0.9f, 1.f });
+        particle->setIsLooping(true);
+        particle->addParticleModule(new ParticleIntervalSpawn(10));
+        particle->addParticleIndividualModule(new ScaleThroughParticleLifetime(0.1f, 1.f));
+        particle->setParticleLifetime(4, 6);
+        particle->setParticleStartVelocity(1, 1);
+        particle->setGravity(0, 0, 0);
+        particle->setSpawnShape(eParticleSpawnShape::BOX);
+        particle->setSpawnShapeDimensions(.1f, .1f, .1f);
+        particle->setParticleStartVelocityDirectionOverride([](vec3& velocity) {
+            velocity[0] = randomFloat(-0.05f, 0.05f); // Override X direction
+            velocity[1] = randomFloat(-0.05f, 0.05f); // Override Y direction
+            velocity[2] = randomFloat(-0.05f, 0.05f); // Override Z direction
+        });
+
+        pNode5->addComponent(particle);
+
+        pNode5->addComponent(new TwoPointsMovement({ -0.5f, 0.f, 1.f }, { 0.5f, 0.f, 1.f }, 2.0f));
+
+        // pNode5->setActive(false);
+        pWorldScene->addNode(pNode5);
     }
 }

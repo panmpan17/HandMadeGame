@@ -14,6 +14,7 @@ public:
     inline static MaterialLoader* getInstance() { return ins; }
 
     inline static void Initialize() { if (!ins) ins = new MaterialLoader(); }
+    inline static void Cleanup() { if (ins) { delete ins; ins = nullptr; } }
 
     std::shared_ptr<Material> getMaterial(const std::string& strFilePath);
 

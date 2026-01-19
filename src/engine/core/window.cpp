@@ -26,7 +26,7 @@
 #include "../render/renderer.h"
 #include "../render/image_loader.h"
 #include "../render/shader_loader.h"
-// #include "../render/material_loader.h"
+#include "../render/material_loader.h"
 #include "../render/vertex.h"
 // #include "../render/post_process/render_process_queue.h"
 // #include "../render/lighting/light_manager.h"
@@ -144,6 +144,7 @@ Window::~Window()
     ImageLoader::Cleanup();
     // LightManager::Cleanup();
     ShaderLoader::Cleanup();
+    MaterialLoader::Cleanup();
     GizmosManager::Cleanup();
 
     Preference::savePreferences();
@@ -345,8 +346,8 @@ void Window::setupManagers()
     // PROFILER_END_TIMER("Initialization", "Lighting setup");
     ShaderLoader::Initialize();
     PROFILER_END_TIMER("Initialization", "Shader setup");
-    // MaterialLoader::Initialize();
-    // PROFILER_END_TIMER("Initialization", "Material setup");
+    MaterialLoader::Initialize();
+    PROFILER_END_TIMER("Initialization", "Material setup");
 
     setupInputManager();
     PROFILER_END_TIMER("Initialization", "Input manager");
