@@ -7,6 +7,11 @@
 #include <linmath.h>
 #include <functional>
 
+#if __APPLE__
+#include <Metal/Metal.hpp>
+#endif // __APPLE__
+
+
 typedef unsigned int GLuint;
 class Image;
 class Material;
@@ -15,10 +20,12 @@ class Material;
 struct ParticleGPUInstance
 {
     vec3 m_vecPosition;
+    float padding1;
     vec4 m_vecColor;
     float m_fRotation;
     float m_fScale;
     float m_fOpacity;
+    float padding2;
 };
 
 struct ParticleCPUInstance
@@ -155,8 +162,14 @@ private:
 
     const ShaderUniformHandle* m_pUseNodeTransformUniform = nullptr;
     const ShaderUniformHandle* m_pUseTextureUniform = nullptr;
-    const ShaderUniformHandle* m_pMVPUniForm = nullptr;
+    const ShaderUniformHandle* m_pModelMatrixUniform = nullptr;
     const ShaderUniformHandle* m_pNodeTransformUniform = nullptr;
+
+#if __APPLE__
+    MTL::Buffer* m_pPosBuffer = nullptr;
+    MTL::Buffer* m_pUVBuffer = nullptr;
+    MTL::Buffer* m_pInstanceBuffer = nullptr;
+#endif // __APPLE__
 
     int m_nAllParticleCount = 0;
     int m_nAliveParticleCount = 0;

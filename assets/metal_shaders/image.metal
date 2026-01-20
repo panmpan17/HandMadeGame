@@ -1,10 +1,6 @@
 #include <metal_stdlib>
+#include "common.metal"
 using namespace metal;
-
-struct image_VertexIn {
-    float2 position [[attribute(0)]];
-    float2 texCoord [[attribute(1)]];
-};
 
 struct image_Uniforms {
     float4x4 MVPMatrix;
@@ -14,22 +10,17 @@ struct image_Uniforms {
     float2 uvOffset;
 };
 
-struct image_VertexOut {
-    float4 position [[position]];
-    float2 texCoord;
-};
 
-
-vertex image_VertexOut image_vertexMain(image_VertexIn in [[stage_in]],
+vertex VertexOut_Image image_vertexMain(VertexIn_Position2DAndUV in [[stage_in]],
                                         constant image_Uniforms& uniforms [[buffer(2)]]) {
-    image_VertexOut out;
+    VertexOut_Image out;
     out.position = uniforms.MVPMatrix * float4(in.position, 0.0, 1.0);
     out.texCoord = metal::float2((in.texCoord.x / float(uniforms.spriteSheetCountX)) + uniforms.uvOffset.x,
                                  (in.texCoord.y / float(uniforms.spriteSheetCountY)) + uniforms.uvOffset.y);
     return out;
 }
 
-fragment float4 image_fragmentMain(image_VertexOut in [[stage_in]],
+fragment float4 image_fragmentMain(VertexOut_Image in [[stage_in]],
                                    texture2d<float> colorTexture [[texture(0)]],
                                    sampler textureSampler [[sampler(0)]],
                                    constant image_Uniforms& uniforms [[buffer(2)]]) {

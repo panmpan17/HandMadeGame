@@ -249,6 +249,11 @@ GLuint Shader::getUniformLocation(const std::string& name) const
     return glGetUniformLocation(m_nProgram, name.c_str());
 }
 
+GLuint Shader::getUniformLocation(const std::string_view& strName) const
+{
+    return glGetUniformLocation(m_nProgram, strName.data());
+}
+
 GLuint Shader::getAttributeLocation(const std::string& name) const
 {
     return glGetAttribLocation(m_nProgram, name.c_str());
@@ -256,26 +261,29 @@ GLuint Shader::getAttributeLocation(const std::string& name) const
 
 void Shader::reload()
 {
-    glDeleteShader(m_nVertexShader);
-    glDeleteShader(m_nFragmentShader);
-    glDeleteProgram(m_nProgram);
-
-    m_nVertexShader = loadShaderFileIntoGPU(m_strVertexShaderPath, true);
-    m_nFragmentShader = loadShaderFileIntoGPU(m_strFragmentShaderPath, false);
-
-    m_nProgram = glCreateProgram();
-    glAttachShader(m_nProgram, m_nVertexShader);
-    glAttachShader(m_nProgram, m_nFragmentShader);
-    glLinkProgram(m_nProgram);
-
-    for (int i = 0; i < m_nUniformHandleCount; ++i)
+    if (Window::ins->isUsingOpenGL())
     {
-        m_arrUniformHandles[i].m_nLocation = getUniformLocation(std::string(m_arrUniformHandles[i].m_strName));
-    }
+        glDeleteShader(m_nVertexShader);
+        glDeleteShader(m_nFragmentShader);
+        glDeleteProgram(m_nProgram);
 
-    reloadCameraUBOBinding();
-    reloadLightUBOBinding();
-    reloadTimeDataUBOBinding();
+        m_nVertexShader = loadShaderFileIntoGPU(m_strVertexShaderPath, true);
+        m_nFragmentShader = loadShaderFileIntoGPU(m_strFragmentShaderPath, false);
+
+        m_nProgram = glCreateProgram();
+        glAttachShader(m_nProgram, m_nVertexShader);
+        glAttachShader(m_nProgram, m_nFragmentShader);
+        glLinkProgram(m_nProgram);
+
+        for (int i = 0; i < m_nUniformHandleCount; ++i)
+        {
+            m_arrUniformHandles[i].m_nLocation = getUniformLocation(m_arrUniformHandles[i].m_strName);
+        }
+
+        reloadCameraUBOBinding();
+        reloadLightUBOBinding();
+        reloadTimeDataUBOBinding();
+    }
 }
 
 const ShaderUniformHandle* Shader::getUniformHandle(const std::string_view& strName)
@@ -294,9 +302,13 @@ const ShaderUniformHandle* Shader::getUniformHandle(const std::string_view& strN
         return nullptr;
     }
 
-    GLuint nLocation = getUniformLocation(std::string(strName));
     ShaderUniformHandle* pHandle = &m_arrUniformHandles[m_nUniformHandleCount++];
-    pHandle->m_nLocation = nLocation;
+
+    if (Window::ins->isUsingOpenGL())
+    {
+        pHandle->m_nLocation = getUniformLocation(strName);
+    }
+
     pHandle->m_strName = std::string(strName);
     return pHandle;
 }

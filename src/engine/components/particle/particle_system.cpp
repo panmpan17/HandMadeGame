@@ -6,6 +6,7 @@
 #include "../../render/shader_loader.h"
 #include "../../render/image.h"
 #include "../../render/material.h"
+#include "../../render/renderer.h"
 #include "../../core/debug_macro.h"
 #include "../../core/scene/node.h"
 #include "../../core/camera.h"
@@ -132,6 +133,30 @@ void ParticleSystem::registerBuffer()
         glBindVertexArray(0);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
+#if __APPLE__
+    else if (Window::ins->isUsingMetal())
+    {
+        MTL::Device* pDevice = Window::ins->getMetalDevice();
+
+        const float positions[] = {
+            -0.5f, -0.5f,
+             0.5f, -0.5f,
+            -0.5f,  0.5f,
+             0.5f,  0.5f,
+        };
+        const float uv[] = {
+            0.f, 0.f,
+            1.f, 0.f,
+            0.f, 1.f,
+            1.f, 1.f,
+        };
+
+        m_pPosBuffer = pDevice->newBuffer(positions, sizeof(positions), MTL::ResourceStorageModeShared);
+        m_pUVBuffer = pDevice->newBuffer(uv, sizeof(uv), MTL::ResourceStorageModeShared);
+
+        m_pInstanceBuffer = pDevice->newBuffer(m_nAllParticleCount * sizeof(ParticleGPUInstance), MTL::ResourceStorageModeShared);
+    }
+#endif // __APPLE__
 }
 
 void ParticleSystem::setMaterial(const std::shared_ptr<Material>& pMaterial)
@@ -150,7 +175,7 @@ void ParticleSystem::setShader(Shader* pShader)
 {
     if (Window::ins->isUsingOpenGL())
     {
-        m_pMVPUniForm = pShader->getUniformHandle("u_MVP");
+        m_pModelMatrixUniform = pShader->getUniformHandle("u_modelMatrix");
         m_pNodeTransformUniform = pShader->getUniformHandle("u_nodeTransform");
         m_pUseNodeTransformUniform = pShader->getUniformHandle("u_useNodeTransform");
         m_pUseTextureUniform = pShader->getUniformHandle("u_useTexture");
@@ -168,39 +193,75 @@ void ParticleSystem::draw()
 
     if (m_nAliveParticleCount <= 0) return;
 
-    glBindVertexArray(m_nVertexArray);
-    m_pMaterial->useShader();
-
-    glUniform1i(m_pUseNodeTransformUniform->m_nLocation, m_bSimulateInLocal ? 1 : 0);
-
-    const mat4x4& cameraViewMatrix = Camera::main->getViewProjectionMatrix();
-
-    glUniformMatrix4fv(m_pMVPUniForm->m_nLocation, 1, GL_FALSE, (const GLfloat*) cameraViewMatrix);
-
-    int nResult = m_pMaterial->sendTexturesData();
-    glUniform1i(m_pUseTextureUniform->m_nLocation, nResult);
-
-    if (m_bSimulateInLocal)
+    if (Window::ins->isUsingOpenGL())
     {
-        mat4x4 nodeTransform;
+        glBindVertexArray(m_nVertexArray);
+        m_pMaterial->useShader();
 
-        mat4x4_identity(nodeTransform);
-        const Vector3& nodePosition = getNode()->getPosition();
-        mat4x4_translate(nodeTransform, nodePosition.x, nodePosition.y, nodePosition.z);
+        glUniform1i(m_pUseNodeTransformUniform->m_nLocation, m_bSimulateInLocal ? 1 : 0);
 
-        glUniformMatrix4fv(m_pNodeTransformUniform->m_nLocation, 1, GL_FALSE, (const GLfloat*) nodeTransform);
+        glUniformMatrix4fv(m_pModelMatrixUniform->m_nLocation, 1, GL_FALSE, (const GLfloat*) getNode()->getWorldMatrix());
+
+        int nResult = m_pMaterial->sendTexturesData();
+        glUniform1i(m_pUseTextureUniform->m_nLocation, nResult);
+
+        if (m_bSimulateInLocal)
+        {
+            mat4x4 nodeTransform;
+
+            mat4x4_identity(nodeTransform);
+            const Vector3& nodePosition = getNode()->getPosition();
+            mat4x4_translate(nodeTransform, nodePosition.x, nodePosition.y, nodePosition.z);
+
+            glUniformMatrix4fv(m_pNodeTransformUniform->m_nLocation, 1, GL_FALSE, (const GLfloat*) nodeTransform);
+        }
+
+        glBindBuffer(GL_ARRAY_BUFFER, m_nInstanceBuffer);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, m_nAliveParticleCount * sizeof(ParticleGPUInstance), m_arrParticlesGPU);
+
+        glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, m_nAliveParticleCount);
+        INCREASE_DRAW_CALL_COUNT(m_nAliveParticleCount * 2);
+
+        glBindTexture(GL_TEXTURE_2D, 0);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindVertexArray(0); // Unbind the vertex array
+        glUseProgram(0);
     }
+#if __APPLE__
+    else if (Window::ins->isUsingMetal())
+    {
+        MTL::RenderCommandEncoder* pRenderEncoder = Window::ins->getCurrentFrameRenderEncoder();
 
-    glBindBuffer(GL_ARRAY_BUFFER, m_nInstanceBuffer);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, m_nAliveParticleCount * sizeof(ParticleGPUInstance), m_arrParticlesGPU);
+        pRenderEncoder->setRenderPipelineState(m_pMaterial->getShader()->getMetalPipelineState());
+        pRenderEncoder->setVertexBuffer(m_pPosBuffer, 0, 0);
+        pRenderEncoder->setVertexBuffer(m_pUVBuffer, 0, 1);
 
-    glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, m_nAliveParticleCount);
-    INCREASE_DRAW_CALL_COUNT(m_nAliveParticleCount * 2);
+        struct
+        {
+            mat4x4 modelMatrix;
+            float useNodeTransform;
+        } uniform;
+        uniform.useNodeTransform = m_bSimulateInLocal ? 1.0f : 0.0f;
+        memcpy(uniform.modelMatrix, getNode()->getWorldMatrix(), sizeof(mat4x4));
+        pRenderEncoder->setVertexBytes(&uniform, sizeof(uniform), 2);
 
-    glBindTexture(GL_TEXTURE_2D, 0);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0); // Unbind the vertex array
-    glUseProgram(0);
+        pRenderEncoder->setVertexBuffer(Camera::main->getCameraMetalUBO(), 0, 3);
+
+        memcpy(m_pInstanceBuffer->contents(), m_arrParticlesGPU, m_nAliveParticleCount * sizeof(ParticleGPUInstance));
+        m_pInstanceBuffer->didModifyRange(NS::Range::Make(0, m_nAliveParticleCount * sizeof(ParticleGPUInstance)));
+        pRenderEncoder->setVertexBuffer(m_pInstanceBuffer, 0, 4);
+
+        if (Image* pImage = m_pMaterial->getImageByUniformName(SHADER_UNIFORM_TEXTURE_0); pImage)
+        {
+            // TODO: is there a better way to set texture index?
+            pRenderEncoder->setFragmentTexture(pImage->getMetalTexture(), 0);
+            pRenderEncoder->setFragmentSamplerState(Renderer::m_pLinearSampler, 0);
+        }
+
+        pRenderEncoder->drawPrimitives(MTL::PrimitiveType::PrimitiveTypeTriangleStrip, NS::UInteger(0), NS::UInteger(4), NS::UInteger(m_nAliveParticleCount));
+        INCREASE_DRAW_CALL_COUNT(m_nAliveParticleCount * 2);
+    }
+#endif // __APPLE__
 }
 
 void ParticleSystem::update(float fDeltaTime)

@@ -9,6 +9,10 @@
   name: particle_instance
   vertex: assets/shaders/particle_instance.vert
   fragment: assets/shaders/particle_instance.frag
+  metal_prefix: particleInstance
+  metal_attribute_size: 2,2
+  cameraUBO: 0
+  transparency: 1
 4:
   name: test
   vertex: assets/shaders/test.vert

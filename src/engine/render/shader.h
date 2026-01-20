@@ -30,7 +30,7 @@ class Image;
 
 struct ShaderUniformHandle
 {
-    GLuint m_nLocation;
+    GLuint m_nLocation = GL_INVALID_INDEX;
     std::string m_strName;
 
     static bool sendData(const ShaderUniformHandle* const pHandle, const mat4x4& matrix);
@@ -96,6 +96,7 @@ protected:
     int m_nUniformHandleCount = 0;
 
     GLuint getUniformLocation(const std::string& name) const;
+    GLuint getUniformLocation(const std::string_view& name) const;
 
     bool m_bTransparent = false;
 
