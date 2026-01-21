@@ -527,6 +527,7 @@ void Window::mainLoop()
 
         if (isUsingOpenGL())
         {
+            // TODO: Change to glfwSetFramebufferSizeCallback
             glViewport(0, 0, m_oActualSize.x, m_oActualSize.y);
             glClearColor(0.f, 0.f, 0.f, 1.0f);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -616,34 +617,35 @@ void Window::drawIMGUIEditor()
         }
     }
 
-    // if (ImGui::BeginMainMenuBar())
-    // {
-        // if (ImGui::BeginMenu("Editor Windows"))
-        // {
-            // for (int i = 0; i < nSize; ++i)
-            // {
-            //     IEditorWindow* pWindow = m_oEditorWindows.getElement(i);
-            //     if (pWindow)
-            //     {
-            //         if (ImGui::MenuItem(typeid(*pWindow).name(), NULL, pWindow->isActive()))
-            //         {
-            //             pWindow->setActive(!pWindow->isActive());
-            //             Preference::getPlayerPreferenceInstance().setBool(std::string("EditorWindow_") + typeid(*pWindow).name(), pWindow->isActive());
-            //         }
-            //     }
-            // }
+    // TODO: try to fix the issue of menu bar on Metal will crash
+    if (!isUsingMetal() && ImGui::BeginMainMenuBar())
+    {
+        if (ImGui::BeginMenu("Editor Windows"))
+        {
+            for (int i = 0; i < nSize; ++i)
+            {
+                IEditorWindow* pWindow = m_oEditorWindows.getElement(i);
+                if (pWindow)
+                {
+                    if (ImGui::MenuItem(typeid(*pWindow).name(), NULL, pWindow->isActive()))
+                    {
+                        pWindow->setActive(!pWindow->isActive());
+                        Preference::getPlayerPreferenceInstance().setBool(std::string("EditorWindow_") + typeid(*pWindow).name(), pWindow->isActive());
+                    }
+                }
+            }
 
-        //     ImGui::EndMenu();
-        // }
+            ImGui::EndMenu();
+        }
 
-        // if (ImGui::MenuItem("Show Gizmos", NULL, m_bDrawGizmos))
-        // {
-        //     m_bDrawGizmos = !m_bDrawGizmos;
-        //     Preference::setEnableGizmos(m_bDrawGizmos);
-        // }
+        if (ImGui::MenuItem("Show Gizmos", NULL, m_bDrawGizmos))
+        {
+            m_bDrawGizmos = !m_bDrawGizmos;
+            Preference::setEnableGizmos(m_bDrawGizmos);
+        }
 
-    // }
-    // ImGui::EndMainMenuBar();
+        ImGui::EndMainMenuBar();
+    }
 }
 
 void Window::drawFrame()
