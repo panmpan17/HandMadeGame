@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.16)
 project(MichaelHandMadeGame
         VERSION 0.1
         DESCRIPTION "GLFW Test"
-        LANGUAGES C CXX
+        LANGUAGES C CXX OBJCXX
 )
 
 set(CMAKE_CXX_STANDARD 23)
@@ -37,6 +37,11 @@ include(src/CMakeLists.txt)
 set(DO_COPY_ASSETS_CUSTOM_COMMAND ON)
 
 if (APPLE)
+    find_library(METAL_LIB Metal REQUIRED)
+    find_library(FOUNDATION_LIB Foundation REQUIRED)
+    find_library(QUARTZ_LIB QuartzCore REQUIRED)
+    find_library(COCOA_LIB Cocoa REQUIRED)
+
     if (CMAKE_GENERATOR STREQUAL "Xcode")
         set(DO_COPY_ASSETS_CUSTOM_COMMAND OFF)
 
@@ -185,16 +190,44 @@ if (TRUE)
 endif()
 
 # ImGui Library
-if (OFF)
-    add_library(imgui STATIC
+if (ON)
+    list(APPEND IMGUI_LIB_SRC
         "external/imgui/imgui.cpp"
         "external/imgui/imgui_demo.cpp"
         "external/imgui/imgui_draw.cpp"
         "external/imgui/imgui_tables.cpp"
         "external/imgui/imgui_widgets.cpp"
         "external/imgui/backends/imgui_impl_glfw.cpp"
-        "external/imgui/backends/imgui_impl_opengl3.cpp"
     )
+
+    if (ON)
+        list(APPEND IMGUI_LIB_SRC
+            "external/imgui/backends/imgui_impl_opengl3.cpp"
+        )
+    endif()
+
+    if (APPLE)
+        # enable_language(OBJCXX)
+        list(APPEND IMGUI_LIB_SRC
+            "external/imgui/backends/imgui_impl_metal.mm"
+        )
+    endif()
+
+    add_library(imgui STATIC ${IMGUI_LIB_SRC})
+
+    if (APPLE)
+        target_include_directories(imgui PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/external/metal-cpp")
+
+        target_link_libraries(imgui PRIVATE
+            ${METAL_LIB}
+            ${FOUNDATION_LIB}
+            ${QUARTZ_LIB}
+        )
+
+        target_compile_definitions(imgui PUBLIC
+            IMGUI_IMPL_METAL_CPP
+        )
+    endif()
 
     target_include_directories(imgui PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/external/imgui
@@ -212,11 +245,6 @@ if (APPLE)
     target_link_libraries(MichaelHandMadeGame PRIVATE mac_frameworks)
 
     # Add Metal framework
-    find_library(METAL_LIB Metal REQUIRED)
-    find_library(FOUNDATION_LIB Foundation REQUIRED)
-    find_library(QUARTZ_LIB QuartzCore REQUIRED)
-    find_library(COCOA_LIB Cocoa REQUIRED)
-
     target_include_directories(MichaelHandMadeGame PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/external/metal-cpp")
 
     target_link_libraries(MichaelHandMadeGame PRIVATE
@@ -239,5 +267,5 @@ elseif(UNIX)
 endif()
 
 target_link_libraries(MichaelHandMadeGame PRIVATE glfw freetype )
-# target_link_libraries(imgui PRIVATE glfw)
+target_link_libraries(imgui PRIVATE glfw)
 

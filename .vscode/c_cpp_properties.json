@@ -11,7 +11,8 @@
             ],
             "defines": [
                 "__APPLE__",
-                "VSCODE_ONLY"
+                "VSCODE_ONLY",
+                "IMGUI_IMPL_METAL_CPP"
             ],
             "compilerPath": "/usr/bin/g++",
             "cStandard": "c23",

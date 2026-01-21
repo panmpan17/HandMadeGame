@@ -95,6 +95,8 @@ private:
     MTL::Device* m_pMetalDevice = nullptr;
     CA::MetalLayer* m_pMetalLayer = nullptr;
     MTL::CommandQueue* m_pMetalCommandQueue = nullptr;
+    MTL::RenderPassDescriptor* m_pRenderPassDescriptor = nullptr;
+    MTL::CommandBuffer* m_pCommandBuffer = nullptr;
     MTL::RenderCommandEncoder* m_pCurrentFrameRenderEncoder = nullptr;
 #endif // __APPLE__
 
