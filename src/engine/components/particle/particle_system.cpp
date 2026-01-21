@@ -79,6 +79,14 @@ ParticleSystem::~ParticleSystem()
         glDeleteVertexArrays(1, &m_nVertexArray);
         glDeleteBuffers(1, &m_nVertexBuffer);
     }
+#if __APPLE__
+    else if (Window::ins->isUsingMetal())
+    {
+        m_pPosBuffer->release();
+        m_pUVBuffer->release();
+        m_pInstanceBuffer->release();
+    }
+#endif // __APPLE__
 }
 
 void ParticleSystem::registerBuffer()

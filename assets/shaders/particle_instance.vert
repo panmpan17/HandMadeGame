@@ -24,12 +24,13 @@ void main()
 
     if (u_useNodeTransform)
     {
-        gl_Position = u_nodeTransform * vec4((rotationMatrix * scaledPos) + instancePos.xy, instancePos.z, 1.0);
+        mat4 mvp = u_Projection * u_View * u_modelMatrix;
+        gl_Position = mvp * vec4((rotationMatrix * scaledPos) + instancePos.xy, instancePos.z, 1.0);
     }
     else
     {
-        mat4 mvp = u_Projection * u_View * u_modelMatrix;
-        gl_Position = mvp * vec4((rotationMatrix * scaledPos) + instancePos.xy, instancePos.z, 1.0);
+        mat4 vp = u_Projection * u_View;
+        gl_Position = vp * vec4((rotationMatrix * scaledPos) + instancePos.xy, instancePos.z, 1.0);
     }
 
     fragmentColor = instanceColor * vec4(1.0, 1.0, 1.0, opacity);
