@@ -1,6 +1,7 @@
 #include "mesh.h"
 
 #include <glad/gl.h>
+#include "../../core/window.h"
 
 
 Mesh::Mesh(int nVertexCount, int nIndiceCount)
@@ -29,16 +30,24 @@ bool Mesh::getIsGPULoaded() const
 
 void Mesh::loadToGPU()
 {
-    glGenBuffers(1, &m_nVertexBuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, m_nVertexBuffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(VertexWUVNormalTangent) * m_nVertexCount, m_arrVertices, GL_STATIC_DRAW);
-
-    glGenBuffers(1, &m_nIndexBuffer);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_nIndexBuffer);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * m_nIndiceCount, m_arrIndices, GL_STATIC_DRAW);
-
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    if (Window::ins->isUsingMetal())
+    {
+        glGenBuffers(1, &m_nVertexBuffer);
+        glBindBuffer(GL_ARRAY_BUFFER, m_nVertexBuffer);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(VertexWUVNormalTangent) * m_nVertexCount, m_arrVertices, GL_STATIC_DRAW);
+    
+        glGenBuffers(1, &m_nIndexBuffer);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_nIndexBuffer);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * m_nIndiceCount, m_arrIndices, GL_STATIC_DRAW);
+    
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    }
+#if __APPLE__
+    else if (Window::ins->isUsingMetal())
+    {
+    }
+#endif // __APPLE__
 }
 
 void Mesh::unloadFromGPU()
@@ -54,4 +63,10 @@ void Mesh::unloadFromGPU()
         glDeleteBuffers(1, &m_nIndexBuffer);
         m_nIndexBuffer = 0;
     }
+
+#if __APPLE__
+    if (Window::ins->isUsingMetal())
+    {
+    }
+#endif // __APPLE__
 }

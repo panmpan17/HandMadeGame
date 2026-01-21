@@ -661,15 +661,15 @@ void Window::drawFrame()
     LightManager* const pLightManager = LightManager::getInstance();
     pLightManager->updateLightingUBO();
 
-    // DirectionLightComponent* pMainDirLight = pLightManager->getMainDirectionLightComponent();
-    // if (pMainDirLight && pMainDirLight->getShadowsEnabled())
-    // {
-    //     glViewport(0, 0, LightManager::SHADOW_MAP_WIDTH, LightManager::SHADOW_MAP_HEIGHT);
-    //     glBindFramebuffer(GL_FRAMEBUFFER, pLightManager->getShadowDepthMapFBO());
-    //     glClear(GL_DEPTH_BUFFER_BIT);
-    //     m_pWorldScene->renderDepth();
-    //     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    // }
+    DirectionLightComponent* pMainDirLight = pLightManager->getMainDirectionLightComponent();
+    if (pMainDirLight && pMainDirLight->getShadowsEnabled())
+    {
+        glViewport(0, 0, LightManager::SHADOW_MAP_WIDTH, LightManager::SHADOW_MAP_HEIGHT);
+        glBindFramebuffer(GL_FRAMEBUFFER, pLightManager->getShadowDepthMapFBO());
+        glClear(GL_DEPTH_BUFFER_BIT);
+        m_pWorldScene->renderDepth();
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    }
 
     // if (m_bEnablePostProcess) // Enable post process
     // {

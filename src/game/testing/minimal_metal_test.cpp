@@ -16,6 +16,7 @@
 #include "../../engine/render/shader_loader.h"
 #include "../../engine/render/image_loader.h"
 #include "../../engine/render/skybox.h"
+#include "../../engine/render/models/assimp_model_reader.h"
 #include "../../engine/components/transform/rotate.h"
 #include "../../engine/components/transform/movement.h"
 #include "../../engine/render/material_loader.h"
@@ -123,7 +124,15 @@ void firstTriangeTest()
 
         pNode5->addComponent(new TwoPointsMovement({ -0.5f, 0.f, 1.f }, { 0.5f, 0.f, 1.f }, 2.0f));
 
-        // pNode5->setActive(false);
+        pNode5->setActive(false);
         pWorldScene->addNode(pNode5);
+    }
+    
+    {
+        std::shared_ptr<Material> pMaterial = MaterialLoader::getInstance()->getMaterial("assets/materials/box.yaml");
+        AssimpModelReader oModelReader("assets/models/box.obj", { pMaterial });
+        Node* pBox = oModelReader.instantiateCloneNode();
+        pBox->setPosition(0.f, 0.f, 0.f);
+        pWorldScene->addNode(pBox);
     }
 }

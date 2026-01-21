@@ -7,7 +7,7 @@
 #include "vertex.h"
 #include "shader_loader.h"
 #include "image.h"
-// #include "lighting/light_manager.h"
+#include "lighting/light_manager.h"
 #include "../core/debug_macro.h"
 #include "../core/camera.h"
 #include "../core/time.h"
@@ -337,12 +337,15 @@ void Shader::setLightUBOBindingPoint(GLuint nBindingPoint)
 
 void Shader::reloadLightUBOBinding()
 {
-    // if (m_nLightUBOBindingPoint != GL_INVALID_INDEX && LightManager::getInstance())
-    // {
-    //     glBindBufferBase(GL_UNIFORM_BUFFER, m_nLightUBOBindingPoint, LightManager::getInstance()->getLightingUBO());
-    //     GLuint lightIndex = glGetUniformBlockIndex(m_nProgram, SHADER_GLOBAL_UNIFORM_LIGHTING_DATA.data());
-    //     glUniformBlockBinding(m_nProgram, lightIndex, m_nLightUBOBindingPoint);
-    // }
+    if (Window::ins->isUsingOpenGL())
+    {
+        if (m_nLightUBOBindingPoint != GL_INVALID_INDEX && LightManager::getInstance())
+        {
+            glBindBufferBase(GL_UNIFORM_BUFFER, m_nLightUBOBindingPoint, LightManager::getInstance()->getLightingUBO());
+            GLuint lightIndex = glGetUniformBlockIndex(m_nProgram, SHADER_GLOBAL_UNIFORM_LIGHTING_DATA.data());
+            glUniformBlockBinding(m_nProgram, lightIndex, m_nLightUBOBindingPoint);
+        }
+    }
 }
 
 void Shader::setTimeDataUBOBindingPoint(GLuint nBindingPoint)
@@ -353,11 +356,14 @@ void Shader::setTimeDataUBOBindingPoint(GLuint nBindingPoint)
 
 void Shader::reloadTimeDataUBOBinding()
 {
-    if (m_nTimeDataUBOBindingPoint != GL_INVALID_INDEX && TimeManager::getInstance())
+    if (Window::ins->isUsingOpenGL())
     {
-        glBindBufferBase(GL_UNIFORM_BUFFER, m_nTimeDataUBOBindingPoint, TimeManager::getInstance()->getTimeUBO());
-        GLuint timeIndex = glGetUniformBlockIndex(m_nProgram, SHADER_GLOBAL_UNIFORM_TIME_DATA.data());
-        glUniformBlockBinding(m_nProgram, timeIndex, m_nTimeDataUBOBindingPoint);
+        if (m_nTimeDataUBOBindingPoint != GL_INVALID_INDEX && TimeManager::getInstance())
+        {
+            glBindBufferBase(GL_UNIFORM_BUFFER, m_nTimeDataUBOBindingPoint, TimeManager::getInstance()->getTimeUBO());
+            GLuint timeIndex = glGetUniformBlockIndex(m_nProgram, SHADER_GLOBAL_UNIFORM_TIME_DATA.data());
+            glUniformBlockBinding(m_nProgram, timeIndex, m_nTimeDataUBOBindingPoint);
+        }
     }
 }
 
