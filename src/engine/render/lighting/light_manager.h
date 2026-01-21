@@ -5,6 +5,10 @@
 #include <linmath.h>
 #include "../../../utils/expandable_array.h"
 
+#if __APPLE__
+#include <Metal/Metal.hpp>
+#endif
+
 typedef unsigned int GLuint;
 class PointLightComponent;
 class DirectionLightComponent;
@@ -83,6 +87,10 @@ private:
 
     bool m_bUBODirty = true;
     GLuint m_nLightingUBO = 0;
+
+#if __APPLE__
+    MTL::Buffer* m_pLightingBuffer = nullptr;
+#endif
 
     vec3 m_colorAmbientLight = {0.2f, 0.2f, 0.2f};
 

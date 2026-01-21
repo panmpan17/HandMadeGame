@@ -29,8 +29,8 @@
 #include "../render/material_loader.h"
 #include "../render/vertex.h"
 // #include "../render/post_process/render_process_queue.h"
-// #include "../render/lighting/light_manager.h"
-// #include "../render/lighting/direction_light.h"
+#include "../render/lighting/light_manager.h"
+#include "../render/lighting/direction_light.h"
 #include "../render/font/font_loader.h"
 #include "../misc/preference.h"
 #include "../../editor/gizmos.h"
@@ -148,7 +148,7 @@ Window::~Window()
 
     InputManager::Cleanup();
     ImageLoader::Cleanup();
-    // LightManager::Cleanup();
+    LightManager::Cleanup();
     ShaderLoader::Cleanup();
     MaterialLoader::Cleanup();
     GizmosManager::Cleanup();
@@ -359,8 +359,8 @@ void Window::setupManagers()
     PROFILER_END_TIMER("Initialization", "TimeManager setup");
     ImageLoader::Initialize();
     PROFILER_END_TIMER("Initialization", "Image setup");
-    // LightManager::Initialize();
-    // PROFILER_END_TIMER("Initialization", "Lighting setup");
+    LightManager::Initialize();
+    PROFILER_END_TIMER("Initialization", "Lighting setup");
     ShaderLoader::Initialize();
     PROFILER_END_TIMER("Initialization", "Shader setup");
     MaterialLoader::Initialize();
@@ -658,8 +658,8 @@ void Window::drawFrame()
         Camera::main->updateCameraDataBuffer();
     }
 
-    // LightManager* const pLightManager = LightManager::getInstance();
-    // pLightManager->updateLightingUBO();
+    LightManager* const pLightManager = LightManager::getInstance();
+    pLightManager->updateLightingUBO();
 
     // DirectionLightComponent* pMainDirLight = pLightManager->getMainDirectionLightComponent();
     // if (pMainDirLight && pMainDirLight->getShadowsEnabled())
