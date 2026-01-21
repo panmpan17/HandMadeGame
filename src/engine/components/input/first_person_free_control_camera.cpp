@@ -1,6 +1,6 @@
 #include "first_person_free_control_camera.h"
 
-// #include <imgui.h>
+#include <imgui.h>
 #include "../../core/camera.h"
 #include "../../core/scene/node.h"
 #include "../../core/input/input_manager.h"
@@ -83,7 +83,7 @@ void FirstPersonFreeControlCamera::onCameraMovementToggle(bool bPressed)
     InputManager* pInput = InputManager::getInstance();
     if (bPressed)
     {
-        // ImGui::SetWindowFocus(NULL);
+        ImGui::SetWindowFocus(NULL);
     }
     else
     {

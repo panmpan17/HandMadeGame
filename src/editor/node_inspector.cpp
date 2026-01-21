@@ -1,17 +1,9 @@
 #include "node_inspector.h"
 
 #include <imgui.h>
-#include <imgui_impl_glfw.h>
-#include <imgui_impl_opengl3.h>
 #include "editor.h"
-#include "../engine/core/camera.h"
 #include "../engine/core/scene/node.h"
 #include "../engine/components/component.h"
-#include "../engine/components/particle/particle_system.h"
-#include "../engine/components/transform/movement.h"
-#include "../engine/components/transform/rotate.h"
-#include "../engine/components/transform/scaling.h"
-#include "../engine/render/lighting/direction_light.h"
 
 
 NodeInspector::NodeInspector()

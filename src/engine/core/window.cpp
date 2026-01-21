@@ -34,8 +34,8 @@
 #include "../render/font/font_loader.h"
 #include "../misc/preference.h"
 #include "../../editor/gizmos.h"
-// #include "../../editor/node_inspector.h"
-// #include "../../editor/hierarchy_view.h"
+#include "../../editor/node_inspector.h"
+#include "../../editor/hierarchy_view.h"
 // #include "../../editor/post_process_inspector.h"
 #include "../../utils/file_watch_dog.h"
 
@@ -358,7 +358,7 @@ void Window::setupManagers()
 
     PROFILER_END_TIMER("Initialization", "TimeManager setup");
     ImageLoader::Initialize();
-    // PROFILER_END_TIMER("Initialization", "Image setup");
+    PROFILER_END_TIMER("Initialization", "Image setup");
     // LightManager::Initialize();
     // PROFILER_END_TIMER("Initialization", "Lighting setup");
     ShaderLoader::Initialize();
@@ -461,22 +461,22 @@ void Window::setupIMGUIAndEditorWindows()
     }
 #endif // __APPLE__
 
-    // if (m_bAddGameRelatedIMGUIWindows)
-    // {
-    //     // m_oEditorWindows.addElement(new NodeInspector());
-    //     m_oEditorWindows.addElement(new HierarchyView());
-    //     // m_oEditorWindows.addElement(new PostProcessInspector());
-    // }
+    if (m_bAddGameRelatedIMGUIWindows)
+    {
+        m_oEditorWindows.addElement(new NodeInspector());
+        m_oEditorWindows.addElement(new HierarchyView());
+        // m_oEditorWindows.addElement(new PostProcessInspector());
+    }
 
-    // for (int i = 0; i < m_oEditorWindows.getSize(); ++i)
-    // {
-    //     IEditorWindow* pWindow = m_oEditorWindows.getElement(i);
-    //     if (pWindow)
-    //     {
-    //         bool bActive = Preference::getPlayerPreferenceInstance().getBool(std::string("EditorWindow_") + typeid(*pWindow).name(), true);
-    //         pWindow->setActive(bActive);
-    //     }
-    // }
+    for (int i = 0; i < m_oEditorWindows.getCount(); ++i)
+    {
+        IEditorWindow* pWindow = m_oEditorWindows.getElement(i);
+        if (pWindow)
+        {
+            bool bActive = Preference::getPlayerPreferenceInstance().getBool(std::string("EditorWindow_") + typeid(*pWindow).name(), true);
+            pWindow->setActive(bActive);
+        }
+    }
 }
 
 void Window::beforeLoop()
@@ -516,6 +516,11 @@ void Window::mainLoop()
                 Renderer::initMetalDepthTexture(m_pMetalDevice, m_oActualSize.x, m_oActualSize.y);
             }
 #endif // __APPLE__
+        }
+
+        if (m_bShowIMGUI)
+        {
+            IMGUINewFrame();
         }
 
         runUpdate();
@@ -575,12 +580,6 @@ void Window::mainLoop()
 
 void Window::runUpdate()
 {
-    if (m_bShowIMGUI)
-    {
-        updateIMGUI();
-    }
-
-
     float fDeltaTime = TimeManager::getInstance()->preUpdate();
 
     EngineEventDispatcher::getInstance().updateEvents(fDeltaTime);
@@ -588,7 +587,7 @@ void Window::runUpdate()
     m_pWorldScene->update(fDeltaTime);
 }
 
-void Window::updateIMGUI()
+void Window::IMGUINewFrame()
 {
     if (isUsingOpenGL())
     {
@@ -603,45 +602,48 @@ void Window::updateIMGUI()
 
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
-    
-    // int nSize = m_oEditorWindows.getSize();
-    // for (int i = 0; i < nSize; ++i)
-    // {
-    //     IEditorWindow* pWindow = m_oEditorWindows.getElement(i);
-    //     if (pWindow && pWindow->isActive())
-    //     {
-    //         pWindow->update();
-    //     }
-    // }
+}
+
+void Window::drawIMGUIEditor()
+{
+    int nSize = m_oEditorWindows.getSize();
+    for (int i = 0; i < nSize; ++i)
+    {
+        IEditorWindow* pWindow = m_oEditorWindows.getElement(i);
+        if (pWindow && pWindow->isActive())
+        {
+            pWindow->update();
+        }
+    }
 
     // if (ImGui::BeginMainMenuBar())
     // {
-    //     if (ImGui::BeginMenu("Editor Windows"))
-    //     {
-    //         for (int i = 0; i < nSize; ++i)
-    //         {
-    //             IEditorWindow* pWindow = m_oEditorWindows.getElement(i);
-    //             if (pWindow)
-    //             {
-    //                 if (ImGui::MenuItem(typeid(*pWindow).name(), NULL, pWindow->isActive()))
-    //                 {
-    //                     pWindow->setActive(!pWindow->isActive());
-    //                     Preference::getPlayerPreferenceInstance().setBool(std::string("EditorWindow_") + typeid(*pWindow).name(), pWindow->isActive());
-    //                 }
-    //             }
-    //         }
+        // if (ImGui::BeginMenu("Editor Windows"))
+        // {
+            // for (int i = 0; i < nSize; ++i)
+            // {
+            //     IEditorWindow* pWindow = m_oEditorWindows.getElement(i);
+            //     if (pWindow)
+            //     {
+            //         if (ImGui::MenuItem(typeid(*pWindow).name(), NULL, pWindow->isActive()))
+            //         {
+            //             pWindow->setActive(!pWindow->isActive());
+            //             Preference::getPlayerPreferenceInstance().setBool(std::string("EditorWindow_") + typeid(*pWindow).name(), pWindow->isActive());
+            //         }
+            //     }
+            // }
 
-    //         ImGui::EndMenu();
-    //     }
+        //     ImGui::EndMenu();
+        // }
 
-    //     if (ImGui::MenuItem("Show Gizmos", NULL, m_bDrawGizmos))
-    //     {
-    //         m_bDrawGizmos = !m_bDrawGizmos;
-    //         Preference::setEnableGizmos(m_bDrawGizmos);
-    //     }
+        // if (ImGui::MenuItem("Show Gizmos", NULL, m_bDrawGizmos))
+        // {
+        //     m_bDrawGizmos = !m_bDrawGizmos;
+        //     Preference::setEnableGizmos(m_bDrawGizmos);
+        // }
 
-    //     ImGui::EndMainMenuBar();
     // }
+    // ImGui::EndMainMenuBar();
 }
 
 void Window::drawFrame()
@@ -690,6 +692,8 @@ void Window::drawFrame()
 
     if (m_bShowIMGUI)
     {
+        drawIMGUIEditor();
+
 #if IS_DEBUG_VERSION
         if (m_bShowFPS)
         {

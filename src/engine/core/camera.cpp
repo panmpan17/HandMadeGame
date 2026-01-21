@@ -5,7 +5,7 @@
 #include "debug_macro.h"
 #include "scene/node.h"
 #include "../render/shader_loader.h"
-// #include "../../editor/inspector_helper.h"
+#include "../../editor/inspector_helper.h"
 
 
 Camera* Camera::main = nullptr;
@@ -200,14 +200,14 @@ Vector3 Camera::worldPositionToScreenPosition(const Vector3& worldPos)
 
 void Camera::onInspectorUI(int nComponentIndex)
 {
-    // bool bIsMainCamera = (this == Camera::main);
-    // if (ImGui::Checkbox("Is Main", &bIsMainCamera))
-    // {
-    //     if (bIsMainCamera)
-    //     {
-    //         useAsMain();
-    //     }
-    // }
+    bool bIsMainCamera = (this == Camera::main);
+    if (ImGui::Checkbox("Is Main", &bIsMainCamera))
+    {
+        if (bIsMainCamera)
+        {
+            useAsMain();
+        }
+    }
 
-    // inspectorBoolField(nComponentIndex, "Ortho", m_bUseOrthoProjection);
+    inspectorBoolField(nComponentIndex, "Ortho", m_bUseOrthoProjection);
 }

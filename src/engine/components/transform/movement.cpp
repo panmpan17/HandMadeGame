@@ -1,7 +1,7 @@
 #include "movement.h"
 #include "../../core/input/input_manager.h"
 #include "../../core/serialization/serializer.h"
-// #include "../../../editor/inspector_helper.h"
+#include "../../../editor/inspector_helper.h"
 
 
 Movement::Movement(float fMoveSpeed)
@@ -147,7 +147,7 @@ bool TwoPointsMovement::deserializeField(DataDeserializer& deserializer, const s
 
 void TwoPointsMovement::onInspectorUI(int nComponentIndex)
 {
-    // inspectorVector3Field(nComponentIndex, "Start", reinterpret_cast<Vector3&>(m_vecStart));
-    // inspectorVector3Field(nComponentIndex, "End", reinterpret_cast<Vector3&>(m_vecEnd));
-    // inspectorFloatField(nComponentIndex, "Duration", m_fDuration);
+    inspectorVector3Field(nComponentIndex, "Start", reinterpret_cast<Vector3&>(m_vecStart));
+    inspectorVector3Field(nComponentIndex, "End", reinterpret_cast<Vector3&>(m_vecEnd));
+    inspectorFloatField(nComponentIndex, "Duration", m_fDuration);
 }

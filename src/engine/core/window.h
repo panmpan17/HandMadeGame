@@ -4,7 +4,7 @@
 #include "input/event.h"
 #include "math/vector.h"
 #include "../../utils/expandable_array.h"
-// #include "../../editor/editor_window.h"
+#include "../../editor/editor_window.h"
 
 #if __APPLE__
 #include <Foundation/Foundation.hpp>
@@ -54,7 +54,7 @@ public:
     // inline RenderProcessQueue* getRenderProcessQueue() const { return m_pRenderProcessQueue; }
 
     inline void setAddGameRelatedIMGUIWindows(bool bAdd) { m_bAddGameRelatedIMGUIWindows = bAdd; }
-    // inline void addEditorWindow(IEditorWindow* pWindow) { m_oEditorWindows.addElement(pWindow); }
+    inline void addEditorWindow(IEditorWindow* pWindow) { m_oEditorWindows.addElement(pWindow); }
 
     inline void setShowFPS(bool bShow) { m_bShowFPS = bShow; }
 
@@ -121,7 +121,7 @@ private:
     bool m_bShowIMGUI = false;
     bool m_bAddGameRelatedIMGUIWindows = true;
     bool m_bShowFPS = true;
-    // PointerExpandableArray<IEditorWindow*> m_oEditorWindows = PointerExpandableArray<IEditorWindow*>(2);
+    PointerExpandableArray<IEditorWindow*> m_oEditorWindows = PointerExpandableArray<IEditorWindow*>(2);
 
     FileWatchDog* m_pFileWatchDog = nullptr;
 
@@ -143,8 +143,9 @@ private:
     void setupIMGUIAndEditorWindows();
 
     void beforeLoop();
+    void IMGUINewFrame();
     void runUpdate();
-    void updateIMGUI();
+    void drawIMGUIEditor();
     void drawFrame();
     void drawFrameInfo();
 };
