@@ -30,7 +30,7 @@ bool Mesh::getIsGPULoaded() const
 
 void Mesh::loadToGPU()
 {
-    if (Window::ins->isUsingMetal())
+    if (Window::ins->isUsingOpenGL())
     {
         glGenBuffers(1, &m_nVertexBuffer);
         glBindBuffer(GL_ARRAY_BUFFER, m_nVertexBuffer);
@@ -52,20 +52,22 @@ void Mesh::loadToGPU()
 
 void Mesh::unloadFromGPU()
 {
-    if (m_nVertexBuffer != 0)
+    if (Window::ins->isUsingOpenGL())
     {
-        glDeleteBuffers(1, &m_nVertexBuffer);
-        m_nVertexBuffer = 0;
-    }
+        if (m_nVertexBuffer != 0)
+        {
+            glDeleteBuffers(1, &m_nVertexBuffer);
+            m_nVertexBuffer = 0;
+        }
 
-    if (m_nIndexBuffer != 0)
-    {
-        glDeleteBuffers(1, &m_nIndexBuffer);
-        m_nIndexBuffer = 0;
+        if (m_nIndexBuffer != 0)
+        {
+            glDeleteBuffers(1, &m_nIndexBuffer);
+            m_nIndexBuffer = 0;
+        }
     }
-
 #if __APPLE__
-    if (Window::ins->isUsingMetal())
+    else if (Window::ins->isUsingMetal())
     {
     }
 #endif // __APPLE__
