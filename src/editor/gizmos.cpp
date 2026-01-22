@@ -83,12 +83,6 @@ GizmosManager::~GizmosManager()
             m_pImageGizmosMetalVertexBuffer->release();
             m_pImageGizmosMetalVertexBuffer = nullptr;
         }
-
-        if (m_pImageGizmosMetalUVBuffer)
-        {
-            m_pImageGizmosMetalUVBuffer->release();
-            m_pImageGizmosMetalUVBuffer = nullptr;
-        }
     }
 #endif // __APPLE__
 }
@@ -101,6 +95,12 @@ void GizmosManager::initImageGizmosShaderAndBuffer()
     constexpr float fStartX = -1 / 2.0f;
     constexpr float fStartY = -1 / 2.0f;
 
+    VertexWUV arrVertices[4];
+    arrVertices[0] = { { fStartX, fStartY }, { 0, 0}  }; // Bottom left
+    arrVertices[2] = { { fStartX, fStartY + 1 }, { 0, 1 } }; // Top right
+    arrVertices[1] = { { fStartX + 1, fStartY }, { 1, 0 } }; // Bottom right
+    arrVertices[3] = { { fStartX + 1, fStartY + 1 }, { 1, 1 } }; // Top left
+
     if (Window::ins->isUsingOpenGL())
     {
         m_pImageGizmosPositionUniform = m_pImageGizmosShader->getUniformHandle("u_WorldPosition");
@@ -111,11 +111,6 @@ void GizmosManager::initImageGizmosShaderAndBuffer()
         glGenBuffers(1, &m_nImageGizmosVertexBuffer);
         glBindBuffer(GL_ARRAY_BUFFER, m_nImageGizmosVertexBuffer);
 
-        VertexWUV arrVertices[4];
-        arrVertices[0] = { { fStartX, fStartY }, { 0, 0}  }; // Bottom left
-        arrVertices[2] = { { fStartX, fStartY + 1 }, { 0, 1 } }; // Top right
-        arrVertices[1] = { { fStartX + 1, fStartY }, { 1, 0 } }; // Bottom right
-        arrVertices[3] = { { fStartX + 1, fStartY + 1 }, { 1, 1 } }; // Top left
         glBufferData(GL_ARRAY_BUFFER, sizeof(arrVertices), arrVertices, GL_STATIC_DRAW);
 
         GLuint nVPosAttr = m_pImageGizmosShader->getAttributeLocation("a_vPos");
@@ -136,22 +131,7 @@ void GizmosManager::initImageGizmosShaderAndBuffer()
     else if (Window::ins->isUsingMetal())
     {
         MTL::Device* pDevice = Window::ins->getMetalDevice();
-
-        const float positions[] = {
-            fStartX, fStartY,
-            fStartX + 1, fStartY,
-            fStartX, fStartY + 1,
-            fStartX + 1, fStartY + 1,
-        };
-        const float uv[] = {
-            0.f, 0.f,
-            1.f, 0.f,
-            0.f, 1.f,
-            1.f, 1.f,
-        };
-
-        m_pImageGizmosMetalVertexBuffer = pDevice->newBuffer(positions, sizeof(positions), MTL::ResourceStorageModeShared);
-        m_pImageGizmosMetalUVBuffer = pDevice->newBuffer(uv, sizeof(uv), MTL::ResourceStorageModeShared);
+        m_pImageGizmosMetalVertexBuffer = pDevice->newBuffer(arrVertices, sizeof(arrVertices), MTL::ResourceStorageModeShared);
     }
 #endif // __APPLE__
 }
@@ -764,7 +744,6 @@ void GizmosManager::drawImageGizmos()
 
         pRenderCommandEncoder->setRenderPipelineState(m_pImageGizmosShader->getMetalPipelineState());
         pRenderCommandEncoder->setVertexBuffer(m_pImageGizmosMetalVertexBuffer, 0, 0);
-        pRenderCommandEncoder->setVertexBuffer(m_pImageGizmosMetalUVBuffer, 0, 1);
         pRenderCommandEncoder->setVertexBuffer(Camera::main->getCameraMetalUBO(), 0, 3);
 
         for (int i = 0; i < m_nImageGizmosSize; ++i)

@@ -166,8 +166,7 @@ private:
     const ShaderUniformHandle* m_pNodeTransformUniform = nullptr;
 
 #if __APPLE__
-    MTL::Buffer* m_pPosBuffer = nullptr;
-    MTL::Buffer* m_pUVBuffer = nullptr;
+    MTL::Buffer* m_pVertexBuffer = nullptr;
     MTL::Buffer* m_pInstanceBuffer = nullptr;
 #endif // __APPLE__
 

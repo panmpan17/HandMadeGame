@@ -119,7 +119,6 @@ private:
 
 #if __APPLE__
     MTL::Buffer* m_pImageGizmosMetalVertexBuffer = nullptr;
-    MTL::Buffer* m_pImageGizmosMetalUVBuffer = nullptr;
 #endif // __APPLE__
 
     void initImageGizmosShaderAndBuffer();

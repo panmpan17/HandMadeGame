@@ -57,16 +57,17 @@ void Quad::registerBuffer()
     const float fStartX = -m_fWidth / 2.0f;
     const float fStartY = -m_fHeight / 2.0f;
 
+    VertexWUV arrVertices[4];
+    arrVertices[0] = { { fStartX, fStartY }, { 0.0f, 0.0f } }; // Bottom left
+    arrVertices[1] = { { fStartX + m_fWidth, fStartY }, { 1.0f, 0.0f } }; // Bottom right
+    arrVertices[2] = { { fStartX, fStartY + m_fHeight }, { 0.0f, 1.0f } }; // Top right
+    arrVertices[3] = { { fStartX + m_fWidth, fStartY + m_fHeight }, { 1.0f, 1.0f } }; // Top left
+
     if (Window::ins->isUsingOpenGL())
     {
         glGenBuffers(1, &m_nVertexBuffer);
         glBindBuffer(GL_ARRAY_BUFFER, m_nVertexBuffer);
 
-        VertexWUV arrVertices[4];
-        arrVertices[0] = { { fStartX, fStartY }, { 0.0f, 0.0f } }; // Bottom left
-        arrVertices[1] = { { fStartX + m_fWidth, fStartY }, { 1.0f, 0.0f } }; // Bottom right
-        arrVertices[2] = { { fStartX, fStartY + m_fHeight }, { 0.0f, 1.0f } }; // Top right
-        arrVertices[3] = { { fStartX + m_fWidth, fStartY + m_fHeight }, { 1.0f, 1.0f } }; // Top left
         glBufferData(GL_ARRAY_BUFFER, sizeof(arrVertices), arrVertices, GL_STATIC_DRAW);
 
         GLuint nVPosAttr = m_pShader->getAttributeLocation("a_vPos");
@@ -87,22 +88,7 @@ void Quad::registerBuffer()
     else if (Window::ins->isUsingMetal())
     {
         MTL::Device* pDevice = Window::ins->getMetalDevice();
-
-        const float positions[] = {
-            fStartX, fStartY,
-            fStartX + m_fWidth, fStartY,
-            fStartX, fStartY + m_fHeight,
-            fStartX + m_fWidth, fStartY + m_fHeight,
-        };
-        const float uv[] = {
-            0.f, 0.f,
-            1.f, 0.f,
-            0.f, 1.f,
-            1.f, 1.f,
-        };
-
-        m_pPosBuffer = pDevice->newBuffer(positions, sizeof(positions), MTL::ResourceStorageModeShared);
-        m_pUVBuffer = pDevice->newBuffer(uv, sizeof(uv), MTL::ResourceStorageModeShared);
+        m_pVertexBuffer = pDevice->newBuffer(arrVertices, sizeof(arrVertices), MTL::ResourceStorageModeShared);
     }
 #endif // __APPLE__
 }
@@ -162,8 +148,7 @@ void Quad::draw()
         MTL::RenderCommandEncoder* pRenderCommandEncoder = Window::ins->getCurrentFrameRenderEncoder();
 
         pRenderCommandEncoder->setRenderPipelineState(m_pShader->getMetalPipelineState());
-        pRenderCommandEncoder->setVertexBuffer(m_pPosBuffer, 0, 0);
-        pRenderCommandEncoder->setVertexBuffer(m_pUVBuffer, 0, 1);
+        pRenderCommandEncoder->setVertexBuffer(m_pVertexBuffer, 0, 0);
 
         struct
         {

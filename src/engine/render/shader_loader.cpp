@@ -159,6 +159,10 @@ void ShaderLoader::readRegistryFromFile()
         {
             oCurrentShaderData.m_bTransparent = (strLine.substr(2 + 14) == "1");
         }
+        else if (memcmp(strLine.data() + 2, "metal_attribute_pack", 20) == 0)
+        {
+            oCurrentShaderData.m_bMetalAttributePack = (strLine.substr(2 + 22) == "1");
+        }
     }
 
     if (oCurrentShaderData.nCurrentShaderId != -1 && !oCurrentShaderData.m_strName.empty())

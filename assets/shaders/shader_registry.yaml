@@ -4,6 +4,7 @@
   fragment: assets/shaders/2d/image.frag
   metal_prefix: image
   metal_attribute_size: 2,2
+  metal_attribute_pack: 1
   transparency: 1
 3:
   name: particle_instance
@@ -11,6 +12,7 @@
   fragment: assets/shaders/particle_instance.frag
   metal_prefix: particleInstance
   metal_attribute_size: 2,2
+  metal_attribute_pack: 1
   cameraUBO: 0
   transparency: 1
 4:
@@ -82,6 +84,7 @@
   cameraUBO: 0
   metal_prefix: imageGizmos
   metal_attribute_size: 2,2
+  metal_attribute_pack: 1
   transparency: 1
 19:
   name: particle_instance_billboard
@@ -102,3 +105,4 @@
   fragment: assets/shaders/colored_vertices.frag
   metal_prefix: coloredVertices
   metal_attribute_size: 2,3
+  metal_attribute_pack: 1

@@ -188,10 +188,53 @@ Shader* Shader::loadFromMetalShader(MTL::Library* const pLibrary, MTL::Device* c
     if (nSize > 0)
     {
         MTL::VertexDescriptor* pVertexDesc = MTL::VertexDescriptor::alloc()->init();
-        for (int i = 0; i < nSize; ++i)
+
+        if (oData.m_bMetalAttributePack)
         {
-            metalShaderAddFloatAttribute(pVertexDesc, i, oData.m_metalAttributeSizes[i]);
+            MTL::VertexBufferLayoutDescriptor* pLayout = pVertexDesc->layouts()->object(0);
+            pLayout->setStepFunction(MTL::VertexStepFunctionPerVertex);
+            pLayout->setStepRate(1);
+
+            int nTotalSize = 0;
+
+            for (int i = 0; i < nSize; ++i)
+            {
+                MTL::VertexAttributeDescriptor* pPosAttr = pVertexDesc->attributes()->object(i);
+                pPosAttr->setOffset(nTotalSize);
+                switch (oData.m_metalAttributeSizes[i])
+                {
+                    case 1:
+                        nTotalSize += sizeof(float) * 1;
+                        pPosAttr->setFormat(MTL::VertexFormatFloat);
+                        break;
+                    case 2:
+                        nTotalSize += sizeof(float) * 2;
+                        pPosAttr->setFormat(MTL::VertexFormatFloat2);
+                        break;
+                    case 3:
+                        nTotalSize += sizeof(float) * 3;
+                        pPosAttr->setFormat(MTL::VertexFormatFloat3);
+                        break;
+                    case 4:
+                        nTotalSize += sizeof(float) * 4;
+                        pPosAttr->setFormat(MTL::VertexFormatFloat4);
+                        break;
+                    default:
+                        throw std::runtime_error("Unsupported float count for vertex attribute in Metal shader");
+                }
+                pPosAttr->setBufferIndex(0); // TODO: Support multiple buffers
+            }
+
+            pLayout->setStride(nTotalSize);
         }
+        else
+        {
+            for (int i = 0; i < nSize; ++i)
+            {
+                metalShaderAddFloatAttribute(pVertexDesc, i, oData.m_metalAttributeSizes[i]);
+            }
+        }
+
         psoDesc->setVertexDescriptor(pVertexDesc);
         pVertexDesc->release();
     }

@@ -37,16 +37,16 @@ void Triangle::setShader(Shader* pShader)
 
 void Triangle::registerBuffer()
 {
+    VertexWColor arrVertices[3];
+    arrVertices[0] = { { -0.6f, -0.4f }, { 1.f, 0.f, 0.f } };
+    arrVertices[1] = { {  0.6f, -0.4f }, { 0.f, 1.f, 0.f } };
+    arrVertices[2] = { {   0.f,  0.6f }, { 0.f, 0.f, 1.f } };
     
     if (Window::ins->isUsingOpenGL())
     {
         glGenBuffers(1, &m_nVertexBuffer);
         glBindBuffer(GL_ARRAY_BUFFER, m_nVertexBuffer);
 
-        VertexWColor arrVertices[3];
-        arrVertices[0] = { { -0.6f, -0.4f }, { 1.f, 0.f, 0.f } };
-        arrVertices[1] = { {  0.6f, -0.4f }, { 0.f, 1.f, 0.f } };
-        arrVertices[2] = { {   0.f,  0.6f }, { 0.f, 0.f, 1.f } };
         glBufferData(GL_ARRAY_BUFFER, sizeof(arrVertices), arrVertices, GL_STATIC_DRAW);
 
         GLuint nVPosAttr =  m_pShader->getAttributeLocation("a_vPos");
@@ -67,20 +67,7 @@ void Triangle::registerBuffer()
     else if (Window::ins->isUsingMetal())
     {
         MTL::Device* pDevice = Window::ins->getMetalDevice();
-
-        const float positions[] = {
-            -0.6f, -0.4f,
-            0.6f, -0.4f,
-            0.f,  0.6f
-        };
-        const float colors[] = {
-            1.f, 0.f, 0.f,
-            0.f, 1.f, 0.f,
-            0.f, 0.f, 1.f,
-        };
-
-        m_pPosBuffer = pDevice->newBuffer(positions, sizeof(positions), MTL::ResourceStorageModeShared);
-        m_pColBuffer = pDevice->newBuffer(colors, sizeof(colors), MTL::ResourceStorageModeShared);
+        m_pVertexBuffer = pDevice->newBuffer(arrVertices, sizeof(arrVertices), MTL::ResourceStorageModeShared);
     }
 #endif // __APPLE__
 }
@@ -109,8 +96,7 @@ void Triangle::draw()
         MTL::RenderCommandEncoder* pRenderCommandEncoder = Window::ins->getCurrentFrameRenderEncoder();
 
         pRenderCommandEncoder->setRenderPipelineState(m_pShader->getMetalPipelineState());
-        pRenderCommandEncoder->setVertexBuffer(m_pPosBuffer, 0, 0);
-        pRenderCommandEncoder->setVertexBuffer(m_pColBuffer, 0, 1);
+        pRenderCommandEncoder->setVertexBuffer(m_pVertexBuffer, 0, 0);
         pRenderCommandEncoder->setVertexBytes(&mvp, sizeof(mat4x4), 2);
         pRenderCommandEncoder->drawPrimitives(MTL::PrimitiveType::PrimitiveTypeTriangle, (NS::UInteger)0, (NS::UInteger)3);
         INCREASE_DRAW_CALL_COUNT(1);

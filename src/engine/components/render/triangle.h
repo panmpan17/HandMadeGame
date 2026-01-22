@@ -30,8 +30,7 @@ private:
     Shader* m_pShader = nullptr;
 
 #if __APPLE__
-    MTL::Buffer* m_pPosBuffer = nullptr;
-    MTL::Buffer* m_pColBuffer = nullptr;
+    MTL::Buffer* m_pVertexBuffer = nullptr;
 #endif // __APPLE__
 
     GLuint m_nVertexBuffer, m_nVertexArray;

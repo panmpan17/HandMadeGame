@@ -24,6 +24,7 @@ struct ShaderRegisteryData
     // Metal
     std::string m_strMetalShaderPrefix;
     std::vector<int> m_metalAttributeSizes;
+    bool m_bMetalAttributePack = false;
 
     void reset()
     {

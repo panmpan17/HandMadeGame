@@ -82,8 +82,7 @@ ParticleSystem::~ParticleSystem()
 #if __APPLE__
     else if (Window::ins->isUsingMetal())
     {
-        m_pPosBuffer->release();
-        m_pUVBuffer->release();
+        m_pVertexBuffer->release();
         m_pInstanceBuffer->release();
     }
 #endif // __APPLE__
@@ -91,15 +90,14 @@ ParticleSystem::~ParticleSystem()
 
 void ParticleSystem::registerBuffer()
 {
+    VertexWUV arrQuadVerticies[4];
+    arrQuadVerticies[0] = { { -.5f, -.5f }, { 0.f, 0.f } };
+    arrQuadVerticies[1] = { { .5f, -.5f }, { 1.f, 0.f } };
+    arrQuadVerticies[2] = { { -.5f, .5f }, { 0.f, 1.f } };
+    arrQuadVerticies[3] = { { .5f, .5f }, { 1.f, 1.f } };
+
     if (Window::ins->isUsingOpenGL())
     {
-        // Four corner vertex datas
-        VertexWUV arrQuadVerticies[4];
-        arrQuadVerticies[0] = { { -.5f, -.5f }, { 0.f, 0.f } };
-        arrQuadVerticies[1] = { { .5f, -.5f }, { 1.f, 0.f } };
-        arrQuadVerticies[2] = { { -.5f, .5f }, { 0.f, 1.f } };
-        arrQuadVerticies[3] = { { .5f, .5f }, { 1.f, 1.f } };
-
         glGenBuffers(1, &m_nVertexBuffer);
         glBindBuffer(GL_ARRAY_BUFFER, m_nVertexBuffer);
         glBufferData(GL_ARRAY_BUFFER, sizeof(arrQuadVerticies), arrQuadVerticies, GL_STATIC_DRAW);
@@ -145,22 +143,7 @@ void ParticleSystem::registerBuffer()
     else if (Window::ins->isUsingMetal())
     {
         MTL::Device* pDevice = Window::ins->getMetalDevice();
-
-        const float positions[] = {
-            -0.5f, -0.5f,
-             0.5f, -0.5f,
-            -0.5f,  0.5f,
-             0.5f,  0.5f,
-        };
-        const float uv[] = {
-            0.f, 0.f,
-            1.f, 0.f,
-            0.f, 1.f,
-            1.f, 1.f,
-        };
-
-        m_pPosBuffer = pDevice->newBuffer(positions, sizeof(positions), MTL::ResourceStorageModeShared);
-        m_pUVBuffer = pDevice->newBuffer(uv, sizeof(uv), MTL::ResourceStorageModeShared);
+        m_pVertexBuffer = pDevice->newBuffer(arrQuadVerticies, sizeof(arrQuadVerticies), MTL::ResourceStorageModeShared);
 
         m_pInstanceBuffer = pDevice->newBuffer(m_nAllParticleCount * sizeof(ParticleGPUInstance), MTL::ResourceStorageModeShared);
     }
@@ -241,8 +224,7 @@ void ParticleSystem::draw()
         MTL::RenderCommandEncoder* pRenderEncoder = Window::ins->getCurrentFrameRenderEncoder();
 
         pRenderEncoder->setRenderPipelineState(m_pMaterial->getShader()->getMetalPipelineState());
-        pRenderEncoder->setVertexBuffer(m_pPosBuffer, 0, 0);
-        pRenderEncoder->setVertexBuffer(m_pUVBuffer, 0, 1);
+        pRenderEncoder->setVertexBuffer(m_pVertexBuffer, 0, 0);
 
         struct
         {
