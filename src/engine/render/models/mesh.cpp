@@ -7,7 +7,6 @@
 Mesh::Mesh(int nVertexCount, int nIndiceCount)
         : m_nVertexCount(nVertexCount),
           m_nIndiceCount(nIndiceCount),
-          m_nVertexArray(GL_INVALID_VALUE),
           m_nVertexBuffer(GL_INVALID_VALUE),
           m_nIndexBuffer(GL_INVALID_VALUE)
 {
@@ -46,6 +45,16 @@ void Mesh::loadToGPU()
 #if __APPLE__
     else if (Window::ins->isUsingMetal())
     {
+        MTL::Device* pDevice = Window::ins->getMetalDevice();
+        m_pMetalVertexBuffer = pDevice->newBuffer(m_arrVertices, sizeof(VertexWUVNormalTangent) * m_nVertexCount, MTL::ResourceStorageModeShared);
+
+        uint32_t* arrIndices32 = new uint32_t[m_nIndiceCount];
+        for (size_t i = 0; i < m_nIndiceCount; ++i)
+        {
+            arrIndices32[i] = static_cast<uint32_t>(m_arrIndices[i]);
+        }
+        m_pMetalIndexBuffer = pDevice->newBuffer(arrIndices32, sizeof(arrIndices32), MTL::ResourceStorageModeShared);
+        delete[] arrIndices32;
     }
 #endif // __APPLE__
 }
@@ -69,6 +78,11 @@ void Mesh::unloadFromGPU()
 #if __APPLE__
     else if (Window::ins->isUsingMetal())
     {
+        if (m_pMetalVertexBuffer)
+        {
+            m_pMetalVertexBuffer->release();
+            m_pMetalVertexBuffer = nullptr;
+        }
     }
 #endif // __APPLE__
 }

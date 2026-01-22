@@ -13,6 +13,8 @@
 #include "../../render/lighting/direction_light.h"
 #include "../../render/models/mesh.h"
 
+#define NS_INT(x) static_cast<NS::UInteger>(x)
+
 
 MeshRenderer::MeshRenderer()
 {
@@ -142,6 +144,8 @@ void MeshRenderer::bindDepthVertexArray()
 #if __APPLE__
     else if (Window::ins->isUsingMetal())
     {
+        // MTL::Device* pDevice = Window::ins->getMetalDevice();
+        // m_pMetalVertexBuffer = pDevice->newBuffer(arrVertices, sizeof(arrVertices), MTL::ResourceStorageModeShared);
     }
 #endif // __APPLE__
 }
@@ -218,6 +222,20 @@ void MeshRenderer::draw()
 #if __APPLE__
     else if (Window::ins->isUsingMetal())
     {
+        MTL::RenderCommandEncoder* pRenderCommandEncoder = Window::ins->getCurrentFrameRenderEncoder();
+
+        pRenderCommandEncoder->setRenderPipelineState(m_pMaterial->getShader()->getMetalPipelineState());
+        pRenderCommandEncoder->setVertexBuffer(m_pMesh->m_pMetalVertexBuffer, 0, 0);
+
+        pRenderCommandEncoder->setVertexBuffer(Camera::main->getCameraMetalUBO(), 0, 1);
+        pRenderCommandEncoder->setVertexBytes(&m_pNode->getWorldMatrix(), sizeof(mat4x4), 2);
+        
+        pRenderCommandEncoder->drawIndexedPrimitives(
+            MTL::PrimitiveType::PrimitiveTypeTriangle,
+            NS_INT(6),
+            MTL::IndexTypeUInt32,
+            m_pMesh->m_pMetalIndexBuffer,
+            NS_INT(0));
     }
 #endif // __APPLE__
 }

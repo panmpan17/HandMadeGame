@@ -58,6 +58,9 @@
   fragment: assets/shaders/3d/lit_default.frag
   cameraUBO: 0
   lightUBO: 1
+  metal_prefix: LitDefault3D
+  metal_attribute_size: 3,2,3,3,3
+  metal_attribute_pack: 1
 14:
   name: point_light
   vertex: assets/shaders/point_light.vert

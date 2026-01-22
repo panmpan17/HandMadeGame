@@ -42,8 +42,6 @@ private:
     std::shared_ptr<Mesh> m_pMesh = nullptr;
 
     GLuint m_nVertexArray = 0;
-    GLuint m_nVertexBuffer = 0;
-    GLuint m_nIndexBuffer = 0;
 
     const ShaderUniformHandle* m_pModelUniform = nullptr;
     const ShaderUniformHandle* m_pSpecularParamUniform = nullptr;
