@@ -18,6 +18,7 @@ struct Mesh
 #if __APPLE__
     MTL::Buffer* m_pMetalVertexBuffer = nullptr;
     MTL::Buffer* m_pMetalIndexBuffer = nullptr;
+    MTL::IndexType m_metalIndexType = MTL::IndexTypeUInt16;
 #endif
 
     VertexWUVNormalTangent* m_arrVertices = nullptr;

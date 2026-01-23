@@ -9,6 +9,7 @@
 #include "../../render/shader.h"
 #include "../../render/shader_loader.h"
 #include "../../render/material.h"
+#include "../../render/renderer.h"
 #include "../../render/lighting/light_manager.h"
 #include "../../render/lighting/direction_light.h"
 #include "../../render/models/mesh.h"
@@ -228,12 +229,20 @@ void MeshRenderer::draw()
         pRenderCommandEncoder->setVertexBuffer(m_pMesh->m_pMetalVertexBuffer, 0, 0);
 
         pRenderCommandEncoder->setVertexBuffer(Camera::main->getCameraMetalUBO(), 0, 1);
+        pRenderCommandEncoder->setFragmentBuffer(Camera::main->getCameraMetalUBO(), 0, 1);
         pRenderCommandEncoder->setVertexBytes(&m_pNode->getWorldMatrix(), sizeof(mat4x4), 2);
+
+        // u_tex0
+        if (Image* pAlbedoImage = m_pMaterial->getImageByUniformName(SHADER_UNIFORM_TEXTURE_0); pAlbedoImage)
+        {
+            pRenderCommandEncoder->setFragmentTexture(pAlbedoImage->getMetalTexture(), 0);
+            pRenderCommandEncoder->setFragmentSamplerState(Renderer::m_pLinearSampler, 0);
+        }
         
         pRenderCommandEncoder->drawIndexedPrimitives(
             MTL::PrimitiveType::PrimitiveTypeTriangle,
-            NS_INT(6),
-            MTL::IndexTypeUInt32,
+            NS_INT(m_nIndiceCount),
+            m_pMesh->m_metalIndexType,
             m_pMesh->m_pMetalIndexBuffer,
             NS_INT(0));
     }

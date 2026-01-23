@@ -1,6 +1,7 @@
 #include "mesh.h"
 
 #include <glad/gl.h>
+#include <sstream>
 #include "../../core/window.h"
 
 
@@ -48,13 +49,30 @@ void Mesh::loadToGPU()
         MTL::Device* pDevice = Window::ins->getMetalDevice();
         m_pMetalVertexBuffer = pDevice->newBuffer(m_arrVertices, sizeof(VertexWUVNormalTangent) * m_nVertexCount, MTL::ResourceStorageModeShared);
 
-        uint32_t* arrIndices32 = new uint32_t[m_nIndiceCount];
-        for (size_t i = 0; i < m_nIndiceCount; ++i)
+        if (m_nVertexCount < 65536)
         {
-            arrIndices32[i] = static_cast<uint32_t>(m_arrIndices[i]);
+            uint16_t* arrIndices16 = new uint16_t[m_nIndiceCount];
+            for (size_t i = 0; i < m_nIndiceCount; ++i)
+            {
+                arrIndices16[i] = static_cast<uint16_t>(m_arrIndices[i]);
+            }
+            m_pMetalIndexBuffer = pDevice->newBuffer(arrIndices16, sizeof(uint16_t) * m_nIndiceCount, MTL::ResourceStorageModeShared);
+            delete[] arrIndices16;
+
+            m_metalIndexType = MTL::IndexTypeUInt16;
         }
-        m_pMetalIndexBuffer = pDevice->newBuffer(arrIndices32, sizeof(arrIndices32), MTL::ResourceStorageModeShared);
-        delete[] arrIndices32;
+        else
+        {
+            uint32_t* arrIndices32 = new uint32_t[m_nIndiceCount];
+            for (size_t i = 0; i < m_nIndiceCount; ++i)
+            {
+                arrIndices32[i] = static_cast<uint32_t>(m_arrIndices[i]);
+            }
+            m_pMetalIndexBuffer = pDevice->newBuffer(arrIndices32, sizeof(uint32_t) * m_nIndiceCount, MTL::ResourceStorageModeShared);
+            delete[] arrIndices32;
+
+            m_metalIndexType = MTL::IndexTypeUInt32;
+        }
     }
 #endif // __APPLE__
 }
