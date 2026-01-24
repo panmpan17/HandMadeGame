@@ -405,20 +405,52 @@ void createLightingShadowDemo()
         // pBackPackFbx->addComponent(new Rotate3D(0.f, 20.f, 0.f));
         pWorldScene->addNode(pBackPackFbx);
     }
+    */
 
+    /*
     {
         Node* pDirectionLightNode = new Node(0, 10.f, 0.f);
         pDirectionLightNode->setName("Direction Light");
         pDirectionLightNode->setRotationQuaternion(Quaternion::fromEulerAngles({-130.f, 30.f, 0.f}));
 
         DirectionLightComponent* pPointLightComp = new DirectionLightComponent();
-        pPointLightComp->setColor({1.f, 1.f, .5f});
+        pPointLightComp->setColor({1.f, 0.f, 0.f});
         pPointLightComp->setIntensity(2.f);
         pDirectionLightNode->addComponent(pPointLightComp);
 
         pWorldScene->addNode(pDirectionLightNode);
     }
 
+    {
+        Node* pDirectionLightNode = new Node(0, 9.f, 0.f);
+        pDirectionLightNode->setName("Direction Light");
+        // pDirectionLightNode->setRotationQuaternion(Quaternion::fromEulerAngles({30.f, 45.f, 0.f}));
+        pDirectionLightNode->setRotationQuaternion(Quaternion::fromEulerAngles({-130.f, 45.f, 0.f}));
+
+        DirectionLightComponent* pPointLightComp = new DirectionLightComponent();
+        pPointLightComp->setColor({0.f, 1.f, 0.f});
+        pPointLightComp->setIntensity(2.f);
+        pDirectionLightNode->addComponent(pPointLightComp);
+
+        pWorldScene->addNode(pDirectionLightNode);
+    }
+
+    {
+        Node* pDirectionLightNode = new Node(0, 9.f, 0.f);
+        pDirectionLightNode->setName("Direction Light");
+        // pDirectionLightNode->setRotationQuaternion(Quaternion::fromEulerAngles({30.f, 45.f, 0.f}));
+        pDirectionLightNode->setRotationQuaternion(Quaternion::fromEulerAngles({-10.f, 10.f, 0.f}));
+
+        DirectionLightComponent* pPointLightComp = new DirectionLightComponent();
+        pPointLightComp->setColor({0.f, 0.f, 1.f});
+        pPointLightComp->setIntensity(2.f);
+        pDirectionLightNode->addComponent(pPointLightComp);
+
+        pWorldScene->addNode(pDirectionLightNode);
+    }
+    */
+
+    /*
     {
         std::shared_ptr<Material> pMaterial = MaterialLoader::getInstance()->getMaterial("assets/materials/water.yaml");
         Node* pWater = oBoxModelReader.instantiateCloneNode({ pMaterial });

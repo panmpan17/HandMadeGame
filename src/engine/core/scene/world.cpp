@@ -133,13 +133,15 @@ void WorldScene::render()
         glEnable(GL_DEPTH_TEST);
         glDepthMask(GL_TRUE);
         glCullFace(GL_BACK);
+        glFrontFace(GL_CCW);
     }
 #if __APPLE__
     else if (bUsingMetal)
     {
-        // TODO: Metal turn on depth write
         MTL::RenderCommandEncoder* pRenderEncoder = Window::ins->getCurrentFrameRenderEncoder();
         pRenderEncoder->setDepthStencilState(Renderer::m_pDepthOnStencilState);
+        pRenderEncoder->setCullMode(MTL::CullModeBack);
+        pRenderEncoder->setFrontFacingWinding(MTL::WindingCounterClockwise);
     }
 #endif // __APPLE__
 

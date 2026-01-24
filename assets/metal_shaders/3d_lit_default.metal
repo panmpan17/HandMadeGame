@@ -94,13 +94,14 @@ fragment float4 LitDefault3D_fragmentMain(VertexOut_Lit in [[stage_in]],
             float attenuation = 1.0 / (lightData.pointLights[i].attenuation.x +
                                        lightData.pointLights[i].attenuation.y * distance +
                                        lightData.pointLights[i].attenuation.z * distance * distance);
+            attenuation *= lightData.pointLights[i].positionAndRange.w;
 
             float diff = metal::max(metal::dot(normalDirection, lightDirection), 0.0);
-            diffuseSum += diff * lightData.pointLights[i].color.xyz * (attenuation * lightData.pointLights[i].attenuation.w);
+            diffuseSum += (diff * attenuation) * lightData.pointLights[i].color.xyz;
 
             metal::float3 reflectDirection = metal::reflect(-lightDirection, normalDirection);
             float specular = metal::pow(metal::max(metal::dot(viewDirection, reflectDirection), 0.0), specularPower);
-            specularSum += specularStrength * specular * attenuation * lightData.pointLights[i].attenuation.w * lightData.pointLights[i].color.xyz;
+            specularSum += (specularStrength * specular * attenuation) * lightData.pointLights[i].color.xyz;
         }
     }
 

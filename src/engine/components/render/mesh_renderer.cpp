@@ -211,8 +211,6 @@ void MeshRenderer::draw()
         }
 
         glBindVertexArray(m_nVertexArray);
-        glCullFace(GL_FRONT);
-        glFrontFace(GL_CW);
         glDrawElements(GL_TRIANGLES, m_nIndiceCount, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
 
@@ -285,8 +283,6 @@ void MeshRenderer::drawDepth()
         }
 
         glBindVertexArray(m_nVertexArray);
-        glCullFace(GL_FRONT);
-        glFrontFace(GL_CW);
         glDrawElements(GL_TRIANGLES, m_nIndiceCount, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
 
