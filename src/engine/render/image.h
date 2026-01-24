@@ -54,5 +54,6 @@ private:
 
     std::string m_strPath;
 
-    void loadFromFileToCPU();
+    void configureAndLoadToGPU();
+    void loadFileToGPU(int nDesiredChannels = 0);
 };

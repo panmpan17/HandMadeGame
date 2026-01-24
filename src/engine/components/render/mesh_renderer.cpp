@@ -230,13 +230,30 @@ void MeshRenderer::draw()
 
         pRenderCommandEncoder->setVertexBuffer(Camera::main->getCameraMetalUBO(), 0, 1);
         pRenderCommandEncoder->setFragmentBuffer(Camera::main->getCameraMetalUBO(), 0, 1);
+        pRenderCommandEncoder->setFragmentBuffer(LightManager::getInstance()->getLightingMetalBuffer(), 0, 2);
+        
         pRenderCommandEncoder->setVertexBytes(&m_pNode->getWorldMatrix(), sizeof(mat4x4), 2);
 
-        // u_tex0
+        int ntextureBitmask = 0;
         if (Image* pAlbedoImage = m_pMaterial->getImageByUniformName(SHADER_UNIFORM_TEXTURE_0); pAlbedoImage)
         {
             pRenderCommandEncoder->setFragmentTexture(pAlbedoImage->getMetalTexture(), 0);
-            pRenderCommandEncoder->setFragmentSamplerState(Renderer::m_pLinearSampler, 0);
+            ntextureBitmask |= (1 << 0);
+        }
+        if (Image* pSpecularImage = m_pMaterial->getImageByUniformName(SHADER_UNIFORM_TEXTURE_1); pSpecularImage)
+        {
+            pRenderCommandEncoder->setFragmentTexture(pSpecularImage->getMetalTexture(), 1);
+            ntextureBitmask |= (1 << 1);
+        }
+        if (Image* pNormalImage = m_pMaterial->getImageByUniformName(SHADER_UNIFORM_TEXTURE_2); pNormalImage)
+        {
+            pRenderCommandEncoder->setFragmentTexture(pNormalImage->getMetalTexture(), 2);
+            ntextureBitmask |= (1 << 2);
+        }
+
+        if (ntextureBitmask != 0)
+        {
+            pRenderCommandEncoder->setFragmentBytes(&ntextureBitmask, sizeof(int), 3);
         }
         
         pRenderCommandEncoder->drawIndexedPrimitives(

@@ -9,7 +9,7 @@ uniform sampler2D u_tex2; // normal map
 uniform sampler2D u_tex3; // depth map
 uniform int u_textureEnabled; // bitmask for texture usage, 1: main texture, 2: specular map, 3: both
 
-uniform vec2 u_SpecularParams; // x: intensity, y: power
+// uniform vec2 u_SpecularParams; // x: intensity, y: power
 
 uniform vec4 u_shadowColor;
 
@@ -65,6 +65,10 @@ void main()
     vec3 diffuseSum = vec3(0.0);
     vec3 specularSum = vec3(0.0);
 
+    vec2 u_SpecularParams = vec2(32.0, 1.0); // TODO: Get from uniform
+    float specularPower = max(u_SpecularParams.x, 32.0);
+    float specularStrength = max(u_SpecularParams.y, 1.0);
+
     for (int i = 0; i < u_LightCounts.x; i++)
     {
         vec3 lightDir = normalize(-u_DirectionLights[i].direction.xyz);
@@ -73,8 +77,8 @@ void main()
         // diffuseSum = vec3(norm);
 
         vec3 reflectDir = reflect(-lightDir, norm);
-        float spec = pow(max(dot(viewDir, reflectDir), 0.0), max(u_SpecularParams.y, 32.0));
-        specularSum += max(u_SpecularParams.x, 1) * spec * u_DirectionLights[i].color.xyz;
+        float spec = pow(max(dot(viewDir, reflectDir), 0.0), specularPower);
+        specularSum += specularStrength * spec * u_DirectionLights[i].color.xyz;
     }
 
     for (int i = 0; i < u_LightCounts.y; i++)
@@ -87,11 +91,11 @@ void main()
             float attenuation = 1 / (u_PointLights[i].attenuationParams.x + (u_PointLights[i].attenuationParams.y * distance) + (u_PointLights[i].attenuationParams.z * distance * distance));
 
             float diff = max(dot(norm, lightDir), 0.0);
-            diffuseSum += diff * u_PointLights[i].color.xyz * attenuation * u_PointLights[i].positionAndRange.w;
+            diffuseSum += diff * u_PointLights[i].color.xyz * (attenuation * u_PointLights[i].positionAndRange.w);
 
             vec3 reflectDir = reflect(-lightDir, norm);
-            float spec = pow(max(dot(viewDir, reflectDir), 0.0), max(u_SpecularParams.y, 32.0));
-            specularSum += max(u_SpecularParams.x, 1) * spec * u_PointLights[i].color.xyz * attenuation * u_PointLights[i].positionAndRange.w;
+            float spec = pow(max(dot(viewDir, reflectDir), 0.0), specularPower);
+            specularSum += specularStrength * spec * attenuation * u_PointLights[i].positionAndRange.w * u_PointLights[i].color.xyz;
         }
     }
 

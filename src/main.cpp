@@ -2,7 +2,7 @@
 #include "engine/core/error_handler.h"
 #include "engine/core/debug_macro.h"
 
-// #include "game/testing/test.h"
+#include "game/testing/test.h"
 // #include "game/pingpong/game.h"
 // #include "game/colorpicker/picker.h"
 #include "game/testing/minimal_metal_test.h"
@@ -44,13 +44,13 @@ int main(int nArgumentCount, char* arrArguments[])
             PROFILER_END_TIMER("World", "Setup post process");
             // createDemo1();
             // createVisualEffectDemo();
-            // createLightingShadowDemo();
+            createLightingShadowDemo();
             // createPingPongGame();
             // sceneTest();
             // createProfolioSceneDemo();
             // colorPicker.pickerMain();
             // serializationTest();
-            firstTriangeTest();
+            // firstTriangeTest();
             PROFILER_END_TIMER("World", "Init");
     
             window.mainLoop();

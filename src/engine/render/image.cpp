@@ -15,16 +15,16 @@
 Image::Image(const std::string& strPath, bool flipVertically/* = true */) : m_strPath(strPath)
 {
     stbi_set_flip_vertically_on_load(flipVertically);
-    loadFromFileToCPU();
+    configureAndLoadToGPU();
 }
 
 Image::Image(const std::string_view& strPath, bool flipVertically/* = true */) : m_strPath(std::string(strPath))
 {
     stbi_set_flip_vertically_on_load(flipVertically);
-    loadFromFileToCPU();
+    configureAndLoadToGPU();
 }
 
-void Image::loadFromFileToCPU()
+void Image::configureAndLoadToGPU()
 {
     int nForcedChannels = 0;
 
@@ -35,16 +35,29 @@ void Image::loadFromFileToCPU()
             || memcmp(m_strPath.c_str() + m_strPath.size() - 5, ".jpeg", 5) == 0)
         {
             nForcedChannels = 4;
-            // LOGLN("Forcing 4 channels for JPEG image: {}", m_strPath);
         }
     }
 #endif
 
+    loadFileToGPU(nForcedChannels);
+
+#if __APPLE__
+    if (Window::ins->isUsingMetal() && (m_nChannels == 3 && nForcedChannels != 4))
+    {
+        freeCPUData();
+        nForcedChannels = 4;
+        loadFileToGPU(nForcedChannels);
+    }
+#endif
+}
+
+void Image::loadFileToGPU(int nDesiredChannels)
+{
     if (*m_strPath.begin() != '/')
     {
         std::string strFullPath = fs::path(FileUtils::getResourcesPath()).append(m_strPath).string();
 
-        m_pData = stbi_load(strFullPath.c_str(), &m_nWidth, &m_nHeight, &m_nChannels, nForcedChannels);
+        m_pData = stbi_load(strFullPath.c_str(), &m_nWidth, &m_nHeight, &m_nChannels, nDesiredChannels);
         if (!m_pData)
         {
             LOGERR("Failed to load image: {}", strFullPath);
@@ -52,11 +65,16 @@ void Image::loadFromFileToCPU()
     }
     else
     {
-        m_pData = stbi_load(m_strPath.c_str(), &m_nWidth, &m_nHeight, &m_nChannels, nForcedChannels);
+        m_pData = stbi_load(m_strPath.c_str(), &m_nWidth, &m_nHeight, &m_nChannels, nDesiredChannels);
         if (!m_pData)
         {
             LOGERR("Failed to load image: {}", m_strPath);
         }
+    }
+
+    if (m_nChannels != nDesiredChannels && nDesiredChannels != 0)
+    {
+        m_nChannels = nDesiredChannels;
     }
 }
 
@@ -154,7 +172,7 @@ void Image::loadTextureToMetal()
             pixelFormat = MTL::PixelFormat::PixelFormatRGBA8Unorm;
             break;
         case 3:
-            LOGERR("Metal does not support 3-channel textures directly. Please convert to 4 channels.");
+            LOGERR("Metal does not support 3-channel textures directly. Please convert to 4 channels.: {}", m_strPath);
             return;
         case 2:
             pixelFormat = MTL::PixelFormat::PixelFormatRG8Unorm;

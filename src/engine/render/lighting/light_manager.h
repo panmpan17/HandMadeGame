@@ -31,12 +31,20 @@ public:
 
     inline GLuint getLightingUBO() const { return m_nLightingUBO; }
 
+#if __APPLE__
+    inline MTL::Buffer* getLightingMetalBuffer() const { return m_pLightingBuffer; }
+#endif
+
     void updateLightingUBO();
+
+    inline const vec3& getAmbientLightColor() const { return m_colorAmbientLight; }
+    inline void setAmbientLightColor(const vec3& color) { vec3_dup(m_colorAmbientLight, color); m_bUBODirty = true; }
 
     inline void registerPointLightComponent(PointLightComponent* pPointLightComp)
     {
         m_arrPointLightsComponents.addElement(pPointLightComp);
         ++m_nNumPointLights;
+        m_bUBODirty = true;
     }
 
     inline void unregisterPointLightComponent(PointLightComponent* pPointLightComp)
@@ -54,6 +62,7 @@ public:
     {
         m_arrDirectionLightsComponents.addElement(pDirectionLightComp);
         ++m_nNumDirectionLights;
+        m_bUBODirty = true;
     }
 
     inline void unregisterDirectionLightComponent(DirectionLightComponent* pDirectionLightComp)
