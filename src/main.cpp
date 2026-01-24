@@ -40,7 +40,7 @@ int main(int nArgumentCount, char* arrArguments[])
             window.setupGameEngineRelatedObject();
     
             PROFILER_START_TIMER();
-            // setupPostProcess();
+            setupPostProcess();
             PROFILER_END_TIMER("World", "Setup post process");
             // createDemo1();
             // createVisualEffectDemo();

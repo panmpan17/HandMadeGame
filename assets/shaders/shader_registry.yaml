@@ -40,6 +40,9 @@
   name: pure_texture
   vertex: assets/shaders/postprocess/screen_pos.vert
   fragment: assets/shaders/postprocess/pure_texture.frag
+  metal_prefix: pureTexture
+  metal_attribute_size: 2,2
+  metal_attribute_pack: 1
 10:
   name: split_texture
   vertex: assets/shaders/postprocess/screen_pos.vert

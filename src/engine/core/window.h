@@ -15,7 +15,7 @@
 typedef struct GLFWwindow GLFWwindow;
 
 class WorldScene;
-// class RenderProcessQueue;
+class RenderProcessQueue;
 class FileWatchDog;
 
 typedef unsigned int GLuint;
@@ -51,7 +51,7 @@ public:
     inline bool isPostProcessEnabled() const { return m_bEnablePostProcess; }
     inline void setPostProcessEnabled(bool enabled) { m_bEnablePostProcess = enabled; }
 
-    // inline RenderProcessQueue* getRenderProcessQueue() const { return m_pRenderProcessQueue; }
+    inline RenderProcessQueue* getRenderProcessQueue() const { return m_pRenderProcessQueue; }
 
     inline void setAddGameRelatedIMGUIWindows(bool bAdd) { m_bAddGameRelatedIMGUIWindows = bAdd; }
     inline void addEditorWindow(IEditorWindow* pWindow) { m_oEditorWindows.addElement(pWindow); }
@@ -79,6 +79,9 @@ public:
 
 #if __APPLE__
     inline MTL::Device* getMetalDevice() const { return m_pMetalDevice; }
+    inline MTL::RenderPassDescriptor* getRenderPassDescriptor() const { return m_pRenderPassDescriptor; }
+
+    inline CA::MetalDrawable* getCurrentDrawable() const { return m_pCurrentDrawable; }
     inline MTL::RenderCommandEncoder* getCurrentFrameRenderEncoder() const { return m_pCurrentFrameRenderEncoder; }
 #endif // __APPLE__
 
@@ -94,13 +97,16 @@ private:
 #if __APPLE__
     MTL::Device* m_pMetalDevice = nullptr;
     CA::MetalLayer* m_pMetalLayer = nullptr;
+
     MTL::CommandQueue* m_pMetalCommandQueue = nullptr;
     MTL::RenderPassDescriptor* m_pRenderPassDescriptor = nullptr;
-    MTL::CommandBuffer* m_pCommandBuffer = nullptr;
+
+    MTL::CommandBuffer* m_pCurrentCommandBuffer = nullptr;
     MTL::RenderCommandEncoder* m_pCurrentFrameRenderEncoder = nullptr;
+    CA::MetalDrawable* m_pCurrentDrawable = nullptr;
 #endif // __APPLE__
 
-    // RenderProcessQueue* m_pRenderProcessQueue = nullptr;
+    RenderProcessQueue* m_pRenderProcessQueue = nullptr;
     bool m_bEnablePostProcess = true;
 
     Vector2i m_oWindowSize;

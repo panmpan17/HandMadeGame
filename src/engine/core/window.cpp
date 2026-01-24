@@ -28,7 +28,7 @@
 #include "../render/shader_loader.h"
 #include "../render/material_loader.h"
 #include "../render/vertex.h"
-// #include "../render/post_process/render_process_queue.h"
+#include "../render/post_process/render_process_queue.h"
 #include "../render/lighting/light_manager.h"
 #include "../render/lighting/direction_light.h"
 #include "../render/font/font_loader.h"
@@ -36,7 +36,7 @@
 #include "../../editor/gizmos.h"
 #include "../../editor/node_inspector.h"
 #include "../../editor/hierarchy_view.h"
-// #include "../../editor/post_process_inspector.h"
+#include "../../editor/post_process_inspector.h"
 #include "../../utils/file_watch_dog.h"
 
 #include "imgui.h"
@@ -333,6 +333,17 @@ void Window::bindMetalToGlfwWindow()
     Renderer::initMetalDepthTexture(m_pMetalDevice, m_oActualSize.x, m_oActualSize.y);
 
     m_pRenderPassDescriptor = MTL::RenderPassDescriptor::alloc()->init();
+
+    MTL::RenderPassDepthAttachmentDescriptor* pDepthAttach = m_pRenderPassDescriptor->depthAttachment();
+    pDepthAttach->setTexture(Renderer::m_pDepthTexture);
+    pDepthAttach->setLoadAction(MTL::LoadActionClear);
+    pDepthAttach->setClearDepth(1.0);
+    pDepthAttach->setStoreAction(MTL::StoreActionDontCare); // TODO: Might need to change to StoreActionStore
+
+    MTL::RenderPassColorAttachmentDescriptor* pColorAttachment = m_pRenderPassDescriptor->colorAttachments()->object(0);
+    pColorAttachment->setLoadAction(MTL::LoadActionClear);
+    pColorAttachment->setClearColor(MTL::ClearColor::Make(0.0, 0.0, 0.0, 1.0));
+    pColorAttachment->setStoreAction(MTL::StoreActionStore);
 }
 #endif
 
@@ -375,7 +386,7 @@ void Window::setupManagers()
     // FontLoader::Initialize();
     // FontLoader::getInstance()->loadFont("assets/fonts/arial.ttf");
 
-    // m_pRenderProcessQueue = new RenderProcessQueue(this);
+    m_pRenderProcessQueue = new RenderProcessQueue(this);
 
     PROFILER_END_TIMER("Initialization", "Render process queue setup");
 
@@ -465,7 +476,7 @@ void Window::setupIMGUIAndEditorWindows()
     {
         m_oEditorWindows.addElement(new NodeInspector());
         m_oEditorWindows.addElement(new HierarchyView());
-        // m_oEditorWindows.addElement(new PostProcessInspector());
+        m_oEditorWindows.addElement(new PostProcessInspector());
     }
 
     for (int i = 0; i < m_oEditorWindows.getCount(); ++i)
@@ -516,6 +527,7 @@ void Window::mainLoop()
                 Renderer::initMetalDepthTexture(m_pMetalDevice, m_oActualSize.x, m_oActualSize.y);
             }
 #endif // __APPLE__
+            // TODO: Change to glfwSetFramebufferSizeCallback
         }
 
         if (m_bShowIMGUI)
@@ -527,7 +539,6 @@ void Window::mainLoop()
 
         if (isUsingOpenGL())
         {
-            // TODO: Change to glfwSetFramebufferSizeCallback
             glViewport(0, 0, m_oActualSize.x, m_oActualSize.y);
             glClearColor(0.f, 0.f, 0.f, 1.0f);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -540,38 +551,14 @@ void Window::mainLoop()
         {
             NS::AutoreleasePool* pPool = NS::AutoreleasePool::alloc()->init();
 
-            CA::MetalDrawable* pDrawable = m_pMetalLayer->nextDrawable();
+            m_pCurrentDrawable = m_pMetalLayer->nextDrawable();
 
-            if (pDrawable)
-            {
-                m_pCommandBuffer = m_pMetalCommandQueue->commandBuffer();
+            m_pCurrentCommandBuffer = m_pMetalCommandQueue->commandBuffer();
 
-                // { // Clear screen
-                    MTL::RenderPassColorAttachmentDescriptor* pColorAttachment = m_pRenderPassDescriptor->colorAttachments()->object(0);
+            drawFrame();
 
-                    pColorAttachment->setTexture(pDrawable->texture());
-                    pColorAttachment->setLoadAction(MTL::LoadActionClear);
-                    pColorAttachment->setClearColor(MTL::ClearColor::Make(0.0, 0.0, 0.0, 1.0));
-                    pColorAttachment->setStoreAction(MTL::StoreActionStore);
-
-                    MTL::RenderPassDepthAttachmentDescriptor* pDepthAttach = m_pRenderPassDescriptor->depthAttachment();
-                    pDepthAttach->setTexture(Renderer::m_pDepthTexture);
-                    pDepthAttach->setLoadAction(MTL::LoadActionClear);
-                    pDepthAttach->setClearDepth(1.0);
-                    pDepthAttach->setStoreAction(MTL::StoreActionDontCare);
-
-                    m_pCurrentFrameRenderEncoder = m_pCommandBuffer->renderCommandEncoder(m_pRenderPassDescriptor);
-
-                    // pRenderPassDescriptor->release();
-                // }
-
-                drawFrame();
-
-                m_pCurrentFrameRenderEncoder->endEncoding();
-
-                m_pCommandBuffer->presentDrawable(pDrawable);
-                m_pCommandBuffer->commit();
-            }
+            m_pCurrentCommandBuffer->presentDrawable(m_pCurrentDrawable);
+            m_pCurrentCommandBuffer->commit();
 
             pPool->release();
         }
@@ -586,6 +573,13 @@ void Window::runUpdate()
     EngineEventDispatcher::getInstance().updateEvents(fDeltaTime);
 
     m_pWorldScene->update(fDeltaTime);
+
+    if (Camera::main)
+    {
+        Camera::main->updateCameraDataBuffer();
+    }
+
+    LightManager::getInstance()->updateLightingUBO();
 }
 
 void Window::IMGUINewFrame()
@@ -646,6 +640,25 @@ void Window::drawIMGUIEditor()
 
         ImGui::EndMainMenuBar();
     }
+
+#if IS_DEBUG_VERSION
+    if (m_bShowFPS)
+    {
+        drawFrameInfo();
+    }
+#endif
+    ImGui::Render();
+
+    if (isUsingOpenGL())
+    {
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+    }
+#if __APPLE__
+    else if (isUsingMetal())
+    {
+        ImGui_ImplMetal_RenderDrawData(ImGui::GetDrawData(), m_pCurrentCommandBuffer, m_pCurrentFrameRenderEncoder);
+    }
+#endif // __APPLE__
 }
 
 void Window::drawFrame()
@@ -653,15 +666,8 @@ void Window::drawFrame()
     m_nDrawCallCount = 0;
     m_nTriangleCount = 0;
 
-    if (Camera::main)
-    {
-        Camera::main->updateCameraDataBuffer();
-    }
-
     LightManager* const pLightManager = LightManager::getInstance();
-    pLightManager->updateLightingUBO();
-
-    DirectionLightComponent* pMainDirLight = pLightManager->getMainDirectionLightComponent();
+    DirectionLightComponent* pMainDirLight = LightManager::getInstance()->getMainDirectionLightComponent();
     if (pMainDirLight && pMainDirLight->getShadowsEnabled())
     {
         if (isUsingOpenGL())
@@ -674,19 +680,36 @@ void Window::drawFrame()
         }
     }
 
-    // if (m_bEnablePostProcess) // Enable post process
-    // {
-    //     // m_pRenderProcessQueue->beginFrame();
-    //     m_pWorldScene->render();
-    //     m_pRenderProcessQueue->endFrame();
-
-    //     glDisable(GL_DEPTH_TEST);
-    //     m_pRenderProcessQueue->startProcessing();
-    //     m_pRenderProcessQueue->renderToScreen();
-    //     glEnable(GL_DEPTH_TEST);
-    // }
-    // else
+    if (m_bEnablePostProcess) // Enable post process
     {
+        m_pRenderProcessQueue->beginFrame();
+        m_pCurrentFrameRenderEncoder = m_pCurrentCommandBuffer->renderCommandEncoder(m_pRenderPassDescriptor);
+
+        m_pWorldScene->render();
+
+        m_pCurrentFrameRenderEncoder->endEncoding();
+
+        m_pRenderProcessQueue->endFrame();
+
+        m_pCurrentFrameRenderEncoder = m_pCurrentCommandBuffer->renderCommandEncoder(m_pRenderPassDescriptor);
+
+        if (isUsingOpenGL())
+        {
+            glDisable(GL_DEPTH_TEST);
+        }
+        m_pRenderProcessQueue->startProcessing();
+        m_pRenderProcessQueue->renderToScreen();
+        if (isUsingOpenGL())
+        {
+            glEnable(GL_DEPTH_TEST);
+        }
+    }
+    else
+    {
+        MTL::RenderPassColorAttachmentDescriptor* pColorAttachment = m_pRenderPassDescriptor->colorAttachments()->object(0);
+        pColorAttachment->setTexture(m_pCurrentDrawable->texture());
+        m_pCurrentFrameRenderEncoder = m_pCurrentCommandBuffer->renderCommandEncoder(m_pRenderPassDescriptor);
+
         m_pWorldScene->render();
     }
 
@@ -698,26 +721,10 @@ void Window::drawFrame()
     if (m_bShowIMGUI)
     {
         drawIMGUIEditor();
-
-#if IS_DEBUG_VERSION
-        if (m_bShowFPS)
-        {
-            drawFrameInfo();
-        }
-#endif
-        ImGui::Render();
-
-        if (isUsingOpenGL())
-        {
-            ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-        }
-#if __APPLE__
-        else if (isUsingMetal())
-        {
-            ImGui_ImplMetal_RenderDrawData(ImGui::GetDrawData(), m_pCommandBuffer, m_pCurrentFrameRenderEncoder);
-        }
-#endif // __APPLE__
     }
+
+
+    m_pCurrentFrameRenderEncoder->endEncoding();
 }
 
 void Window::drawFrameInfo()

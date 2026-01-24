@@ -104,92 +104,123 @@ void RenderProcessQueue::init(int nWidth, int nHeight)
     m_nRenderWidth = nWidth;
     m_nRenderHeight = nHeight;
 
+    const ShaderLoader* const pShaderLoader = ShaderLoader::getInstance();
+    m_pShader = pShaderLoader->getShader("pure_texture");
+    m_pSplitShader = pShaderLoader->getShader("split_texture");
+
     initializeQuad();
     initializeOriginalFBO();
 }
 
 void RenderProcessQueue::initializeQuad()
 {
-    m_pShader = ShaderLoader::getInstance()->getShader("pure_texture");
-    m_pTextureHandle = m_pShader->getUniformHandle(SHADER_UNIFORM_TEXTURE_0);
-
-    m_pSplitShader = ShaderLoader::getInstance()->getShader("split_texture");
-    m_pOriginalTextureUniform_Split = m_pSplitShader->getUniformHandle(SHADER_UNIFORM_TEXTURE_0);
-    m_pFinalTextureUniform_Split = m_pSplitShader->getUniformHandle(SHADER_UNIFORM_TEXTURE_1);
-    m_pSplitFactorUniform = m_pSplitShader->getUniformHandle(SHADER_UNIFORM_SPLIT_FACTOR);
-
-    glGenBuffers(1, &m_nVertexBuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, m_nVertexBuffer);
+    ASSERT(m_pShader, "RenderProcessQueue::initializeQuad: Shader is null!");
 
     VertexWUV arrVertices[4];
     arrVertices[0] = { { -1, -1 }, { 0.0f, 0.0f } };
     arrVertices[1] = { { 1, -1 }, { 1.0f, 0.0f } };
     arrVertices[2] = { { -1, 1 }, { 0.0f, 1.0f } };
     arrVertices[3] = { { 1, 1 }, { 1.0f, 1.0f } };
-    glBufferData(GL_ARRAY_BUFFER, sizeof(arrVertices), arrVertices, GL_STATIC_DRAW);
 
-    GLuint nVPosAttr = m_pShader->getAttributeLocation("a_vPos");
-    GLuint nVUVAttr = m_pShader->getAttributeLocation("a_vUV");
+    if (Window::ins->isUsingOpenGL())
+    {
+        m_pTextureHandle = m_pShader->getUniformHandle(SHADER_UNIFORM_TEXTURE_0);
 
-    GLuint nVPosAttr_Split = m_pSplitShader->getAttributeLocation("a_vPos");
-    GLuint nVUVAttr_Split = m_pSplitShader->getAttributeLocation("a_vUV");
+        m_pOriginalTextureUniform_Split = m_pSplitShader->getUniformHandle(SHADER_UNIFORM_TEXTURE_0);
+        m_pFinalTextureUniform_Split = m_pSplitShader->getUniformHandle(SHADER_UNIFORM_TEXTURE_1);
+        m_pSplitFactorUniform = m_pSplitShader->getUniformHandle(SHADER_UNIFORM_SPLIT_FACTOR);
 
-    glGenVertexArrays(1, &m_nVertexArray);
-    glBindVertexArray(m_nVertexArray);
+        glGenBuffers(1, &m_nVertexBuffer);
+        glBindBuffer(GL_ARRAY_BUFFER, m_nVertexBuffer);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(arrVertices), arrVertices, GL_STATIC_DRAW);
 
-    glEnableVertexAttribArray(nVPosAttr);
-    glVertexAttribPointer(nVPosAttr, 2, GL_FLOAT, GL_FALSE, sizeof(VertexWUV), (void*)offsetof(VertexWUV, pos));
-    glEnableVertexAttribArray(nVUVAttr);
-    glVertexAttribPointer(nVUVAttr, 2, GL_FLOAT, GL_FALSE, sizeof(VertexWUV), (void*)offsetof(VertexWUV, uv));
+        GLuint nVPosAttr = m_pShader->getAttributeLocation("a_vPos");
+        GLuint nVUVAttr = m_pShader->getAttributeLocation("a_vUV");
 
-    glEnableVertexAttribArray(nVPosAttr_Split);
-    glVertexAttribPointer(nVPosAttr_Split, 2, GL_FLOAT, GL_FALSE, sizeof(VertexWUV), (void*)offsetof(VertexWUV, pos));
-    glEnableVertexAttribArray(nVUVAttr_Split);
-    glVertexAttribPointer(nVUVAttr_Split, 2, GL_FLOAT, GL_FALSE, sizeof(VertexWUV), (void*)offsetof(VertexWUV, uv));
+        GLuint nVPosAttr_Split = m_pSplitShader->getAttributeLocation("a_vPos");
+        GLuint nVUVAttr_Split = m_pSplitShader->getAttributeLocation("a_vUV");
 
-    // Unbind
-    glBindVertexArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glGenVertexArrays(1, &m_nVertexArray);
+        glBindVertexArray(m_nVertexArray);
+
+        glEnableVertexAttribArray(nVPosAttr);
+        glVertexAttribPointer(nVPosAttr, 2, GL_FLOAT, GL_FALSE, sizeof(VertexWUV), (void*)offsetof(VertexWUV, pos));
+        glEnableVertexAttribArray(nVUVAttr);
+        glVertexAttribPointer(nVUVAttr, 2, GL_FLOAT, GL_FALSE, sizeof(VertexWUV), (void*)offsetof(VertexWUV, uv));
+
+        glEnableVertexAttribArray(nVPosAttr_Split);
+        glVertexAttribPointer(nVPosAttr_Split, 2, GL_FLOAT, GL_FALSE, sizeof(VertexWUV), (void*)offsetof(VertexWUV, pos));
+        glEnableVertexAttribArray(nVUVAttr_Split);
+        glVertexAttribPointer(nVUVAttr_Split, 2, GL_FLOAT, GL_FALSE, sizeof(VertexWUV), (void*)offsetof(VertexWUV, uv));
+
+        // Unbind
+        glBindVertexArray(0);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+    }
+#if __APPLE__
+    else if (Window::ins->isUsingMetal())
+    {
+        m_pMetalFullScreenVertexBuffer = Window::ins->getMetalDevice()->newBuffer(sizeof(arrVertices), MTL::ResourceStorageModeShared);
+        memcpy(m_pMetalFullScreenVertexBuffer->contents(), arrVertices, sizeof(arrVertices));
+    }
+#endif // __APPLE__
 }
 
 void RenderProcessQueue::initializeOriginalFBO(bool bGenFramebuffer/* = true*/)
 {
-    if (bGenFramebuffer)
+    if (Window::ins->isUsingOpenGL())
     {
-        glGenFramebuffers(1, &m_nFBOID_original);
+        if (bGenFramebuffer)
+        {
+            glGenFramebuffers(1, &m_nFBOID_original);
+        }
+        glBindFramebuffer(GL_FRAMEBUFFER, m_nFBOID_original);
+
+        glGenTextures(1, &m_nRenderTexture_original);
+        glBindTexture(GL_TEXTURE_2D, m_nRenderTexture_original);
+
+        if (sm_bAllowHDR)
+        {
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, m_nRenderWidth, m_nRenderHeight, 0, GL_RGB, GL_FLOAT, NULL);
+        }
+        else
+        {
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_nRenderWidth, m_nRenderHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+        }
+
+        // Set texture parameters for correct filtering and wrapping
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+        // Attach the texture to the FBO's color attachment
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_nRenderTexture_original, 0);
+
+        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+        {
+            LOGERR("Framebuffer is not complete!");
+        }
+
+        glGenRenderbuffers(1, &m_nDepthBuffer_original);
+        glBindRenderbuffer(GL_RENDERBUFFER, m_nDepthBuffer_original);
+        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, m_nRenderWidth, m_nRenderHeight);
+        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_nDepthBuffer_original);
+
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
-    glBindFramebuffer(GL_FRAMEBUFFER, m_nFBOID_original);
-
-    glGenTextures(1, &m_nRenderTexture_original);
-    glBindTexture(GL_TEXTURE_2D, m_nRenderTexture_original);
-
-    if (sm_bAllowHDR)
+#if __APPLE__
+    else if (Window::ins->isUsingMetal())
     {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, m_nRenderWidth, m_nRenderHeight, 0, GL_RGB, GL_FLOAT, NULL);
+        if (!m_pMetalOriginalRenderTexture)
+        {
+            m_pMetalOriginalRenderTexture->release();
+            m_pMetalOriginalRenderTexture = nullptr;
+        }
+
+        MTL::TextureDescriptor* pTextureDesc = MTL::TextureDescriptor::texture2DDescriptor(MTL::PixelFormatRGBA8Unorm, m_nRenderWidth, m_nRenderHeight, false);
+        pTextureDesc->setUsage(MTL::TextureUsageRenderTarget | MTL::TextureUsageShaderRead);
+        m_pMetalOriginalRenderTexture = Window::ins->getMetalDevice()->newTexture(pTextureDesc);
     }
-    else
-    {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_nRenderWidth, m_nRenderHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-    }
-
-    // Set texture parameters for correct filtering and wrapping
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    // Attach the texture to the FBO's color attachment
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_nRenderTexture_original, 0);
-
-    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-    {
-        LOGERR("Framebuffer is not complete!");
-    }
-
-    glGenRenderbuffers(1, &m_nDepthBuffer_original);
-    glBindRenderbuffer(GL_RENDERBUFFER, m_nDepthBuffer_original);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, m_nRenderWidth, m_nRenderHeight);
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_nDepthBuffer_original);
-
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+#endif // __APPLE__
 }
 
 void RenderProcessQueue::onWindowSizeChanged(Vector2i oSize)
@@ -197,8 +228,11 @@ void RenderProcessQueue::onWindowSizeChanged(Vector2i oSize)
     m_nRenderWidth = oSize.x;
     m_nRenderHeight = oSize.y;
 
-    glDeleteTextures(1, &m_nRenderTexture_original);
-    glDeleteRenderbuffers(1, &m_nDepthBuffer_original);
+    if (Window::ins->isUsingOpenGL())
+    {
+        glDeleteTextures(1, &m_nRenderTexture_original);
+        glDeleteRenderbuffers(1, &m_nDepthBuffer_original);
+    }
     initializeOriginalFBO(false);
 
     int nSize = m_oProcessArray.getCount();
@@ -215,20 +249,41 @@ void RenderProcessQueue::onWindowSizeChanged(Vector2i oSize)
 #pragma mark Drawing every frame
 void RenderProcessQueue::beginFrame()
 {
-    glBindFramebuffer(GL_FRAMEBUFFER, m_nFBOID_original);
+    if (Window::ins->isUsingOpenGL())
+    {
+        glBindFramebuffer(GL_FRAMEBUFFER, m_nFBOID_original);
 
-    glViewport(0, 0, m_nRenderWidth, m_nRenderHeight);
+        glViewport(0, 0, m_nRenderWidth, m_nRenderHeight);
 
-    glClearColor(0.f, 0.f, 0.f, 1.0f);
+        glClearColor(0.f, 0.f, 0.f, 1.0f);
 
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    }
+#if __APPLE__
+    else if (Window::ins->isUsingMetal())
+    {
+        MTL::RenderPassColorAttachmentDescriptor* pColorAttachment = Window::ins->getRenderPassDescriptor()->colorAttachments()->object(0);
+        pColorAttachment->setTexture(m_pMetalOriginalRenderTexture);
+    }
+#endif // __APPLE__
 }
 
 void RenderProcessQueue::endFrame()
 {
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    if (Window::ins->isUsingOpenGL())
+    {
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        m_nFinalRenderTexture = m_nRenderTexture_original;
+    }
+#if __APPLE__
+    else if (Window::ins->isUsingMetal())
+    {
+        MTL::RenderPassColorAttachmentDescriptor* pColorAttachment = Window::ins->getRenderPassDescriptor()->colorAttachments()->object(0);
+        pColorAttachment->setTexture(Window::ins->getCurrentDrawable()->texture());
 
-    m_nFinalRenderTexture = m_nRenderTexture_original;
+        m_pMetalFinalRenderTexture = m_pMetalOriginalRenderTexture;
+    }
+#endif // __APPLE__
 }
 
 void RenderProcessQueue::startProcessing()
@@ -252,23 +307,42 @@ void RenderProcessQueue::renderToScreen()
         return;
     }
 
-    glViewport(0, 0, m_pWindow->GetActualWidth(), m_pWindow->GetActualHeight());
-    glClear(GL_COLOR_BUFFER_BIT);
+    if (Window::ins->isUsingOpenGL())
+    {
+        glViewport(0, 0, m_pWindow->GetActualWidth(), m_pWindow->GetActualHeight());
+        glClear(GL_COLOR_BUFFER_BIT);
 
-    glUseProgram(m_pShader->getProgram());
+        glUseProgram(m_pShader->getProgram());
 
-    glUniform1i(m_pTextureHandle->m_nLocation, 0);
+        glUniform1i(m_pTextureHandle->m_nLocation, 0);
 
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, m_nFinalRenderTexture);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, m_nFinalRenderTexture);
 
-    glBindVertexArray(m_nVertexArray);
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4); // Draw the quad using triangle strip
-    INCREASE_DRAW_CALL_COUNT(2);
+        glBindVertexArray(m_nVertexArray);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4); // Draw the quad using triangle strip
+        INCREASE_DRAW_CALL_COUNT(2);
 
-    glBindTexture(GL_TEXTURE_2D, 0); // Unbind the texture
-    glBindVertexArray(0); // Unbind the vertex array
-    glUseProgram(0);
+        glBindTexture(GL_TEXTURE_2D, 0); // Unbind the texture
+        glBindVertexArray(0); // Unbind the vertex array
+        glUseProgram(0);
+    }
+#if __APPLE__
+    else if (Window::ins->isUsingMetal())
+    {
+        MTL::RenderCommandEncoder* pEncoder = Window::ins->getCurrentFrameRenderEncoder();
+
+        pEncoder->setRenderPipelineState(m_pShader->getMetalPipelineState());
+
+        pEncoder->setVertexBuffer(m_pMetalFullScreenVertexBuffer, 0, 0);
+
+        pEncoder->setFragmentTexture(m_pMetalFinalRenderTexture, 0);
+
+        pEncoder->drawPrimitives(MTL::PrimitiveTypeTriangleStrip, NS::UInteger(0), NS::UInteger(4));
+
+        INCREASE_DRAW_CALL_COUNT(2);
+    }
+#endif // __APPLE__
 }
 
 void RenderProcessQueue::renderToScreenSplit()

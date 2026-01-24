@@ -5,6 +5,10 @@
 #include "../../core/math/vector.h"
 #include "../../../utils/expandable_array.h"
 
+#if __APPLE__
+#include <Metal/Metal.hpp>
+#endif // __APPLE__
+
 typedef unsigned int GLuint;
 
 class Shader;
@@ -101,6 +105,13 @@ private:
     GLuint m_nVertexArray = 0;
 
     GLuint m_nFinalRenderTexture = 0;
+
+#if __APPLE__
+    MTL::Buffer* m_pMetalFullScreenVertexBuffer = nullptr;
+    MTL::Texture* m_pMetalOriginalRenderTexture = nullptr;
+
+    MTL::Texture* m_pMetalFinalRenderTexture = nullptr;
+#endif // __APPLE__
 
     bool m_bSplitScreen = false;
     float m_fSplitFactor = 0.5f;

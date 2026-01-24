@@ -10,6 +10,6 @@ list(APPEND SOURCES
     ${CMAKE_CURRENT_LIST_DIR}/inspector_helper.h
     ${CMAKE_CURRENT_LIST_DIR}/node_inspector.cpp
     ${CMAKE_CURRENT_LIST_DIR}/node_inspector.h
-    # ${CMAKE_CURRENT_LIST_DIR}/post_process_inspector.cpp
-    # ${CMAKE_CURRENT_LIST_DIR}/post_process_inspector.h
+    ${CMAKE_CURRENT_LIST_DIR}/post_process_inspector.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/post_process_inspector.h
 )
