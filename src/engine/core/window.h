@@ -83,6 +83,8 @@ public:
 
     inline CA::MetalDrawable* getCurrentDrawable() const { return m_pCurrentDrawable; }
     inline MTL::RenderCommandEncoder* getCurrentFrameRenderEncoder() const { return m_pCurrentFrameRenderEncoder; }
+
+    void setCurrentDrawingTexture(MTL::Texture* pTexture);
 #endif // __APPLE__
 
     inline GraphicAPI getGraphicAPI() const { return m_eGraphicAPI; }

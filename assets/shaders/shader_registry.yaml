@@ -79,6 +79,9 @@
   name: gamma_correction
   vertex: assets/shaders/postprocess/screen_pos.vert
   fragment: assets/shaders/postprocess/gamma_correction.frag
+  metal_prefix: gammaCorrection
+  metal_attribute_size: 2,2
+  metal_attribute_pack: 1
 17:
   name: 3d_depth
   vertex: assets/shaders/3d/depth.vert

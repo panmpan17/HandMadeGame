@@ -1,10 +1,6 @@
 #include "render_process_queue.h"
 
 #include <glad/gl.h>
-#include "bloom_test.h"
-#include "order_dithering.h"
-#include "difference_of_gaussian.h"
-#include "gamma_correction.h"
 #include "../vertex.h"
 #include "../shader_loader.h"
 #include "../../core/window.h"
@@ -14,56 +10,6 @@ inline constexpr std::string_view SHADER_UNIFORM_SPLIT_FACTOR = "u_splitFactor";
 
 
 RenderProcessQueue* RenderProcessQueue::ins = nullptr;
-
-
-void IRenderProcess::registerShaderPosAndUV(Shader* pShader)
-{
-    GLuint nVPosAttr = pShader->getAttributeLocation("a_vPos");
-    GLuint nVUVAttr = pShader->getAttributeLocation("a_vUV");
-    glEnableVertexAttribArray(nVPosAttr);
-    glVertexAttribPointer(nVPosAttr, 2, GL_FLOAT, GL_FALSE, sizeof(VertexWUV), (void*)offsetof(VertexWUV, pos));
-    glEnableVertexAttribArray(nVUVAttr);
-    glVertexAttribPointer(nVUVAttr, 2, GL_FLOAT, GL_FALSE, sizeof(VertexWUV), (void*)offsetof(VertexWUV, uv));
-}
-
-void IRenderProcess::initializeRenderTextureAndFBO(GLuint& nFBO, GLuint& nTexture, int nWidth, int nHeight, bool bGenerateFramebuffer/* = true*/)
-{
-    if (bGenerateFramebuffer)
-    {
-        glGenFramebuffers(1, &nFBO);
-    }
-    glBindFramebuffer(GL_FRAMEBUFFER, nFBO);
-
-    glGenTextures(1, &nTexture);
-    glBindTexture(GL_TEXTURE_2D, nTexture);
-
-    // Set the texture's format and size to match your window
-    if (RenderProcessQueue::sm_bAllowHDR)
-    {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, nWidth, nHeight, 0, GL_RGB, GL_FLOAT, NULL);
-    }
-    else
-    {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, nWidth, nHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-    }
-
-    // Set texture parameters for correct filtering and wrapping
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-    // Attach the texture to the FBO's color attachment
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, nTexture, 0);
-
-    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-    {
-        LOGERR("Framebuffer is not complete!");
-    }
-}
-
-
 
 RenderProcessQueue::RenderProcessQueue(Window* pWindow)
 {
@@ -210,7 +156,7 @@ void RenderProcessQueue::initializeOriginalFBO(bool bGenFramebuffer/* = true*/)
 #if __APPLE__
     else if (Window::ins->isUsingMetal())
     {
-        if (!m_pMetalOriginalRenderTexture)
+        if (m_pMetalOriginalRenderTexture)
         {
             m_pMetalOriginalRenderTexture->release();
             m_pMetalOriginalRenderTexture = nullptr;
@@ -262,8 +208,7 @@ void RenderProcessQueue::beginFrame()
 #if __APPLE__
     else if (Window::ins->isUsingMetal())
     {
-        MTL::RenderPassColorAttachmentDescriptor* pColorAttachment = Window::ins->getRenderPassDescriptor()->colorAttachments()->object(0);
-        pColorAttachment->setTexture(m_pMetalOriginalRenderTexture);
+        Window::ins->setCurrentDrawingTexture(m_pMetalOriginalRenderTexture);
     }
 #endif // __APPLE__
 }
@@ -278,9 +223,6 @@ void RenderProcessQueue::endFrame()
 #if __APPLE__
     else if (Window::ins->isUsingMetal())
     {
-        MTL::RenderPassColorAttachmentDescriptor* pColorAttachment = Window::ins->getRenderPassDescriptor()->colorAttachments()->object(0);
-        pColorAttachment->setTexture(Window::ins->getCurrentDrawable()->texture());
-
         m_pMetalFinalRenderTexture = m_pMetalOriginalRenderTexture;
     }
 #endif // __APPLE__
@@ -330,16 +272,15 @@ void RenderProcessQueue::renderToScreen()
 #if __APPLE__
     else if (Window::ins->isUsingMetal())
     {
+        Window::ins->setCurrentDrawingTexture(Window::ins->getCurrentDrawable()->texture());
+
         MTL::RenderCommandEncoder* pEncoder = Window::ins->getCurrentFrameRenderEncoder();
 
         pEncoder->setRenderPipelineState(m_pShader->getMetalPipelineState());
-
         pEncoder->setVertexBuffer(m_pMetalFullScreenVertexBuffer, 0, 0);
-
         pEncoder->setFragmentTexture(m_pMetalFinalRenderTexture, 0);
 
         pEncoder->drawPrimitives(MTL::PrimitiveTypeTriangleStrip, NS::UInteger(0), NS::UInteger(4));
-
         INCREASE_DRAW_CALL_COUNT(2);
     }
 #endif // __APPLE__

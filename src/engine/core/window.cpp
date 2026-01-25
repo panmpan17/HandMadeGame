@@ -661,6 +661,19 @@ void Window::drawIMGUIEditor()
 #endif // __APPLE__
 }
 
+void Window::setCurrentDrawingTexture(MTL::Texture* pTexture)
+{
+    if (m_pCurrentFrameRenderEncoder)
+    {
+        m_pCurrentFrameRenderEncoder->endEncoding();
+    }
+
+    MTL::RenderPassColorAttachmentDescriptor* pColorAttachment = m_pRenderPassDescriptor->colorAttachments()->object(0);
+    pColorAttachment->setTexture(pTexture);
+
+    m_pCurrentFrameRenderEncoder = m_pCurrentCommandBuffer->renderCommandEncoder(m_pRenderPassDescriptor);
+}
+
 void Window::drawFrame()
 {
     m_nDrawCallCount = 0;
@@ -683,15 +696,8 @@ void Window::drawFrame()
     if (m_bEnablePostProcess) // Enable post process
     {
         m_pRenderProcessQueue->beginFrame();
-        m_pCurrentFrameRenderEncoder = m_pCurrentCommandBuffer->renderCommandEncoder(m_pRenderPassDescriptor);
-
         m_pWorldScene->render();
-
-        m_pCurrentFrameRenderEncoder->endEncoding();
-
         m_pRenderProcessQueue->endFrame();
-
-        m_pCurrentFrameRenderEncoder = m_pCurrentCommandBuffer->renderCommandEncoder(m_pRenderPassDescriptor);
 
         if (isUsingOpenGL())
         {
@@ -725,6 +731,7 @@ void Window::drawFrame()
 
 
     m_pCurrentFrameRenderEncoder->endEncoding();
+    m_pCurrentFrameRenderEncoder = nullptr;
 }
 
 void Window::drawFrameInfo()

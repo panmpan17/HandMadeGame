@@ -25,6 +25,10 @@ private:
     GLuint m_nFBOID = 0;
     GLuint m_nRenderTexture = 0;
 
+#if __APPLE__
+    MTL::Texture* m_pMetalRenderTexture = nullptr;
+#endif // __APPLE__
+
     int m_nRenderWidth, m_nRenderHeight;
 
     Shader* m_pShader = nullptr;

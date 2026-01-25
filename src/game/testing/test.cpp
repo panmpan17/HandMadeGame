@@ -32,16 +32,16 @@
 
 void setupPostProcess()
 {
-    // RenderProcessQueue* pQueue;
-    // if (!Window::ins || !(pQueue = Window::ins->getRenderProcessQueue()))
-    // {
-    //     return;
-    // }
+    RenderProcessQueue* pQueue;
+    if (!Window::ins || !(pQueue = Window::ins->getRenderProcessQueue()))
+    {
+        return;
+    }
 
-    // auto pGammaCorrection = new GammaCorrection(pQueue);
-    // pGammaCorrection->setGamma(1.3f);
-    // pGammaCorrection->setActive(false);
-    // pQueue->addProcess(pGammaCorrection);
+    auto pGammaCorrection = new GammaCorrection(pQueue);
+    pGammaCorrection->setGamma(1.3f);
+    pGammaCorrection->setActive(true);
+    pQueue->addProcess(pGammaCorrection);
 
     // auto pDifferenceOfGaussian = new DifferenceOfGaussian(pQueue);
     // pDifferenceOfGaussian->setActive(false);
