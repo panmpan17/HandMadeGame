@@ -41,6 +41,7 @@
   vertex: assets/shaders/postprocess/screen_pos.vert
   fragment: assets/shaders/postprocess/pure_texture.frag
   metal_prefix: pureTexture
+  metal_vertex_func: screenPosVertexMain
   metal_attribute_size: 2,2
   metal_attribute_pack: 1
 10:
@@ -80,6 +81,7 @@
   vertex: assets/shaders/postprocess/screen_pos.vert
   fragment: assets/shaders/postprocess/gamma_correction.frag
   metal_prefix: gammaCorrection
+  metal_vertex_func: screenPosVertexMain
   metal_attribute_size: 2,2
   metal_attribute_pack: 1
 17:
@@ -99,7 +101,12 @@
   name: particle_instance_billboard
   vertex: assets/shaders/particle_instance_billboard.vert
   fragment: assets/shaders/particle_instance.frag
+  metal_prefix: particleInstance
+  metal_vertex_func: particleInstanceBillboardVertexMain
+  metal_attribute_size: 2,2
+  metal_attribute_pack: 1
   cameraUBO: 0
+  transparency: 1
 20:
   name: mesh_gizmos
   vertex: assets/shaders/3d/mesh_gizmos.vert

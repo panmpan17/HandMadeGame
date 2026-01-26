@@ -1,5 +1,8 @@
 #include <metal_stdlib>
 #include "camera_data.metal"
+// #include "math.metal"
+
+metal::float3x3 mat4ToMat3(metal::float4x4 mat4);
 
 struct imageGizmos_VertexIn {
     metal::float2 position [[attribute(0)]];
@@ -21,9 +24,7 @@ vertex imageGizmos_VertexOut imageGizmos_vertexMain(imageGizmos_VertexIn in [[st
                                         constant imageGizmos_Uniforms& uniforms [[buffer(2)]],
                                         constant CameraMatrices& cameraMatrices [[buffer(3)]]) {
     
-    metal::float3x3 viewRotation = metal::float3x3(cameraMatrices.view.columns[0].xyz,
-                                                   cameraMatrices.view.columns[1].xyz,
-                                                   cameraMatrices.view.columns[2].xyz);
+    metal::float3x3 viewRotation = mat4ToMat3(cameraMatrices.view);
         
     metal::float3x3 billboardRotation = metal::transpose(viewRotation);
     metal::float3 worldPosition = uniforms.worldPosition +

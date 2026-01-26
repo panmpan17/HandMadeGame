@@ -525,6 +525,18 @@ void Window::mainLoop()
             {
                 m_pMetalLayer->setDrawableSize(CGSizeMake(m_oActualSize.x, m_oActualSize.y));
                 Renderer::initMetalDepthTexture(m_pMetalDevice, m_oActualSize.x, m_oActualSize.y);
+
+                // If don't reset the depth attachment and color attachment, it will keep using the old texture size and cause issues.
+                MTL::RenderPassDepthAttachmentDescriptor* pDepthAttach = m_pRenderPassDescriptor->depthAttachment();
+                pDepthAttach->setTexture(Renderer::m_pDepthTexture);
+                pDepthAttach->setLoadAction(MTL::LoadActionClear);
+                pDepthAttach->setClearDepth(1.0);
+                pDepthAttach->setStoreAction(MTL::StoreActionDontCare); // TODO: Might need to change to StoreActionStore
+
+                MTL::RenderPassColorAttachmentDescriptor* pColorAttachment = m_pRenderPassDescriptor->colorAttachments()->object(0);
+                pColorAttachment->setLoadAction(MTL::LoadActionClear);
+                pColorAttachment->setClearColor(MTL::ClearColor::Make(0.0, 0.0, 0.0, 1.0));
+                pColorAttachment->setStoreAction(MTL::StoreActionStore);
             }
 #endif // __APPLE__
             // TODO: Change to glfwSetFramebufferSizeCallback
@@ -712,10 +724,7 @@ void Window::drawFrame()
     }
     else
     {
-        MTL::RenderPassColorAttachmentDescriptor* pColorAttachment = m_pRenderPassDescriptor->colorAttachments()->object(0);
-        pColorAttachment->setTexture(m_pCurrentDrawable->texture());
-        m_pCurrentFrameRenderEncoder = m_pCurrentCommandBuffer->renderCommandEncoder(m_pRenderPassDescriptor);
-
+        setCurrentDrawingTexture(m_pCurrentDrawable->texture());
         m_pWorldScene->render();
     }
 

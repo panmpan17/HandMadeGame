@@ -20,6 +20,11 @@ void IRenderProcess::registerShaderPosAndUV(Shader* pShader)
 
 void IRenderProcess::initializeRenderTextureAndFBO(GLuint& nFBO, GLuint& nTexture, int nWidth, int nHeight, bool bGenerateFramebuffer/* = true*/)
 {
+    if (nTexture != 0 && nTexture != GL_INVALID_INDEX)
+    {
+        glDeleteTextures(1, &nTexture);
+    }
+
     if (bGenerateFramebuffer)
     {
         glGenFramebuffers(1, &nFBO);

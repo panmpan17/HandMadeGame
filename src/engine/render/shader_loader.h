@@ -23,6 +23,8 @@ struct ShaderRegisteryData
 
     // Metal
     std::string m_strMetalShaderPrefix;
+    std::string m_strMetalVertexShaderFunc;
+    std::string m_strMetalFragmentShaderFunc;
     std::vector<int> m_metalAttributeSizes;
     bool m_bMetalAttributePack = false;
 
@@ -39,6 +41,8 @@ struct ShaderRegisteryData
         nTimeDataUBOIndex = GL_INVALID_INDEX;
 
         m_strMetalShaderPrefix.clear();
+        m_strMetalVertexShaderFunc.clear();
+        m_strMetalFragmentShaderFunc.clear();
         m_metalAttributeSizes.clear();
     }
 };

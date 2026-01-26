@@ -150,8 +150,10 @@ void metalShaderAddFloatAttribute(MTL::VertexDescriptor* const pVertexDesc, int 
 
 Shader* Shader::loadFromMetalShader(MTL::Library* const pLibrary, MTL::Device* const pDevice, const ShaderRegisteryData& oData)
 {
-    std::string strFullVertexName = oData.m_strMetalShaderPrefix + "_vertexMain";
-    std::string strFullFragmentName = oData.m_strMetalShaderPrefix + "_fragmentMain";
+    std::string strFullVertexName = oData.m_strMetalVertexShaderFunc.empty() ?
+            (oData.m_strMetalShaderPrefix + "_vertexMain") : oData.m_strMetalVertexShaderFunc;
+    std::string strFullFragmentName = oData.m_strMetalFragmentShaderFunc.empty() ?
+            (oData.m_strMetalShaderPrefix + "_fragmentMain") : oData.m_strMetalFragmentShaderFunc;
 
     MTL::Function* pVertexFunction = pLibrary->newFunction(NS::String::string(strFullVertexName.c_str(), NS::UTF8StringEncoding));
     MTL::Function* pFragmentFunction = pLibrary->newFunction(NS::String::string(strFullFragmentName.c_str(), NS::UTF8StringEncoding));

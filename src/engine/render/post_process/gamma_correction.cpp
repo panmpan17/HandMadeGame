@@ -107,6 +107,14 @@ void GammaCorrection::onWindowResize()
     m_nRenderWidth = m_pProcessQueue->getRenderWidth();
     m_nRenderHeight = m_pProcessQueue->getRenderHeight();
 
-    glDeleteTextures(1, &m_nRenderTexture);
-    initializeRenderTextureAndFBO(m_nFBOID, m_nRenderTexture, m_nRenderWidth, m_nRenderHeight, false);
+    if (Window::ins->isUsingOpenGL())
+    {
+        initializeRenderTextureAndFBO(m_nFBOID, m_nRenderTexture, m_nRenderWidth, m_nRenderHeight, false);
+    }
+#if __APPLE__
+    else if (Window::ins->isUsingMetal())
+    {
+        initializeRenderTextureAndFBO(m_pMetalRenderTexture, m_nRenderWidth, m_nRenderHeight);
+    }
+#endif // __APPLE__
 }

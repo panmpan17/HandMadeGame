@@ -2,7 +2,7 @@
 
 #include "assets/shaders/base/camera_data.glsl"
 
-uniform mat4 u_MVP;
+uniform mat4 u_modelMatrix;
 uniform mat4 u_nodeTransform;
 uniform bool u_useNodeTransform;
 
@@ -25,14 +25,18 @@ void main()
     mat2 rotationMatrix = mat2(cos(rotation), -sin(rotation), sin(rotation), cos(rotation));
     vec2 scaledPos = quadPos * scale;
 
+    vec3 verticeRelativePos = billboardRotation * vec3(rotationMatrix * scaledPos, 0.0);
+    vec4 verticePos = vec4(instancePos + verticeRelativePos, 1.0);
+
     if (u_useNodeTransform)
     {
-        // TODO: position is bit broken here
-        gl_Position = u_nodeTransform * vec4(instancePos + billboardRotation * vec3(rotationMatrix * scaledPos, 0.0), 1.0);
+        mat4 mvp = u_Projection * u_View * u_modelMatrix;
+        gl_Position = mvp * verticePos;
     }
     else
     {
-        gl_Position = u_Projection * u_View * vec4(instancePos + billboardRotation * vec3(rotationMatrix * scaledPos, 0.0), 1.0);
+        mat4 vp = u_Projection * u_View;
+        gl_Position = vp * verticePos;
     }
 
     fragmentColor = instanceColor * vec4(1.0, 1.0, 1.0, opacity);

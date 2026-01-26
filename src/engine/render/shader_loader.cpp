@@ -163,6 +163,14 @@ void ShaderLoader::readRegistryFromFile()
         {
             oCurrentShaderData.m_bMetalAttributePack = (strLine.substr(2 + 22) == "1");
         }
+        else if (memcmp(strLine.data() + 2, "metal_vertex_func", 17) == 0)
+        {
+            oCurrentShaderData.m_strMetalVertexShaderFunc = strLine.substr(2 + 19);
+        }
+        else if (memcmp(strLine.data() + 2, "metal_fragment_func", 19) == 0)
+        {
+            oCurrentShaderData.m_strMetalFragmentShaderFunc = strLine.substr(2 + 21);
+        }
     }
 
     if (oCurrentShaderData.nCurrentShaderId != -1 && !oCurrentShaderData.m_strName.empty())
