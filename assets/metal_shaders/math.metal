@@ -1,4 +1,3 @@
-#pragma once
 #include <metal_stdlib>
 
 #ifndef MATH_METAL

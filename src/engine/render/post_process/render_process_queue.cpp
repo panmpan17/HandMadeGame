@@ -3,6 +3,7 @@
 #include <glad/gl.h>
 #include "../vertex.h"
 #include "../shader_loader.h"
+#include "../renderer.h"
 #include "../../core/window.h"
 
 
@@ -279,6 +280,7 @@ void RenderProcessQueue::renderToScreen()
         pEncoder->setRenderPipelineState(m_pShader->getMetalPipelineState());
         pEncoder->setVertexBuffer(m_pMetalFullScreenVertexBuffer, 0, 0);
         pEncoder->setFragmentTexture(m_pMetalFinalRenderTexture, 0);
+        pEncoder->setFragmentSamplerState(Renderer::m_pLinearSampler, 0);
 
         pEncoder->drawPrimitives(MTL::PrimitiveTypeTriangleStrip, NS::UInteger(0), NS::UInteger(4));
         INCREASE_DRAW_CALL_COUNT(2);

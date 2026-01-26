@@ -13,6 +13,12 @@ struct Uniform_ModelMatrix {
     metal::float4x4 modelMatrix;
 };
 
+struct Uniform_Blur
+{
+    metal::int2 sizeAndBlurRadius;
+    float sigma;
+};
+
 struct VertexOut_Position {
     metal::float4 position [[position]];
 };

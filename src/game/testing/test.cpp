@@ -51,9 +51,9 @@ void setupPostProcess()
     // pOrderDithering->setActive(false);
     // pQueue->addProcess(pOrderDithering);
 
-    // auto pBloomTest = new BloomTest(pQueue);
-    // pBloomTest->setHighlightThreshold(1.1f);
-    // pQueue->addProcess(pBloomTest);
+    auto pBloomTest = new BloomTest(pQueue);
+    pBloomTest->setHighlightThreshold(0.5f);
+    pQueue->addProcess(pBloomTest);
 }
 
 void createDemo1()

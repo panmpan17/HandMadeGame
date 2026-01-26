@@ -1,7 +1,10 @@
 #include <metal_stdlib>
 #include "camera_data.metal"
 #include "common.metal"
-#include "math.metal"
+// #include "math.metal"
+
+metal::float3x3 mat4ToMat3(metal::float4x4 mat4);
+metal::float4x4 mat3ToMat4(metal::float3x3 mat3);
 
 vertex VertexOut_CubeMap cubemap_vertexMain(VertexIn_Position in [[stage_in]],
                                             constant CameraMatrices& cameraMatrices [[buffer(1)]]) {
