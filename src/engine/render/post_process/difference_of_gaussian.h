@@ -75,10 +75,11 @@ private:
 
     void initializeQuad();
 
-    void renderBlur1Horizontal();
+    void renderHorizontalBlurOpenGL(GLuint nFBO, GLuint nOutputTexture, GLuint nInputTexture, float fBlurRadius, float fBlurSigma);
+    void renderVerticalBlurOpenGL(GLuint nFBO, GLuint nOutputTexture, GLuint nInputTexture, float fBlurRadius, float fBlurSigma);
+
     void renderBlur1Vertical();
 
-    void renderBlur2Horizontal();
     void renderBlur2Vertical();
 
     void renderComposite();

@@ -61,20 +61,22 @@ void DifferenceOfGaussian::renderProcess()
 {
     m_nOriginalRenderTexture = m_pProcessQueue->getFinalRenderTexture();
 
-    renderBlur1Horizontal();
-    renderBlur1Vertical();
+    // The first blur pass
+    renderHorizontalBlurOpenGL(m_nFBOID_Blur1_Horizontal, m_nRenderTexture_Blur1_Horizontal, m_nOriginalRenderTexture, m_fBlurRadius1, m_fBlurSigma1);
+    renderVerticalBlurOpenGL(m_nFBOID_BLur1_Vertical, m_nRenderTexture_Blur1_Vertical, m_nRenderTexture_Blur1_Horizontal, m_fBlurRadius1, m_fBlurSigma1);
 
-    renderBlur2Horizontal();
-    renderBlur2Vertical();
+    // The second blur pass
+    renderHorizontalBlurOpenGL(m_nFBOID_Blur2_Horizontal, m_nRenderTexture_Blur2_Horizontal, m_nOriginalRenderTexture, m_fBlurRadius2, m_fBlurSigma2);
+    renderVerticalBlurOpenGL(m_nFBOID_BLur2_Vertical, m_nRenderTexture_Blur2_Vertical, m_nRenderTexture_Blur2_Horizontal, m_fBlurRadius2, m_fBlurSigma2);
 
     renderComposite();
 }
 
-void DifferenceOfGaussian::renderBlur1Horizontal()
+void DifferenceOfGaussian::renderHorizontalBlurOpenGL(GLuint nFBO, GLuint nOutputTexture, GLuint nInputTexture, float fBlurRadius, float fBlurSigma)
 {
     ASSERT(m_pHorizontalBlurShader, "Shader must be set before drawing the quad");
 
-    glBindFramebuffer(GL_FRAMEBUFFER, m_nFBOID_Blur1_Horizontal);
+    glBindFramebuffer(GL_FRAMEBUFFER, nFBO);
     glViewport(0, 0, m_nRenderWidth * BLUR_TEXTURE_RATIO, m_nRenderHeight * BLUR_TEXTURE_RATIO);
     glClear(GL_COLOR_BUFFER_BIT);
 
@@ -82,72 +84,11 @@ void DifferenceOfGaussian::renderBlur1Horizontal()
 
     glUniform1i(m_pTextureUniform_HorizontalBlur->m_nLocation, 0); // Texture unit 0
     glUniform1i(m_pTextureWidthUniform_HorizontalBlur->m_nLocation, m_nRenderWidth * BLUR_TEXTURE_RATIO);
-    glUniform1f(m_pBlurRadiusUniform_HorizontalBlur->m_nLocation, m_fBlurRadius1);
-    glUniform1f(m_pBlurSigmaUniform_HorizontalBlur->m_nLocation, m_fBlurSigma1);
+    glUniform1f(m_pBlurRadiusUniform_HorizontalBlur->m_nLocation, fBlurRadius);
+    glUniform1f(m_pBlurSigmaUniform_HorizontalBlur->m_nLocation, fBlurSigma);
 
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, m_nOriginalRenderTexture);
-
-    glBindVertexArray(m_pProcessQueue->getFullScreenVertexArray());
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4); // Draw the quad using triangle strip
-    INCREASE_DRAW_CALL_COUNT(2);
-
-    glBindTexture(GL_TEXTURE_2D, 0); // Unbind the texture
-    glBindVertexArray(0); // Unbind the vertex array
-    glUseProgram(0);
-
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-    m_pProcessQueue->setFinalRenderTexture(m_nRenderTexture_Blur1_Horizontal);
-}
-
-void DifferenceOfGaussian::renderBlur1Vertical()
-{
-    ASSERT(m_pVerticalBlurShader, "Shader must be set before drawing the quad");
-
-    glBindFramebuffer(GL_FRAMEBUFFER, m_nFBOID_BLur1_Vertical);
-    glViewport(0, 0, m_nRenderWidth * BLUR_TEXTURE_RATIO, m_nRenderHeight * BLUR_TEXTURE_RATIO);
-    glClear(GL_COLOR_BUFFER_BIT);
-
-    glUseProgram(m_pVerticalBlurShader->getProgram());
-
-    glUniform1i(m_pTextureUniform_VerticalBlur->m_nLocation, 0); // Texture unit 0
-    glUniform1i(m_pTextureHeightUniform_VerticalBlur->m_nLocation, m_nRenderHeight * BLUR_TEXTURE_RATIO);
-    glUniform1f(m_pBlurRadiusUniform_VerticalBlur->m_nLocation, m_fBlurRadius1);
-    glUniform1f(m_pBlurSigmaUniform_VerticalBlur->m_nLocation, m_fBlurSigma1);
-
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, m_nRenderTexture_Blur1_Horizontal);
-
-    glBindVertexArray(m_pProcessQueue->getFullScreenVertexArray());
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4); // Draw the quad using triangle strip
-    INCREASE_DRAW_CALL_COUNT(2);
-    glBindTexture(GL_TEXTURE_2D, 0); // Unbind the texture
-
-    glBindVertexArray(0); // Unbind the vertex array
-    glUseProgram(0);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-    m_pProcessQueue->setFinalRenderTexture(m_nRenderTexture_Blur1_Vertical);
-}
-
-void DifferenceOfGaussian::renderBlur2Horizontal()
-{
-    ASSERT(m_pHorizontalBlurShader, "Shader must be set before drawing the quad");
-
-    glBindFramebuffer(GL_FRAMEBUFFER, m_nFBOID_Blur2_Horizontal);
-    glViewport(0, 0, m_nRenderWidth * BLUR_TEXTURE_RATIO, m_nRenderHeight * BLUR_TEXTURE_RATIO);
-    glClear(GL_COLOR_BUFFER_BIT);
-
-    glUseProgram(m_pHorizontalBlurShader->getProgram());
-
-    glUniform1i(m_pTextureUniform_HorizontalBlur->m_nLocation, 0); // Texture unit 0
-    glUniform1i(m_pTextureWidthUniform_HorizontalBlur->m_nLocation, m_nRenderWidth * BLUR_TEXTURE_RATIO);
-    glUniform1f(m_pBlurRadiusUniform_HorizontalBlur->m_nLocation, m_fBlurRadius2);
-    glUniform1f(m_pBlurSigmaUniform_HorizontalBlur->m_nLocation, m_fBlurSigma2);
-
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, m_nOriginalRenderTexture);
+    glBindTexture(GL_TEXTURE_2D, nInputTexture);
 
     glBindVertexArray(m_pProcessQueue->getFullScreenVertexArray());
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4); // Draw the
@@ -158,14 +99,14 @@ void DifferenceOfGaussian::renderBlur2Horizontal()
     glUseProgram(0);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-    m_pProcessQueue->setFinalRenderTexture(m_nRenderTexture_Blur2_Horizontal);
+    m_pProcessQueue->setFinalRenderTexture(nOutputTexture);
 }
 
-void DifferenceOfGaussian::renderBlur2Vertical()
+void DifferenceOfGaussian::renderVerticalBlurOpenGL(GLuint nFBO, GLuint nOutputTexture, GLuint nInputTexture, float fBlurRadius, float fBlurSigma)
 {
     ASSERT(m_pVerticalBlurShader, "Shader must be set before drawing the quad");
 
-    glBindFramebuffer(GL_FRAMEBUFFER, m_nFBOID_BLur2_Vertical);
+    glBindFramebuffer(GL_FRAMEBUFFER, nFBO);
     glViewport(0, 0, m_nRenderWidth * BLUR_TEXTURE_RATIO, m_nRenderHeight * BLUR_TEXTURE_RATIO);
     glClear(GL_COLOR_BUFFER_BIT);
 
@@ -173,11 +114,11 @@ void DifferenceOfGaussian::renderBlur2Vertical()
 
     glUniform1i(m_pTextureUniform_VerticalBlur->m_nLocation, 0); // Texture unit 0
     glUniform1i(m_pTextureHeightUniform_VerticalBlur->m_nLocation, m_nRenderHeight * BLUR_TEXTURE_RATIO);
-    glUniform1f(m_pBlurRadiusUniform_VerticalBlur->m_nLocation, m_fBlurRadius2);
-    glUniform1f(m_pBlurSigmaUniform_VerticalBlur->m_nLocation, m_fBlurSigma2);
+    glUniform1f(m_pBlurRadiusUniform_VerticalBlur->m_nLocation, fBlurRadius);
+    glUniform1f(m_pBlurSigmaUniform_VerticalBlur->m_nLocation, fBlurSigma);
 
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, m_nRenderTexture_Blur2_Horizontal);
+    glBindTexture(GL_TEXTURE_2D, nInputTexture);
 
     glBindVertexArray(m_pProcessQueue->getFullScreenVertexArray());
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4); // Draw the quad using triangle strip
@@ -188,7 +129,7 @@ void DifferenceOfGaussian::renderBlur2Vertical()
     glUseProgram(0);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-    m_pProcessQueue->setFinalRenderTexture(m_nRenderTexture_Blur2_Vertical);
+    m_pProcessQueue->setFinalRenderTexture(nOutputTexture);
 }
 
 void DifferenceOfGaussian::renderComposite()
