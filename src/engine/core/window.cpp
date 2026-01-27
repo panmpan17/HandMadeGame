@@ -138,6 +138,11 @@ Window::~Window()
         m_pRenderPassDescriptor->release();
         m_pRenderPassDescriptor = nullptr;
     }
+    if (m_pDepthOnlyRenderPassDescriptor)
+    {
+        m_pDepthOnlyRenderPassDescriptor->release();
+        m_pDepthOnlyRenderPassDescriptor = nullptr;
+    }
 #endif // __APPLE__
 
     if (m_pWorldScene)
@@ -299,34 +304,15 @@ void Window::bindMetalToGlfwWindow()
 
     void* pNSWindow = glfwGetCocoaWindow(m_pWindow);
 
-    // 2. Get the "contentView" of the window
-    // Equivalent to: NSView* view = [nsWindow contentView];
     void* view = ((void* (*)(id, SEL))objc_msgSend)((id)pNSWindow, sel_registerName("contentView"));
 
-    // 3. Create the Metal Layer using metal-cpp
     m_pMetalLayer = CA::MetalLayer::layer();
     m_pMetalLayer->setDevice(m_pMetalDevice);
-
-    // the PixelFormat is defined in MTLPixelFormat.hpp, for some reason the enum type is not compiled correctly
-    m_pMetalLayer->setPixelFormat(MTL::PixelFormat::PixelFormatBGRA8Unorm);
-
-    // Use the window's scale factor for Retina displays
+    m_pMetalLayer->setPixelFormat(MTL::PixelFormat::PixelFormatBGRA8Unorm); // TODO: Might need to make this HDR?
     m_pMetalLayer->setDrawableSize(CGSizeMake(m_oActualSize.x, m_oActualSize.y)); // TODO: Should this be m_oActualSize or m_oWindowSize?
 
-    // 4. Attach the Metal Layer to the View (The "Bridge")
-    // Equivalent to: [view setLayer:outLayer];
     ((void (*)(id, SEL, id))objc_msgSend)((id)view, sel_registerName("setLayer:"), (id)m_pMetalLayer);
-
-    // 5. Tell the view to host the layer
-    // Equivalent to: [view setWantsLayer:YES];
     ((void (*)(id, SEL, BOOL))objc_msgSend)((id)view, sel_registerName("setWantsLayer:"), (BOOL)true);
-
-    // // TODO: setOpaque true?
-    // ((void (*)(id, SEL, BOOL))objc_msgSend)((id)view, sel_registerName("setOpaque:"), (BOOL)true);
-    
-    // 6. Set layer resizing policy (so it resizes with window)
-    // kCALayerWidthSizable | kCALayerHeightSizable = 2 | 16 = 18
-    // m_pMetalLayer->setAutoresizingMask(18);
 
     m_pMetalCommandQueue = m_pMetalDevice->newCommandQueue();
 
@@ -344,6 +330,17 @@ void Window::bindMetalToGlfwWindow()
     pColorAttachment->setLoadAction(MTL::LoadActionClear);
     pColorAttachment->setClearColor(MTL::ClearColor::Make(0.0, 0.0, 0.0, 1.0));
     pColorAttachment->setStoreAction(MTL::StoreActionStore);
+
+
+    m_pDepthOnlyRenderPassDescriptor = MTL::RenderPassDescriptor::alloc()->init();
+
+    MTL::RenderPassDepthAttachmentDescriptor* pDepthOnlyAttach = m_pDepthOnlyRenderPassDescriptor->depthAttachment();
+    pDepthOnlyAttach->setTexture(nullptr); // Lighting system will set the depth texture when render depth
+    pDepthOnlyAttach->setLoadAction(MTL::LoadActionClear);
+    pDepthOnlyAttach->setClearDepth(1.0);
+    pDepthOnlyAttach->setStoreAction(MTL::StoreActionDontCare);
+
+    m_pDepthOnlyRenderPassDescriptor->colorAttachments()->object(0)->setTexture(nullptr);
 }
 #endif
 
@@ -440,8 +437,8 @@ void Window::setupGameEngineRelatedObject()
     m_pFileWatchDog = new FileWatchDog("assets/");
     m_pFileWatchDog->setFileChangeCallback([](const std::string& strFilePath, eFileChangeType eType) {
         EngineEventDispatcher::getInstance().runOnMainThread([strFilePath, eType]() {
-            // ShaderLoader::getInstance()->onFileChangedListener(strFilePath, eType);
-            // MaterialLoader::getInstance()->onFileChangedListener(strFilePath, eType);
+            ShaderLoader::getInstance()->onFileChangedListener(strFilePath, eType);
+            MaterialLoader::getInstance()->onFileChangedListener(strFilePath, eType);
         });
     });
     m_pFileWatchDog->startWatching();
@@ -703,6 +700,12 @@ void Window::drawFrame()
             m_pWorldScene->renderDepth();
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
         }
+#if __APPLE__
+        else if (isUsingMetal())
+        {
+            m_pDepthOnlyRenderPassDescriptor->depthAttachment()->setTexture(pLightManager->getShadowDepthMapTextureMetal());
+        }
+#endif // __APPLE__
     }
 
     if (m_bEnablePostProcess) // Enable post process

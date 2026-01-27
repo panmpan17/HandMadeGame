@@ -87,6 +87,9 @@ public:
     inline GLuint getShadowDepthMapFBO() const { return m_nShadowDepthMapFBO; }
     inline GLuint getShadowDepthMapTexture() const { return m_nShadowDepthMapTexture; }
 
+#if __APPLE__
+    inline MTL::Texture* getShadowDepthMapTextureMetal() const { return m_pShadowDepthMapTextureMetal; }
+#endif
 
 private:
     static LightManager* ins;
@@ -99,6 +102,7 @@ private:
 
 #if __APPLE__
     MTL::Buffer* m_pLightingBuffer = nullptr;
+    MTL::Texture* m_pShadowDepthMapTextureMetal = nullptr;
 #endif
 
     vec3 m_colorAmbientLight = {0.2f, 0.2f, 0.2f};

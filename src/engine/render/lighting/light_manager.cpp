@@ -93,6 +93,20 @@ void LightManager::registerShadowDepthMap()
     else if (Window::ins->isUsingMetal())
     {
         // TODO: Implement Metal shadow depth map setup
+        // MTL::TextureDescriptor* pTextureDesc = MTL::TextureDescriptor::texture2DDescriptor(MTL::PixelFormatRGBA8Unorm, SHADOW_MAP_WIDTH, SHADOW_MAP_HEIGHT, false);
+        // pTextureDesc->setUsage(MTL::TextureUsageRenderTarget | MTL::TextureUsageShaderRead);
+        // m_pShadowDepthMapTextureMetal = Window::ins->getMetalDevice()->newTexture(pTextureDesc);
+
+        MTL::TextureDescriptor* pTextureDesc = MTL::TextureDescriptor::alloc()->init();
+        pTextureDesc->setPixelFormat(MTL::PixelFormatDepth32Float);
+        pTextureDesc->setWidth(SHADOW_MAP_WIDTH);
+        pTextureDesc->setHeight(SHADOW_MAP_HEIGHT);
+        pTextureDesc->setUsage(MTL::TextureUsageRenderTarget | MTL::TextureUsageShaderRead);
+        pTextureDesc->setStorageMode(MTL::StorageModePrivate);
+
+        m_pShadowDepthMapTextureMetal = Window::ins->getMetalDevice()->newTexture(pTextureDesc);
+
+        pTextureDesc->release();
     }
 #endif // __APPLE__
 }

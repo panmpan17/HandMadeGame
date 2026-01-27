@@ -230,6 +230,12 @@ void ShaderLoader::onFileChangedListener(const std::string& strFilePath, eFileCh
         return;
     }
 
+    if (Window::ins->isUsingMetal())
+    {
+        // NOTE: Because metal shader require precompilation, which is might need extra tool to trigger recompilation.
+        return;
+    }
+
     for (auto& pair : m_mapShaders)
     {
         if (pair.second->getIsUsingFile(strFilePath))

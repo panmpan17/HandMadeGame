@@ -79,7 +79,6 @@ public:
 
 #if __APPLE__
     inline MTL::Device* getMetalDevice() const { return m_pMetalDevice; }
-    inline MTL::RenderPassDescriptor* getRenderPassDescriptor() const { return m_pRenderPassDescriptor; }
 
     inline CA::MetalDrawable* getCurrentDrawable() const { return m_pCurrentDrawable; }
     inline MTL::RenderCommandEncoder* getCurrentFrameRenderEncoder() const { return m_pCurrentFrameRenderEncoder; }
@@ -102,6 +101,7 @@ private:
 
     MTL::CommandQueue* m_pMetalCommandQueue = nullptr;
     MTL::RenderPassDescriptor* m_pRenderPassDescriptor = nullptr;
+    MTL::RenderPassDescriptor* m_pDepthOnlyRenderPassDescriptor = nullptr;
 
     MTL::CommandBuffer* m_pCurrentCommandBuffer = nullptr;
     MTL::RenderCommandEncoder* m_pCurrentFrameRenderEncoder = nullptr;

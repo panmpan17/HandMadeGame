@@ -125,11 +125,10 @@ void Skybox::loadSkyboxCubmaps(std::initializer_list<std::string_view> strImages
 
 #if __APPLE__
     bool bUsingMetal = Window::ins->isUsingMetal();
-    MTL::TextureDescriptor* pDesc;
 
     if (bUsingMetal)
     {
-        pDesc = MTL::TextureDescriptor::alloc()->init();
+        MTL::TextureDescriptor* pDesc = MTL::TextureDescriptor::alloc()->init();
         pDesc->setTextureType(MTL::TextureTypeCube);
         pDesc->setPixelFormat(MTL::PixelFormatRGBA8Unorm);
         pDesc->setWidth(2048);
@@ -137,6 +136,8 @@ void Skybox::loadSkyboxCubmaps(std::initializer_list<std::string_view> strImages
         pDesc->setArrayLength(1);
 
         m_pSkyboxMetalTexture = Window::ins->getMetalDevice()->newTexture(pDesc);
+
+        pDesc->release();
     }
 #endif // __APPLE__
 
@@ -167,12 +168,6 @@ void Skybox::loadSkyboxCubmaps(std::initializer_list<std::string_view> strImages
     {
         glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
     }
-#if __APPLE__
-    else if (bUsingMetal)
-    {
-        pDesc->release();
-    }
-#endif // __APPLE__
 }
 
 void Skybox::draw()
