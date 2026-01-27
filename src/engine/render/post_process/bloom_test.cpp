@@ -103,10 +103,10 @@ void BloomTest::renderProcess()
 
     renderVerticalBlur();
 
-    // if (m_nBloomProcessDebugStep == 3)
-    //     return;
+    if (m_nBloomProcessDebugStep == 3)
+        return;
 
-    // renderComposite();
+    renderComposite();
 }
 
 void BloomTest::renderColorHighlight()
@@ -297,34 +297,66 @@ void BloomTest::renderComposite()
     // Debug draw it to screen instead of another post-process render texture
     ASSERT(m_pCompositeShader, "Shader must be set before drawing the quad");
 
-    glBindFramebuffer(GL_FRAMEBUFFER, m_nFBOID_Final);
-    glViewport(0, 0, m_nRenderWidth, m_nRenderHeight);
-    glClear(GL_COLOR_BUFFER_BIT);
+    if (Window::ins->isUsingOpenGL())
+    {
+        glBindFramebuffer(GL_FRAMEBUFFER, m_nFBOID_Final);
+        glViewport(0, 0, m_nRenderWidth, m_nRenderHeight);
+        glClear(GL_COLOR_BUFFER_BIT);
 
-    glUseProgram(m_pCompositeShader->getProgram());
+        glUseProgram(m_pCompositeShader->getProgram());
 
-    glUniform1i(m_pOriginalTextureUniform->m_nLocation, 0);
-    glUniform1i(m_pBloomTextureUniform->m_nLocation, 1);
-    glUniform1f(m_pBloomTextureScaleUniform->m_nLocation, 1);
-    glUniform1f(m_pIntensityUniform->m_nLocation, m_nIntensity);
+        glUniform1i(m_pOriginalTextureUniform->m_nLocation, 0);
+        glUniform1i(m_pBloomTextureUniform->m_nLocation, 1);
+        glUniform1f(m_pBloomTextureScaleUniform->m_nLocation, 1);
+        glUniform1f(m_pIntensityUniform->m_nLocation, m_nIntensity);
 
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, m_nOriginalRenderTexture);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, m_nOriginalRenderTexture);
 
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, m_nRenderTexture_VerticalBlur);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, m_nRenderTexture_VerticalBlur);
 
-    glBindVertexArray(m_pProcessQueue->getFullScreenVertexArray());
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4); // Draw the quad using triangle strip
-    INCREASE_DRAW_CALL_COUNT(2);
+        glBindVertexArray(m_pProcessQueue->getFullScreenVertexArray());
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4); // Draw the quad using triangle strip
+        INCREASE_DRAW_CALL_COUNT(2);
 
-    glBindTexture(GL_TEXTURE_2D, 0); // Unbind the texture
-    glBindVertexArray(0); // Unbind the vertex array
-    glUseProgram(0);
+        glBindTexture(GL_TEXTURE_2D, 0); // Unbind the texture
+        glBindVertexArray(0); // Unbind the vertex array
+        glUseProgram(0);
 
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-    m_pProcessQueue->setFinalRenderTexture(m_nRenderTexture_Final);
+        m_pProcessQueue->setFinalRenderTexture(m_nRenderTexture_Final);
+    }
+#if __APPLE__
+    else if (Window::ins->isUsingMetal())
+    {
+        Window::ins->setCurrentDrawingTexture(m_pMetalFinalRenderTexture);
+
+        MTL::RenderCommandEncoder* pEncoder = Window::ins->getCurrentFrameRenderEncoder();
+
+        RenderProcessQueue* pQueue = Window::ins->getRenderProcessQueue();
+        pEncoder->setRenderPipelineState(m_pCompositeShader->getMetalPipelineState());
+        pEncoder->setVertexBuffer(pQueue->getMetalFullScreenVertexBuffer(), 0, 0);
+
+        struct {
+            float fBloomTextureScale;
+            float fIntensity;
+        } bloomParams;
+        bloomParams.fBloomTextureScale = 1.0f;
+        bloomParams.fIntensity = m_nIntensity;
+        pEncoder->setFragmentBytes(&bloomParams, sizeof(bloomParams), 1);
+
+        pEncoder->setFragmentTexture(m_pMetalOriginalRenderTexture, 0);
+        pEncoder->setFragmentTexture(m_pMetalRenderTexture_VerticalBlur, 1);
+        pEncoder->setFragmentSamplerState(Renderer::m_pLinearSampler, 0);
+
+        pEncoder->drawPrimitives(MTL::PrimitiveTypeTriangleStrip, NS::UInteger(0), NS::UInteger(4));
+        INCREASE_DRAW_CALL_COUNT(2);
+
+        pQueue->setFinalMetalRenderTexture(m_pMetalFinalRenderTexture);
+    }
+#endif // __APPLE__
 }
 
 void BloomTest::onWindowResize()

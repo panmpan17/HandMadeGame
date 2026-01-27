@@ -290,26 +290,47 @@ void RenderProcessQueue::renderToScreen()
 
 void RenderProcessQueue::renderToScreenSplit()
 {
-    glViewport(0, 0, m_pWindow->GetActualWidth(), m_pWindow->GetActualHeight());
-    glClear(GL_COLOR_BUFFER_BIT);
+    if (Window::ins->isUsingOpenGL())
+    {
+        glViewport(0, 0, m_pWindow->GetActualWidth(), m_pWindow->GetActualHeight());
+        glClear(GL_COLOR_BUFFER_BIT);
 
-    glUseProgram(m_pSplitShader->getProgram());
+        glUseProgram(m_pSplitShader->getProgram());
 
-    glUniform1i(m_pOriginalTextureUniform_Split->m_nLocation, 0);
-    glUniform1i(m_pFinalTextureUniform_Split->m_nLocation, 1);
-    glUniform1f(m_pSplitFactorUniform->m_nLocation, m_fSplitFactor);
+        glUniform1i(m_pOriginalTextureUniform_Split->m_nLocation, 0);
+        glUniform1i(m_pFinalTextureUniform_Split->m_nLocation, 1);
+        glUniform1f(m_pSplitFactorUniform->m_nLocation, m_fSplitFactor);
 
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, m_nRenderTexture_original);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, m_nRenderTexture_original);
 
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, m_nFinalRenderTexture);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, m_nFinalRenderTexture);
 
-    glBindVertexArray(m_nVertexArray);
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4); // Draw the quad using triangle strip
-    INCREASE_DRAW_CALL_COUNT(2);
+        glBindVertexArray(m_nVertexArray);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4); // Draw the quad using triangle strip
+        INCREASE_DRAW_CALL_COUNT(2);
 
-    glBindTexture(GL_TEXTURE_2D, 0); // Unbind the texture
-    glBindVertexArray(0); // Unbind the vertex array
-    glUseProgram(0);
+        glBindTexture(GL_TEXTURE_2D, 0); // Unbind the texture
+        glBindVertexArray(0); // Unbind the vertex array
+        glUseProgram(0);
+    }
+#if __APPLE__
+    else if (Window::ins->isUsingMetal())
+    {
+        Window::ins->setCurrentDrawingTexture(Window::ins->getCurrentDrawable()->texture());
+
+        MTL::RenderCommandEncoder* pEncoder = Window::ins->getCurrentFrameRenderEncoder();
+
+        pEncoder->setRenderPipelineState(m_pSplitShader->getMetalPipelineState());
+        pEncoder->setVertexBuffer(m_pMetalFullScreenVertexBuffer, 0, 0);
+        pEncoder->setFragmentTexture(m_pMetalOriginalRenderTexture, 0);
+        pEncoder->setFragmentTexture(m_pMetalFinalRenderTexture, 1);
+        pEncoder->setFragmentSamplerState(Renderer::m_pLinearSampler, 0);
+        pEncoder->setFragmentBytes(&m_fSplitFactor, sizeof(float), 1);
+
+        pEncoder->drawPrimitives(MTL::PrimitiveTypeTriangleStrip, NS::UInteger(0), NS::UInteger(4));
+        INCREASE_DRAW_CALL_COUNT(2);
+    }
+#endif // __APPLE__
 }
