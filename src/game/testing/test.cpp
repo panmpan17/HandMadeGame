@@ -43,13 +43,13 @@ void setupPostProcess()
     pGammaCorrection->setActive(true);
     pQueue->addProcess(pGammaCorrection);
 
-    // auto pDifferenceOfGaussian = new DifferenceOfGaussian(pQueue);
-    // pDifferenceOfGaussian->setActive(false);
-    // pQueue->addProcess(pDifferenceOfGaussian);
+    auto pDifferenceOfGaussian = new DifferenceOfGaussian(pQueue);
+    pDifferenceOfGaussian->setActive(true);
+    pQueue->addProcess(pDifferenceOfGaussian);
 
-    // auto pOrderDithering = new OrderDithering(pQueue);
-    // pOrderDithering->setActive(false);
-    // pQueue->addProcess(pOrderDithering);
+    auto pOrderDithering = new OrderDithering(pQueue);
+    pOrderDithering->setActive(true);
+    pQueue->addProcess(pOrderDithering);
 
     auto pBloomTest = new BloomTest(pQueue);
     pBloomTest->setHighlightThreshold(0.95f);

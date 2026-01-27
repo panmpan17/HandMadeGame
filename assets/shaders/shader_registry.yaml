@@ -72,10 +72,18 @@
   name: order_dithering
   vertex: assets/shaders/postprocess/screen_pos.vert
   fragment: assets/shaders/postprocess/order_dithering.frag
+  metal_prefix: orderDithering
+  metal_vertex_func: screenPosVertexMain
+  metal_attribute_size: 2,2
+  metal_attribute_pack: 1
 12:
   name: difference_of_gaussian_composite
   vertex: assets/shaders/postprocess/screen_pos.vert
   fragment: assets/shaders/postprocess/difference_of_gaussian_composite.frag
+  metal_prefix: differenceOfGaussianComposite
+  metal_vertex_func: screenPosVertexMain
+  metal_attribute_size: 2,2
+  metal_attribute_pack: 1
 13:
   name: 3d_lit_default
   vertex: assets/shaders/3d/lit_default.vert
