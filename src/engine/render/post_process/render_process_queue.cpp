@@ -252,6 +252,7 @@ void RenderProcessQueue::renderToScreen()
 
     if (Window::ins->isUsingOpenGL())
     {
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glViewport(0, 0, m_pWindow->GetActualWidth(), m_pWindow->GetActualHeight());
         glClear(GL_COLOR_BUFFER_BIT);
 

@@ -47,7 +47,7 @@
 8:
   name: bloom_composite
   vertex: assets/shaders/postprocess/screen_pos.vert
-  fragment: assets/shaders/postprocess/bloom_composite.frag 
+  fragment: assets/shaders/postprocess/bloom_composite.frag
   metal_prefix: bloomComposite
   metal_vertex_func: screenPosVertexMain
   metal_attribute_size: 2,2
