@@ -24,18 +24,34 @@
   name: bloom_filter
   vertex: assets/shaders/postprocess/screen_pos.vert
   fragment: assets/shaders/postprocess/bloom_filter.frag
+  metal_prefix: bloomFilter
+  metal_vertex_func: screenPosVertexMain
+  metal_attribute_size: 2,2
+  metal_attribute_pack: 1
 6:
   name: horizontal_blur
   vertex: assets/shaders/postprocess/screen_pos.vert
   fragment: assets/shaders/postprocess/horizontal_blur.frag
+  metal_prefix: horizontalBlur
+  metal_vertex_func: screenPosVertexMain
+  metal_attribute_size: 2,2
+  metal_attribute_pack: 1
 7:
   name: vertical_blur
   vertex: assets/shaders/postprocess/screen_pos.vert
   fragment: assets/shaders/postprocess/vertical_blur.frag
+  metal_prefix: verticleBlur
+  metal_vertex_func: screenPosVertexMain
+  metal_attribute_size: 2,2
+  metal_attribute_pack: 1
 8:
   name: bloom_composite
   vertex: assets/shaders/postprocess/screen_pos.vert
-  fragment: assets/shaders/postprocess/bloom_composite.frag
+  fragment: assets/shaders/postprocess/bloom_composite.frag 
+  metal_prefix: bloomComposite
+  metal_vertex_func: screenPosVertexMain
+  metal_attribute_size: 2,2
+  metal_attribute_pack: 1
 9:
   name: pure_texture
   vertex: assets/shaders/postprocess/screen_pos.vert
@@ -48,6 +64,10 @@
   name: split_texture
   vertex: assets/shaders/postprocess/screen_pos.vert
   fragment: assets/shaders/postprocess/split_texture.frag
+  metal_prefix: splitTexture
+  metal_vertex_func: screenPosVertexMain
+  metal_attribute_size: 2,2
+  metal_attribute_pack: 1
 11:
   name: order_dithering
   vertex: assets/shaders/postprocess/screen_pos.vert
