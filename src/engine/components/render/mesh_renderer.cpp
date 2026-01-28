@@ -59,6 +59,7 @@ void MeshRenderer::initShader(Shader* const pShader)
 void MeshRenderer::bindVertexArray(Shader* const pShader)
 {
     m_nIndiceCount = m_pMesh->m_nIndiceCount;
+    m_pDepthShader = ShaderLoader::getInstance()->getShader("3d_depth");
     
     if (Window::ins->isUsingOpenGL())
     {
@@ -110,11 +111,6 @@ void MeshRenderer::bindVertexArray(Shader* const pShader)
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     }
-#if __APPLE__
-    else if (Window::ins->isUsingMetal())
-    {
-    }
-#endif // __APPLE__
 }
 
 void MeshRenderer::bindDepthVertexArray()
@@ -129,7 +125,6 @@ void MeshRenderer::bindDepthVertexArray()
         glBindBuffer(GL_ARRAY_BUFFER, m_pMesh->m_nVertexBuffer);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_pMesh->m_nIndexBuffer);
 
-        m_pDepthShader = ShaderLoader::getInstance()->getShader("3d_depth");
         m_pDepthModelUniform = m_pDepthShader->getUniformHandle("u_Model");
         m_pLightMatrixUniform2 = m_pDepthShader->getUniformHandle("u_LightMatrix");
 
@@ -249,6 +244,19 @@ void MeshRenderer::draw()
             ntextureBitmask |= (1 << 2);
         }
 
+        DirectionLightComponent* pMainDirLight = LightManager::getInstance()->getMainDirectionLightComponent();
+        if (pMainDirLight && pMainDirLight->getShadowsEnabled())
+        {
+            pRenderCommandEncoder->setFragmentTexture(LightManager::getInstance()->getShadowDepthMapTextureMetal(), 3);
+            ntextureBitmask |= (1 << 3);
+
+            pRenderCommandEncoder->setVertexBytes(&pMainDirLight->getLightCastingMatrix(), sizeof(mat4x4), 3);
+            // if (m_pLightMatrixUniform1)
+            // {
+            //     glUniformMatrix4fv(m_pLightMatrixUniform1->m_nLocation, 1, GL_FALSE, (const GLfloat*) pMainDirLight->getLightCastingMatrix());
+            // }
+        }
+
         if (ntextureBitmask != 0)
         {
             pRenderCommandEncoder->setFragmentBytes(&ntextureBitmask, sizeof(int), 3);
@@ -293,6 +301,25 @@ void MeshRenderer::drawDepth()
 #if __APPLE__
     else if (Window::ins->isUsingMetal())
     {
+        MTL::RenderCommandEncoder* pRenderCommandEncoder = Window::ins->getCurrentFrameDepthRenderEncoder();
+
+        pRenderCommandEncoder->setRenderPipelineState(m_pDepthShader->getMetalPipelineState());
+        pRenderCommandEncoder->setVertexBuffer(m_pMesh->m_pMetalVertexBuffer, 0, 0);
+
+        mat4x4 MVP;
+        DirectionLightComponent* pMainDirLight = LightManager::getInstance()->getMainDirectionLightComponent();
+        mat4x4_mul(MVP, pMainDirLight->getLightCastingMatrix(), m_pNode->getWorldMatrix());
+        // mat4x4_mul(MVP, Camera::main->getViewProjectionMatrix(), m_pNode->getWorldMatrix());
+        pRenderCommandEncoder->setVertexBytes(&MVP, sizeof(mat4x4), 1);
+
+        pRenderCommandEncoder->drawIndexedPrimitives(
+            MTL::PrimitiveType::PrimitiveTypeTriangle,
+            NS_INT(m_nIndiceCount),
+            m_pMesh->m_metalIndexType,
+            m_pMesh->m_pMetalIndexBuffer,
+            NS_INT(0));
+        
+        INCREASE_DRAW_CALL_COUNT(m_nIndiceCount / 3);
     }
 #endif // __APPLE__
 }

@@ -38,22 +38,22 @@ void setupPostProcess()
         return;
     }
 
-    auto pGammaCorrection = new GammaCorrection(pQueue);
-    pGammaCorrection->setGamma(1.3f);
-    pGammaCorrection->setActive(true);
-    pQueue->addProcess(pGammaCorrection);
+    // auto pGammaCorrection = new GammaCorrection(pQueue);
+    // pGammaCorrection->setGamma(1.3f);
+    // pGammaCorrection->setActive(true);
+    // pQueue->addProcess(pGammaCorrection);
 
-    auto pDifferenceOfGaussian = new DifferenceOfGaussian(pQueue);
-    pDifferenceOfGaussian->setActive(true);
-    pQueue->addProcess(pDifferenceOfGaussian);
+    // auto pDifferenceOfGaussian = new DifferenceOfGaussian(pQueue);
+    // pDifferenceOfGaussian->setActive(true);
+    // pQueue->addProcess(pDifferenceOfGaussian);
 
-    auto pOrderDithering = new OrderDithering(pQueue);
-    pOrderDithering->setActive(true);
-    pQueue->addProcess(pOrderDithering);
+    // auto pOrderDithering = new OrderDithering(pQueue);
+    // pOrderDithering->setActive(true);
+    // pQueue->addProcess(pOrderDithering);
 
-    auto pBloomTest = new BloomTest(pQueue);
-    pBloomTest->setHighlightThreshold(0.95f);
-    pQueue->addProcess(pBloomTest);
+    // auto pBloomTest = new BloomTest(pQueue);
+    // pBloomTest->setHighlightThreshold(0.95f);
+    // pQueue->addProcess(pBloomTest);
 }
 
 void createDemo1()
@@ -407,7 +407,6 @@ void createLightingShadowDemo()
     }
     */
 
-    /*
     {
         Node* pDirectionLightNode = new Node(0, 10.f, 0.f);
         pDirectionLightNode->setName("Direction Light");
@@ -418,9 +417,12 @@ void createLightingShadowDemo()
         pPointLightComp->setIntensity(2.f);
         pDirectionLightNode->addComponent(pPointLightComp);
 
+        pDirectionLightNode->addComponent(new TwoPointsMovement(vec3{0.f, 10.f, 0.f}, vec3{0.f, 0.f, 0.f}, 10.f));
+
         pWorldScene->addNode(pDirectionLightNode);
     }
 
+    /*
     {
         Node* pDirectionLightNode = new Node(0, 9.f, 0.f);
         pDirectionLightNode->setName("Direction Light");

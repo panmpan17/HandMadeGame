@@ -338,9 +338,7 @@ void Window::bindMetalToGlfwWindow()
     pDepthOnlyAttach->setTexture(nullptr); // Lighting system will set the depth texture when render depth
     pDepthOnlyAttach->setLoadAction(MTL::LoadActionClear);
     pDepthOnlyAttach->setClearDepth(1.0);
-    pDepthOnlyAttach->setStoreAction(MTL::StoreActionDontCare);
-
-    m_pDepthOnlyRenderPassDescriptor->colorAttachments()->object(0)->setTexture(nullptr);
+    pDepthOnlyAttach->setStoreAction(MTL::StoreActionStore);
 }
 #endif
 
@@ -422,6 +420,13 @@ void Window::setupGameEngineRelatedObject()
     });
 
 #if IS_DEBUG_VERSION
+    InputManager::getInstance()->registerKeyPressCallback(KeyCode::KEY_FUNCTION_1, [this](bool pressed) {
+        if (pressed)
+        {
+            m_bShowDebugDepth = !m_bShowDebugDepth;
+        }
+    });
+
     InputManager::getInstance()->registerKeyPressCallback(KeyCode::KEY_FUNCTION_4, [](bool pressed) {
         if (pressed)
         {
@@ -498,6 +503,8 @@ void Window::mainLoop()
 {
     beforeLoop();
 
+    Shader* pPureColorTexture = ShaderLoader::getInstance()->getShader("depth_debug");
+
 #if IS_DEBUG_VERSION
     while (!glfwWindowShouldClose(m_pWindow) && !sm_bRestartRequested)
 #else
@@ -565,6 +572,21 @@ void Window::mainLoop()
             m_pCurrentCommandBuffer = m_pMetalCommandQueue->commandBuffer();
 
             drawFrame();
+
+            if (m_bShowDebugDepth)
+            {
+                setCurrentDrawingTexture(m_pCurrentDrawable->texture());
+
+                m_pCurrentFrameRenderEncoder->setRenderPipelineState(pPureColorTexture->getMetalPipelineState());
+                m_pCurrentFrameRenderEncoder->setVertexBuffer(m_pRenderProcessQueue->getMetalFullScreenVertexBuffer(), 0, 0);
+                m_pCurrentFrameRenderEncoder->setFragmentTexture(LightManager::getInstance()->getShadowDepthMapTextureMetal(), 0);
+                m_pCurrentFrameRenderEncoder->setFragmentSamplerState(Renderer::m_pLinearSampler, 0);
+
+                m_pCurrentFrameRenderEncoder->drawPrimitives(MTL::PrimitiveTypeTriangleStrip, NS::UInteger(0), NS::UInteger(4));
+
+                m_pCurrentFrameRenderEncoder->endEncoding();
+                m_pCurrentFrameRenderEncoder = nullptr;
+            }
 
             m_pCurrentCommandBuffer->presentDrawable(m_pCurrentDrawable);
             m_pCurrentCommandBuffer->commit();
@@ -697,15 +719,31 @@ void Window::drawFrame()
             glViewport(0, 0, LightManager::SHADOW_MAP_WIDTH, LightManager::SHADOW_MAP_HEIGHT);
             glBindFramebuffer(GL_FRAMEBUFFER, pLightManager->getShadowDepthMapFBO());
             glClear(GL_DEPTH_BUFFER_BIT);
+            glCullFace(GL_FRONT);
             m_pWorldScene->renderDepth();
+            glCullFace(GL_BACK);
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
         }
 #if __APPLE__
         else if (isUsingMetal())
         {
             m_pDepthOnlyRenderPassDescriptor->depthAttachment()->setTexture(pLightManager->getShadowDepthMapTextureMetal());
+
+            m_pCurrentFrameDepthRenderEncoder = m_pCurrentCommandBuffer->renderCommandEncoder(m_pDepthOnlyRenderPassDescriptor);
+            m_pCurrentFrameDepthRenderEncoder->setDepthStencilState(Renderer::m_pDepthOnStencilState);
+            m_pCurrentFrameDepthRenderEncoder->setCullMode(MTL::CullModeFront); // Use front-face culling for shadow maps to reduce shadow acne
+            m_pCurrentFrameDepthRenderEncoder->setFrontFacingWinding(MTL::WindingCounterClockwise);
+
+            m_pWorldScene->renderDepth();
+            m_pCurrentFrameDepthRenderEncoder->endEncoding();
+            m_pCurrentFrameDepthRenderEncoder = nullptr;
         }
 #endif // __APPLE__
+    }
+
+    if (m_bShowDebugDepth)
+    {
+        return;
     }
 
     if (m_bEnablePostProcess) // Enable post process

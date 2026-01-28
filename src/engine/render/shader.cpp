@@ -36,7 +36,8 @@ void readShaderFile(const std::string& strFolderPath, std::ostringstream& ss)
     auto oReader = FileReader(strFolderPath);
     if (!oReader.isOpen())
     {
-        throw std::runtime_error("Failed to open shader file: " + strFolderPath);
+        std::cout << "Failed to open shader file: " << strFolderPath << std::endl;
+        return;
     }
 
     {
@@ -157,7 +158,7 @@ Shader* Shader::loadFromMetalShader(MTL::Library* const pLibrary, MTL::Device* c
 
     MTL::Function* pVertexFunction = pLibrary->newFunction(NS::String::string(strFullVertexName.c_str(), NS::UTF8StringEncoding));
     MTL::Function* pFragmentFunction = pLibrary->newFunction(NS::String::string(strFullFragmentName.c_str(), NS::UTF8StringEncoding));
-    if (!pVertexFunction || !pFragmentFunction)
+    if (!pVertexFunction || (!pFragmentFunction && strFullFragmentName != "null"))
     {
         LOGLN("Failed to load Metal shader functions. {}: {}, {}: {}",
             strFullVertexName, pVertexFunction ? "Loaded" : "Not Found",
@@ -170,7 +171,17 @@ Shader* Shader::loadFromMetalShader(MTL::Library* const pLibrary, MTL::Device* c
     psoDesc->setFragmentFunction(pFragmentFunction);
 
     MTL::RenderPipelineColorAttachmentDescriptor* pColorAttachment = psoDesc->colorAttachments()->object(0);
-    pColorAttachment->setPixelFormat(MTL::PixelFormatBGRA8Unorm);
+
+    if (pFragmentFunction)
+    {
+        pColorAttachment->setPixelFormat(MTL::PixelFormatBGRA8Unorm);
+    }
+    else
+    {
+        psoDesc->setFragmentFunction(nullptr);
+        pColorAttachment->setPixelFormat(MTL::PixelFormatInvalid);
+        psoDesc->setDepthAttachmentPixelFormat(MTL::PixelFormatDepth32Float);
+    }
 
     if (oData.m_bTransparent)
     {

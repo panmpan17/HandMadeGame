@@ -21,6 +21,8 @@ public:
             pSamplerDesc->setSAddressMode(MTL::SamplerAddressModeClampToEdge);
             pSamplerDesc->setTAddressMode(MTL::SamplerAddressModeClampToEdge);
 
+            pSamplerDesc->setCompareFunction(MTL::CompareFunctionNever);
+
             m_pLinearSampler = pDevice->newSamplerState(pSamplerDesc);
 
             pSamplerDesc->release();

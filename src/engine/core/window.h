@@ -82,6 +82,7 @@ public:
 
     inline CA::MetalDrawable* getCurrentDrawable() const { return m_pCurrentDrawable; }
     inline MTL::RenderCommandEncoder* getCurrentFrameRenderEncoder() const { return m_pCurrentFrameRenderEncoder; }
+    inline MTL::RenderCommandEncoder* getCurrentFrameDepthRenderEncoder() const { return m_pCurrentFrameDepthRenderEncoder; }
 
     void setCurrentDrawingTexture(MTL::Texture* pTexture);
 #endif // __APPLE__
@@ -105,6 +106,7 @@ private:
 
     MTL::CommandBuffer* m_pCurrentCommandBuffer = nullptr;
     MTL::RenderCommandEncoder* m_pCurrentFrameRenderEncoder = nullptr;
+    MTL::RenderCommandEncoder* m_pCurrentFrameDepthRenderEncoder = nullptr;
     CA::MetalDrawable* m_pCurrentDrawable = nullptr;
 #endif // __APPLE__
 
@@ -134,6 +136,8 @@ private:
     FileWatchDog* m_pFileWatchDog = nullptr;
 
     CustomEvent<Vector2i> m_onWindowResize;
+
+    bool m_bShowDebugDepth = false;
 
 #if IS_DEBUG_VERSION
     bool m_bDrawGizmos = true;

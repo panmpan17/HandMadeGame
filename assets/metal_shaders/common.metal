@@ -9,6 +9,14 @@ struct VertexIn_Position2DAndUV {
     float2 texCoord [[attribute(1)]];
 };
 
+struct VertexIn_Lit {
+    metal::float3 position [[attribute(0)]];
+    metal::float2 texCoord [[attribute(1)]];
+    metal::float3 normal [[attribute(2)]];
+    metal::float3 tangent [[attribute(3)]];
+    metal::float3 bitangent [[attribute(4)]];
+};
+
 struct Uniform_ModelMatrix {
     metal::float4x4 modelMatrix;
 };

@@ -28,6 +28,11 @@ float shadowCalculation(vec4 lightSpacePos, vec3 normal, vec3 lightDir, float sh
     float closestDepth = texture(u_tex3, projCoords.xy).r;
     float currentDepth = projCoords.z;
 
+    if (currentDepth > 1.0)
+    {
+        return 0.0;
+    }
+
     // float bias = 0.005;
     float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);  
     float shadow = currentDepth - bias > closestDepth ? shadowIntensity : 0.0;

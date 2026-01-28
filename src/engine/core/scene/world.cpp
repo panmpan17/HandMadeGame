@@ -208,19 +208,15 @@ void WorldScene::renderTransparentObjects()
 
 void WorldScene::renderDepth()
 {
-    glCullFace(GL_FRONT);
-
     int nSize = m_oOpaqueDrawableArray.getCount();
     for (int i = 0; i < nSize; ++i)
     {
         IDrawable* pDrawable = m_oOpaqueDrawableArray.getElement(i);
         if (pDrawable)
         {
-            pDrawable->draw();
+            pDrawable->drawDepth();
         }
     }
-
-    glCullFace(GL_BACK);
 }
 
 void WorldScene::drawGizmos()

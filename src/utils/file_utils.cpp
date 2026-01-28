@@ -88,29 +88,15 @@ std::string FileUtils::getExecutableDirectory()
 
 FileReader::FileReader(const std::string& strPath)
 {
-    if (*strPath.begin() != '/')
-    {
-        std::string strFullPath = fs::path(FileUtils::getResourcesPath()).append(strPath).string();
-
-        if (fs::exists(strFullPath))
-        {
-            file.open(strFullPath);
-        }
-        else
-        {
-            std::cout << "File does not exist: " << strFullPath << std::endl;
-        }
-    }
-    else
-    {
-        if (fs::exists(strPath))
-        {
-            file.open(strPath);
-        }
-    }
+    read(strPath);
 }
 
-FileReader::FileReader(const std::string_view& strPath)
+FileReader::FileReader(std::string_view strPath)
+{
+    read(strPath);
+}
+
+void FileReader::read(std::string_view strPath)
 {
     if (*strPath.begin() != '/')
     {
@@ -122,7 +108,7 @@ FileReader::FileReader(const std::string_view& strPath)
         }
         else
         {
-            throw std::runtime_error("File does not exist: " + strFullPath);
+            std::cout << "File does not exist: " << strFullPath << std::endl;
         }
     }
     else
@@ -141,7 +127,7 @@ FileReader::FileReader(const std::string_view& strPath)
         }
         else
         {
-            throw std::runtime_error("File does not exist: " + std::string(strPath));
+            std::cout << "File does not exist: " << strPath << std::endl;
         }
     }
 }

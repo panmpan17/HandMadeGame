@@ -23,8 +23,8 @@ int main(int nArgumentCount, char* arrArguments[])
     registerSignalHandlers();
     // ColorPicker colorPicker;
 
-    try
-    {
+    // try
+    // {
         do
         {
             Window window;
@@ -60,12 +60,12 @@ int main(int nArgumentCount, char* arrArguments[])
 #else
         while (false);
 #endif
-    }
-    catch (const std::exception& e)
-    {
-        std::cerr << "main.cpp catch exception: " << e.what() << '\n';
-        return -1;
-    }
+    // }
+    // catch (const std::exception& e)
+    // {
+    //     std::cerr << "main.cpp catch exception: " << e.what() << '\n';
+    //     return -1;
+    // }
 
     return 0;
 }

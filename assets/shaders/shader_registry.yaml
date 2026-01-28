@@ -116,6 +116,10 @@
   name: 3d_depth
   vertex: assets/shaders/3d/depth.vert
   fragment: assets/shaders/3d/depth.frag
+  metal_prefix: DepthOnly3D
+  metal_fragment_func: null
+  metal_attribute_size: 2,2
+  metal_attribute_pack: 1
 18:
   name: simple_gizmos
   vertex: assets/shaders/3d/billboard.vert
@@ -149,4 +153,10 @@
   fragment: assets/shaders/colored_vertices.frag
   metal_prefix: coloredVertices
   metal_attribute_size: 2,3
+  metal_attribute_pack: 1
+22:
+  name: depth_debug
+  metal_prefix: debugDepth
+  metal_vertex_func: screenPosVertexMain
+  metal_attribute_size: 2,2
   metal_attribute_pack: 1
