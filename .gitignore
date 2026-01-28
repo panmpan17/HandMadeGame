@@ -16,3 +16,4 @@ xcode_proj/
 player_preferences.cfg
 crash_log.log
 utilites/outputs/
+.cache/

@@ -22,9 +22,8 @@ float shadowCalculation(metal::depth2d<float> shadowMap,
                          metal::float4 lightSpacePosition,
                          metal::float3 normal,
                          metal::float3 lightDir,
-                         float shadowBias)
+                         float shadowIntensity)
 {
-    // 1. Perspective Divide
     metal::float3 projCoords = lightSpacePosition.xyz / lightSpacePosition.w;
 
     // 2. Remap to [0, 1] Texture Space
@@ -34,15 +33,15 @@ float shadowCalculation(metal::depth2d<float> shadowMap,
     // Z: Metal Clip Space is ALREADY [0, 1], but usually we flip Y in Metal
     projCoords.y = 1.0 - projCoords.y; 
 
-    // 3. Out of bounds check (optional but good)
+
     if (projCoords.z > 1.0 || projCoords.x < 0.0 || projCoords.x > 1.0 || projCoords.y < 0.0 || projCoords.y > 1.0)
     {
-        return 0.0; // No shadow
+        return 0; // No shadow
     }
 
     // 4. Calculate Bias
     // Note: metal::max, not std::max
-    float bias = metal::max(shadowBias * (1.0 - metal::dot(normal, lightDir)), 0.005);
+    float bias = metal::max(0.05 * (1.0 - metal::dot(normal, lightDir)), 0.005);
     
     // 5. Hardware Sample Comparison
     // We subtract bias from the CURRENT depth before comparing.
@@ -56,9 +55,7 @@ float shadowCalculation(metal::depth2d<float> shadowMap,
         currentDepth
     );
 
-    // Note: This returns VISIBILITY (1.0 = Lit, 0.0 = Shadow)
-    // If you want "Shadow Amount", return (1.0 - shadowVisibility)
-    return 1.0 - shadowVisibility;
+    return shadowVisibility == 1.0 ? 0.0 : shadowIntensity;
 }
 
 
@@ -170,7 +167,7 @@ fragment float4 LitDefault3D_fragmentMain(VertexOut_Lit in [[stage_in]],
                                                in.lightSpacePosition, 
                                                normalDirection, 
                                                metal::normalize(-lightData.directionLights[0].direction.xyz), 
-                                               0.05);
+                                               1);
         noAmbientLightSum *= (1.0 - shadowFactor);
         // noAmbientLightSum = metal::float3(0, 0, 0);
     }

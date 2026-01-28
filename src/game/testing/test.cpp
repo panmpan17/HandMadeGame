@@ -417,8 +417,6 @@ void createLightingShadowDemo()
         pPointLightComp->setIntensity(2.f);
         pDirectionLightNode->addComponent(pPointLightComp);
 
-        pDirectionLightNode->addComponent(new TwoPointsMovement(vec3{0.f, 10.f, 0.f}, vec3{0.f, 0.f, 0.f}, 10.f));
-
         pWorldScene->addNode(pDirectionLightNode);
     }
 

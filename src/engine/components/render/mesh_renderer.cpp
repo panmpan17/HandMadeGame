@@ -9,7 +9,6 @@
 #include "../../render/shader.h"
 #include "../../render/shader_loader.h"
 #include "../../render/material.h"
-#include "../../render/renderer.h"
 #include "../../render/lighting/light_manager.h"
 #include "../../render/lighting/direction_light.h"
 #include "../../render/models/mesh.h"
@@ -59,7 +58,6 @@ void MeshRenderer::initShader(Shader* const pShader)
 void MeshRenderer::bindVertexArray(Shader* const pShader)
 {
     m_nIndiceCount = m_pMesh->m_nIndiceCount;
-    m_pDepthShader = ShaderLoader::getInstance()->getShader("3d_depth");
     
     if (Window::ins->isUsingOpenGL())
     {
@@ -116,6 +114,7 @@ void MeshRenderer::bindVertexArray(Shader* const pShader)
 void MeshRenderer::bindDepthVertexArray()
 {
     m_nIndiceCount = m_pMesh->m_nIndiceCount;
+    m_pDepthShader = ShaderLoader::getInstance()->getShader("3d_depth");
     
     if (Window::ins->isUsingOpenGL())
     {
@@ -125,8 +124,7 @@ void MeshRenderer::bindDepthVertexArray()
         glBindBuffer(GL_ARRAY_BUFFER, m_pMesh->m_nVertexBuffer);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_pMesh->m_nIndexBuffer);
 
-        m_pDepthModelUniform = m_pDepthShader->getUniformHandle("u_Model");
-        m_pLightMatrixUniform2 = m_pDepthShader->getUniformHandle("u_LightMatrix");
+        m_pDepthMVPUniform = m_pDepthShader->getUniformHandle("u_MVP");
 
         GLuint nVPosAttr = m_pDepthShader->getAttributeLocation("a_vPos");
 
@@ -276,19 +274,18 @@ void MeshRenderer::drawDepth()
 {
     ASSERT(m_pMesh, "Mesh must be set before drawing the mesh");
 
+    mat4x4 MVP;
+    DirectionLightComponent* pMainDirLight = LightManager::getInstance()->getMainDirectionLightComponent();
+    mat4x4_mul(MVP, pMainDirLight->getLightCastingMatrix(), m_pNode->getWorldMatrix());
+    // mat4x4_mul(MVP, Camera::main->getViewProjectionMatrix(), m_pNode->getWorldMatrix());
+
     if (Window::ins->isUsingOpenGL())
     {
         const mat4x4& local = m_pNode->getWorldMatrix();
 
         glUseProgram(m_pDepthShader->getProgram());
-
-        glUniformMatrix4fv(m_pDepthModelUniform->m_nLocation, 1, GL_FALSE, (const GLfloat*) local);
-
-        DirectionLightComponent* pMainDirLight = LightManager::getInstance()->getMainDirectionLightComponent();
-        if (pMainDirLight)
-        {
-            glUniformMatrix4fv(m_pLightMatrixUniform2->m_nLocation, 1, GL_FALSE, (const GLfloat*) pMainDirLight->getLightCastingMatrix());
-        }
+        
+        glUniformMatrix4fv(m_pDepthMVPUniform->m_nLocation, 1, GL_FALSE, (const GLfloat*) MVP);
 
         glBindVertexArray(m_nVertexArray);
         glDrawElements(GL_TRIANGLES, m_nIndiceCount, GL_UNSIGNED_INT, 0);
@@ -306,10 +303,6 @@ void MeshRenderer::drawDepth()
         pRenderCommandEncoder->setRenderPipelineState(m_pDepthShader->getMetalPipelineState());
         pRenderCommandEncoder->setVertexBuffer(m_pMesh->m_pMetalVertexBuffer, 0, 0);
 
-        mat4x4 MVP;
-        DirectionLightComponent* pMainDirLight = LightManager::getInstance()->getMainDirectionLightComponent();
-        mat4x4_mul(MVP, pMainDirLight->getLightCastingMatrix(), m_pNode->getWorldMatrix());
-        // mat4x4_mul(MVP, Camera::main->getViewProjectionMatrix(), m_pNode->getWorldMatrix());
         pRenderCommandEncoder->setVertexBytes(&MVP, sizeof(mat4x4), 1);
 
         pRenderCommandEncoder->drawIndexedPrimitives(

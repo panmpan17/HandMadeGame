@@ -118,7 +118,7 @@
   fragment: assets/shaders/3d/depth.frag
   metal_prefix: DepthOnly3D
   metal_fragment_func: null
-  metal_attribute_size: 2,2
+  metal_attribute_size: 3,2,3,3,3
   metal_attribute_pack: 1
 18:
   name: simple_gizmos
