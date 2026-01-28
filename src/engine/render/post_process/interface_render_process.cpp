@@ -58,6 +58,9 @@ void IRenderProcess::initializeRenderTextureAndFBO(GLuint& nFBO, GLuint& nTextur
     {
         LOGERR("Framebuffer is not complete!");
     }
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 #if __APPLE__

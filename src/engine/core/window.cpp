@@ -724,7 +724,11 @@ void Window::drawFrame()
     }
     else
     {
+        if (isUsingMetal())
+        {
         setCurrentDrawingTexture(m_pCurrentDrawable->texture());
+        }
+
         m_pWorldScene->render();
     }
 
@@ -738,9 +742,11 @@ void Window::drawFrame()
         drawIMGUIEditor();
     }
 
-
-    m_pCurrentFrameRenderEncoder->endEncoding();
-    m_pCurrentFrameRenderEncoder = nullptr;
+    if (isUsingMetal())
+    {
+        m_pCurrentFrameRenderEncoder->endEncoding();
+        m_pCurrentFrameRenderEncoder = nullptr;
+    }
 }
 
 void Window::drawFrameInfo()

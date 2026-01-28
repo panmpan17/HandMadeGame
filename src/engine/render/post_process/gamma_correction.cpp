@@ -77,8 +77,6 @@ void GammaCorrection::render()
         glBindVertexArray(0); // Unbind the vertex array
         glUseProgram(0);
 
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
         m_pProcessQueue->setFinalRenderTexture(m_nRenderTexture);
     }
 #if __APPLE__
