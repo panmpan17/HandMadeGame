@@ -12,6 +12,7 @@
 #include "../../engine/render/material_loader.h"
 #include "../../engine/render/skybox.h"
 #include "../../engine/render/models/assimp_model_reader.h"
+#include "../../engine/render/lighting/light_manager.h"
 #include "../../engine/render/lighting/direction_light.h"
 #include "../../engine/render/lighting/point_light.h"
 #include "../../engine/render/post_process/render_process_queue.h"
@@ -37,22 +38,22 @@ void setupPostProcess()
         return;
     }
 
-    auto pGammaCorrection = new GammaCorrection(pQueue);
-    pGammaCorrection->setGamma(1.3f);
-    pGammaCorrection->setActive(false);
-    pQueue->addProcess(pGammaCorrection);
+    // auto pGammaCorrection = new GammaCorrection(pQueue);
+    // pGammaCorrection->setGamma(1.3f);
+    // pGammaCorrection->setActive(true);
+    // pQueue->addProcess(pGammaCorrection);
 
-    auto pDifferenceOfGaussian = new DifferenceOfGaussian(pQueue);
-    pDifferenceOfGaussian->setActive(false);
-    pQueue->addProcess(pDifferenceOfGaussian);
+    // auto pDifferenceOfGaussian = new DifferenceOfGaussian(pQueue);
+    // pDifferenceOfGaussian->setActive(true);
+    // pQueue->addProcess(pDifferenceOfGaussian);
 
-    auto pOrderDithering = new OrderDithering(pQueue);
-    pOrderDithering->setActive(false);
-    pQueue->addProcess(pOrderDithering);
+    // auto pOrderDithering = new OrderDithering(pQueue);
+    // pOrderDithering->setActive(true);
+    // pQueue->addProcess(pOrderDithering);
 
-    auto pBloomTest = new BloomTest(pQueue);
-    pBloomTest->setHighlightThreshold(1.1f);
-    pQueue->addProcess(pBloomTest);
+    // auto pBloomTest = new BloomTest(pQueue);
+    // pBloomTest->setHighlightThreshold(0.95f);
+    // pQueue->addProcess(pBloomTest);
 }
 
 void createDemo1()
@@ -342,6 +343,8 @@ void createVisualEffectDemo()
 
 void createLightingShadowDemo()
 {
+    LightManager::getInstance()->setAmbientLightColor({0.2f, 0.2f, 0.2f});
+
     WorldScene* const pWorldScene = WorldScene::current;
 
     {
@@ -390,6 +393,7 @@ void createLightingShadowDemo()
         pWorldScene->addNode(pBackPackObj);
     }
 
+    /*
     {
         std::shared_ptr<Material> pMaterial = MaterialLoader::getInstance()->getMaterial("assets/materials/backpack.yaml");
         AssimpModelReader oModelReader("assets/models/back_pack.fbx", { pMaterial });
@@ -398,9 +402,10 @@ void createLightingShadowDemo()
         pBackPackFbx->setScale(0.01f);
         pBackPackFbx->setPosition(2.f, 0.f, 0.f);
         pBackPackFbx->setRotationQuaternion(Quaternion::fromEulerAngles({0.f, -105.f, 0.f}));
-        pBackPackFbx->addComponent(new Rotate3D(0.f, 20.f, 0.f));
+        // pBackPackFbx->addComponent(new Rotate3D(0.f, 20.f, 0.f));
         pWorldScene->addNode(pBackPackFbx);
     }
+    */
 
     {
         Node* pDirectionLightNode = new Node(0, 10.f, 0.f);
@@ -408,13 +413,44 @@ void createLightingShadowDemo()
         pDirectionLightNode->setRotationQuaternion(Quaternion::fromEulerAngles({-130.f, 30.f, 0.f}));
 
         DirectionLightComponent* pPointLightComp = new DirectionLightComponent();
-        pPointLightComp->setColor({1.f, 1.f, .5f});
+        pPointLightComp->setColor({1.f, 0.f, 0.f});
         pPointLightComp->setIntensity(2.f);
         pDirectionLightNode->addComponent(pPointLightComp);
 
         pWorldScene->addNode(pDirectionLightNode);
     }
 
+    /*
+    {
+        Node* pDirectionLightNode = new Node(0, 9.f, 0.f);
+        pDirectionLightNode->setName("Direction Light");
+        // pDirectionLightNode->setRotationQuaternion(Quaternion::fromEulerAngles({30.f, 45.f, 0.f}));
+        pDirectionLightNode->setRotationQuaternion(Quaternion::fromEulerAngles({-130.f, 45.f, 0.f}));
+
+        DirectionLightComponent* pPointLightComp = new DirectionLightComponent();
+        pPointLightComp->setColor({0.f, 1.f, 0.f});
+        pPointLightComp->setIntensity(2.f);
+        pDirectionLightNode->addComponent(pPointLightComp);
+
+        pWorldScene->addNode(pDirectionLightNode);
+    }
+
+    {
+        Node* pDirectionLightNode = new Node(0, 9.f, 0.f);
+        pDirectionLightNode->setName("Direction Light");
+        // pDirectionLightNode->setRotationQuaternion(Quaternion::fromEulerAngles({30.f, 45.f, 0.f}));
+        pDirectionLightNode->setRotationQuaternion(Quaternion::fromEulerAngles({-10.f, 10.f, 0.f}));
+
+        DirectionLightComponent* pPointLightComp = new DirectionLightComponent();
+        pPointLightComp->setColor({0.f, 0.f, 1.f});
+        pPointLightComp->setIntensity(2.f);
+        pDirectionLightNode->addComponent(pPointLightComp);
+
+        pWorldScene->addNode(pDirectionLightNode);
+    }
+    */
+
+    /*
     {
         std::shared_ptr<Material> pMaterial = MaterialLoader::getInstance()->getMaterial("assets/materials/water.yaml");
         Node* pWater = oBoxModelReader.instantiateCloneNode({ pMaterial });
@@ -423,6 +459,7 @@ void createLightingShadowDemo()
         pWater->setScale(10.f, 0.2f, 10.f);
         pWorldScene->addNode(pWater);
     }
+    */
 
     {
         // Shader* pParticleShader = ShaderLoader::getInstance()->getShader("particle_instance");
@@ -458,6 +495,21 @@ void createLightingShadowDemo()
 
         // pNode5->setActive(false);
         pWorldScene->addNode(pNode5);
+    }
+
+    {
+        Node* pPointLightNode = new Node();
+        pPointLightNode->setPosition(0.f, 3.f, 0.f);
+
+        PointLightComponent* pPointLightComp = new PointLightComponent();
+        pPointLightComp->setColor({1.f, 1.f, 0.f});
+        pPointLightComp->setIntensity(1.f);
+        pPointLightComp->setRange(1.f);
+        pPointLightNode->addComponent(pPointLightComp);
+
+        pPointLightNode->addComponent(new TwoPointsMovement(vec3{-6.f, 0, 2.f}, vec3{6.f, 0, 2.f}, 8.f));
+
+        pWorldScene->addNode(pPointLightNode);
     }
 }
 

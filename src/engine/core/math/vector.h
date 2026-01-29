@@ -49,6 +49,12 @@ public:
     Vector2 operator/(float fMultiplier) const { return Vector2(x / fMultiplier, y / fMultiplier); }
     Vector2& operator/=(float fMultiplier) { x /= fMultiplier; y /= fMultiplier; return *this; }
 
+    void copyValueFrom(const Vector2& vecOther)
+    {
+        x = vecOther.x;
+        y = vecOther.y;
+    }
+
     static Vector2 lerp(const Vector2& vecStart, const Vector2& vecEnd, float fT)
     {
         return Vector2(
@@ -104,6 +110,13 @@ public:
 
     Vector3 operator/(float fMultiplier) const { return Vector3(x / fMultiplier, y / fMultiplier, z / fMultiplier); }
     Vector3& operator/=(float fMultiplier) { x /= fMultiplier; y /= fMultiplier; z /= fMultiplier; return *this; }
+
+    void copyValueFrom(const Vector3& vecOther)
+    {
+        x = vecOther.x;
+        y = vecOther.y;
+        z = vecOther.z;
+    }
 
     static Vector3 lerp(const Vector3& vecStart, const Vector3& vecEnd, float fT)
     {

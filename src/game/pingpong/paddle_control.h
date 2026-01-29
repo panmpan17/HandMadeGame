@@ -11,7 +11,7 @@ enum class PaddleControlType
 };
 
 // class PaddleControl
-class PaddleControl : public Component
+class PaddleControl : public NodeComponent
 {
 public:
     PaddleControl(const Box& oBox, PaddleControlType eControlType, float fMaxSpeed = 5.0f);

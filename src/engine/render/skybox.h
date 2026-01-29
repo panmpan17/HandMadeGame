@@ -3,6 +3,10 @@
 #include <string_view>
 #include <initializer_list>
 
+#if __APPLE__
+#include <Metal/Metal.hpp>
+#endif // __APPLE__
+
 
 class Shader;
 class ShaderUniformHandle;
@@ -25,4 +29,13 @@ private:
 
     void initShader(Shader* const pShader);
     void bindVertexArray();
+
+    void drawWithOpenGL();
+
+#if __APPLE__
+    MTL::Texture* m_pSkyboxMetalTexture = nullptr;
+    MTL::Buffer* m_pMetalVertexBuffer = nullptr;
+
+    void drawWithMetal();
+#endif // __APPLE__
 };

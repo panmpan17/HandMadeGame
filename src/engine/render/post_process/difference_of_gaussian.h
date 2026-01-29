@@ -48,6 +48,15 @@ private:
     GLuint m_nFBOID_Final = 0;
     GLuint m_nRenderTexture_Final = 0;
 
+#if __APPLE__
+    MTL::Texture* m_pOriginalRenderTexture_Metal = nullptr;
+    MTL::Texture* m_pRenderTexture_Blur1_Horizontal_Metal = nullptr;
+    MTL::Texture* m_pRenderTexture_Blur1_Vertical_Metal = nullptr;
+    MTL::Texture* m_pRenderTexture_Blur2_Horizontal_Metal = nullptr;
+    MTL::Texture* m_pRenderTexture_Blur2_Vertical_Metal = nullptr;
+    MTL::Texture* m_pRenderTexture_Final_Metal = nullptr;
+#endif // __APPLE__
+
     int m_nRenderWidth, m_nRenderHeight;
 
     float m_fBlurRadius1 = 2.0f;
@@ -78,9 +87,9 @@ private:
     void renderHorizontalBlurOpenGL(GLuint nFBO, GLuint nOutputTexture, GLuint nInputTexture, float fBlurRadius, float fBlurSigma);
     void renderVerticalBlurOpenGL(GLuint nFBO, GLuint nOutputTexture, GLuint nInputTexture, float fBlurRadius, float fBlurSigma);
 
-    void renderBlur1Vertical();
-
-    void renderBlur2Vertical();
+#if __APPLE__
+    void renderBlurMetal(Shader* pShader, MTL::Texture* pOutputTexture, MTL::Texture* pInputTexture, int nSize, float fBlurRadius, float fBlurSigma);
+#endif // __APPLE__
 
     void renderComposite();
 };

@@ -52,6 +52,8 @@ def pretty_print_crash_trace(trace: str):
         function_part = line[:first_space_index]
 
         second_space_index = line.find(") (", first_space_index + 1)
+        if second_space_index == -1:
+            second_space_index = line.find(") +", first_space_index + 1)
         file_part = line[second_space_index + 2:]
 
         print(f"{get_pretty_function_name(function_part)} {get_pretty_file_name(file_part)}")

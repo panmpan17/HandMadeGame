@@ -12,6 +12,7 @@ struct ShaderRegisteryData
 {
     int nCurrentShaderId = -1;
     std::string m_strName;
+    bool m_bTransparent = false;
 
     // OpenGL
     std::string m_strVertexPath;
@@ -20,15 +21,29 @@ struct ShaderRegisteryData
     GLuint nLightUBOIndex = GL_INVALID_INDEX;
     GLuint nTimeDataUBOIndex = GL_INVALID_INDEX;
 
+    // Metal
+    std::string m_strMetalShaderPrefix;
+    std::string m_strMetalVertexShaderFunc;
+    std::string m_strMetalFragmentShaderFunc;
+    std::vector<int> m_metalAttributeSizes;
+    bool m_bMetalAttributePack = false;
+
     void reset()
     {
         nCurrentShaderId = -1;
         m_strName.clear();
+        m_bTransparent = false;
+
         m_strVertexPath.clear();
         m_strFragmentPath.clear();
         nCameraUBOIndex = GL_INVALID_INDEX;
         nLightUBOIndex = GL_INVALID_INDEX;
         nTimeDataUBOIndex = GL_INVALID_INDEX;
+
+        m_strMetalShaderPrefix.clear();
+        m_strMetalVertexShaderFunc.clear();
+        m_strMetalFragmentShaderFunc.clear();
+        m_metalAttributeSizes.clear();
     }
 };
 
@@ -39,9 +54,10 @@ public:
     inline static ShaderLoader* getInstance() { return ins; }
 
     inline static void Initialize() { if (!ins) ins = new ShaderLoader(); }
+    static void Cleanup() { if (ins) { delete ins; ins = nullptr; } }
 
     Shader* getShader(int nId) const;
-    Shader* getShader(const std::string_view& strName) const;
+    Shader* getShader(const std::string& strName) const;
 
     void reloadAllShaders();
 

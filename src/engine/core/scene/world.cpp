@@ -3,9 +3,11 @@
 #include <glad/gl.h>
 #include "node.h"
 #include "../camera.h"
+#include "../window.h"
 #include "../math/random.h"
 #include "../serialization/serializer.h"
 #include "../../render/skybox.h"
+#include "../../render/renderer.h"
 #include "../../components/input/first_person_free_control_camera.h"
 #include "../../components/drawable_interface.h"
 #include "../../../editor/gizmos.h"
@@ -76,7 +78,7 @@ void WorldScene::readFromFiles(const std::string_view& strFilePath)
                 addNode(pNode);
             }
         }
-        else if (Component* pComponent = dynamic_cast<Component*>(pObject))
+        else if (NodeComponent* pComponent = dynamic_cast<NodeComponent*>(pObject))
         {
             pCurrentNode->addComponent(pComponent);
         }
@@ -123,9 +125,25 @@ void WorldScene::update(float fDeltatime)
 
 void WorldScene::render()
 {
-    glEnable(GL_DEPTH_TEST);
-    glDepthMask(GL_TRUE);
-    glCullFace(GL_BACK);
+    bool bUsingOpenGL = Window::ins->isUsingOpenGL();
+    bool bUsingMetal = Window::ins->isUsingMetal();
+
+    if (bUsingOpenGL)
+    {
+        glEnable(GL_DEPTH_TEST);
+        glDepthMask(GL_TRUE);
+        glCullFace(GL_BACK);
+        glFrontFace(GL_CCW);
+    }
+#if __APPLE__
+    else if (bUsingMetal)
+    {
+        MTL::RenderCommandEncoder* pRenderEncoder = Window::ins->getCurrentFrameRenderEncoder();
+        pRenderEncoder->setDepthStencilState(Renderer::m_pDepthOnStencilState);
+        pRenderEncoder->setCullMode(MTL::CullModeBack);
+        pRenderEncoder->setFrontFacingWinding(MTL::WindingCounterClockwise);
+    }
+#endif // __APPLE__
 
     int nSize = m_oOpaqueDrawableArray.getCount();
     for (int i = 0; i < nSize; ++i)
@@ -137,15 +155,32 @@ void WorldScene::render()
         }
     }
 
-
-    glDepthMask(GL_FALSE);
-
     if (m_pSkybox)
     {
         m_pSkybox->draw();
     }
 
-    glEnable(GL_BLEND);
+    renderTransparentObjects();
+}
+
+void WorldScene::renderTransparentObjects()
+{
+    bool bUsingOpenGL = Window::ins->isUsingOpenGL();
+    bool bUsingMetal = Window::ins->isUsingMetal();
+
+    if (bUsingOpenGL)
+    {
+        glDepthMask(GL_FALSE);
+        glEnable(GL_BLEND);
+    }
+#if __APPLE__
+    else if (bUsingMetal)
+    {
+        MTL::RenderCommandEncoder* pRenderEncoder = Window::ins->getCurrentFrameRenderEncoder();
+        pRenderEncoder->setDepthStencilState(Renderer::m_pDepthOffStencilState);
+
+    }
+#endif // __APPLE__
 
     int nTransparentSize = m_oTransparentDrawableArray.getCount();
     for (int i = 0; i < nTransparentSize; ++i)
@@ -157,25 +192,31 @@ void WorldScene::render()
         }
     }
 
-    glDisable(GL_BLEND);
-    glDepthMask(GL_TRUE);
+    if (bUsingOpenGL)
+    {
+        glDepthMask(GL_TRUE);
+        glDisable(GL_BLEND);
+    }
+#if __APPLE__
+    else if (bUsingMetal)
+    {
+        MTL::RenderCommandEncoder* pRenderEncoder = Window::ins->getCurrentFrameRenderEncoder();
+        pRenderEncoder->setDepthStencilState(Renderer::m_pDepthOnStencilState);
+    }
+#endif // __APPLE__
 }
 
 void WorldScene::renderDepth()
 {
-    glCullFace(GL_FRONT);
-
     int nSize = m_oOpaqueDrawableArray.getCount();
     for (int i = 0; i < nSize; ++i)
     {
         IDrawable* pDrawable = m_oOpaqueDrawableArray.getElement(i);
         if (pDrawable)
         {
-            pDrawable->draw();
+            pDrawable->drawDepth();
         }
     }
-
-    glCullFace(GL_BACK);
 }
 
 void WorldScene::drawGizmos()

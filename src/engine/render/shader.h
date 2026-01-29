@@ -17,6 +17,12 @@ inline constexpr std::string_view SHADER_GLOBAL_UNIFORM_CAMERA_MATRICES = "Camer
 inline constexpr std::string_view SHADER_GLOBAL_UNIFORM_LIGHTING_DATA = "LightData";
 inline constexpr std::string_view SHADER_GLOBAL_UNIFORM_TIME_DATA = "TimeData";
 
+#if __APPLE__
+#include <Foundation/Foundation.hpp>
+#include <Metal/Metal.hpp>
+#include <QuartzCore/QuartzCore.hpp>
+#endif
+
 
 struct ShaderRegisteryData;
 class Image;
@@ -24,7 +30,7 @@ class Image;
 
 struct ShaderUniformHandle
 {
-    GLuint m_nLocation;
+    GLuint m_nLocation = GL_INVALID_INDEX;
     std::string m_strName;
 
     static bool sendData(const ShaderUniformHandle* const pHandle, const mat4x4& matrix);
@@ -38,6 +44,10 @@ class Shader
 {
 public:
     static Shader* loadFromOpenGLShader(const ShaderRegisteryData& pData);
+
+#if __APPLE__
+    static Shader* loadFromMetalShader(MTL::Library* const pLibrary, MTL::Device* const pDevice, const ShaderRegisteryData& oData);
+#endif // __APPLE__
 
     ~Shader();
 
@@ -63,6 +73,8 @@ public:
     void setTimeDataUBOBindingPoint(GLuint nBindingPoint);
     void reloadTimeDataUBOBinding();
 
+    inline bool isTransparent() const { return m_bTransparent; }
+
 protected:
     Shader() {}
 
@@ -84,4 +96,15 @@ protected:
     int m_nUniformHandleCount = 0;
 
     GLuint getUniformLocation(const std::string& name) const;
+    GLuint getUniformLocation(const std::string_view& name) const;
+
+    bool m_bTransparent = false;
+
+#if __APPLE__
+public:
+    inline MTL::RenderPipelineState* getMetalPipelineState() const { return m_pPSO; }
+
+protected:
+    MTL::RenderPipelineState* m_pPSO = nullptr;
+#endif // __APPLE__
 };

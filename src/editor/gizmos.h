@@ -5,8 +5,12 @@
 #include "../engine/core/math/color.h"
 #include "../engine/core/math/quaternion.h"
 
+#if __APPLE__
+#include <Metal/Metal.hpp>
+#endif // __APPLE__
 
-class Component;
+
+class NodeComponent;
 class Shader;
 class ShaderUniformHandle;
 
@@ -18,7 +22,7 @@ struct ImageGizmosData
     Vector3 m_vecPosition;
     Vector3 m_vecColor;
     std::string_view m_strImagePath;
-    Component* m_pAttachedComponent = nullptr; // Optional: to link gizmo to a specific component
+    NodeComponent* m_pAttachedComponent = nullptr; // Optional: to link gizmo to a specific component
 };
 
 struct CircleGizmosData
@@ -65,11 +69,19 @@ public:
             ins = new GizmosManager();
         }
     }
+    static void Cleanup()
+    {
+        if (ins)
+        {
+            delete ins;
+            ins = nullptr;
+        }
+    }
 
     void clearAllGizmos();
 
-    void addImageGizmos(Component* const pComponent, const Vector3& vecPosition, const std::string_view& m_strImagePath);
-    void addImageGizmos(Component* const pComponent, const Vector3& vecPosition, const std::string_view& m_strImagePath, const Vector3& vecColor);
+    void addImageGizmos(NodeComponent* const pComponent, const Vector3& vecPosition, const std::string_view& m_strImagePath);
+    void addImageGizmos(NodeComponent* const pComponent, const Vector3& vecPosition, const std::string_view& m_strImagePath, const Vector3& vecColor);
 
     void addCircleGizmos(const Vector3& vecPosition, const Quaternion& rotation, float fRadius);
     void addCircleGizmos(const Vector3& vecPosition, const Quaternion& rotation, float fRadius, const Color& vecColor);
@@ -105,6 +117,10 @@ private:
     GLuint m_nImageGizmosVertexBuffer = 0;
     GLuint m_nImageGizmosVertexArray = 0;
 
+#if __APPLE__
+    MTL::Buffer* m_pImageGizmosMetalVertexBuffer = nullptr;
+#endif // __APPLE__
+
     void initImageGizmosShaderAndBuffer();
     void drawImageGizmos();
 #pragma endregion
@@ -124,6 +140,10 @@ private:
     GLuint m_nCircleGizmosVertexBuffer = 0;
     GLuint m_nCircleGizmosVertexArray = 0;
 
+#if __APPLE__
+    MTL::Buffer* m_pCircleGizmosMetalVertexBuffer = nullptr;
+#endif // __APPLE__
+
     void initCircleGizmosShaderAndBuffer();
     void drawCircleGizmos();
 
@@ -135,6 +155,10 @@ private:
 
     GLuint m_nSphereGizmosVertexBuffer = 0;
     GLuint m_nSphereGizmosVertexArray = 0;
+
+#if __APPLE__
+    MTL::Buffer* m_pSphereGizmosMetalVertexBuffer = nullptr;
+#endif // __APPLE__
 
     void initSphereGizmosShaderAndBuffer();
     void drawSphereGizmos();
@@ -148,6 +172,10 @@ private:
     GLuint m_nRectangleGizmosVertexBuffer = 0;
     GLuint m_nRectangleGizmosVertexArray = 0;
 
+#if __APPLE__
+    MTL::Buffer* m_pRectangleGizmosMetalVertexBuffer = nullptr;
+#endif // __APPLE__
+
     void initRectangleGizmosShaderAndBuffer();
     void drawRectangleGizmos();
 
@@ -160,10 +188,19 @@ private:
     GLuint m_nCubeGizmosVertexBuffer = 0;
     GLuint m_nCubeGizmosVertexArray = 0;
 
+#if __APPLE__
+    MTL::Buffer* m_pCubeGizmosMetalVertexBuffer = nullptr;
+#endif // __APPLE__
+
     void initCubeGizmosShaderAndBuffer();
     void drawCubeGizmos();
 #pragma endregion
 
 
     void onMouseClickCheck(bool bPressed);
+
+    void initMeshBufferUsingOpenGL(const std::string_view& strFilePath, int& nVertexCount, GLuint& nVertexBuffer, GLuint& nVertxArray);
+#if __APPLE__
+    void initMeshBufferUsingMetal(const std::string_view& strFilePath, int& nVertexCount, MTL::Buffer*& pMetalVertexBuffer);
+#endif // __APPLE__
 };

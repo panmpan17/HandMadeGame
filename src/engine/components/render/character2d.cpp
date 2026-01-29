@@ -14,7 +14,7 @@ void Character2d::onStart()
         m_nIdleAnimationIndex = m_pAnimation->getAnimationIndexByName("idle");
         m_nWalkAnimationIndex = m_pAnimation->getAnimationIndexByName("walk");
         
-        InputManager::getInstance()->registerKeyPressCallback(KeyCode::KEY_D, [this](bool bPressed) {
+        InputManager::getInstance()->registerKeyPressCallback(KeyCode::KEY_F, [this](bool bPressed) {
             if (bPressed) {
                 m_pAnimation->playAnimationInfo(m_nWalkAnimationIndex);
             } else {
@@ -31,7 +31,7 @@ void Character2d::serializeToWrapper(DataSerializer& serializer) const
 
 bool Character2d::deserializeField(DataDeserializer& deserializer, const std::string_view& strFieldName, const std::string_view& strFieldValue)
 {
-    if (Component::deserializeField(deserializer, strFieldName, strFieldValue))
+    if (NodeComponent::deserializeField(deserializer, strFieldName, strFieldValue))
     {
         return true;
     }

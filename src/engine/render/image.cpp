@@ -5,48 +5,59 @@
 #include <GLFW/glfw3.h>
 #include <assimp/scene.h>
 
+#include "../core/window.h"
+
 #include "../../utils/filesystem.h"
 #include "../../utils/file_utils.h"
 #include "../core/debug_macro.h"
 
 
-Image::Image(const std::string& strPath, bool flipVertically/* = true */)
+Image::Image(const std::string& strPath, bool flipVertically/* = true */) : m_strPath(strPath)
 {
     stbi_set_flip_vertically_on_load(flipVertically);
-
-    m_strPath = strPath;
-
-    if (*strPath.begin() != '/')
-    {
-        std::string strFullPath = fs::path(FileUtils::getResourcesPath()).append(strPath).string();
-
-        m_pData = stbi_load(strFullPath.c_str(), &m_nWidth, &m_nHeight, &m_nChannels, 0);
-        if (!m_pData)
-        {
-            LOGERR("Failed to load image: {}", strFullPath);
-        }
-    }
-    else
-    {
-        m_pData = stbi_load(strPath.c_str(), &m_nWidth, &m_nHeight, &m_nChannels, 0);
-        if (!m_pData)
-        {
-            LOGERR("Failed to load image: {}", strPath);
-        }
-    }
+    configureAndLoadToGPU();
 }
 
-Image::Image(const std::string_view& strPath, bool flipVertically/* = true */)
+Image::Image(const std::string_view& strPath, bool flipVertically/* = true */) : m_strPath(std::string(strPath))
 {
     stbi_set_flip_vertically_on_load(flipVertically);
+    configureAndLoadToGPU();
+}
 
-    m_strPath = strPath;
+void Image::configureAndLoadToGPU()
+{
+    int nForcedChannels = 0;
 
-    if (*strPath.begin() != '/')
+#if __APPLE__
+    if (Window::ins->isUsingMetal())
     {
-        std::string strFullPath = fs::path(FileUtils::getResourcesPath()).append(strPath).string();
+        if (memcmp(m_strPath.c_str() + m_strPath.size() - 4, ".jpg", 4) == 0
+            || memcmp(m_strPath.c_str() + m_strPath.size() - 5, ".jpeg", 5) == 0)
+        {
+            nForcedChannels = 4;
+        }
+    }
+#endif
 
-        m_pData = stbi_load(strFullPath.c_str(), &m_nWidth, &m_nHeight, &m_nChannels, 0);
+    loadFileToGPU(nForcedChannels);
+
+#if __APPLE__
+    if (Window::ins->isUsingMetal() && (m_nChannels == 3 && nForcedChannels != 4))
+    {
+        freeCPUData();
+        nForcedChannels = 4;
+        loadFileToGPU(nForcedChannels);
+    }
+#endif
+}
+
+void Image::loadFileToGPU(int nDesiredChannels)
+{
+    if (*m_strPath.begin() != '/')
+    {
+        std::string strFullPath = fs::path(FileUtils::getResourcesPath()).append(m_strPath).string();
+
+        m_pData = stbi_load(strFullPath.c_str(), &m_nWidth, &m_nHeight, &m_nChannels, nDesiredChannels);
         if (!m_pData)
         {
             LOGERR("Failed to load image: {}", strFullPath);
@@ -54,13 +65,17 @@ Image::Image(const std::string_view& strPath, bool flipVertically/* = true */)
     }
     else
     {
-        m_pData = stbi_load(strPath.data(), &m_nWidth, &m_nHeight, &m_nChannels, 0);
+        m_pData = stbi_load(m_strPath.c_str(), &m_nWidth, &m_nHeight, &m_nChannels, nDesiredChannels);
         if (!m_pData)
         {
-            LOGERR("Failed to load image: {}", strPath);
+            LOGERR("Failed to load image: {}", m_strPath);
         }
     }
 
+    if (m_nChannels != nDesiredChannels && nDesiredChannels != 0)
+    {
+        m_nChannels = nDesiredChannels;
+    }
 }
 
 Image::Image(const aiTexture* pAiTexture, const char* strName, bool flipVertically/* = true */)
@@ -95,6 +110,11 @@ Image::Image(const aiTexture* pAiTexture, const char* strName, bool flipVertical
         m_pData = new unsigned char[nDataSize];
         memcpy(m_pData, pAiTexture->pcData, nDataSize);
     }
+}
+
+Image::Image(int nWidth, int nHeight, int nChannels, unsigned char* pData)
+    : m_nWidth(nWidth), m_nHeight(nHeight), m_nChannels(nChannels), m_pData(pData)
+{
 }
 
 Image::~Image()
@@ -140,6 +160,45 @@ void Image::loadTextureToGL()
     
     glBindTexture(GL_TEXTURE_2D, 0); // Unbind the texture
 }
+
+#if __APPLE__
+void Image::loadTextureToMetal()
+{
+    MTL::PixelFormat pixelFormat = MTL::PixelFormatInvalid;
+
+    switch (m_nChannels)
+    {
+        case 4:
+            pixelFormat = MTL::PixelFormat::PixelFormatRGBA8Unorm;
+            break;
+        case 3:
+            LOGERR("Metal does not support 3-channel textures directly. Please convert to 4 channels.: {}", m_strPath);
+            return;
+        case 2:
+            pixelFormat = MTL::PixelFormat::PixelFormatRG8Unorm;
+            break;
+        case 1:
+            pixelFormat = MTL::PixelFormat::PixelFormatR8Unorm;
+            break;
+        default:
+            LOGERR("Unsupported number of channels ({}) in image: {}", m_nChannels, m_strPath);
+            return;
+    }
+
+    MTL::TextureDescriptor* pTextureDescriptor = MTL::TextureDescriptor::alloc()->init();
+    pTextureDescriptor->setPixelFormat(pixelFormat);
+    pTextureDescriptor->setWidth(static_cast<NS::UInteger>(m_nWidth));
+    pTextureDescriptor->setHeight(static_cast<NS::UInteger>(m_nHeight));
+    pTextureDescriptor->setUsage(MTL::TextureUsageShaderRead);
+
+    m_pMetalTexture = Window::ins->getMetalDevice()->newTexture(pTextureDescriptor);
+
+    MTL::Region region = MTL::Region::Make2D(0, 0, static_cast<NS::UInteger>(m_nWidth), static_cast<NS::UInteger>(m_nHeight));
+    m_pMetalTexture->replaceRegion(region, 0, m_pData, static_cast<NS::UInteger>(m_nWidth * m_nChannels));
+
+    pTextureDescriptor->release();
+}
+#endif
 
 void Image::freeCPUData()
 {

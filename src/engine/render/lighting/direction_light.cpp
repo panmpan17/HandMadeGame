@@ -2,14 +2,8 @@
 
 #include <glad/gl.h>
 #include "light_manager.h"
-#include "../vertex.h"
-#include "../shader.h"
-#include "../shader_loader.h"
-#include "../image_loader.h"
-#include "../../core/window.h"
-#include "../../core/camera.h"
-#include "../../core/debug_macro.h"
 #include "../../core/serialization/serializer.h"
+#include "../../core/window.h"
 #include "../../../editor/inspector_helper.h"
 #include "../../../editor/gizmos.h"
 
@@ -40,7 +34,7 @@ void DirectionLightComponent::onStart()
 
 bool DirectionLightComponent::deserializeField(DataDeserializer& deserializer, const std::string_view& strFieldName, const std::string_view& strFieldValue)
 {
-    if (Component::deserializeField(deserializer, strFieldName, strFieldValue)) return true;
+    if (NodeComponent::deserializeField(deserializer, strFieldName, strFieldValue)) return true;
 
     DESERIALIZE_FIELD(m_color);
     DESERIALIZE_FIELD(m_intensity);
@@ -60,6 +54,35 @@ void DirectionLightComponent::serializeToWrapper(DataSerializer& serializer) con
     serializer.ADD_ATTRIBUTES(m_fShadowIntensity);
 }
 
+void mat4x4_ortho_metal(mat4x4 M, float l, float r, float b, float t, float n, float f) 
+{
+    float ral = r + l;
+    float rsl = r - l;
+    float tab = t + b;
+    float tsb = t - b;
+    float fan = f + n;
+    float fsn = f - n;
+
+    M[0][0] = 2.0f / rsl;
+    M[0][1] = 0.0f;
+    M[0][2] = 0.0f;
+    M[0][3] = 0.0f;
+
+    M[1][0] = 0.0f;
+    M[1][1] = 2.0f / tsb;
+    M[1][2] = 0.0f;
+    M[1][3] = 0.0f;
+
+    M[2][0] = 0.0f;
+    M[2][1] = 0.0f;
+    M[2][2] = 1.0f / (f - n); // <--- Crucial Difference: 1.0, not -2.0
+    M[2][3] = 0.0f;
+
+    M[3][0] = -ral / rsl;
+    M[3][1] = -tab / tsb;
+    M[3][2] = -n / (f - n);   // <--- Crucial Difference
+    M[3][3] = 1.0f;
+}
 
 const mat4x4& DirectionLightComponent::getLightCastingMatrix()
 {
@@ -71,7 +94,10 @@ const mat4x4& DirectionLightComponent::getLightCastingMatrix()
         float farPlane = 30.0f;
 
         mat4x4 matOrtho;
-        mat4x4_ortho(matOrtho, -orthoSize, orthoSize, -orthoSize, orthoSize, nearPlane, farPlane);
+        if (Window::ins->isUsingOpenGL())
+            mat4x4_ortho(matOrtho, -orthoSize, orthoSize, -orthoSize, orthoSize, nearPlane, farPlane);
+        else
+            mat4x4_ortho_metal(matOrtho, -orthoSize, orthoSize, -orthoSize, orthoSize, nearPlane, farPlane);
 
         mat4x4 matView;
 

@@ -3,6 +3,10 @@
 #include <string>
 #include <unordered_map>
 
+#if __APPLE__
+#include <Metal/Metal.hpp>
+#endif // __APPLE__
+
 typedef unsigned int GLuint;
 
 class aiTexture;
@@ -14,12 +18,16 @@ public:
     Image(const std::string& strPath, bool flipVertically = true);
     Image(const std::string_view& strPath, bool flipVertically = true);
     Image(const aiTexture* pAiTexture, const char* strName, bool flipVertically = true);
+    Image(int nWidth, int nHeight, int nChannels, unsigned char* pData);
     ~Image();
 
     inline int getWidth() const { return m_nWidth; }
     inline int getHeight() const { return m_nHeight; }
     inline unsigned char* getData() const { return m_pData; }
     inline GLuint getTextureID() const { return m_nTextureID; }
+#if __APPLE__
+    inline MTL::Texture* getMetalTexture() const { return m_pMetalTexture; }
+#endif
 
     inline bool isCPULoaded() const { return m_pData != nullptr; }
     inline bool isGPULoaded() const { return m_nTextureID != 0; }
@@ -27,6 +35,10 @@ public:
     inline const std::string& getPath() const { return m_strPath; }
 
     void loadTextureToGL();
+#if __APPLE__
+    void loadTextureToMetal();
+#endif
+
     void freeCPUData();
 
 private:
@@ -34,6 +46,14 @@ private:
     int m_nHeight;
     int m_nChannels;
     unsigned char* m_pData;
+
     GLuint m_nTextureID = 0; // Texture ID for OpenGL texture binding
+#if __APPLE__
+    MTL::Texture* m_pMetalTexture = nullptr; // Texture for Metal
+#endif
+
     std::string m_strPath;
+
+    void configureAndLoadToGPU();
+    void loadFileToGPU(int nDesiredChannels = 0);
 };

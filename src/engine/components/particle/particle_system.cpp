@@ -6,6 +6,7 @@
 #include "../../render/shader_loader.h"
 #include "../../render/image.h"
 #include "../../render/material.h"
+#include "../../render/renderer.h"
 #include "../../core/debug_macro.h"
 #include "../../core/scene/node.h"
 #include "../../core/camera.h"
@@ -72,115 +73,185 @@ ParticleSystem::~ParticleSystem()
         }
     }
 
-    glDeleteBuffers(1, &m_nInstanceBuffer);
-    glDeleteVertexArrays(1, &m_nVertexArray);
-    glDeleteBuffers(1, &m_nVertexBuffer);
+    if (Window::ins->isUsingOpenGL())
+    {
+        glDeleteBuffers(1, &m_nInstanceBuffer);
+        glDeleteVertexArrays(1, &m_nVertexArray);
+        glDeleteBuffers(1, &m_nVertexBuffer);
+    }
+#if __APPLE__
+    else if (Window::ins->isUsingMetal())
+    {
+        m_pVertexBuffer->release();
+        m_pInstanceBuffer->release();
+    }
+#endif // __APPLE__
 }
 
 void ParticleSystem::registerBuffer()
 {
-    // Four corner vertex datas
     VertexWUV arrQuadVerticies[4];
     arrQuadVerticies[0] = { { -.5f, -.5f }, { 0.f, 0.f } };
     arrQuadVerticies[1] = { { .5f, -.5f }, { 1.f, 0.f } };
     arrQuadVerticies[2] = { { -.5f, .5f }, { 0.f, 1.f } };
     arrQuadVerticies[3] = { { .5f, .5f }, { 1.f, 1.f } };
 
-    glGenBuffers(1, &m_nVertexBuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, m_nVertexBuffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(arrQuadVerticies), arrQuadVerticies, GL_STATIC_DRAW);
+    if (Window::ins->isUsingOpenGL())
+    {
+        glGenBuffers(1, &m_nVertexBuffer);
+        glBindBuffer(GL_ARRAY_BUFFER, m_nVertexBuffer);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(arrQuadVerticies), arrQuadVerticies, GL_STATIC_DRAW);
 
-    glGenVertexArrays(1, &m_nVertexArray);
-    glBindVertexArray(m_nVertexArray);
+        glGenVertexArrays(1, &m_nVertexArray);
+        glBindVertexArray(m_nVertexArray);
 
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(VertexWUV), (void*)offsetof(VertexWUV, pos));
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(VertexWUV), (void*)offsetof(VertexWUV, uv));
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(VertexWUV), (void*)offsetof(VertexWUV, pos));
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(VertexWUV), (void*)offsetof(VertexWUV, uv));
 
 
-    // Instance data
-    glGenBuffers(1, &m_nInstanceBuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, m_nInstanceBuffer);
-    glBufferData(GL_ARRAY_BUFFER, m_nAllParticleCount * sizeof(ParticleGPUInstance), m_arrParticlesGPU, GL_DYNAMIC_DRAW);
+        // Instance data
+        glGenBuffers(1, &m_nInstanceBuffer);
+        glBindBuffer(GL_ARRAY_BUFFER, m_nInstanceBuffer);
+        glBufferData(GL_ARRAY_BUFFER, m_nAllParticleCount * sizeof(ParticleGPUInstance), m_arrParticlesGPU, GL_DYNAMIC_DRAW);
 
-    glEnableVertexAttribArray(2);
-    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(ParticleGPUInstance), (void*)offsetof(ParticleGPUInstance, m_vecPosition));
-    glVertexAttribDivisor(2, 1);
+        glEnableVertexAttribArray(2);
+        glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(ParticleGPUInstance), (void*)offsetof(ParticleGPUInstance, m_vecPosition));
+        glVertexAttribDivisor(2, 1);
 
-    glEnableVertexAttribArray(3);
-    glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(ParticleGPUInstance), (void*)offsetof(ParticleGPUInstance, m_vecColor));
-    glVertexAttribDivisor(3, 1);
+        glEnableVertexAttribArray(3);
+        glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(ParticleGPUInstance), (void*)offsetof(ParticleGPUInstance, m_vecColor));
+        glVertexAttribDivisor(3, 1);
 
-    glEnableVertexAttribArray(4);
-    glVertexAttribPointer(4, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleGPUInstance), (void*)offsetof(ParticleGPUInstance, m_fRotation));
-    glVertexAttribDivisor(4, 1);
+        glEnableVertexAttribArray(4);
+        glVertexAttribPointer(4, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleGPUInstance), (void*)offsetof(ParticleGPUInstance, m_fRotation));
+        glVertexAttribDivisor(4, 1);
 
-    glEnableVertexAttribArray(5);
-    glVertexAttribPointer(5, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleGPUInstance), (void*)offsetof(ParticleGPUInstance, m_fScale));
-    glVertexAttribDivisor(5, 1);
+        glEnableVertexAttribArray(5);
+        glVertexAttribPointer(5, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleGPUInstance), (void*)offsetof(ParticleGPUInstance, m_fScale));
+        glVertexAttribDivisor(5, 1);
 
-    glEnableVertexAttribArray(6);
-    glVertexAttribPointer(6, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleGPUInstance), (void*)offsetof(ParticleGPUInstance, m_fOpacity));
-    glVertexAttribDivisor(6, 1);
+        glEnableVertexAttribArray(6);
+        glVertexAttribPointer(6, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleGPUInstance), (void*)offsetof(ParticleGPUInstance, m_fOpacity));
+        glVertexAttribDivisor(6, 1);
 
-    glBindVertexArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindVertexArray(0);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+    }
+#if __APPLE__
+    else if (Window::ins->isUsingMetal())
+    {
+        MTL::Device* pDevice = Window::ins->getMetalDevice();
+        m_pVertexBuffer = pDevice->newBuffer(arrQuadVerticies, sizeof(arrQuadVerticies), MTL::ResourceStorageModeShared);
+
+        m_pInstanceBuffer = pDevice->newBuffer(m_nAllParticleCount * sizeof(ParticleGPUInstance), MTL::ResourceStorageModeShared);
+    }
+#endif // __APPLE__
 }
 
 void ParticleSystem::setMaterial(const std::shared_ptr<Material>& pMaterial)
 {
+    if (!pMaterial)
+    {
+        LOGLN("ParticleSystem::setMaterial: material is nullptr");
+        return;
+    }
+
     m_pMaterial = pMaterial;
     setShader(m_pMaterial->getShader());
 }
 
 void ParticleSystem::setShader(Shader* pShader)
 {
-    m_pMVPUniForm = pShader->getUniformHandle("u_MVP");
-    m_pNodeTransformUniform = pShader->getUniformHandle("u_nodeTransform");
-    m_pUseNodeTransformUniform = pShader->getUniformHandle("u_useNodeTransform");
-    m_pUseTextureUniform = pShader->getUniformHandle("u_useTexture");
+    if (Window::ins->isUsingOpenGL())
+    {
+        m_pModelMatrixUniform = pShader->getUniformHandle("u_modelMatrix");
+        m_pNodeTransformUniform = pShader->getUniformHandle("u_nodeTransform");
+        m_pUseNodeTransformUniform = pShader->getUniformHandle("u_useNodeTransform");
+        m_pUseTextureUniform = pShader->getUniformHandle("u_useTexture");
+    }
 }
 
 void ParticleSystem::draw()
 {
-    ASSERT(m_pMaterial && m_pMaterial->getShader(), "Material must be set before drawing the quad");
+    if (!m_pMaterial)
+    {
+        return;
+    }
+
+    ASSERT(m_pMaterial->getShader(), "Material must be set before drawing the quad");
 
     if (m_nAliveParticleCount <= 0) return;
 
-    glBindVertexArray(m_nVertexArray);
-    m_pMaterial->useShader();
-
-    glUniform1i(m_pUseNodeTransformUniform->m_nLocation, m_bSimulateInLocal ? 1 : 0);
-
-    const mat4x4& cameraViewMatrix = Camera::main->getViewProjectionMatrix();
-
-    glUniformMatrix4fv(m_pMVPUniForm->m_nLocation, 1, GL_FALSE, (const GLfloat*) cameraViewMatrix);
-
-    int nResult = m_pMaterial->sendTexturesData();
-    glUniform1i(m_pUseTextureUniform->m_nLocation, nResult);
-
-    if (m_bSimulateInLocal)
+    if (Window::ins->isUsingOpenGL())
     {
-        mat4x4 nodeTransform;
+        glBindVertexArray(m_nVertexArray);
+        m_pMaterial->useShader();
 
-        mat4x4_identity(nodeTransform);
-        const Vector3& nodePosition = getNode()->getPosition();
-        mat4x4_translate(nodeTransform, nodePosition.x, nodePosition.y, nodePosition.z);
+        glUniform1i(m_pUseNodeTransformUniform->m_nLocation, m_bSimulateInLocal ? 1 : 0);
 
-        glUniformMatrix4fv(m_pNodeTransformUniform->m_nLocation, 1, GL_FALSE, (const GLfloat*) nodeTransform);
+        glUniformMatrix4fv(m_pModelMatrixUniform->m_nLocation, 1, GL_FALSE, (const GLfloat*) getNode()->getWorldMatrix());
+
+        int nResult = m_pMaterial->sendTexturesData();
+        glUniform1i(m_pUseTextureUniform->m_nLocation, nResult);
+
+        if (m_bSimulateInLocal)
+        {
+            mat4x4 nodeTransform;
+
+            mat4x4_identity(nodeTransform);
+            const Vector3& nodePosition = getNode()->getPosition();
+            mat4x4_translate(nodeTransform, nodePosition.x, nodePosition.y, nodePosition.z);
+
+            glUniformMatrix4fv(m_pNodeTransformUniform->m_nLocation, 1, GL_FALSE, (const GLfloat*) nodeTransform);
+        }
+
+        glBindBuffer(GL_ARRAY_BUFFER, m_nInstanceBuffer);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, m_nAliveParticleCount * sizeof(ParticleGPUInstance), m_arrParticlesGPU);
+
+        glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, m_nAliveParticleCount);
+        INCREASE_DRAW_CALL_COUNT(m_nAliveParticleCount * 2);
+
+        glBindTexture(GL_TEXTURE_2D, 0);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindVertexArray(0); // Unbind the vertex array
+        glUseProgram(0);
     }
+#if __APPLE__
+    else if (Window::ins->isUsingMetal())
+    {
+        MTL::RenderCommandEncoder* pRenderEncoder = Window::ins->getCurrentFrameRenderEncoder();
 
-    glBindBuffer(GL_ARRAY_BUFFER, m_nInstanceBuffer);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, m_nAliveParticleCount * sizeof(ParticleGPUInstance), m_arrParticlesGPU);
+        pRenderEncoder->setRenderPipelineState(m_pMaterial->getShader()->getMetalPipelineState());
+        pRenderEncoder->setVertexBuffer(m_pVertexBuffer, 0, 0);
 
-    glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, m_nAliveParticleCount);
-    INCREASE_DRAW_CALL_COUNT(m_nAliveParticleCount * 2);
+        struct
+        {
+            mat4x4 modelMatrix;
+            float useNodeTransform;
+        } uniform;
+        uniform.useNodeTransform = m_bSimulateInLocal ? 1.0f : 0.0f;
+        memcpy(uniform.modelMatrix, getNode()->getWorldMatrix(), sizeof(mat4x4));
+        pRenderEncoder->setVertexBytes(&uniform, sizeof(uniform), 2);
 
-    glBindTexture(GL_TEXTURE_2D, 0);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0); // Unbind the vertex array
-    glUseProgram(0);
+        pRenderEncoder->setVertexBuffer(Camera::main->getCameraMetalUBO(), 0, 3);
+
+        memcpy(m_pInstanceBuffer->contents(), m_arrParticlesGPU, m_nAliveParticleCount * sizeof(ParticleGPUInstance));
+        m_pInstanceBuffer->didModifyRange(NS::Range::Make(0, m_nAliveParticleCount * sizeof(ParticleGPUInstance)));
+        pRenderEncoder->setVertexBuffer(m_pInstanceBuffer, 0, 4);
+
+        if (Image* pImage = m_pMaterial->getImageByUniformName(SHADER_UNIFORM_TEXTURE_0); pImage)
+        {
+            // TODO: is there a better way to set texture index?
+            pRenderEncoder->setFragmentTexture(pImage->getMetalTexture(), 0);
+            pRenderEncoder->setFragmentSamplerState(Renderer::m_pLinearSampler, 0);
+        }
+
+        pRenderEncoder->drawPrimitives(MTL::PrimitiveType::PrimitiveTypeTriangleStrip, NS::UInteger(0), NS::UInteger(4), NS::UInteger(m_nAliveParticleCount));
+        INCREASE_DRAW_CALL_COUNT(m_nAliveParticleCount * 2);
+    }
+#endif // __APPLE__
 }
 
 void ParticleSystem::update(float fDeltaTime)
@@ -506,7 +577,7 @@ inline const Color PARTICLE_SYSTEM_SPAWN_SHAPE_COLOR = Color(.45f, .58f, .75f, .
 
 void ParticleSystem::onDrawGizmos(bool bIsSelected)
 {
-    // GizmosManager::getInstance()->addImageGizmos(this, m_pNode->getPositionInWorld(), PARTICLE_SYSTEM_GIZMOS_IMAGE, PARTICLE_SYSTEM_GIZMOS_COLOR);
+    GizmosManager::getInstance()->addImageGizmos(this, m_pNode->getPositionInWorld(), PARTICLE_SYSTEM_GIZMOS_IMAGE, PARTICLE_SYSTEM_GIZMOS_COLOR);
 
     switch (m_eSpawnShape)
     {

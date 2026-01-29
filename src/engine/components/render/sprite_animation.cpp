@@ -86,7 +86,7 @@ void SpriteAnimation::serializeToWrapper(DataSerializer& serializer) const
 
 bool SpriteAnimation::deserializeField(DataDeserializer& deserializer, const std::string_view& strFieldName, const std::string_view& strFieldValue)
 {
-    if (Component::deserializeField(deserializer, strFieldName, strFieldValue))
+    if (NodeComponent::deserializeField(deserializer, strFieldName, strFieldValue))
     {
         return true;
     }

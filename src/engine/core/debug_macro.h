@@ -7,7 +7,7 @@
 #include <ctime>
 
 
-#ifndef DEBUG_FLAG
+#if !defined(DEBUG_FLAG) && !(__WIN32__ || __WIN64__)
 #define DEBUG_FLAG 1
 #endif
 
@@ -57,7 +57,7 @@ bool Profiler_CheckTagIsInIgnore(const std::string_view& strTag);
 #define LOGERR(msg, ...) do {} while (0)
 
 #define PROFILER_START_TIMER() do {} while (0)
-#define PROFILER_END_TIMER(strTag) do {} while (0)
+#define PROFILER_END_TIMER(strTag, strMsg) do {} while (0)
 #define PROFILER_FRESH_TIMER() do {} while (0)
 
 #endif

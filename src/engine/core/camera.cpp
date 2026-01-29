@@ -20,10 +20,19 @@ Camera::Camera()
         m_bCameraUBODirty = true;
     });
 
-    glGenBuffers(1, &m_nCameraUBO);
-    glBindBuffer(GL_UNIFORM_BUFFER, m_nCameraUBO);
-    glBufferData(GL_UNIFORM_BUFFER, sizeof(mat4x4) * 2 + sizeof(vec4), nullptr, GL_DYNAMIC_DRAW);
-    glBindBuffer(GL_UNIFORM_BUFFER, 0);
+    if (Window::ins->isUsingOpenGL())
+    {
+        glGenBuffers(1, &m_nCameraUBO);
+        glBindBuffer(GL_UNIFORM_BUFFER, m_nCameraUBO);
+        glBufferData(GL_UNIFORM_BUFFER, sizeof(mat4x4) * 2 + sizeof(vec4), nullptr, GL_DYNAMIC_DRAW);
+        glBindBuffer(GL_UNIFORM_BUFFER, 0);
+    }
+#if __APPLE__
+    else if (Window::ins->isUsingMetal())
+    {
+        m_pCameraMetalUBO = Window::ins->getMetalDevice()->newBuffer(sizeof(mat4x4) * 2 + sizeof(vec4), MTL::ResourceStorageModeShared);
+    }
+#endif // __APPLE__
 }
 
 Camera::~Camera()
@@ -142,12 +151,26 @@ void Camera::updateCameraDataBuffer()
     {
         // m_bCameraUBODirty = false;
 
-        glBindBuffer(GL_UNIFORM_BUFFER, m_nCameraUBO);
-        glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(mat4x4), getViewMatrix());
-        glBufferSubData(GL_UNIFORM_BUFFER, sizeof(mat4x4), sizeof(mat4x4), getProjectionMatrix());
         Vector3 camPos = m_pNode->getPositionInWorld();
-        glBufferSubData(GL_UNIFORM_BUFFER, sizeof(mat4x4) * 2, sizeof(vec3), &camPos);
-        glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+        if (Window::ins->isUsingOpenGL())
+        {
+            glBindBuffer(GL_UNIFORM_BUFFER, m_nCameraUBO);
+            glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(mat4x4), getViewMatrix());
+            glBufferSubData(GL_UNIFORM_BUFFER, sizeof(mat4x4), sizeof(mat4x4), getProjectionMatrix());
+            glBufferSubData(GL_UNIFORM_BUFFER, sizeof(mat4x4) * 2, sizeof(vec3), &camPos);
+            glBindBuffer(GL_UNIFORM_BUFFER, 0);
+        }
+#if __APPLE__
+        else if (Window::ins->isUsingMetal())
+        {
+            float* pBuffer = reinterpret_cast<float*>(m_pCameraMetalUBO->contents());
+            memcpy(pBuffer, getViewMatrix(), sizeof(mat4x4));
+            memcpy(pBuffer + sizeof(mat4x4) / sizeof(float), getProjectionMatrix(), sizeof(mat4x4));
+            memcpy(pBuffer + (sizeof(mat4x4) * 2) / sizeof(float), &camPos, sizeof(vec3));
+            m_pCameraMetalUBO->didModifyRange(NS::Range{0, m_pCameraMetalUBO->length()});
+        }
+#endif // __APPLE__
     }
 }
 

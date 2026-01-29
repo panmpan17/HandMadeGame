@@ -29,6 +29,9 @@ public:
     inline static bool getEnableGizmos() { return getPlayerPreferenceInstance().getBool("EnableGizmos", true); }
     inline static void setEnableGizmos(bool bEnable) { getPlayerPreferenceInstance().setBool("EnableGizmos", bEnable); }
 
+    inline static bool getForceOpenGLOnMac() { return getPlayerPreferenceInstance().getBool("ForceOpenGLOnMac", false); }
+    inline static void setForceOpenGLOnMac(bool bForce) { getPlayerPreferenceInstance().setBool("ForceOpenGLOnMac", bForce); }
+
     static PlayerPreference& getPlayerPreferenceInstance()
     {
         static PlayerPreference instance("player_preferences.cfg");

@@ -13,6 +13,8 @@
 #include "../../render/lighting/direction_light.h"
 #include "../../render/models/mesh.h"
 
+#define NS_INT(x) static_cast<NS::UInteger>(x)
+
 
 MeshRenderer::MeshRenderer()
 {
@@ -24,21 +26,30 @@ MeshRenderer::~MeshRenderer()
 
 void MeshRenderer::setMaterial(const std::shared_ptr<Material>& pMaterial)
 {
+    if (!pMaterial || !pMaterial->getShader())
+    {
+        LOGERR("Material or its shader is null");
+        return;
+    }
+
     m_pMaterial = pMaterial;
     initShader(m_pMaterial->getShader());
 }
 
 void MeshRenderer::initShader(Shader* const pShader)
 {
-    // Main 3d shader uniforms
-    m_pModelUniform = pShader->getUniformHandle("u_Model");
-    m_pSpecularParamUniform = pShader->getUniformHandle("u_SpecularParams");
-    m_pTextureEnabledUniform = pShader->getUniformHandle("u_textureEnabled");
+    if (Window::ins->isUsingOpenGL())
+    {
+        // Main 3d shader uniforms
+        m_pModelUniform = pShader->getUniformHandle("u_Model");
+        m_pSpecularParamUniform = pShader->getUniformHandle("u_SpecularParams");
+        m_pTextureEnabledUniform = pShader->getUniformHandle("u_textureEnabled");
 
-    // Depth shader uniforms
-    m_pDepthTextureUniform = pShader->getUniformHandle(SHADER_UNIFORM_TEXTURE_3);
-    m_pLightMatrixUniform1 = pShader->getUniformHandle("u_LightMatrix");
-    m_pShadowColorUniform = pShader->getUniformHandle("u_shadowColor");
+        // Depth shader uniforms
+        m_pDepthTextureUniform = pShader->getUniformHandle(SHADER_UNIFORM_TEXTURE_3);
+        m_pLightMatrixUniform1 = pShader->getUniformHandle("u_LightMatrix");
+        m_pShadowColorUniform = pShader->getUniformHandle("u_shadowColor");
+    }
 
     bindDepthVertexArray();
     bindVertexArray(pShader);
@@ -48,83 +59,95 @@ void MeshRenderer::bindVertexArray(Shader* const pShader)
 {
     m_nIndiceCount = m_pMesh->m_nIndiceCount;
     
-    glGenVertexArrays(1, &m_nVertexArray);
-    glBindVertexArray(m_nVertexArray);
-    
-    glBindBuffer(GL_ARRAY_BUFFER, m_pMesh->m_nVertexBuffer);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_pMesh->m_nIndexBuffer);
-
-    // Get the attribute locations from the shader
-    GLuint nVPosAttr = pShader->getAttributeLocation("a_vPos");
-    GLuint nVUVAttr = pShader->getAttributeLocation("a_vUV");
-    GLuint nVNormalAttr = pShader->getAttributeLocation("a_vNormal");
-    GLuint nVTangentAttr = pShader->getAttributeLocation("a_vTangent");
-    GLuint nVBitangentAttr = pShader->getAttributeLocation("a_vBitangent");
-
-    // Enable and set the vertex attributes using the retrieved locations
-    if (nVPosAttr != GL_INVALID_VALUE)
+    if (Window::ins->isUsingOpenGL())
     {
-        glEnableVertexAttribArray(nVPosAttr);
-        glVertexAttribPointer(nVPosAttr, 3, GL_FLOAT, GL_FALSE, sizeof(VertexWUVNormalTangent), (void*)offsetof(VertexWUVNormalTangent, pos));
-    }
+        glGenVertexArrays(1, &m_nVertexArray);
+        glBindVertexArray(m_nVertexArray);
+        
+        glBindBuffer(GL_ARRAY_BUFFER, m_pMesh->m_nVertexBuffer);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_pMesh->m_nIndexBuffer);
 
-    if (nVUVAttr != GL_INVALID_VALUE)
-    {
-        glEnableVertexAttribArray(nVUVAttr);
-        glVertexAttribPointer(nVUVAttr, 2, GL_FLOAT, GL_FALSE, sizeof(VertexWUVNormalTangent), (void*)offsetof(VertexWUVNormalTangent, uv));
-    }
+        // Get the attribute locations from the shader
+        GLuint nVPosAttr = pShader->getAttributeLocation("a_vPos");
+        GLuint nVUVAttr = pShader->getAttributeLocation("a_vUV");
+        GLuint nVNormalAttr = pShader->getAttributeLocation("a_vNormal");
+        GLuint nVTangentAttr = pShader->getAttributeLocation("a_vTangent");
+        GLuint nVBitangentAttr = pShader->getAttributeLocation("a_vBitangent");
 
-    if (nVNormalAttr != GL_INVALID_VALUE)
-    {
-        glEnableVertexAttribArray(nVNormalAttr);
-        glVertexAttribPointer(nVNormalAttr, 3, GL_FLOAT, GL_FALSE, sizeof(VertexWUVNormalTangent), (void*)offsetof(VertexWUVNormalTangent, normal));
-    }
+        // Enable and set the vertex attributes using the retrieved locations
+        if (nVPosAttr != GL_INVALID_VALUE)
+        {
+            glEnableVertexAttribArray(nVPosAttr);
+            glVertexAttribPointer(nVPosAttr, 3, GL_FLOAT, GL_FALSE, sizeof(VertexWUVNormalTangent), (void*)offsetof(VertexWUVNormalTangent, pos));
+        }
 
-    if (nVTangentAttr != GL_INVALID_VALUE)
-    {
-        glEnableVertexAttribArray(nVTangentAttr);
-        glVertexAttribPointer(nVTangentAttr, 3, GL_FLOAT, GL_FALSE, sizeof(VertexWUVNormalTangent), (void*)offsetof(VertexWUVNormalTangent, tangent));
-    }
+        if (nVUVAttr != GL_INVALID_VALUE)
+        {
+            glEnableVertexAttribArray(nVUVAttr);
+            glVertexAttribPointer(nVUVAttr, 2, GL_FLOAT, GL_FALSE, sizeof(VertexWUVNormalTangent), (void*)offsetof(VertexWUVNormalTangent, uv));
+        }
 
-    if (nVBitangentAttr != GL_INVALID_VALUE)
-    {
-        glEnableVertexAttribArray(nVBitangentAttr);
-        glVertexAttribPointer(nVBitangentAttr, 3, GL_FLOAT, GL_FALSE, sizeof(VertexWUVNormalTangent), (void*)offsetof(VertexWUVNormalTangent, bitangent));
-    }
+        if (nVNormalAttr != GL_INVALID_VALUE)
+        {
+            glEnableVertexAttribArray(nVNormalAttr);
+            glVertexAttribPointer(nVNormalAttr, 3, GL_FLOAT, GL_FALSE, sizeof(VertexWUVNormalTangent), (void*)offsetof(VertexWUVNormalTangent, normal));
+        }
 
-    glBindVertexArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+        if (nVTangentAttr != GL_INVALID_VALUE)
+        {
+            glEnableVertexAttribArray(nVTangentAttr);
+            glVertexAttribPointer(nVTangentAttr, 3, GL_FLOAT, GL_FALSE, sizeof(VertexWUVNormalTangent), (void*)offsetof(VertexWUVNormalTangent, tangent));
+        }
+
+        if (nVBitangentAttr != GL_INVALID_VALUE)
+        {
+            glEnableVertexAttribArray(nVBitangentAttr);
+            glVertexAttribPointer(nVBitangentAttr, 3, GL_FLOAT, GL_FALSE, sizeof(VertexWUVNormalTangent), (void*)offsetof(VertexWUVNormalTangent, bitangent));
+        }
+
+        glBindVertexArray(0);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    }
 }
 
 void MeshRenderer::bindDepthVertexArray()
 {
     m_nIndiceCount = m_pMesh->m_nIndiceCount;
-    
-    glGenVertexArrays(1, &m_nVertexArray);
-    glBindVertexArray(m_nVertexArray);
-    
-    glBindBuffer(GL_ARRAY_BUFFER, m_pMesh->m_nVertexBuffer);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_pMesh->m_nIndexBuffer);
-
     m_pDepthShader = ShaderLoader::getInstance()->getShader("3d_depth");
-    m_pDepthModelUniform = m_pDepthShader->getUniformHandle("u_Model");
-    m_pLightMatrixUniform2 = m_pDepthShader->getUniformHandle("u_LightMatrix");
+    
+    if (Window::ins->isUsingOpenGL())
+    {
+        glGenVertexArrays(1, &m_nVertexArray);
+        glBindVertexArray(m_nVertexArray);
+        
+        glBindBuffer(GL_ARRAY_BUFFER, m_pMesh->m_nVertexBuffer);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_pMesh->m_nIndexBuffer);
 
-    GLuint nVPosAttr = m_pDepthShader->getAttributeLocation("a_vPos");
+        m_pDepthMVPUniform = m_pDepthShader->getUniformHandle("u_MVP");
 
-    glEnableVertexAttribArray(nVPosAttr);
-    glVertexAttribPointer(nVPosAttr, 3, GL_FLOAT, GL_FALSE, sizeof(VertexWUVNormal), (void*)offsetof(VertexWUVNormal, pos));
+        GLuint nVPosAttr = m_pDepthShader->getAttributeLocation("a_vPos");
 
-    glBindVertexArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+        glEnableVertexAttribArray(nVPosAttr);
+        glVertexAttribPointer(nVPosAttr, 3, GL_FLOAT, GL_FALSE, sizeof(VertexWUVNormal), (void*)offsetof(VertexWUVNormal, pos));
+
+        glBindVertexArray(0);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    }
+#if __APPLE__
+    else if (Window::ins->isUsingMetal())
+    {
+        // MTL::Device* pDevice = Window::ins->getMetalDevice();
+        // m_pMetalVertexBuffer = pDevice->newBuffer(arrVertices, sizeof(arrVertices), MTL::ResourceStorageModeShared);
+    }
+#endif // __APPLE__
 }
 
 
 bool MeshRenderer::deserializeField(DataDeserializer& deserializer, const std::string_view& strFieldName, const std::string_view& strFieldValue)
 {
-    if (Component::deserializeField(deserializer, strFieldName, strFieldValue)) return true;
+    if (NodeComponent::deserializeField(deserializer, strFieldName, strFieldValue)) return true;
 
     // TODO: Deserialize m_pMesh, m_pMaterial
 
@@ -143,75 +166,153 @@ void MeshRenderer::draw()
 
     if (!m_pMaterial || !m_pMaterial->getShader())
     {
-        ASSERT(false, "Shader and material not set for MeshRenderer");
+        LOGERR("Shader and material not set for MeshRenderer");
         return;
     }
 
-    m_pMaterial->useShader();
-
-    ShaderUniformHandle::sendData(m_pModelUniform, m_pNode->getWorldMatrix());
-
-    int ntextureBitmask = m_pMaterial->sendTexturesData();
-
-    DirectionLightComponent* pMainDirLight = LightManager::getInstance()->getMainDirectionLightComponent();
-    if (pMainDirLight && pMainDirLight->getShadowsEnabled())
+    if (Window::ins->isUsingOpenGL())
     {
-        if (ShaderUniformHandle::sendTexture(m_pDepthTextureUniform, LightManager::getInstance()->getShadowDepthMapTexture(), 3))
+        m_pMaterial->useShader();
+
+        ShaderUniformHandle::sendData(m_pModelUniform, m_pNode->getWorldMatrix());
+
+        int ntextureBitmask = m_pMaterial->sendTexturesData();
+
+        DirectionLightComponent* pMainDirLight = LightManager::getInstance()->getMainDirectionLightComponent();
+        if (pMainDirLight && pMainDirLight->getShadowsEnabled())
         {
-            ntextureBitmask |= (1 << 3); // Enable shadow map texture
+            if (ShaderUniformHandle::sendTexture(m_pDepthTextureUniform, LightManager::getInstance()->getShadowDepthMapTexture(), 3))
+            {
+                ntextureBitmask |= (1 << 3); // Enable shadow map texture
+            }
+
+            if (m_pLightMatrixUniform1)
+            {
+                glUniformMatrix4fv(m_pLightMatrixUniform1->m_nLocation, 1, GL_FALSE, (const GLfloat*) pMainDirLight->getLightCastingMatrix());
+            }
+
+            if (m_pShadowColorUniform)
+            {
+                const Vector3& vecShadowColor = pMainDirLight->getShadowColor();
+                glUniform4f(m_pShadowColorUniform->m_nLocation, vecShadowColor.x, vecShadowColor.y, vecShadowColor.z, pMainDirLight->getShadowIntensity());
+            }
         }
 
-        if (m_pLightMatrixUniform1)
+        if (m_pTextureEnabledUniform)
         {
-            glUniformMatrix4fv(m_pLightMatrixUniform1->m_nLocation, 1, GL_FALSE, (const GLfloat*) pMainDirLight->getLightCastingMatrix());
+            glUniform1i(m_pTextureEnabledUniform->m_nLocation, ntextureBitmask);
         }
 
-        if (m_pShadowColorUniform)
-        {
-            const Vector3& vecShadowColor = pMainDirLight->getShadowColor();
-            glUniform4f(m_pShadowColorUniform->m_nLocation, vecShadowColor.x, vecShadowColor.y, vecShadowColor.z, pMainDirLight->getShadowIntensity());
-        }
+        glBindVertexArray(m_nVertexArray);
+        glDrawElements(GL_TRIANGLES, m_nIndiceCount, GL_UNSIGNED_INT, 0);
+        glBindVertexArray(0);
+
+        INCREASE_DRAW_CALL_COUNT(m_nIndiceCount / 3);
+
+        glUseProgram(0);
     }
-
-    if (m_pTextureEnabledUniform)
+#if __APPLE__
+    else if (Window::ins->isUsingMetal())
     {
-        glUniform1i(m_pTextureEnabledUniform->m_nLocation, ntextureBitmask);
+        MTL::RenderCommandEncoder* pRenderCommandEncoder = Window::ins->getCurrentFrameRenderEncoder();
+
+        pRenderCommandEncoder->setRenderPipelineState(m_pMaterial->getShader()->getMetalPipelineState());
+        pRenderCommandEncoder->setVertexBuffer(m_pMesh->m_pMetalVertexBuffer, 0, 0);
+
+        pRenderCommandEncoder->setVertexBuffer(Camera::main->getCameraMetalUBO(), 0, 1);
+        pRenderCommandEncoder->setFragmentBuffer(Camera::main->getCameraMetalUBO(), 0, 1);
+        pRenderCommandEncoder->setFragmentBuffer(LightManager::getInstance()->getLightingMetalBuffer(), 0, 2);
+        
+        pRenderCommandEncoder->setVertexBytes(&m_pNode->getWorldMatrix(), sizeof(mat4x4), 2);
+
+        int ntextureBitmask = 0;
+        if (Image* pAlbedoImage = m_pMaterial->getImageByUniformName(SHADER_UNIFORM_TEXTURE_0); pAlbedoImage)
+        {
+            pRenderCommandEncoder->setFragmentTexture(pAlbedoImage->getMetalTexture(), 0);
+            ntextureBitmask |= (1 << 0);
+        }
+        if (Image* pSpecularImage = m_pMaterial->getImageByUniformName(SHADER_UNIFORM_TEXTURE_1); pSpecularImage)
+        {
+            pRenderCommandEncoder->setFragmentTexture(pSpecularImage->getMetalTexture(), 1);
+            ntextureBitmask |= (1 << 1);
+        }
+        if (Image* pNormalImage = m_pMaterial->getImageByUniformName(SHADER_UNIFORM_TEXTURE_2); pNormalImage)
+        {
+            pRenderCommandEncoder->setFragmentTexture(pNormalImage->getMetalTexture(), 2);
+            ntextureBitmask |= (1 << 2);
+        }
+
+        DirectionLightComponent* pMainDirLight = LightManager::getInstance()->getMainDirectionLightComponent();
+        if (pMainDirLight && pMainDirLight->getShadowsEnabled())
+        {
+            pRenderCommandEncoder->setFragmentTexture(LightManager::getInstance()->getShadowDepthMapTextureMetal(), 3);
+            ntextureBitmask |= (1 << 3);
+
+            pRenderCommandEncoder->setVertexBytes(&pMainDirLight->getLightCastingMatrix(), sizeof(mat4x4), 3);
+            // if (m_pLightMatrixUniform1)
+            // {
+            //     glUniformMatrix4fv(m_pLightMatrixUniform1->m_nLocation, 1, GL_FALSE, (const GLfloat*) pMainDirLight->getLightCastingMatrix());
+            // }
+        }
+
+        if (ntextureBitmask != 0)
+        {
+            pRenderCommandEncoder->setFragmentBytes(&ntextureBitmask, sizeof(int), 3);
+        }
+        
+        pRenderCommandEncoder->drawIndexedPrimitives(
+            MTL::PrimitiveType::PrimitiveTypeTriangle,
+            NS_INT(m_nIndiceCount),
+            m_pMesh->m_metalIndexType,
+            m_pMesh->m_pMetalIndexBuffer,
+            NS_INT(0));
     }
-
-    glBindVertexArray(m_nVertexArray);
-    glCullFace(GL_FRONT);
-    glFrontFace(GL_CW);
-    glDrawElements(GL_TRIANGLES, m_nIndiceCount, GL_UNSIGNED_INT, 0);
-    glBindVertexArray(0);
-
-    INCREASE_DRAW_CALL_COUNT(m_nIndiceCount / 3);
-
-    glUseProgram(0);
+#endif // __APPLE__
 }
 
 void MeshRenderer::drawDepth()
 {
     ASSERT(m_pMesh, "Mesh must be set before drawing the mesh");
 
-    const mat4x4& local = m_pNode->getWorldMatrix();
-
-    glUseProgram(m_pDepthShader->getProgram());
-
-    glUniformMatrix4fv(m_pDepthModelUniform->m_nLocation, 1, GL_FALSE, (const GLfloat*) local);
-
+    mat4x4 MVP;
     DirectionLightComponent* pMainDirLight = LightManager::getInstance()->getMainDirectionLightComponent();
-    if (pMainDirLight)
+    mat4x4_mul(MVP, pMainDirLight->getLightCastingMatrix(), m_pNode->getWorldMatrix());
+    // mat4x4_mul(MVP, Camera::main->getViewProjectionMatrix(), m_pNode->getWorldMatrix());
+
+    if (Window::ins->isUsingOpenGL())
     {
-        glUniformMatrix4fv(m_pLightMatrixUniform2->m_nLocation, 1, GL_FALSE, (const GLfloat*) pMainDirLight->getLightCastingMatrix());
+        const mat4x4& local = m_pNode->getWorldMatrix();
+
+        glUseProgram(m_pDepthShader->getProgram());
+        
+        glUniformMatrix4fv(m_pDepthMVPUniform->m_nLocation, 1, GL_FALSE, (const GLfloat*) MVP);
+
+        glBindVertexArray(m_nVertexArray);
+        glDrawElements(GL_TRIANGLES, m_nIndiceCount, GL_UNSIGNED_INT, 0);
+        glBindVertexArray(0);
+
+        INCREASE_DRAW_CALL_COUNT(m_nIndiceCount / 3);
+
+        glUseProgram(0);
     }
+#if __APPLE__
+    else if (Window::ins->isUsingMetal())
+    {
+        MTL::RenderCommandEncoder* pRenderCommandEncoder = Window::ins->getCurrentFrameDepthRenderEncoder();
 
-    glBindVertexArray(m_nVertexArray);
-    glCullFace(GL_FRONT);
-    glFrontFace(GL_CW);
-    glDrawElements(GL_TRIANGLES, m_nIndiceCount, GL_UNSIGNED_INT, 0);
-    glBindVertexArray(0);
+        pRenderCommandEncoder->setRenderPipelineState(m_pDepthShader->getMetalPipelineState());
+        pRenderCommandEncoder->setVertexBuffer(m_pMesh->m_pMetalVertexBuffer, 0, 0);
 
-    INCREASE_DRAW_CALL_COUNT(m_nIndiceCount / 3);
+        pRenderCommandEncoder->setVertexBytes(&MVP, sizeof(mat4x4), 1);
 
-    glUseProgram(0);
+        pRenderCommandEncoder->drawIndexedPrimitives(
+            MTL::PrimitiveType::PrimitiveTypeTriangle,
+            NS_INT(m_nIndiceCount),
+            m_pMesh->m_metalIndexType,
+            m_pMesh->m_pMetalIndexBuffer,
+            NS_INT(0));
+        
+        INCREASE_DRAW_CALL_COUNT(m_nIndiceCount / 3);
+    }
+#endif // __APPLE__
 }

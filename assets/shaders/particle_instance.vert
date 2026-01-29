@@ -1,6 +1,8 @@
 #version 330
 
-uniform mat4 u_MVP;
+#include "assets/shaders/base/camera_data.glsl"
+
+uniform mat4 u_modelMatrix;
 uniform mat4 u_nodeTransform;
 uniform bool u_useNodeTransform;
 
@@ -22,13 +24,13 @@ void main()
 
     if (u_useNodeTransform)
     {
-        // TODO: position is bit broken here
-        // gl_Position = u_nodeTransform * vec4((rotationMatrix * scaledPos) + instancePos, 0.0, 1.0);
-        gl_Position = u_nodeTransform * vec4((rotationMatrix * scaledPos) + instancePos.xy, instancePos.z, 1.0);
+        mat4 mvp = u_Projection * u_View * u_modelMatrix;
+        gl_Position = mvp * vec4((rotationMatrix * scaledPos) + instancePos.xy, instancePos.z, 1.0);
     }
     else
     {
-        gl_Position = u_MVP * vec4((rotationMatrix * scaledPos) + instancePos.xy, instancePos.z, 1.0);
+        mat4 vp = u_Projection * u_View;
+        gl_Position = vp * vec4((rotationMatrix * scaledPos) + instancePos.xy, instancePos.z, 1.0);
     }
 
     fragmentColor = instanceColor * vec4(1.0, 1.0, 1.0, opacity);

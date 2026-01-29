@@ -23,7 +23,7 @@ private:
 class FileReader {
 public:
     FileReader(const std::string& strPath);
-    FileReader(const std::string_view& strPath);
+    FileReader(std::string_view strPath);
     ~FileReader();
 
     bool isOpen() const;
@@ -35,6 +35,8 @@ public:
 
 private:
     std::ifstream file;
+
+    void read(std::string_view strPath);
 };
 
 class FileWriter

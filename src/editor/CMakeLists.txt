@@ -1,6 +1,6 @@
 list(APPEND SOURCES
-    ${CMAKE_CURRENT_LIST_DIR}/camera_inspector.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/camera_inspector.h
+    # ${CMAKE_CURRENT_LIST_DIR}/camera_inspector.cpp
+    # ${CMAKE_CURRENT_LIST_DIR}/camera_inspector.h
     ${CMAKE_CURRENT_LIST_DIR}/editor.h
     ${CMAKE_CURRENT_LIST_DIR}/editor_window.h
     ${CMAKE_CURRENT_LIST_DIR}/gizmos.cpp

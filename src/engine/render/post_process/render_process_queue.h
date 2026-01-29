@@ -1,39 +1,19 @@
 #pragma once
 
+#include "interface_render_process.h"
 #include "../shader.h"
 #include "../../core/serialization/type_registry.h"
 #include "../../core/math/vector.h"
 #include "../../../utils/expandable_array.h"
 
+#if __APPLE__
+#include <Metal/Metal.hpp>
+#endif // __APPLE__
+
 typedef unsigned int GLuint;
 
 class Shader;
 class Window;
-
-class RenderProcessQueue;
-
-class IRenderProcess
-{
-public:
-    IRenderProcess(RenderProcessQueue* pQueue) : m_pProcessQueue(pQueue) {}
-    virtual ~IRenderProcess() = default;
-
-    virtual void renderProcess() = 0;
-
-    inline bool isActive() const { return m_bActive; }
-    inline void setActive(bool bActive) { m_bActive = bActive; }
-
-    virtual void initialize() = 0;
-
-    virtual void onWindowResize() {}
-
-protected:
-    RenderProcessQueue* m_pProcessQueue = nullptr;
-    bool m_bActive = true;
-
-    static void registerShaderPosAndUV(Shader* pShader);
-    static void initializeRenderTextureAndFBO(GLuint& nFBO, GLuint& nTexture, int nWidth, int nHeight, bool bGenerateFramebuffer = true);
-};
 
 
 class RenderProcessQueue
@@ -60,6 +40,13 @@ public:
     inline GLuint getOriginalRenderTexture() const { return m_nRenderTexture_original; }
     inline GLuint getFinalRenderTexture() const { return m_nFinalRenderTexture; }
     inline void setFinalRenderTexture(GLuint texture) { m_nFinalRenderTexture = texture; }
+
+#if __APPLE__
+    inline MTL::Buffer* getMetalFullScreenVertexBuffer() const { return m_pMetalFullScreenVertexBuffer; }
+    inline MTL::Texture* getOriginalMetalRenderTexture() const { return m_pMetalOriginalRenderTexture; }
+    inline MTL::Texture* getFinalMetalRenderTexture() const { return m_pMetalFinalRenderTexture; }
+    inline void setFinalMetalRenderTexture(MTL::Texture* pTexture) { m_pMetalFinalRenderTexture = pTexture; }
+#endif // __APPLE__
 
     inline GLuint getFullScreenVertexArray() const { return m_nVertexArray; }
     inline GLuint getFullScreenVertexBuffer() const { return m_nVertexBuffer; }
@@ -101,6 +88,13 @@ private:
     GLuint m_nVertexArray = 0;
 
     GLuint m_nFinalRenderTexture = 0;
+
+#if __APPLE__
+    MTL::Buffer* m_pMetalFullScreenVertexBuffer = nullptr;
+    MTL::Texture* m_pMetalOriginalRenderTexture = nullptr;
+
+    MTL::Texture* m_pMetalFinalRenderTexture = nullptr;
+#endif // __APPLE__
 
     bool m_bSplitScreen = false;
     float m_fSplitFactor = 0.5f;

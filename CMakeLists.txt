@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.16)
 project(MichaelHandMadeGame
         VERSION 0.1
         DESCRIPTION "GLFW Test"
-        LANGUAGES C CXX
+        LANGUAGES C CXX OBJCXX
 )
 
 set(CMAKE_CXX_STANDARD 23)
@@ -31,13 +31,17 @@ endif()
 include(src/CMakeLists.txt)
 
 
-file(GLOB_RECURSE ASSETS "${CMAKE_SOURCE_DIR}/assets/*")
-file(GLOB_RECURSE ASSETS_RELATIVE RELATIVE "${CMAKE_SOURCE_DIR}/assets" "${CMAKE_SOURCE_DIR}/assets/*")
+
 
 
 set(DO_COPY_ASSETS_CUSTOM_COMMAND ON)
 
 if (APPLE)
+    find_library(METAL_LIB Metal REQUIRED)
+    find_library(FOUNDATION_LIB Foundation REQUIRED)
+    find_library(QUARTZ_LIB QuartzCore REQUIRED)
+    find_library(COCOA_LIB Cocoa REQUIRED)
+
     if (CMAKE_GENERATOR STREQUAL "Xcode")
         set(DO_COPY_ASSETS_CUSTOM_COMMAND OFF)
 
@@ -143,19 +147,16 @@ else()
 endif()
 
 
+# Assets handling
+include(CMake/assets.cmake)
+
+if (APPLE)
+    ADD_COMPILE_METAL_SHADERS_COMMAND(MichaelHandMadeGame)
+endif()
+
 # Assets files
 if (DO_COPY_ASSETS_CUSTOM_COMMAND)
-    # Copy assets files
-    add_custom_command(
-        OUTPUT ${CMAKE_BINARY_DIR}/assets.timestamp
-        COMMAND ${CMAKE_COMMAND} -E copy_directory
-            ${CMAKE_SOURCE_DIR}/assets
-            ${ASSET_BUILD_TARGET_FOLDER}
-        COMMAND ${CMAKE_COMMAND} -E touch ${CMAKE_BINARY_DIR}/assets.timestamp
-        DEPENDS ${ASSETS}
-    )
-    add_custom_target(copy_assets ALL DEPENDS ${CMAKE_BINARY_DIR}/assets.timestamp)
-    add_dependencies(MichaelHandMadeGame copy_assets)
+    ADD_COPY_ASSETS_COMMAND(MichaelHandMadeGame ${ASSET_BUILD_TARGET_FOLDER})
 endif()
 
 
@@ -189,16 +190,44 @@ if (TRUE)
 endif()
 
 # ImGui Library
-if (TRUE)
-    add_library(imgui STATIC
+if (ON)
+    list(APPEND IMGUI_LIB_SRC
         "external/imgui/imgui.cpp"
         "external/imgui/imgui_demo.cpp"
         "external/imgui/imgui_draw.cpp"
         "external/imgui/imgui_tables.cpp"
         "external/imgui/imgui_widgets.cpp"
         "external/imgui/backends/imgui_impl_glfw.cpp"
-        "external/imgui/backends/imgui_impl_opengl3.cpp"
     )
+
+    if (ON)
+        list(APPEND IMGUI_LIB_SRC
+            "external/imgui/backends/imgui_impl_opengl3.cpp"
+        )
+    endif()
+
+    if (APPLE)
+        # enable_language(OBJCXX)
+        list(APPEND IMGUI_LIB_SRC
+            "external/imgui/backends/imgui_impl_metal.mm"
+        )
+    endif()
+
+    add_library(imgui STATIC ${IMGUI_LIB_SRC})
+
+    if (APPLE)
+        target_include_directories(imgui PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/external/metal-cpp")
+
+        target_link_libraries(imgui PRIVATE
+            ${METAL_LIB}
+            ${FOUNDATION_LIB}
+            ${QUARTZ_LIB}
+        )
+
+        target_compile_definitions(imgui PUBLIC
+            IMGUI_IMPL_METAL_CPP
+        )
+    endif()
 
     target_include_directories(imgui PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/external/imgui
@@ -214,6 +243,16 @@ if (APPLE)
     # Add mac specific frameworks
     add_library(mac_frameworks INTERFACE)
     target_link_libraries(MichaelHandMadeGame PRIVATE mac_frameworks)
+
+    # Add Metal framework
+    target_include_directories(MichaelHandMadeGame PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/external/metal-cpp")
+
+    target_link_libraries(MichaelHandMadeGame PRIVATE
+        ${METAL_LIB}
+        ${FOUNDATION_LIB}
+        ${QUARTZ_LIB}
+        ${COCOA_LIB}
+    )
 
     # Properly set rpath for macOS
     set_target_properties(MichaelHandMadeGame PROPERTIES

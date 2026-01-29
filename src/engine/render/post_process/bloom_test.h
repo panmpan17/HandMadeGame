@@ -48,6 +48,14 @@ private:
     GLuint m_nFBOID_Final = 0;
     GLuint m_nRenderTexture_Final = 0;
 
+#if __APPLE__
+    MTL::Texture* m_pMetalOriginalRenderTexture = nullptr;
+    MTL::Texture* m_pMetalRenderTexture_ColorHighlight = nullptr;
+    MTL::Texture* m_pMetalRenderTexture_HorizontalBlur = nullptr;
+    MTL::Texture* m_pMetalRenderTexture_VerticalBlur = nullptr;
+    MTL::Texture* m_pMetalFinalRenderTexture = nullptr;
+#endif
+
     int m_nRenderWidth, m_nRenderHeight;
 
     Shader* m_pColorHighlightShader = nullptr;

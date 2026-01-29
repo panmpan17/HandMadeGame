@@ -101,11 +101,11 @@ private:
 
     bool m_bKeyPressed[(int)KeyCode::MAX_KEY_CODE]; // Array to track key states, if needed
 
-    Event<bool> m_KeyPressEvent[(int)KeyCode::MAX_KEY_CODE]; // Event for key press callbacks
+    CustomEvent<bool> m_KeyPressEvent[(int)KeyCode::MAX_KEY_CODE]; // Event for key press callbacks
 
     constexpr static int MAX_MOUSE_BUTTONS = 8;
     bool m_arrMouseDown[MAX_MOUSE_BUTTONS] = { false, false, false, false, false, false, false, false }; // Track mouse button states, if needed
-    Event<bool> m_arrMouseButtonEvent[MAX_MOUSE_BUTTONS]; // Events for mouse button callbacks, if needed
+    CustomEvent<bool> m_arrMouseButtonEvent[MAX_MOUSE_BUTTONS]; // Events for mouse button callbacks, if needed
 
-    Event<float, float> m_arrMouseMoveEvent;
+    CustomEvent<float, float> m_arrMouseMoveEvent;
 };

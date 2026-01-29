@@ -13,6 +13,7 @@ class Image;
 struct TextureUniform
 {
     const ShaderUniformHandle* pUniformHandle = nullptr;
+    int nTextureUnitIndex = -1;
     Image* pImage = nullptr;
 };
 
@@ -36,6 +37,9 @@ public:
     void setTransparent(bool bTransparent) { m_bTransparent = bTransparent; }
     bool getIsTransparent() const { return m_bTransparent; }
 
+    Image* getImageByUniformName(const std::string& strUniformName) const;
+    Image* getImageByUniformName(const std::string_view& strUniformName) const;
+    
 private:
     Shader* m_pShader = nullptr;
     bool m_bTransparent = false;

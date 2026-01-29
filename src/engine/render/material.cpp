@@ -32,6 +32,36 @@ void Material::bindTextureWithImage(const std::string_view& strUniformName, Imag
     m_vecTextureUniforms.push_back(texUniform);
 }
 
+Image* Material::getImageByUniformName(const std::string& strUniformName) const
+{
+    int nSize = static_cast<int>(m_vecTextureUniforms.size());
+    for (int i = 0; i < nSize; ++i)
+    {
+        const TextureUniform& texUniform = m_vecTextureUniforms[i];
+        if (texUniform.pUniformHandle && texUniform.pUniformHandle->m_strName == strUniformName)
+        {
+            return texUniform.pImage;
+        }
+    }
+    return nullptr;
+}
+Image* Material::getImageByUniformName(const std::string_view& strUniformName) const
+{
+    int nSize = static_cast<int>(m_vecTextureUniforms.size());
+    for (int i = 0; i < nSize; ++i)
+    {
+        const TextureUniform& texUniform = m_vecTextureUniforms[i];
+        if (texUniform.pUniformHandle)
+        {
+            if (texUniform.pUniformHandle->m_strName == strUniformName)
+            {
+                return texUniform.pImage;
+            }
+        }
+    }
+    return nullptr;
+}
+
 int Material::sendTexturesData() const
 {
     int nTextureBitmask = 0;

@@ -6,7 +6,7 @@
 #include "../../core/scene/node.h"
 
 
-class Movement : public Component
+class Movement : public NodeComponent
 {
 public:
     Movement(float fMoveSpeed = 0);
@@ -29,7 +29,7 @@ protected:
 REGISTER_CLASS(Movement)
 
 
-class TwoPointsMovement : public Component
+class TwoPointsMovement : public NodeComponent
 {
 public:
     TwoPointsMovement()

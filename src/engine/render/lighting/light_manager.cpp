@@ -3,7 +3,7 @@
 
 #include "point_light.h"
 #include "direction_light.h"
-#include "../../core/debug_macro.h"
+#include "../../core/window.h"
 
 
 constexpr int AMBIENT_LIGHT_SIZE = 16; // vec3 + padding
@@ -33,40 +33,76 @@ LightManager::LightManager()
 
 LightManager::~LightManager()
 {
-    glDeleteBuffers(1, &m_nLightingUBO);
+    if (Window::ins->isUsingOpenGL())
+    {
+        glDeleteBuffers(1, &m_nLightingUBO);
 
-    glDeleteFramebuffers(1, &m_nShadowDepthMapFBO);
-    glDeleteTextures(1, &m_nShadowDepthMapTexture);
+        glDeleteFramebuffers(1, &m_nShadowDepthMapFBO);
+        glDeleteTextures(1, &m_nShadowDepthMapTexture);
+    }
+#if __APPLE__
+    else if (Window::ins->isUsingMetal())
+    {
+        m_pLightingBuffer->release();
+    }
+#endif // __APPLE__
 }
 
 void LightManager::registerLightingUBO()
 {
-    glGenBuffers(1, &m_nLightingUBO);
-    glBindBuffer(GL_UNIFORM_BUFFER, m_nLightingUBO);
-    glBufferData(GL_UNIFORM_BUFFER, LIGHTING_UBO_SIZE, nullptr, GL_STATIC_DRAW);
-    glBindBuffer(GL_UNIFORM_BUFFER, 0);
+    if (Window::ins->isUsingOpenGL())
+    {
+        glGenBuffers(1, &m_nLightingUBO);
+        glBindBuffer(GL_UNIFORM_BUFFER, m_nLightingUBO);
+        glBufferData(GL_UNIFORM_BUFFER, LIGHTING_UBO_SIZE, nullptr, GL_STATIC_DRAW);
+        glBindBuffer(GL_UNIFORM_BUFFER, 0);
+    }
+#if __APPLE__
+    else if (Window::ins->isUsingMetal())
+    {
+        m_pLightingBuffer = Window::ins->getMetalDevice()->newBuffer(LIGHTING_UBO_SIZE, MTL::ResourceStorageModeShared);
+    }
+#endif // __APPLE__
 }
 
 void LightManager::registerShadowDepthMap()
 {
-    glGenFramebuffers(1, &m_nShadowDepthMapFBO);
-    glBindFramebuffer(GL_FRAMEBUFFER, m_nShadowDepthMapFBO);
+    if (Window::ins->isUsingOpenGL())
+    {
+        glGenFramebuffers(1, &m_nShadowDepthMapFBO);
+        glBindFramebuffer(GL_FRAMEBUFFER, m_nShadowDepthMapFBO);
 
-    glGenTextures(1, &m_nShadowDepthMapTexture);
-    glBindTexture(GL_TEXTURE_2D, m_nShadowDepthMapTexture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_MAP_WIDTH, SHADOW_MAP_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
+        glGenTextures(1, &m_nShadowDepthMapTexture);
+        glBindTexture(GL_TEXTURE_2D, m_nShadowDepthMapTexture);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_MAP_WIDTH, SHADOW_MAP_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_nShadowDepthMapTexture, 0);
-    glDrawBuffer(GL_NONE);
-    glReadBuffer(GL_NONE);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_nShadowDepthMapTexture, 0);
+        glDrawBuffer(GL_NONE);
+        glReadBuffer(GL_NONE);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-    glBindTexture(GL_TEXTURE_2D, 0);
+        glBindTexture(GL_TEXTURE_2D, 0);
+    }
+#if __APPLE__
+    else if (Window::ins->isUsingMetal())
+    {
+        MTL::TextureDescriptor* pTextureDesc = MTL::TextureDescriptor::alloc()->init();
+        pTextureDesc->setPixelFormat(MTL::PixelFormatDepth32Float);
+        pTextureDesc->setWidth(SHADOW_MAP_WIDTH);
+        pTextureDesc->setHeight(SHADOW_MAP_HEIGHT);
+        pTextureDesc->setUsage(MTL::TextureUsageRenderTarget | MTL::TextureUsageShaderRead);
+        pTextureDesc->setStorageMode(MTL::StorageModePrivate);
+
+        m_pShadowDepthMapTextureMetal = Window::ins->getMetalDevice()->newTexture(pTextureDesc);
+
+        pTextureDesc->release();
+    }
+#endif // __APPLE__
 }
 
 void LightManager::updateLightingUBO()
@@ -98,22 +134,46 @@ void LightManager::updateLightingUBO()
     {
         m_bUBODirty = false;
 
-        glBindBuffer(GL_UNIFORM_BUFFER, m_nLightingUBO);
-        unsigned long nOffset = 0;
+        if (Window::ins->isUsingOpenGL())
+        {
+            glBindBuffer(GL_UNIFORM_BUFFER, m_nLightingUBO);
+            unsigned long nOffset = 0;
 
-        glBufferSubData(GL_UNIFORM_BUFFER, nOffset, sizeof(vec3), &m_colorAmbientLight);
-        nOffset += sizeof(vec4); // vec3 + padding
+            glBufferSubData(GL_UNIFORM_BUFFER, nOffset, sizeof(vec3), &m_colorAmbientLight);
+            nOffset += sizeof(vec4); // vec3 + padding
 
-        glBufferSubData(GL_UNIFORM_BUFFER, nOffset, MAX_DIRECTION_LIGHTS * DIRECTION_LIGHT_SIZE, &m_vecDirectionLights); 
-        nOffset += (MAX_DIRECTION_LIGHTS * DIRECTION_LIGHT_SIZE);
+            glBufferSubData(GL_UNIFORM_BUFFER, nOffset, MAX_DIRECTION_LIGHTS * DIRECTION_LIGHT_SIZE, &m_vecDirectionLights); 
+            nOffset += (MAX_DIRECTION_LIGHTS * DIRECTION_LIGHT_SIZE);
 
-        glBufferSubData(GL_UNIFORM_BUFFER, nOffset, MAX_POINT_LIGHTS * POINT_LIGHT_SIZE, &m_vecPointLights);
-        nOffset += (MAX_POINT_LIGHTS * POINT_LIGHT_SIZE);
+            glBufferSubData(GL_UNIFORM_BUFFER, nOffset, MAX_POINT_LIGHTS * POINT_LIGHT_SIZE, &m_vecPointLights);
+            nOffset += (MAX_POINT_LIGHTS * POINT_LIGHT_SIZE);
 
-        glBufferSubData(GL_UNIFORM_BUFFER, nOffset, sizeof(int), &m_nNumDirectionLights);
-        glBufferSubData(GL_UNIFORM_BUFFER, nOffset + sizeof(int), sizeof(int), &nNumPointLights);
+            glBufferSubData(GL_UNIFORM_BUFFER, nOffset, sizeof(int), &m_nNumDirectionLights);
+            glBufferSubData(GL_UNIFORM_BUFFER, nOffset + sizeof(int), sizeof(int), &nNumPointLights);
 
-        glBindBuffer(GL_UNIFORM_BUFFER, 0);
+            glBindBuffer(GL_UNIFORM_BUFFER, 0);
+        }
+#if __APPLE__
+        else if (Window::ins->isUsingMetal())
+        {
+            void* pBufferContents = m_pLightingBuffer->contents();
+            unsigned long nOffset = 0;
+
+            memcpy((char*)pBufferContents + nOffset, &m_colorAmbientLight, sizeof(vec3));
+            nOffset += sizeof(vec4); // vec3 + padding
+
+            memcpy((char*)pBufferContents + nOffset, &m_vecDirectionLights, MAX_DIRECTION_LIGHTS * DIRECTION_LIGHT_SIZE);
+            nOffset += (MAX_DIRECTION_LIGHTS * DIRECTION_LIGHT_SIZE);
+
+            memcpy((char*)pBufferContents + nOffset, &m_vecPointLights, MAX_POINT_LIGHTS * POINT_LIGHT_SIZE);
+            nOffset += (MAX_POINT_LIGHTS * POINT_LIGHT_SIZE);
+
+            memcpy((char*)pBufferContents + nOffset, &m_nNumDirectionLights, sizeof(int));
+            memcpy((char*)pBufferContents + nOffset + sizeof(int), &nNumPointLights, sizeof(int));
+
+            m_pLightingBuffer->didModifyRange(NS::Range(0, LIGHTING_UBO_SIZE));
+        }
+#endif // __APPLE__
     }
 }
 

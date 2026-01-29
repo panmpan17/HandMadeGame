@@ -12,6 +12,8 @@ public:
 
     Image* getImageByPath(const std::string_view& strPath);
 
+    inline Image* getPureWhite1by1Image() const { return m_pPureWhite1by1Image; }
+
 private:
     ImageLoader();
     ~ImageLoader();
@@ -19,4 +21,6 @@ private:
     static inline ImageLoader* ins = nullptr;
 
     std::unordered_map<std::string_view, Image*> m_mapLoadedImages;
+
+    Image* m_pPureWhite1by1Image = nullptr;
 };

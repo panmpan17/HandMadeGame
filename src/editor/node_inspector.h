@@ -4,7 +4,7 @@
 
 
 class Node;
-class Component;
+class NodeComponent;
 
 
 class NodeInspector : public IEditorWindow
@@ -19,5 +19,5 @@ private:
     bool m_bCollapsed = false;
 
     void updateTransform(Node* pNode);
-    void updateComponent(int nComponentIndex, Node* pNode, Component* pComponent);
+    void updateComponent(int nComponentIndex, Node* pNode, NodeComponent* pComponent);
 };

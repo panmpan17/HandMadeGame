@@ -22,7 +22,7 @@ public:
 
     virtual void setShader(Shader* pShader) override {}
 
-    virtual Component* clone() const override
+    virtual NodeComponent* clone() const override
     {
         TextRenderer* pNewTextRenderer = new TextRenderer();
         if (m_pMaterial) pNewTextRenderer->setMaterial(m_pMaterial);

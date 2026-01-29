@@ -7,7 +7,7 @@
 // #include "../serialization/type_registry.h"
 
 
-class TwoPointScaling : public Component
+class TwoPointScaling : public NodeComponent
 {
 public:
     TwoPointScaling(const Vector3& start, const Vector3& end, float duration)

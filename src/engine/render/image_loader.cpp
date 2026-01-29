@@ -1,5 +1,7 @@
 #include "image_loader.h"
 
+#include "../core/window.h"
+
 void ImageLoader::Initialize()
 {
     if (!ins)
@@ -20,7 +22,18 @@ void ImageLoader::Cleanup()
 
 ImageLoader::ImageLoader()
 {
+    m_pPureWhite1by1Image = new Image(1, 1, 4, new unsigned char[4]{255, 255, 255, 255});
 
+    if (Window::ins->isUsingOpenGL())
+    {
+        m_pPureWhite1by1Image->loadTextureToGL();
+    }
+#if __APPLE__
+    else if (Window::ins->isUsingMetal())
+    {
+        m_pPureWhite1by1Image->loadTextureToMetal();
+    }
+#endif
 }
 
 ImageLoader::~ImageLoader()
@@ -43,7 +56,20 @@ Image* ImageLoader::getImageByPath(const std::string_view& strPath)
     auto pImage = new Image(strPath);
     if (pImage->isCPULoaded())
     {
-        pImage->loadTextureToGL();
+        switch (Window::ins->getGraphicAPI())
+        {
+            case GraphicAPI::OpenGL:
+                pImage->loadTextureToGL();
+                break;
+#if __APPLE__
+            case GraphicAPI::Metal:
+                pImage->loadTextureToMetal();
+                break;
+#endif
+            default:
+                break;
+        }
+
         pImage->freeCPUData();
         m_mapLoadedImages[strPath] = pImage;
         return pImage;

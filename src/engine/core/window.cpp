@@ -1,7 +1,15 @@
 // #define GLAD_GL_IMPLEMENTATION
 #include <glad/gl.h>
-// #define GLFW_INCLUDE_NONE
+#define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
+
+#if __APPLE__
+#define GLFW_EXPOSE_NATIVE_COCOA
+#include <GLFW/glfw3native.h>
+
+#include <objc/runtime.h>
+#include <objc/message.h>
+#endif // __APPLE__
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
@@ -15,6 +23,7 @@
 #include "engine_event_dispatcher.h"
 #include "input/input_manager.h"
 #include "scene/world.h"
+#include "../render/renderer.h"
 #include "../render/image_loader.h"
 #include "../render/shader_loader.h"
 #include "../render/material_loader.h"
@@ -34,9 +43,21 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 
+#if __APPLE__
+#include "imgui_impl_metal.h"
+#include "metal/helper.h"
+#endif // __APPLE__
+
 
 inline constexpr std::string_view PROFILER_TAG_WINDOW_INITIALIZATION = "WindowInitialization";
 #define DEBUG_WINDOW_INIT_TIMER(strMsg) PROFILER_END_TIMER(PROFILER_TAG_WINDOW_INITIALIZATION, strMsg)
+
+
+// This is a workaround for Metal PixelFormat enum not being properly recognized in VSCode intellisense.
+#if VSCODE_ONLY
+namespace MTL { enum PixelFormat : NS::UInteger { PixelFormatBGRA8Unorm = 80 }; }
+#endif // VSCODE_ONLY
+
 
 Window* Window::ins = nullptr;
 
@@ -44,11 +65,32 @@ Window::Window()
 {
     ins = this;
 
+#if IS_DEBUG_VERSION
+    sm_bRestartRequested = false;
+#endif // IS_DEBUG_VERSION
+
     m_bShowIMGUI = Preference::getEnableIMGUI();
     m_bEnablePostProcess = Preference::getEnablePostProcess();
     m_oWindowSize.x = Preference::getWindowWidth();
     m_oWindowSize.y = Preference::getWindowHeight();
     m_bDrawGizmos = Preference::getEnableGizmos();
+
+#if __APPLE__
+    if (!Preference::getForceOpenGLOnMac())
+    {
+        m_pMetalDevice = MTL::CreateSystemDefaultDevice();
+    }
+    if (m_pMetalDevice)
+    {
+        m_eGraphicAPI = GraphicAPI::Metal;
+    }
+    else
+    {
+        m_eGraphicAPI = GraphicAPI::OpenGL;
+    }
+#else
+    m_eGraphicAPI = GraphicAPI::OpenGL;
+#endif
 
     if (!glfwInit())
     {
@@ -79,6 +121,30 @@ Window::~Window()
 
         glfwDestroyWindow(m_pWindow);
     }
+
+#if __APPLE__
+    if (m_pMetalLayer)
+    {
+        m_pMetalLayer->release();
+        m_pMetalLayer = nullptr;
+    }
+    if (m_pMetalDevice)
+    {
+        m_pMetalDevice->release();
+        m_pMetalDevice = nullptr;
+    }
+    if (m_pRenderPassDescriptor)
+    {
+        m_pRenderPassDescriptor->release();
+        m_pRenderPassDescriptor = nullptr;
+    }
+    if (m_pDepthOnlyRenderPassDescriptor)
+    {
+        m_pDepthOnlyRenderPassDescriptor->release();
+        m_pDepthOnlyRenderPassDescriptor = nullptr;
+    }
+#endif // __APPLE__
+
     if (m_pWorldScene)
     {
         delete m_pWorldScene;
@@ -88,14 +154,28 @@ Window::~Window()
     InputManager::Cleanup();
     ImageLoader::Cleanup();
     LightManager::Cleanup();
+    ShaderLoader::Cleanup();
+    MaterialLoader::Cleanup();
+    GizmosManager::Cleanup();
 
     Preference::savePreferences();
 
     glfwTerminate();
 
-    ImGui_ImplOpenGL3_Shutdown();
+    if (isUsingOpenGL())
+    {
+        ImGui_ImplOpenGL3_Shutdown();
+    }
+#if __APPLE__
+    else if (isUsingMetal())
+    {
+        ImGui_ImplMetal_Shutdown();
+    }
+#endif // __APPLE__
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
+
+    ins = nullptr;
 }
 
 void APIENTRY glDebugOutput(GLenum source, GLenum type, unsigned int id, GLenum severity, GLsizei length, const char* message, const void* userParam)
@@ -110,25 +190,22 @@ bool Window::configureAndCreateWindow()
 {
     PROFILER_START_TIMER();
 
-    // Configure GL version
-#if __APPLE__
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
-#else
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
-#endif
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
     glfwWindowHint(GLFW_RESIZABLE, m_bResizable ? GLFW_TRUE : GLFW_FALSE);
 
-    glfwWindowHint(GLFW_DEPTH_BITS, 24);
-
-    glfwSwapInterval(1);
+    if (isUsingOpenGL())
+    {
+        configureGLFWWithOpenGL();
+    }
+#if __APPLE__
+    else if (isUsingMetal())
+    {
+        configureGLFWWithMetal();
+    }
+#endif // __APPLE__
 
 #if IS_DEBUG_VERSION
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
-#endif
+#endif // IS_DEBUG_VERSION
 
     // GLFWmonitor* pPrimaryMonitor = glfwGetPrimaryMonitor();
     // const GLFWvidmode* pVideoMode = glfwGetVideoMode(pPrimaryMonitor);
@@ -164,35 +241,106 @@ bool Window::configureAndCreateWindow()
 
     // glfwSetWindowMonitor(m_pWindow, pPrimaryMonitor, 0, 0, pVideoMode->width, pVideoMode->height, pVideoMode->refreshRate);
 
-#if !__APPLE__
-    // GLint flags;
-    // glGetIntegerv(GL_CONTEXT_FLAGS, &flags);
-    // if (flags & GL_CONTEXT_FLAG_DEBUG_BIT)
-    // {
-    //     glEnable(GL_DEBUG_OUTPUT);
-    //     glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-    //     glDebugMessageCallback(glDebugOutput, nullptr);
-    //     glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
-    // }
-#endif
-
     // glfwSetWindowOpacity(m_pWindow, 0.5f); // Fun
+
+    DEBUG_WINDOW_INIT_TIMER("Window configured");
+
+    return true;
+}
+
+void Window::configureGLFWWithOpenGL()
+{
+    LOGLN("Configuring GLFW with OpenGL");
+#if __APPLE__
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+#else
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
+#endif // __APPLE__
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+    glfwWindowHint(GLFW_DEPTH_BITS, 24);
+}
+
+void Window::configureGLFWWithMetal()
+{
+    glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+}
+
+void Window::initializeGraphicsAPI()
+{
+    if (isUsingOpenGL())
+    {
+        LOGLN("Metal is not supported on this device.");
+        bindOpenGLToGlfwWindow();
+    }
+#if __APPLE__
+    else if (isUsingMetal())
+    {
+        LOGLN("Metal Device found: {}", m_pMetalDevice->name()->utf8String());
+        bindMetalToGlfwWindow();
+    }
+#endif // __APPLE__
+}
+
+void Window::bindOpenGLToGlfwWindow()
+{
     glfwMakeContextCurrent(m_pWindow);
     glfwSwapInterval(1); // Enable vsync
 
-
-    // Set up GLAD
     gladLoadGL(glfwGetProcAddress);
 
     glDepthFunc(GL_LESS);
     glEnable(GL_CULL_FACE);
 
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-    DEBUG_WINDOW_INIT_TIMER("Window configured");
-
-    return true;
 }
+
+#if __APPLE__
+void Window::bindMetalToGlfwWindow()
+{
+    glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+
+    void* pNSWindow = glfwGetCocoaWindow(m_pWindow);
+
+    void* view = ((void* (*)(id, SEL))objc_msgSend)((id)pNSWindow, sel_registerName("contentView"));
+
+    m_pMetalLayer = CA::MetalLayer::layer();
+    m_pMetalLayer->setDevice(m_pMetalDevice);
+    m_pMetalLayer->setPixelFormat(MTL::PixelFormat::PixelFormatBGRA8Unorm); // TODO: Might need to make this HDR?
+    m_pMetalLayer->setDrawableSize(CGSizeMake(m_oActualSize.x, m_oActualSize.y)); // TODO: Should this be m_oActualSize or m_oWindowSize?
+
+    ((void (*)(id, SEL, id))objc_msgSend)((id)view, sel_registerName("setLayer:"), (id)m_pMetalLayer);
+    ((void (*)(id, SEL, BOOL))objc_msgSend)((id)view, sel_registerName("setWantsLayer:"), (BOOL)true);
+
+    m_pMetalCommandQueue = m_pMetalDevice->newCommandQueue();
+
+    Renderer::initMetalDepthTexture(m_pMetalDevice, m_oActualSize.x, m_oActualSize.y);
+
+    m_pRenderPassDescriptor = MTL::RenderPassDescriptor::alloc()->init();
+
+    MTL::RenderPassDepthAttachmentDescriptor* pDepthAttach = m_pRenderPassDescriptor->depthAttachment();
+    pDepthAttach->setTexture(Renderer::m_pDepthTexture);
+    pDepthAttach->setLoadAction(MTL::LoadActionClear);
+    pDepthAttach->setClearDepth(1.0);
+    pDepthAttach->setStoreAction(MTL::StoreActionDontCare); // TODO: Might need to change to StoreActionStore
+
+    MTL::RenderPassColorAttachmentDescriptor* pColorAttachment = m_pRenderPassDescriptor->colorAttachments()->object(0);
+    pColorAttachment->setLoadAction(MTL::LoadActionClear);
+    pColorAttachment->setClearColor(MTL::ClearColor::Make(0.0, 0.0, 0.0, 1.0));
+    pColorAttachment->setStoreAction(MTL::StoreActionStore);
+
+
+    m_pDepthOnlyRenderPassDescriptor = MTL::RenderPassDescriptor::alloc()->init();
+
+    MTL::RenderPassDepthAttachmentDescriptor* pDepthOnlyAttach = m_pDepthOnlyRenderPassDescriptor->depthAttachment();
+    pDepthOnlyAttach->setTexture(nullptr); // Lighting system will set the depth texture when render depth
+    pDepthOnlyAttach->setLoadAction(MTL::LoadActionClear);
+    pDepthOnlyAttach->setClearDepth(1.0);
+    pDepthOnlyAttach->setStoreAction(MTL::StoreActionStore);
+}
+#endif
 
 void Window::setWindowSize(int nWidth, int nHeight)
 {
@@ -209,6 +357,11 @@ void Window::setupManagers()
     PROFILER_START_TIMER();
 
     TimeManager::Initialize();
+
+#if __APPLE__
+    Renderer::initializeSamplers(m_pMetalDevice);
+#endif // __APPLE__
+
     PROFILER_END_TIMER("Initialization", "TimeManager setup");
     ImageLoader::Initialize();
     PROFILER_END_TIMER("Initialization", "Image setup");
@@ -225,8 +378,8 @@ void Window::setupManagers()
     GizmosManager::Initialize();
     PROFILER_END_TIMER("Initialization", "Gizmos setup");
 
-    FontLoader::Initialize();
-    FontLoader::getInstance()->loadFont("assets/fonts/arial.ttf");
+    // FontLoader::Initialize();
+    // FontLoader::getInstance()->loadFont("assets/fonts/arial.ttf");
 
     m_pRenderProcessQueue = new RenderProcessQueue(this);
 
@@ -266,6 +419,23 @@ void Window::setupGameEngineRelatedObject()
         }
     });
 
+#if IS_DEBUG_VERSION
+    InputManager::getInstance()->registerKeyPressCallback(KeyCode::KEY_FUNCTION_1, [this](bool pressed) {
+        if (pressed)
+        {
+            m_bShowDebugDepth = !m_bShowDebugDepth;
+        }
+    });
+
+    InputManager::getInstance()->registerKeyPressCallback(KeyCode::KEY_FUNCTION_4, [](bool pressed) {
+        if (pressed)
+        {
+            Preference::setForceOpenGLOnMac(!Preference::getForceOpenGLOnMac());
+            Window::ins->sm_bRestartRequested = true;
+        }
+    });
+#endif // IS_DEBUG_VERSION
+
     PROFILER_END_TIMER("Initialization", "Input key setup");
 
 #if IS_DEBUG_VERSION
@@ -291,8 +461,18 @@ void Window::setupIMGUIAndEditorWindows()
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
 
     // Setup Platform/Renderer backends
-    ImGui_ImplGlfw_InitForOpenGL(m_pWindow, true);          // Second param install_callback=true will install GLFW callbacks and chain to existing ones.
-    ImGui_ImplOpenGL3_Init();
+    if (isUsingOpenGL())
+    {
+        ImGui_ImplGlfw_InitForOpenGL(m_pWindow, true);          // Second param install_callback=true will install GLFW callbacks and chain to existing ones.
+        ImGui_ImplOpenGL3_Init();
+    }
+#if __APPLE__
+    else if (isUsingMetal())
+    {
+        ImGui_ImplGlfw_InitForOther(m_pWindow, true);
+        ImGui_ImplMetal_Init(m_pMetalDevice);
+    }
+#endif // __APPLE__
 
     if (m_bAddGameRelatedIMGUIWindows)
     {
@@ -301,7 +481,7 @@ void Window::setupIMGUIAndEditorWindows()
         m_oEditorWindows.addElement(new PostProcessInspector());
     }
 
-    for (int i = 0; i < m_oEditorWindows.getSize(); ++i)
+    for (int i = 0; i < m_oEditorWindows.getCount(); ++i)
     {
         IEditorWindow* pWindow = m_oEditorWindows.getElement(i);
         if (pWindow)
@@ -323,7 +503,13 @@ void Window::mainLoop()
 {
     beforeLoop();
 
+    Shader* pPureColorTexture = ShaderLoader::getInstance()->getShader("depth_debug");
+
+#if IS_DEBUG_VERSION
+    while (!glfwWindowShouldClose(m_pWindow) && !sm_bRestartRequested)
+#else
     while (!glfwWindowShouldClose(m_pWindow))
+#endif
     {
         glfwPollEvents();
 
@@ -337,36 +523,115 @@ void Window::mainLoop()
             m_onWindowResize.invoke(m_oActualSize);
 
             glfwGetWindowSize(m_pWindow, &m_oWindowSize.x, &m_oWindowSize.y);
+
+#if __APPLE__
+            if (isUsingMetal())
+            {
+                m_pMetalLayer->setDrawableSize(CGSizeMake(m_oActualSize.x, m_oActualSize.y));
+                Renderer::initMetalDepthTexture(m_pMetalDevice, m_oActualSize.x, m_oActualSize.y);
+
+                // If don't reset the depth attachment and color attachment, it will keep using the old texture size and cause issues.
+                MTL::RenderPassDepthAttachmentDescriptor* pDepthAttach = m_pRenderPassDescriptor->depthAttachment();
+                pDepthAttach->setTexture(Renderer::m_pDepthTexture);
+                pDepthAttach->setLoadAction(MTL::LoadActionClear);
+                pDepthAttach->setClearDepth(1.0);
+                pDepthAttach->setStoreAction(MTL::StoreActionDontCare); // TODO: Might need to change to StoreActionStore
+
+                MTL::RenderPassColorAttachmentDescriptor* pColorAttachment = m_pRenderPassDescriptor->colorAttachments()->object(0);
+                pColorAttachment->setLoadAction(MTL::LoadActionClear);
+                pColorAttachment->setClearColor(MTL::ClearColor::Make(0.0, 0.0, 0.0, 1.0));
+                pColorAttachment->setStoreAction(MTL::StoreActionStore);
+            }
+#endif // __APPLE__
+            // TODO: Change to glfwSetFramebufferSizeCallback
+        }
+
+        if (m_bShowIMGUI)
+        {
+            IMGUINewFrame();
         }
 
         runUpdate();
-        drawFrame();
 
-        glfwSwapBuffers(m_pWindow);
+        if (isUsingOpenGL())
+        {
+            glViewport(0, 0, m_oActualSize.x, m_oActualSize.y);
+            glClearColor(0.f, 0.f, 0.f, 1.0f);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+            drawFrame();
+            glfwSwapBuffers(m_pWindow);
+        }
+#if __APPLE__
+        else if (isUsingMetal())
+        {
+            NS::AutoreleasePool* pPool = NS::AutoreleasePool::alloc()->init();
+
+            m_pCurrentDrawable = m_pMetalLayer->nextDrawable();
+
+            m_pCurrentCommandBuffer = m_pMetalCommandQueue->commandBuffer();
+
+            drawFrame();
+
+            if (m_bShowDebugDepth)
+            {
+                setCurrentDrawingTexture(m_pCurrentDrawable->texture());
+
+                m_pCurrentFrameRenderEncoder->setRenderPipelineState(pPureColorTexture->getMetalPipelineState());
+                m_pCurrentFrameRenderEncoder->setVertexBuffer(m_pRenderProcessQueue->getMetalFullScreenVertexBuffer(), 0, 0);
+                m_pCurrentFrameRenderEncoder->setFragmentTexture(LightManager::getInstance()->getShadowDepthMapTextureMetal(), 0);
+                m_pCurrentFrameRenderEncoder->setFragmentSamplerState(Renderer::m_pLinearSampler, 0);
+
+                m_pCurrentFrameRenderEncoder->drawPrimitives(MTL::PrimitiveTypeTriangleStrip, NS::UInteger(0), NS::UInteger(4));
+
+                m_pCurrentFrameRenderEncoder->endEncoding();
+                m_pCurrentFrameRenderEncoder = nullptr;
+            }
+
+            m_pCurrentCommandBuffer->presentDrawable(m_pCurrentDrawable);
+            m_pCurrentCommandBuffer->commit();
+
+            pPool->release();
+        }
+#endif // __APPLE__
     }
 }
 
 void Window::runUpdate()
 {
-    if (m_bShowIMGUI)
-    {
-        updateIMGUI();
-    }
-
-
     float fDeltaTime = TimeManager::getInstance()->preUpdate();
 
     EngineEventDispatcher::getInstance().updateEvents(fDeltaTime);
 
     m_pWorldScene->update(fDeltaTime);
+
+    if (Camera::main)
+    {
+        Camera::main->updateCameraDataBuffer();
+    }
+
+    LightManager::getInstance()->updateLightingUBO();
 }
 
-void Window::updateIMGUI()
+void Window::IMGUINewFrame()
 {
-    ImGui_ImplOpenGL3_NewFrame();
+    if (isUsingOpenGL())
+    {
+        ImGui_ImplOpenGL3_NewFrame();
+    }
+#if __APPLE__
+    else if (isUsingMetal())
+    {
+        ImGui_ImplMetal_NewFrame(m_pRenderPassDescriptor);
+    }
+#endif // __APPLE__
+
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
-    
+}
+
+void Window::drawIMGUIEditor()
+{
     int nSize = m_oEditorWindows.getSize();
     for (int i = 0; i < nSize; ++i)
     {
@@ -377,7 +642,8 @@ void Window::updateIMGUI()
         }
     }
 
-    if (ImGui::BeginMainMenuBar())
+    // TODO: try to fix the issue of menu bar on Metal will crash
+    if (!isUsingMetal() && ImGui::BeginMainMenuBar())
     {
         if (ImGui::BeginMenu("Editor Windows"))
         {
@@ -405,6 +671,38 @@ void Window::updateIMGUI()
 
         ImGui::EndMainMenuBar();
     }
+
+#if IS_DEBUG_VERSION
+    if (m_bShowFPS)
+    {
+        drawFrameInfo();
+    }
+#endif
+    ImGui::Render();
+
+    if (isUsingOpenGL())
+    {
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+    }
+#if __APPLE__
+    else if (isUsingMetal())
+    {
+        ImGui_ImplMetal_RenderDrawData(ImGui::GetDrawData(), m_pCurrentCommandBuffer, m_pCurrentFrameRenderEncoder);
+    }
+#endif // __APPLE__
+}
+
+void Window::setCurrentDrawingTexture(MTL::Texture* pTexture)
+{
+    if (m_pCurrentFrameRenderEncoder)
+    {
+        m_pCurrentFrameRenderEncoder->endEncoding();
+    }
+
+    MTL::RenderPassColorAttachmentDescriptor* pColorAttachment = m_pRenderPassDescriptor->colorAttachments()->object(0);
+    pColorAttachment->setTexture(pTexture);
+
+    m_pCurrentFrameRenderEncoder = m_pCurrentCommandBuffer->renderCommandEncoder(m_pRenderPassDescriptor);
 }
 
 void Window::drawFrame()
@@ -412,22 +710,40 @@ void Window::drawFrame()
     m_nDrawCallCount = 0;
     m_nTriangleCount = 0;
 
-    if (Camera::main)
-    {
-        Camera::main->updateCameraDataBuffer();
-    }
-
     LightManager* const pLightManager = LightManager::getInstance();
-    pLightManager->updateLightingUBO();
-
-    DirectionLightComponent* pMainDirLight = pLightManager->getMainDirectionLightComponent();
+    DirectionLightComponent* pMainDirLight = LightManager::getInstance()->getMainDirectionLightComponent();
     if (pMainDirLight && pMainDirLight->getShadowsEnabled())
     {
-        glViewport(0, 0, LightManager::SHADOW_MAP_WIDTH, LightManager::SHADOW_MAP_HEIGHT);
-        glBindFramebuffer(GL_FRAMEBUFFER, pLightManager->getShadowDepthMapFBO());
-        glClear(GL_DEPTH_BUFFER_BIT);
-        m_pWorldScene->renderDepth();
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        if (isUsingOpenGL())
+        {
+            glViewport(0, 0, LightManager::SHADOW_MAP_WIDTH, LightManager::SHADOW_MAP_HEIGHT);
+            glBindFramebuffer(GL_FRAMEBUFFER, pLightManager->getShadowDepthMapFBO());
+            glClear(GL_DEPTH_BUFFER_BIT);
+            glCullFace(GL_FRONT);
+            m_pWorldScene->renderDepth();
+            glCullFace(GL_BACK);
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        }
+#if __APPLE__
+        else if (isUsingMetal())
+        {
+            m_pDepthOnlyRenderPassDescriptor->depthAttachment()->setTexture(pLightManager->getShadowDepthMapTextureMetal());
+
+            m_pCurrentFrameDepthRenderEncoder = m_pCurrentCommandBuffer->renderCommandEncoder(m_pDepthOnlyRenderPassDescriptor);
+            m_pCurrentFrameDepthRenderEncoder->setDepthStencilState(Renderer::m_pDepthOnStencilState);
+            m_pCurrentFrameDepthRenderEncoder->setCullMode(MTL::CullModeFront); // Use front-face culling for shadow maps to reduce shadow acne
+            m_pCurrentFrameDepthRenderEncoder->setFrontFacingWinding(MTL::WindingCounterClockwise);
+
+            m_pWorldScene->renderDepth();
+            m_pCurrentFrameDepthRenderEncoder->endEncoding();
+            m_pCurrentFrameDepthRenderEncoder = nullptr;
+        }
+#endif // __APPLE__
+    }
+
+    if (m_bShowDebugDepth)
+    {
+        return;
     }
 
     if (m_bEnablePostProcess) // Enable post process
@@ -436,16 +752,24 @@ void Window::drawFrame()
         m_pWorldScene->render();
         m_pRenderProcessQueue->endFrame();
 
-        glDisable(GL_DEPTH_TEST);
+        if (isUsingOpenGL())
+        {
+            glDisable(GL_DEPTH_TEST);
+        }
         m_pRenderProcessQueue->startProcessing();
         m_pRenderProcessQueue->renderToScreen();
-        glEnable(GL_DEPTH_TEST);
+        if (isUsingOpenGL())
+        {
+            glEnable(GL_DEPTH_TEST);
+        }
     }
     else
     {
-        glViewport(0, 0, m_oActualSize.x, m_oActualSize.y);
-        glClearColor(0.f, 0.f, 0.f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        if (isUsingMetal())
+        {
+        setCurrentDrawingTexture(m_pCurrentDrawable->texture());
+        }
+
         m_pWorldScene->render();
     }
 
@@ -456,14 +780,13 @@ void Window::drawFrame()
 
     if (m_bShowIMGUI)
     {
-#if IS_DEBUG_VERSION
-        if (m_bShowFPS)
-        {
-            drawFrameInfo();
-        }
-#endif
-        ImGui::Render();
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+        drawIMGUIEditor();
+    }
+
+    if (isUsingMetal())
+    {
+        m_pCurrentFrameRenderEncoder->endEncoding();
+        m_pCurrentFrameRenderEncoder = nullptr;
     }
 }
 
@@ -474,7 +797,8 @@ void Window::drawFrameInfo()
                  | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing
                  | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoBackground);
     ImGui::SetWindowSize(ImVec2(200, 100), ImGuiCond_Always);
-    ImGui::SetWindowPos(ImVec2(0, ImGui::GetIO().DisplaySize.y - 45), ImGuiCond_Always);
+    ImGui::SetWindowPos(ImVec2(0, ImGui::GetIO().DisplaySize.y - 60), ImGuiCond_Always);
+    ImGui::Text("Grahpics: %s", isUsingOpenGL() ? "OpenGL" : (isUsingMetal() ? "Metal" : "Unknown"));
     ImGui::Text("%.1f FPS (%.3f ms)", ImGui::GetIO().Framerate, 1000.0f / ImGui::GetIO().Framerate);
     ImGui::Text("Draw Call: %d; Triangle: %d", m_nDrawCallCount, m_nTriangleCount);
     ImGui::End();

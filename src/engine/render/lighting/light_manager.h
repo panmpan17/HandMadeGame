@@ -5,6 +5,10 @@
 #include <linmath.h>
 #include "../../../utils/expandable_array.h"
 
+#if __APPLE__
+#include <Metal/Metal.hpp>
+#endif
+
 typedef unsigned int GLuint;
 class PointLightComponent;
 class DirectionLightComponent;
@@ -27,12 +31,20 @@ public:
 
     inline GLuint getLightingUBO() const { return m_nLightingUBO; }
 
+#if __APPLE__
+    inline MTL::Buffer* getLightingMetalBuffer() const { return m_pLightingBuffer; }
+#endif
+
     void updateLightingUBO();
+
+    inline const vec3& getAmbientLightColor() const { return m_colorAmbientLight; }
+    inline void setAmbientLightColor(const vec3& color) { vec3_dup(m_colorAmbientLight, color); m_bUBODirty = true; }
 
     inline void registerPointLightComponent(PointLightComponent* pPointLightComp)
     {
         m_arrPointLightsComponents.addElement(pPointLightComp);
         ++m_nNumPointLights;
+        m_bUBODirty = true;
     }
 
     inline void unregisterPointLightComponent(PointLightComponent* pPointLightComp)
@@ -50,6 +62,7 @@ public:
     {
         m_arrDirectionLightsComponents.addElement(pDirectionLightComp);
         ++m_nNumDirectionLights;
+        m_bUBODirty = true;
     }
 
     inline void unregisterDirectionLightComponent(DirectionLightComponent* pDirectionLightComp)
@@ -74,6 +87,9 @@ public:
     inline GLuint getShadowDepthMapFBO() const { return m_nShadowDepthMapFBO; }
     inline GLuint getShadowDepthMapTexture() const { return m_nShadowDepthMapTexture; }
 
+#if __APPLE__
+    inline MTL::Texture* getShadowDepthMapTextureMetal() const { return m_pShadowDepthMapTextureMetal; }
+#endif
 
 private:
     static LightManager* ins;
@@ -83,6 +99,11 @@ private:
 
     bool m_bUBODirty = true;
     GLuint m_nLightingUBO = 0;
+
+#if __APPLE__
+    MTL::Buffer* m_pLightingBuffer = nullptr;
+    MTL::Texture* m_pShadowDepthMapTextureMetal = nullptr;
+#endif
 
     vec3 m_colorAmbientLight = {0.2f, 0.2f, 0.2f};
 

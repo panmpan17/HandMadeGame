@@ -34,7 +34,7 @@
 
 
 
-class Rotate3D : public Component
+class Rotate3D : public NodeComponent
 {
 public:
     Rotate3D(float fXSpeed = 0, float fYSpeed = 0, float fZSpeed = 0)
@@ -52,7 +52,7 @@ public:
         }
     }
 
-    virtual Component* clone() const override
+    virtual NodeComponent* clone() const override
     {
         Rotate3D* pNewRotate = new Rotate3D();
         pNewRotate->m_vecCurrentEulerAngles = this->m_vecCurrentEulerAngles;

@@ -27,6 +27,7 @@ public:
 
     void update(float fDeltatime);
     void render();
+    void renderTransparentObjects();
     void renderDepth();
     void drawGizmos();
 

@@ -1,17 +1,9 @@
 #include "node_inspector.h"
 
 #include <imgui.h>
-#include <imgui_impl_glfw.h>
-#include <imgui_impl_opengl3.h>
 #include "editor.h"
-#include "../engine/core/camera.h"
 #include "../engine/core/scene/node.h"
 #include "../engine/components/component.h"
-#include "../engine/components/particle/particle_system.h"
-#include "../engine/components/transform/movement.h"
-#include "../engine/components/transform/rotate.h"
-#include "../engine/components/transform/scaling.h"
-#include "../engine/render/lighting/direction_light.h"
 
 
 NodeInspector::NodeInspector()
@@ -97,7 +89,7 @@ void NodeInspector::updateTransform(Node* pNode)
     }
 }
 
-void NodeInspector::updateComponent(int nComponentIndex, Node* pNode, Component* pComponent)
+void NodeInspector::updateComponent(int nComponentIndex, Node* pNode, NodeComponent* pComponent)
 {
     const std::string strTypeName = TypeRegistry::instance().getTitlizedName(typeid(*pComponent));
     ImGui::Text("%s", strTypeName.c_str());

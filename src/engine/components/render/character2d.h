@@ -2,7 +2,7 @@
 #include "../component.h"
 #include "../../core/debug_macro.h"
 
-class Character2d : public Component
+class Character2d : public NodeComponent
 {
 public:
     Character2d() {};

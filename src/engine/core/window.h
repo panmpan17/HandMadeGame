@@ -6,6 +6,12 @@
 #include "../../utils/expandable_array.h"
 #include "../../editor/editor_window.h"
 
+#if __APPLE__
+#include <Foundation/Foundation.hpp>
+#include <Metal/Metal.hpp>
+#include <QuartzCore/QuartzCore.hpp>
+#endif // __APPLE__
+
 typedef struct GLFWwindow GLFWwindow;
 
 class WorldScene;
@@ -14,9 +20,19 @@ class FileWatchDog;
 
 typedef unsigned int GLuint;
 
+enum class GraphicAPI
+{
+    OpenGL,
+    Metal
+};
+
 class Window {
 public:
     static Window* ins;
+
+#if IS_DEBUG_VERSION
+    static inline bool sm_bRestartRequested = false;
+#endif // IS_DEBUG_VERSION
 
     Window();
     ~Window();
@@ -43,6 +59,10 @@ public:
     inline void setShowFPS(bool bShow) { m_bShowFPS = bShow; }
 
     bool configureAndCreateWindow();
+    void configureGLFWWithOpenGL();
+    void configureGLFWWithMetal();
+
+    void initializeGraphicsAPI();
 
     void setupManagers();
     void setupGameEngineRelatedObject();
@@ -57,8 +77,39 @@ public:
         m_onWindowResize.add(funcListener); 
     }
 
+#if __APPLE__
+    inline MTL::Device* getMetalDevice() const { return m_pMetalDevice; }
+
+    inline CA::MetalDrawable* getCurrentDrawable() const { return m_pCurrentDrawable; }
+    inline MTL::RenderCommandEncoder* getCurrentFrameRenderEncoder() const { return m_pCurrentFrameRenderEncoder; }
+    inline MTL::RenderCommandEncoder* getCurrentFrameDepthRenderEncoder() const { return m_pCurrentFrameDepthRenderEncoder; }
+
+    void setCurrentDrawingTexture(MTL::Texture* pTexture);
+#endif // __APPLE__
+
+    inline GraphicAPI getGraphicAPI() const { return m_eGraphicAPI; }
+    inline bool isUsingMetal() const { return m_eGraphicAPI == GraphicAPI::Metal; }
+    inline bool isUsingOpenGL() const { return m_eGraphicAPI == GraphicAPI::OpenGL; }
+
 private:
     GLFWwindow* m_pWindow = nullptr;
+
+    GraphicAPI m_eGraphicAPI = GraphicAPI::OpenGL;
+
+#if __APPLE__
+    MTL::Device* m_pMetalDevice = nullptr;
+    CA::MetalLayer* m_pMetalLayer = nullptr;
+
+    MTL::CommandQueue* m_pMetalCommandQueue = nullptr;
+    MTL::RenderPassDescriptor* m_pRenderPassDescriptor = nullptr;
+    MTL::RenderPassDescriptor* m_pDepthOnlyRenderPassDescriptor = nullptr;
+
+    MTL::CommandBuffer* m_pCurrentCommandBuffer = nullptr;
+    MTL::RenderCommandEncoder* m_pCurrentFrameRenderEncoder = nullptr;
+    MTL::RenderCommandEncoder* m_pCurrentFrameDepthRenderEncoder = nullptr;
+    CA::MetalDrawable* m_pCurrentDrawable = nullptr;
+#endif // __APPLE__
+
     RenderProcessQueue* m_pRenderProcessQueue = nullptr;
     bool m_bEnablePostProcess = true;
 
@@ -84,21 +135,29 @@ private:
 
     FileWatchDog* m_pFileWatchDog = nullptr;
 
-    Event<Vector2i> m_onWindowResize;
+    CustomEvent<Vector2i> m_onWindowResize;
+
+    bool m_bShowDebugDepth = false;
 
 #if IS_DEBUG_VERSION
     bool m_bDrawGizmos = true;
 #else
     bool m_bDrawGizmos = false;
-#endif
+#endif // IS_DEBUG_VERSION
+
+    void bindOpenGLToGlfwWindow();
+#if __APPLE__
+    void bindMetalToGlfwWindow();
+#endif // __APPLE__
 
     void setupInputManager();
 
     void setupIMGUIAndEditorWindows();
 
     void beforeLoop();
+    void IMGUINewFrame();
     void runUpdate();
-    void updateIMGUI();
+    void drawIMGUIEditor();
     void drawFrame();
     void drawFrameInfo();
 };
@@ -107,4 +166,4 @@ private:
 #define INCREASE_DRAW_CALL_COUNT(n) Window::ins->increaseDrawCallCount(n)
 #else
 #define INCREASE_DRAW_CALL_COUNT(n) do {} while (0)
-#endif
+#endif // IS_DEBUG_VERSION
