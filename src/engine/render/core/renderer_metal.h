@@ -1,12 +1,9 @@
-#pragma once
-
-
 #if __APPLE__
 #include <Metal/Metal.hpp>
 #endif // __APPLE__
 
 
-class Renderer
+class MetalRenderer
 {
 #if __APPLE__
 public:

@@ -2,7 +2,7 @@
 
 #include <glad/glad.h>
 #include "../shader_loader.h"
-#include "../renderer.h"
+#include "../core/renderer.h"
 #include "../../core/debug_macro.h"
 #include "../../core/window.h"
 
@@ -92,7 +92,7 @@ void GammaCorrection::render()
         pEncoder->setVertexBuffer(pQueue->getMetalFullScreenVertexBuffer(), 0, 0);
         pEncoder->setFragmentBytes(&m_fGamma, sizeof(float), 1);
         pEncoder->setFragmentTexture(pQueue->getFinalMetalRenderTexture(), 0);
-        pEncoder->setFragmentSamplerState(Renderer::m_pLinearSampler, 0);
+        pEncoder->setFragmentSamplerState(MetalRenderer::m_pLinearSampler, 0);
 
         pEncoder->drawPrimitives(MTL::PrimitiveTypeTriangleStrip, NS::UInteger(0), NS::UInteger(4));
         INCREASE_DRAW_CALL_COUNT(2);

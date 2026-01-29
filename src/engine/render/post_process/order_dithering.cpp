@@ -2,7 +2,7 @@
 
 #include <glad/glad.h>
 #include "../shader_loader.h"
-#include "../renderer.h"
+#include "../core/renderer.h"
 #include "../../core/debug_macro.h"
 #include "../../core/window.h"
 
@@ -91,7 +91,7 @@ void OrderDithering::render()
         pEncoder->setVertexBuffer(m_pProcessQueue->getMetalFullScreenVertexBuffer(), 0, 0);
 
         pEncoder->setFragmentTexture(m_pProcessQueue->getFinalMetalRenderTexture(), 0);
-        pEncoder->setFragmentSamplerState(Renderer::m_pLinearSampler, 0);
+        pEncoder->setFragmentSamplerState(MetalRenderer::m_pLinearSampler, 0);
 
         pEncoder->drawPrimitives(MTL::PrimitiveType::PrimitiveTypeTriangleStrip, 0, 4, 1);
         INCREASE_DRAW_CALL_COUNT(2);

@@ -7,7 +7,7 @@
 #include "../math/random.h"
 #include "../serialization/serializer.h"
 #include "../../render/skybox.h"
-#include "../../render/renderer.h"
+#include "../../render/core/renderer.h"
 #include "../../components/input/first_person_free_control_camera.h"
 #include "../../components/drawable_interface.h"
 #include "../../../editor/gizmos.h"
@@ -139,7 +139,7 @@ void WorldScene::render()
     else if (bUsingMetal)
     {
         MTL::RenderCommandEncoder* pRenderEncoder = Window::ins->getCurrentFrameRenderEncoder();
-        pRenderEncoder->setDepthStencilState(Renderer::m_pDepthOnStencilState);
+        pRenderEncoder->setDepthStencilState(MetalRenderer::m_pDepthOnStencilState);
         pRenderEncoder->setCullMode(MTL::CullModeBack);
         pRenderEncoder->setFrontFacingWinding(MTL::WindingCounterClockwise);
     }
@@ -177,7 +177,7 @@ void WorldScene::renderTransparentObjects()
     else if (bUsingMetal)
     {
         MTL::RenderCommandEncoder* pRenderEncoder = Window::ins->getCurrentFrameRenderEncoder();
-        pRenderEncoder->setDepthStencilState(Renderer::m_pDepthOffStencilState);
+        pRenderEncoder->setDepthStencilState(MetalRenderer::m_pDepthOffStencilState);
 
     }
 #endif // __APPLE__
@@ -201,7 +201,7 @@ void WorldScene::renderTransparentObjects()
     else if (bUsingMetal)
     {
         MTL::RenderCommandEncoder* pRenderEncoder = Window::ins->getCurrentFrameRenderEncoder();
-        pRenderEncoder->setDepthStencilState(Renderer::m_pDepthOnStencilState);
+        pRenderEncoder->setDepthStencilState(MetalRenderer::m_pDepthOnStencilState);
     }
 #endif // __APPLE__
 }

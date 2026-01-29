@@ -4,7 +4,7 @@
 #include "../vertex.h"
 #include "../shader.h"
 #include "../shader_loader.h"
-#include "../renderer.h"
+#include "../core/renderer.h"
 #include "../../core/window.h"
 #include "../../core/debug_macro.h"
 
@@ -152,7 +152,7 @@ void BloomTest::renderColorHighlight()
         pEncoder->setVertexBuffer(pQueue->getMetalFullScreenVertexBuffer(), 0, 0);
         pEncoder->setFragmentBytes(&m_fHighlightThreshold, sizeof(float), 1);
         pEncoder->setFragmentTexture(pQueue->getFinalMetalRenderTexture(), 0);
-        pEncoder->setFragmentSamplerState(Renderer::m_pLinearSampler, 0);
+        pEncoder->setFragmentSamplerState(MetalRenderer::m_pLinearSampler, 0);
 
         pEncoder->drawPrimitives(MTL::PrimitiveTypeTriangleStrip, NS::UInteger(0), NS::UInteger(4));
         INCREASE_DRAW_CALL_COUNT(2);
@@ -217,7 +217,7 @@ void BloomTest::renderHorizontalBlur()
         pEncoder->setFragmentBytes(&sizeRadiusSigma, sizeof(sizeRadiusSigma), 1);
 
         pEncoder->setFragmentTexture(m_pMetalRenderTexture_ColorHighlight, 0);
-        pEncoder->setFragmentSamplerState(Renderer::m_pLinearSampler, 0);
+        pEncoder->setFragmentSamplerState(MetalRenderer::m_pLinearSampler, 0);
 
         pEncoder->drawPrimitives(MTL::PrimitiveTypeTriangleStrip, NS::UInteger(0), NS::UInteger(4));
         INCREASE_DRAW_CALL_COUNT(2);
@@ -282,7 +282,7 @@ void BloomTest::renderVerticalBlur()
         pEncoder->setFragmentBytes(&sizeRadiusSigma, sizeof(sizeRadiusSigma), 1);
 
         pEncoder->setFragmentTexture(m_pMetalRenderTexture_HorizontalBlur, 0);
-        pEncoder->setFragmentSamplerState(Renderer::m_pLinearSampler, 0);
+        pEncoder->setFragmentSamplerState(MetalRenderer::m_pLinearSampler, 0);
 
         pEncoder->drawPrimitives(MTL::PrimitiveTypeTriangleStrip, NS::UInteger(0), NS::UInteger(4));
         INCREASE_DRAW_CALL_COUNT(2);
@@ -349,7 +349,7 @@ void BloomTest::renderComposite()
 
         pEncoder->setFragmentTexture(m_pMetalOriginalRenderTexture, 0);
         pEncoder->setFragmentTexture(m_pMetalRenderTexture_VerticalBlur, 1);
-        pEncoder->setFragmentSamplerState(Renderer::m_pLinearSampler, 0);
+        pEncoder->setFragmentSamplerState(MetalRenderer::m_pLinearSampler, 0);
 
         pEncoder->drawPrimitives(MTL::PrimitiveTypeTriangleStrip, NS::UInteger(0), NS::UInteger(4));
         INCREASE_DRAW_CALL_COUNT(2);

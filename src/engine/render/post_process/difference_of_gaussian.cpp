@@ -3,7 +3,7 @@
 #include <glad/gl.h>
 #include "../vertex.h"
 #include "../shader_loader.h"
-#include "../renderer.h"
+#include "../core/renderer.h"
 #include "../../core/window.h"
 #include "../../core/debug_macro.h"
 
@@ -189,7 +189,7 @@ void DifferenceOfGaussian::renderBlurMetal(Shader* pShader, MTL::Texture* pOutpu
     pEncoder->setFragmentBytes(&sizeRadiusSigma, sizeof(sizeRadiusSigma), 1);
 
     pEncoder->setFragmentTexture(pInputTexture, 0);
-    pEncoder->setFragmentSamplerState(Renderer::m_pLinearSampler, 0);
+    pEncoder->setFragmentSamplerState(MetalRenderer::m_pLinearSampler, 0);
 
     pEncoder->drawPrimitives(MTL::PrimitiveTypeTriangleStrip, NS::UInteger(0), NS::UInteger(4));
     INCREASE_DRAW_CALL_COUNT(2);
@@ -246,7 +246,7 @@ void DifferenceOfGaussian::renderComposite()
         pEncoder->setFragmentTexture(m_pOriginalRenderTexture_Metal, 0);
         pEncoder->setFragmentTexture(m_pRenderTexture_Blur1_Vertical_Metal, 1);
         pEncoder->setFragmentTexture(m_pRenderTexture_Blur2_Vertical_Metal, 2);
-        pEncoder->setFragmentSamplerState(Renderer::m_pLinearSampler, 0);
+        pEncoder->setFragmentSamplerState(MetalRenderer::m_pLinearSampler, 0);
 
         pEncoder->drawPrimitives(MTL::PrimitiveTypeTriangleStrip, NS::UInteger(0), NS::UInteger(4));
         INCREASE_DRAW_CALL_COUNT(2);

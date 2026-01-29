@@ -6,7 +6,7 @@
 #include "../../render/shader_loader.h"
 #include "../../render/image.h"
 #include "../../render/material.h"
-#include "../../render/renderer.h"
+#include "../../render/core/renderer.h"
 #include "../../core/debug_macro.h"
 #include "../../core/scene/node.h"
 #include "../../core/camera.h"
@@ -245,7 +245,7 @@ void ParticleSystem::draw()
         {
             // TODO: is there a better way to set texture index?
             pRenderEncoder->setFragmentTexture(pImage->getMetalTexture(), 0);
-            pRenderEncoder->setFragmentSamplerState(Renderer::m_pLinearSampler, 0);
+            pRenderEncoder->setFragmentSamplerState(MetalRenderer::m_pLinearSampler, 0);
         }
 
         pRenderEncoder->drawPrimitives(MTL::PrimitiveType::PrimitiveTypeTriangleStrip, NS::UInteger(0), NS::UInteger(4), NS::UInteger(m_nAliveParticleCount));

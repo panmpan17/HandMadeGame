@@ -12,7 +12,7 @@
 #include "../engine/render/shader_loader.h"
 #include "../engine/render/image_loader.h"
 #include "../engine/render/vertex.h"
-#include "../engine/render/renderer.h"
+#include "../engine/render/core/renderer.h"
 #include "../engine/render/models/simple_obj_reader.h"
 
 #define NS_INT(x) static_cast<NS::UInteger>(x)
@@ -400,7 +400,7 @@ void GizmosManager::drawAllGizmos()
     else if (Window::ins->isUsingMetal())
     {
         MTL::RenderCommandEncoder* pRenderCommandEncoder = Window::ins->getCurrentFrameRenderEncoder();
-        pRenderCommandEncoder->setDepthStencilState(Renderer::m_pDepthOffStencilState);
+        pRenderCommandEncoder->setDepthStencilState(MetalRenderer::m_pDepthOffStencilState);
     }
 #endif
 
@@ -420,7 +420,7 @@ void GizmosManager::drawAllGizmos()
     else if (Window::ins->isUsingMetal())
     {
         MTL::RenderCommandEncoder* pRenderCommandEncoder = Window::ins->getCurrentFrameRenderEncoder();
-        pRenderCommandEncoder->setDepthStencilState(Renderer::m_pDepthOnStencilState);
+        pRenderCommandEncoder->setDepthStencilState(MetalRenderer::m_pDepthOnStencilState);
     }
 #endif
 }
@@ -771,7 +771,7 @@ void GizmosManager::drawImageGizmos()
 
                 MTL::Texture* pTexture = pImage ? pImage->getMetalTexture() : ImageLoader::getInstance()->getPureWhite1by1Image()->getMetalTexture();
                 pRenderCommandEncoder->setFragmentTexture(pTexture, 0);
-                pRenderCommandEncoder->setFragmentSamplerState(Renderer::m_pLinearSampler, 0);
+                pRenderCommandEncoder->setFragmentSamplerState(MetalRenderer::m_pLinearSampler, 0);
 
                 pRenderCommandEncoder->drawPrimitives(MTL::PrimitiveType::PrimitiveTypeTriangleStrip, (NS::UInteger)0, (NS::UInteger)4);
                 INCREASE_DRAW_CALL_COUNT(1);

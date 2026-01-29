@@ -23,7 +23,7 @@
 #include "engine_event_dispatcher.h"
 #include "input/input_manager.h"
 #include "scene/world.h"
-#include "../render/renderer.h"
+#include "../render/core/renderer.h"
 #include "../render/image_loader.h"
 #include "../render/shader_loader.h"
 #include "../render/material_loader.h"
@@ -316,12 +316,12 @@ void Window::bindMetalToGlfwWindow()
 
     m_pMetalCommandQueue = m_pMetalDevice->newCommandQueue();
 
-    Renderer::initMetalDepthTexture(m_pMetalDevice, m_oActualSize.x, m_oActualSize.y);
+    MetalRenderer::initMetalDepthTexture(m_pMetalDevice, m_oActualSize.x, m_oActualSize.y);
 
     m_pRenderPassDescriptor = MTL::RenderPassDescriptor::alloc()->init();
 
     MTL::RenderPassDepthAttachmentDescriptor* pDepthAttach = m_pRenderPassDescriptor->depthAttachment();
-    pDepthAttach->setTexture(Renderer::m_pDepthTexture);
+    pDepthAttach->setTexture(MetalRenderer::m_pDepthTexture);
     pDepthAttach->setLoadAction(MTL::LoadActionClear);
     pDepthAttach->setClearDepth(1.0);
     pDepthAttach->setStoreAction(MTL::StoreActionDontCare); // TODO: Might need to change to StoreActionStore
@@ -359,7 +359,7 @@ void Window::setupManagers()
     TimeManager::Initialize();
 
 #if __APPLE__
-    Renderer::initializeSamplers(m_pMetalDevice);
+    MetalRenderer::initializeSamplers(m_pMetalDevice);
 #endif // __APPLE__
 
     PROFILER_END_TIMER("Initialization", "TimeManager setup");
@@ -528,11 +528,11 @@ void Window::mainLoop()
             if (isUsingMetal())
             {
                 m_pMetalLayer->setDrawableSize(CGSizeMake(m_oActualSize.x, m_oActualSize.y));
-                Renderer::initMetalDepthTexture(m_pMetalDevice, m_oActualSize.x, m_oActualSize.y);
+                MetalRenderer::initMetalDepthTexture(m_pMetalDevice, m_oActualSize.x, m_oActualSize.y);
 
                 // If don't reset the depth attachment and color attachment, it will keep using the old texture size and cause issues.
                 MTL::RenderPassDepthAttachmentDescriptor* pDepthAttach = m_pRenderPassDescriptor->depthAttachment();
-                pDepthAttach->setTexture(Renderer::m_pDepthTexture);
+                pDepthAttach->setTexture(MetalRenderer::m_pDepthTexture);
                 pDepthAttach->setLoadAction(MTL::LoadActionClear);
                 pDepthAttach->setClearDepth(1.0);
                 pDepthAttach->setStoreAction(MTL::StoreActionDontCare); // TODO: Might need to change to StoreActionStore
@@ -580,7 +580,7 @@ void Window::mainLoop()
                 m_pCurrentFrameRenderEncoder->setRenderPipelineState(pPureColorTexture->getMetalPipelineState());
                 m_pCurrentFrameRenderEncoder->setVertexBuffer(m_pRenderProcessQueue->getMetalFullScreenVertexBuffer(), 0, 0);
                 m_pCurrentFrameRenderEncoder->setFragmentTexture(LightManager::getInstance()->getShadowDepthMapTextureMetal(), 0);
-                m_pCurrentFrameRenderEncoder->setFragmentSamplerState(Renderer::m_pLinearSampler, 0);
+                m_pCurrentFrameRenderEncoder->setFragmentSamplerState(MetalRenderer::m_pLinearSampler, 0);
 
                 m_pCurrentFrameRenderEncoder->drawPrimitives(MTL::PrimitiveTypeTriangleStrip, NS::UInteger(0), NS::UInteger(4));
 
@@ -730,7 +730,7 @@ void Window::drawFrame()
             m_pDepthOnlyRenderPassDescriptor->depthAttachment()->setTexture(pLightManager->getShadowDepthMapTextureMetal());
 
             m_pCurrentFrameDepthRenderEncoder = m_pCurrentCommandBuffer->renderCommandEncoder(m_pDepthOnlyRenderPassDescriptor);
-            m_pCurrentFrameDepthRenderEncoder->setDepthStencilState(Renderer::m_pDepthOnStencilState);
+            m_pCurrentFrameDepthRenderEncoder->setDepthStencilState(MetalRenderer::m_pDepthOnStencilState);
             m_pCurrentFrameDepthRenderEncoder->setCullMode(MTL::CullModeFront); // Use front-face culling for shadow maps to reduce shadow acne
             m_pCurrentFrameDepthRenderEncoder->setFrontFacingWinding(MTL::WindingCounterClockwise);
 

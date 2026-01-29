@@ -9,7 +9,7 @@
 #include "../../core/serialization/serializer.h"
 #include "../../core/math/random.h"
 #include "../../render/shader_loader.h"
-#include "../../render/renderer.h"
+#include "../../render/core/renderer.h"
 
 
 inline constexpr std::string_view SHADER_UNIFORM_COLOR = "u_imageColor";
@@ -168,7 +168,7 @@ void Quad::draw()
         pRenderCommandEncoder->setFragmentBytes(&uniforms, sizeof(uniforms), 2);
 
         pRenderCommandEncoder->setFragmentTexture(m_pImage ? m_pImage->getMetalTexture() : ImageLoader::getInstance()->getPureWhite1by1Image()->getMetalTexture(), 0);
-        pRenderCommandEncoder->setFragmentSamplerState(Renderer::m_pLinearSampler, 0);
+        pRenderCommandEncoder->setFragmentSamplerState(MetalRenderer::m_pLinearSampler, 0);
 
         pRenderCommandEncoder->drawPrimitives(MTL::PrimitiveType::PrimitiveTypeTriangleStrip, (NS::UInteger)0, (NS::UInteger)4);
         INCREASE_DRAW_CALL_COUNT(1);

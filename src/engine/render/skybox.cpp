@@ -4,7 +4,7 @@
 #include "image.h"
 #include "shader.h"
 #include "shader_loader.h"
-#include "renderer.h"
+#include "core/renderer.h"
 #include "../core/camera.h"
 #include "../core/window.h"
 
@@ -187,11 +187,11 @@ void Skybox::draw()
     else if (bUsingMetal)
     {
         MTL::RenderCommandEncoder* pRenderEncoder = Window::ins->getCurrentFrameRenderEncoder();
-        pRenderEncoder->setDepthStencilState(Renderer::m_pSkyboxStencilState);
+        pRenderEncoder->setDepthStencilState(MetalRenderer::m_pSkyboxStencilState);
 
         drawWithMetal();
 
-        pRenderEncoder->setDepthStencilState(Renderer::m_pDepthOnStencilState);
+        pRenderEncoder->setDepthStencilState(MetalRenderer::m_pDepthOnStencilState);
     }
 #endif // __APPLE__
 }
@@ -225,7 +225,7 @@ void Skybox::drawWithMetal()
     pRenderCommandEncoder->setVertexBuffer(Camera::main->getCameraMetalUBO(), 0, 1);
 
     pRenderCommandEncoder->setFragmentTexture(m_pSkyboxMetalTexture, 0);
-    pRenderCommandEncoder->setFragmentSamplerState(Renderer::m_pLinearSampler, 0);
+    pRenderCommandEncoder->setFragmentSamplerState(MetalRenderer::m_pLinearSampler, 0);
 
     pRenderCommandEncoder->drawPrimitives(MTL::PrimitiveType::PrimitiveTypeTriangle, NS_INT(0), NS_INT(36));
     INCREASE_DRAW_CALL_COUNT(12);
