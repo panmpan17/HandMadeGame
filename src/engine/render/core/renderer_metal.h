@@ -1,11 +1,12 @@
+#pragma once
+
 #if __APPLE__
 #include <Metal/Metal.hpp>
-#endif // __APPLE__
+#include "../../core/window.h"
 
 
 class MetalRenderer
 {
-#if __APPLE__
 public:
     static void initializeSamplers(MTL::Device* const pDevice)
     {
@@ -62,10 +63,94 @@ public:
         pTextureDesc->release();
     }
 
+    static void initRenderPassDescriptor()
+    {
+        if (!sm_pRenderPassDescriptor)
+        {
+            sm_pRenderPassDescriptor = MTL::RenderPassDescriptor::alloc()->init();
+        }
+
+        MTL::RenderPassDepthAttachmentDescriptor* pDepthAttach = sm_pRenderPassDescriptor->depthAttachment();
+        pDepthAttach->setTexture(MetalRenderer::m_pDepthTexture);
+        pDepthAttach->setLoadAction(MTL::LoadActionClear);
+        pDepthAttach->setClearDepth(1.0);
+        pDepthAttach->setStoreAction(MTL::StoreActionDontCare);
+
+        MTL::RenderPassColorAttachmentDescriptor* pColorAttachment = sm_pRenderPassDescriptor->colorAttachments()->object(0);
+        pColorAttachment->setLoadAction(MTL::LoadActionClear);
+        pColorAttachment->setClearColor(MTL::ClearColor::Make(0.0, 0.0, 0.0, 1.0));
+        pColorAttachment->setStoreAction(MTL::StoreActionStore);
+    }
+
+    static inline MTL::RenderPassDescriptor* getRenderPassDescriptor() { return sm_pRenderPassDescriptor; }
+
+    static void cleanup()
+    {
+        if (sm_pRenderPassDescriptor)
+        {
+            sm_pRenderPassDescriptor->release();
+            sm_pRenderPassDescriptor = nullptr;
+        }
+        if (sm_pDepthOnlyRenderPassDescriptor)
+        {
+            sm_pDepthOnlyRenderPassDescriptor->release();
+            sm_pDepthOnlyRenderPassDescriptor = nullptr;
+        }
+    }
+
+
     static inline MTL::SamplerState* m_pLinearSampler = nullptr;
     static inline MTL::DepthStencilState* m_pDepthOnStencilState = nullptr;
     static inline MTL::DepthStencilState* m_pDepthOffStencilState = nullptr;
     static inline MTL::DepthStencilState* m_pSkyboxStencilState = nullptr;
     static inline MTL::Texture* m_pDepthTexture = nullptr;
-#endif
+
+private:
+    static inline MTL::RenderPassDescriptor* sm_pRenderPassDescriptor = nullptr;
+
+
+#pragma region Lighting shadow depth rendering
+
+public:
+    static inline MTL::RenderPassDescriptor* getDepthOnlyRenderPassDescriptor() { return sm_pDepthOnlyRenderPassDescriptor; }
+    static inline MTL::RenderCommandEncoder* getCurrentFrameDepthRenderEncoder() { return sm_pCurrentFrameDepthRenderEncoder; }
+
+    static void initDepthOnlyRenderPassDescriptor()
+    {
+        if (!sm_pDepthOnlyRenderPassDescriptor)
+        {
+            sm_pDepthOnlyRenderPassDescriptor = MTL::RenderPassDescriptor::alloc()->init();
+        }
+
+        MTL::RenderPassDepthAttachmentDescriptor* pDepthOnlyAttach = sm_pDepthOnlyRenderPassDescriptor->depthAttachment();
+        pDepthOnlyAttach->setTexture(nullptr); // Lighting system will set the depth texture when render depth
+        pDepthOnlyAttach->setLoadAction(MTL::LoadActionClear);
+        pDepthOnlyAttach->setClearDepth(1.0);
+        pDepthOnlyAttach->setStoreAction(MTL::StoreActionStore);
+    }
+
+    static void startNewDepthOnlyFrame(MTL::Texture* const pTexture)
+    {
+        MTL::RenderPassDescriptor* pDepthOnlyRenderPassDescriptor = MetalRenderer::getDepthOnlyRenderPassDescriptor();
+        sm_pDepthOnlyRenderPassDescriptor->depthAttachment()->setTexture(pTexture);
+
+        sm_pCurrentFrameDepthRenderEncoder = Window::ins->getCurrentCommandBuffer()->renderCommandEncoder(pDepthOnlyRenderPassDescriptor);
+        sm_pCurrentFrameDepthRenderEncoder->setDepthStencilState(MetalRenderer::m_pDepthOnStencilState);
+        sm_pCurrentFrameDepthRenderEncoder->setCullMode(MTL::CullModeFront); // Use front-face culling for shadow maps to reduce shadow acne
+        sm_pCurrentFrameDepthRenderEncoder->setFrontFacingWinding(MTL::WindingCounterClockwise);
+    }
+
+    static void endDepthOnlyFrame()
+    {
+        sm_pCurrentFrameDepthRenderEncoder->endEncoding();
+        sm_pCurrentFrameDepthRenderEncoder = nullptr;
+    }
+
+private:
+    static inline MTL::RenderPassDescriptor* sm_pDepthOnlyRenderPassDescriptor = nullptr;
+    static inline MTL::RenderCommandEncoder* sm_pCurrentFrameDepthRenderEncoder = nullptr;
+
+#pragma endregion
 };
+
+#endif // __APPLE__

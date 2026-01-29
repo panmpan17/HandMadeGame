@@ -133,16 +133,7 @@ Window::~Window()
         m_pMetalDevice->release();
         m_pMetalDevice = nullptr;
     }
-    if (m_pRenderPassDescriptor)
-    {
-        m_pRenderPassDescriptor->release();
-        m_pRenderPassDescriptor = nullptr;
-    }
-    if (m_pDepthOnlyRenderPassDescriptor)
-    {
-        m_pDepthOnlyRenderPassDescriptor->release();
-        m_pDepthOnlyRenderPassDescriptor = nullptr;
-    }
+    MetalRenderer::cleanup();
 #endif // __APPLE__
 
     if (m_pWorldScene)
@@ -317,28 +308,8 @@ void Window::bindMetalToGlfwWindow()
     m_pMetalCommandQueue = m_pMetalDevice->newCommandQueue();
 
     MetalRenderer::initMetalDepthTexture(m_pMetalDevice, m_oActualSize.x, m_oActualSize.y);
-
-    m_pRenderPassDescriptor = MTL::RenderPassDescriptor::alloc()->init();
-
-    MTL::RenderPassDepthAttachmentDescriptor* pDepthAttach = m_pRenderPassDescriptor->depthAttachment();
-    pDepthAttach->setTexture(MetalRenderer::m_pDepthTexture);
-    pDepthAttach->setLoadAction(MTL::LoadActionClear);
-    pDepthAttach->setClearDepth(1.0);
-    pDepthAttach->setStoreAction(MTL::StoreActionDontCare); // TODO: Might need to change to StoreActionStore
-
-    MTL::RenderPassColorAttachmentDescriptor* pColorAttachment = m_pRenderPassDescriptor->colorAttachments()->object(0);
-    pColorAttachment->setLoadAction(MTL::LoadActionClear);
-    pColorAttachment->setClearColor(MTL::ClearColor::Make(0.0, 0.0, 0.0, 1.0));
-    pColorAttachment->setStoreAction(MTL::StoreActionStore);
-
-
-    m_pDepthOnlyRenderPassDescriptor = MTL::RenderPassDescriptor::alloc()->init();
-
-    MTL::RenderPassDepthAttachmentDescriptor* pDepthOnlyAttach = m_pDepthOnlyRenderPassDescriptor->depthAttachment();
-    pDepthOnlyAttach->setTexture(nullptr); // Lighting system will set the depth texture when render depth
-    pDepthOnlyAttach->setLoadAction(MTL::LoadActionClear);
-    pDepthOnlyAttach->setClearDepth(1.0);
-    pDepthOnlyAttach->setStoreAction(MTL::StoreActionStore);
+    MetalRenderer::initRenderPassDescriptor();
+    MetalRenderer::initDepthOnlyRenderPassDescriptor();
 }
 #endif
 
@@ -527,18 +498,7 @@ void Window::mainLoop()
             {
                 m_pMetalLayer->setDrawableSize(CGSizeMake(m_oActualSize.x, m_oActualSize.y));
                 MetalRenderer::initMetalDepthTexture(m_pMetalDevice, m_oActualSize.x, m_oActualSize.y);
-
-                // If don't reset the depth attachment and color attachment, it will keep using the old texture size and cause issues.
-                MTL::RenderPassDepthAttachmentDescriptor* pDepthAttach = m_pRenderPassDescriptor->depthAttachment();
-                pDepthAttach->setTexture(MetalRenderer::m_pDepthTexture);
-                pDepthAttach->setLoadAction(MTL::LoadActionClear);
-                pDepthAttach->setClearDepth(1.0);
-                pDepthAttach->setStoreAction(MTL::StoreActionDontCare); // TODO: Might need to change to StoreActionStore
-
-                MTL::RenderPassColorAttachmentDescriptor* pColorAttachment = m_pRenderPassDescriptor->colorAttachments()->object(0);
-                pColorAttachment->setLoadAction(MTL::LoadActionClear);
-                pColorAttachment->setClearColor(MTL::ClearColor::Make(0.0, 0.0, 0.0, 1.0));
-                pColorAttachment->setStoreAction(MTL::StoreActionStore);
+                MetalRenderer::initRenderPassDescriptor();
             }
 #endif // __APPLE__
             // TODO: Change to glfwSetFramebufferSizeCallback
@@ -605,7 +565,7 @@ void Window::IMGUINewFrame()
 #if __APPLE__
     else if (Renderer::isUsingMetal())
     {
-        ImGui_ImplMetal_NewFrame(m_pRenderPassDescriptor);
+        ImGui_ImplMetal_NewFrame(MetalRenderer::getRenderPassDescriptor());
     }
 #endif // __APPLE__
 
@@ -682,10 +642,11 @@ void Window::setCurrentDrawingTexture(MTL::Texture* pTexture)
         m_pCurrentFrameRenderEncoder->endEncoding();
     }
 
-    MTL::RenderPassColorAttachmentDescriptor* pColorAttachment = m_pRenderPassDescriptor->colorAttachments()->object(0);
+    MTL::RenderPassDescriptor* pRenderPassDescriptor = MetalRenderer::getRenderPassDescriptor();
+    MTL::RenderPassColorAttachmentDescriptor* pColorAttachment = pRenderPassDescriptor->colorAttachments()->object(0);
     pColorAttachment->setTexture(pTexture);
 
-    m_pCurrentFrameRenderEncoder = m_pCurrentCommandBuffer->renderCommandEncoder(m_pRenderPassDescriptor);
+    m_pCurrentFrameRenderEncoder = m_pCurrentCommandBuffer->renderCommandEncoder(pRenderPassDescriptor);
 }
 
 void Window::drawFrame()
@@ -710,16 +671,9 @@ void Window::drawFrame()
 #if __APPLE__
         else if (Renderer::isUsingMetal())
         {
-            m_pDepthOnlyRenderPassDescriptor->depthAttachment()->setTexture(pLightManager->getShadowDepthMapTextureMetal());
-
-            m_pCurrentFrameDepthRenderEncoder = m_pCurrentCommandBuffer->renderCommandEncoder(m_pDepthOnlyRenderPassDescriptor);
-            m_pCurrentFrameDepthRenderEncoder->setDepthStencilState(MetalRenderer::m_pDepthOnStencilState);
-            m_pCurrentFrameDepthRenderEncoder->setCullMode(MTL::CullModeFront); // Use front-face culling for shadow maps to reduce shadow acne
-            m_pCurrentFrameDepthRenderEncoder->setFrontFacingWinding(MTL::WindingCounterClockwise);
-
+            MetalRenderer::startNewDepthOnlyFrame(pLightManager->getShadowDepthMapTextureMetal());
             m_pWorldScene->renderDepth();
-            m_pCurrentFrameDepthRenderEncoder->endEncoding();
-            m_pCurrentFrameDepthRenderEncoder = nullptr;
+            MetalRenderer::endDepthOnlyFrame();
         }
 #endif // __APPLE__
     }
@@ -735,9 +689,6 @@ void Window::drawFrame()
         m_pCurrentFrameRenderEncoder->setFragmentSamplerState(MetalRenderer::m_pLinearSampler, 0);
 
         m_pCurrentFrameRenderEncoder->drawPrimitives(MTL::PrimitiveTypeTriangleStrip, NS::UInteger(0), NS::UInteger(4));
-
-        m_pCurrentFrameRenderEncoder->endEncoding();
-        m_pCurrentFrameRenderEncoder = nullptr;
     }
     else
     {

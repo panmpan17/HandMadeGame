@@ -299,7 +299,7 @@ void MeshRenderer::drawDepth()
 #if __APPLE__
     else if (Renderer::isUsingMetal())
     {
-        MTL::RenderCommandEncoder* pRenderCommandEncoder = Window::ins->getCurrentFrameDepthRenderEncoder();
+        MTL::RenderCommandEncoder* pRenderCommandEncoder = MetalRenderer::getCurrentFrameDepthRenderEncoder();
 
         pRenderCommandEncoder->setRenderPipelineState(m_pDepthShader->getMetalPipelineState());
         pRenderCommandEncoder->setVertexBuffer(m_pMesh->m_pMetalVertexBuffer, 0, 0);
