@@ -9,6 +9,7 @@
 #include "../../render/shader.h"
 #include "../../render/shader_loader.h"
 #include "../../render/material.h"
+#include "../../render/core/renderer.h"
 #include "../../render/lighting/light_manager.h"
 #include "../../render/lighting/direction_light.h"
 #include "../../render/models/mesh.h"
@@ -38,7 +39,7 @@ void MeshRenderer::setMaterial(const std::shared_ptr<Material>& pMaterial)
 
 void MeshRenderer::initShader(Shader* const pShader)
 {
-    if (Window::ins->isUsingOpenGL())
+    if (Renderer::isUsingOpenGL())
     {
         // Main 3d shader uniforms
         m_pModelUniform = pShader->getUniformHandle("u_Model");
@@ -59,7 +60,7 @@ void MeshRenderer::bindVertexArray(Shader* const pShader)
 {
     m_nIndiceCount = m_pMesh->m_nIndiceCount;
     
-    if (Window::ins->isUsingOpenGL())
+    if (Renderer::isUsingOpenGL())
     {
         glGenVertexArrays(1, &m_nVertexArray);
         glBindVertexArray(m_nVertexArray);
@@ -116,7 +117,7 @@ void MeshRenderer::bindDepthVertexArray()
     m_nIndiceCount = m_pMesh->m_nIndiceCount;
     m_pDepthShader = ShaderLoader::getInstance()->getShader("3d_depth");
     
-    if (Window::ins->isUsingOpenGL())
+    if (Renderer::isUsingOpenGL())
     {
         glGenVertexArrays(1, &m_nVertexArray);
         glBindVertexArray(m_nVertexArray);
@@ -136,7 +137,7 @@ void MeshRenderer::bindDepthVertexArray()
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     }
 #if __APPLE__
-    else if (Window::ins->isUsingMetal())
+    else if (Renderer::isUsingMetal())
     {
         // MTL::Device* pDevice = Window::ins->getMetalDevice();
         // m_pMetalVertexBuffer = pDevice->newBuffer(arrVertices, sizeof(arrVertices), MTL::ResourceStorageModeShared);
@@ -170,7 +171,7 @@ void MeshRenderer::draw()
         return;
     }
 
-    if (Window::ins->isUsingOpenGL())
+    if (Renderer::isUsingOpenGL())
     {
         m_pMaterial->useShader();
 
@@ -212,7 +213,7 @@ void MeshRenderer::draw()
         glUseProgram(0);
     }
 #if __APPLE__
-    else if (Window::ins->isUsingMetal())
+    else if (Renderer::isUsingMetal())
     {
         MTL::RenderCommandEncoder* pRenderCommandEncoder = Window::ins->getCurrentFrameRenderEncoder();
 
@@ -279,7 +280,7 @@ void MeshRenderer::drawDepth()
     mat4x4_mul(MVP, pMainDirLight->getLightCastingMatrix(), m_pNode->getWorldMatrix());
     // mat4x4_mul(MVP, Camera::main->getViewProjectionMatrix(), m_pNode->getWorldMatrix());
 
-    if (Window::ins->isUsingOpenGL())
+    if (Renderer::isUsingOpenGL())
     {
         const mat4x4& local = m_pNode->getWorldMatrix();
 
@@ -296,7 +297,7 @@ void MeshRenderer::drawDepth()
         glUseProgram(0);
     }
 #if __APPLE__
-    else if (Window::ins->isUsingMetal())
+    else if (Renderer::isUsingMetal())
     {
         MTL::RenderCommandEncoder* pRenderCommandEncoder = Window::ins->getCurrentFrameDepthRenderEncoder();
 

@@ -82,14 +82,14 @@ Window::Window()
     }
     if (m_pMetalDevice)
     {
-        m_eGraphicAPI = GraphicAPI::Metal;
+        Renderer::setGraphicAPI(GraphicAPI::Metal);
     }
     else
     {
-        m_eGraphicAPI = GraphicAPI::OpenGL;
+        Renderer::setGraphicAPI(GraphicAPI::OpenGL);
     }
 #else
-    m_eGraphicAPI = GraphicAPI::OpenGL;
+    Renderer::setGraphicAPI(GraphicAPI::OpenGL);
 #endif
 
     if (!glfwInit())
@@ -162,12 +162,12 @@ Window::~Window()
 
     glfwTerminate();
 
-    if (isUsingOpenGL())
+    if (Renderer::isUsingOpenGL())
     {
         ImGui_ImplOpenGL3_Shutdown();
     }
 #if __APPLE__
-    else if (isUsingMetal())
+    else if (Renderer::isUsingMetal())
     {
         ImGui_ImplMetal_Shutdown();
     }
@@ -192,12 +192,12 @@ bool Window::configureAndCreateWindow()
 
     glfwWindowHint(GLFW_RESIZABLE, m_bResizable ? GLFW_TRUE : GLFW_FALSE);
 
-    if (isUsingOpenGL())
+    if (Renderer::isUsingOpenGL())
     {
         configureGLFWWithOpenGL();
     }
 #if __APPLE__
-    else if (isUsingMetal())
+    else if (Renderer::isUsingMetal())
     {
         configureGLFWWithMetal();
     }
@@ -270,13 +270,13 @@ void Window::configureGLFWWithMetal()
 
 void Window::initializeGraphicsAPI()
 {
-    if (isUsingOpenGL())
+    if (Renderer::isUsingOpenGL())
     {
         LOGLN("Metal is not supported on this device.");
         bindOpenGLToGlfwWindow();
     }
 #if __APPLE__
-    else if (isUsingMetal())
+    else if (Renderer::isUsingMetal())
     {
         LOGLN("Metal Device found: {}", m_pMetalDevice->name()->utf8String());
         bindMetalToGlfwWindow();
@@ -461,13 +461,13 @@ void Window::setupIMGUIAndEditorWindows()
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
 
     // Setup Platform/Renderer backends
-    if (isUsingOpenGL())
+    if (Renderer::isUsingOpenGL())
     {
         ImGui_ImplGlfw_InitForOpenGL(m_pWindow, true);          // Second param install_callback=true will install GLFW callbacks and chain to existing ones.
         ImGui_ImplOpenGL3_Init();
     }
 #if __APPLE__
-    else if (isUsingMetal())
+    else if (Renderer::isUsingMetal())
     {
         ImGui_ImplGlfw_InitForOther(m_pWindow, true);
         ImGui_ImplMetal_Init(m_pMetalDevice);
@@ -525,7 +525,7 @@ void Window::mainLoop()
             glfwGetWindowSize(m_pWindow, &m_oWindowSize.x, &m_oWindowSize.y);
 
 #if __APPLE__
-            if (isUsingMetal())
+            if (Renderer::isUsingMetal())
             {
                 m_pMetalLayer->setDrawableSize(CGSizeMake(m_oActualSize.x, m_oActualSize.y));
                 MetalRenderer::initMetalDepthTexture(m_pMetalDevice, m_oActualSize.x, m_oActualSize.y);
@@ -553,7 +553,7 @@ void Window::mainLoop()
 
         runUpdate();
 
-        if (isUsingOpenGL())
+        if (Renderer::isUsingOpenGL())
         {
             glViewport(0, 0, m_oActualSize.x, m_oActualSize.y);
             glClearColor(0.f, 0.f, 0.f, 1.0f);
@@ -563,7 +563,7 @@ void Window::mainLoop()
             glfwSwapBuffers(m_pWindow);
         }
 #if __APPLE__
-        else if (isUsingMetal())
+        else if (Renderer::isUsingMetal())
         {
             NS::AutoreleasePool* pPool = NS::AutoreleasePool::alloc()->init();
 
@@ -615,12 +615,12 @@ void Window::runUpdate()
 
 void Window::IMGUINewFrame()
 {
-    if (isUsingOpenGL())
+    if (Renderer::isUsingOpenGL())
     {
         ImGui_ImplOpenGL3_NewFrame();
     }
 #if __APPLE__
-    else if (isUsingMetal())
+    else if (Renderer::isUsingMetal())
     {
         ImGui_ImplMetal_NewFrame(m_pRenderPassDescriptor);
     }
@@ -643,7 +643,7 @@ void Window::drawIMGUIEditor()
     }
 
     // TODO: try to fix the issue of menu bar on Metal will crash
-    if (!isUsingMetal() && ImGui::BeginMainMenuBar())
+    if (!Renderer::isUsingMetal() && ImGui::BeginMainMenuBar())
     {
         if (ImGui::BeginMenu("Editor Windows"))
         {
@@ -680,12 +680,12 @@ void Window::drawIMGUIEditor()
 #endif
     ImGui::Render();
 
-    if (isUsingOpenGL())
+    if (Renderer::isUsingOpenGL())
     {
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     }
 #if __APPLE__
-    else if (isUsingMetal())
+    else if (Renderer::isUsingMetal())
     {
         ImGui_ImplMetal_RenderDrawData(ImGui::GetDrawData(), m_pCurrentCommandBuffer, m_pCurrentFrameRenderEncoder);
     }
@@ -714,7 +714,7 @@ void Window::drawFrame()
     DirectionLightComponent* pMainDirLight = LightManager::getInstance()->getMainDirectionLightComponent();
     if (pMainDirLight && pMainDirLight->getShadowsEnabled())
     {
-        if (isUsingOpenGL())
+        if (Renderer::isUsingOpenGL())
         {
             glViewport(0, 0, LightManager::SHADOW_MAP_WIDTH, LightManager::SHADOW_MAP_HEIGHT);
             glBindFramebuffer(GL_FRAMEBUFFER, pLightManager->getShadowDepthMapFBO());
@@ -725,7 +725,7 @@ void Window::drawFrame()
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
         }
 #if __APPLE__
-        else if (isUsingMetal())
+        else if (Renderer::isUsingMetal())
         {
             m_pDepthOnlyRenderPassDescriptor->depthAttachment()->setTexture(pLightManager->getShadowDepthMapTextureMetal());
 
@@ -752,20 +752,20 @@ void Window::drawFrame()
         m_pWorldScene->render();
         m_pRenderProcessQueue->endFrame();
 
-        if (isUsingOpenGL())
+        if (Renderer::isUsingOpenGL())
         {
             glDisable(GL_DEPTH_TEST);
         }
         m_pRenderProcessQueue->startProcessing();
         m_pRenderProcessQueue->renderToScreen();
-        if (isUsingOpenGL())
+        if (Renderer::isUsingOpenGL())
         {
             glEnable(GL_DEPTH_TEST);
         }
     }
     else
     {
-        if (isUsingMetal())
+        if (Renderer::isUsingMetal())
         {
         setCurrentDrawingTexture(m_pCurrentDrawable->texture());
         }
@@ -783,7 +783,7 @@ void Window::drawFrame()
         drawIMGUIEditor();
     }
 
-    if (isUsingMetal())
+    if (Renderer::isUsingMetal())
     {
         m_pCurrentFrameRenderEncoder->endEncoding();
         m_pCurrentFrameRenderEncoder = nullptr;
@@ -798,7 +798,7 @@ void Window::drawFrameInfo()
                  | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoBackground);
     ImGui::SetWindowSize(ImVec2(200, 100), ImGuiCond_Always);
     ImGui::SetWindowPos(ImVec2(0, ImGui::GetIO().DisplaySize.y - 60), ImGuiCond_Always);
-    ImGui::Text("Grahpics: %s", isUsingOpenGL() ? "OpenGL" : (isUsingMetal() ? "Metal" : "Unknown"));
+    ImGui::Text("Grahpics: %s", Renderer::isUsingOpenGL() ? "OpenGL" : (Renderer::isUsingMetal() ? "Metal" : "Unknown"));
     ImGui::Text("%.1f FPS (%.3f ms)", ImGui::GetIO().Framerate, 1000.0f / ImGui::GetIO().Framerate);
     ImGui::Text("Draw Call: %d; Triangle: %d", m_nDrawCallCount, m_nTriangleCount);
     ImGui::End();

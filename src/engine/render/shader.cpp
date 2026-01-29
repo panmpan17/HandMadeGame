@@ -8,10 +8,10 @@
 #include "shader_loader.h"
 #include "image.h"
 #include "lighting/light_manager.h"
+#include "core/renderer.h"
 #include "../core/debug_macro.h"
 #include "../core/camera.h"
 #include "../core/time.h"
-#include "../core/window.h"
 #include "../../utils/file_utils.h"
 
 
@@ -276,7 +276,7 @@ Shader* Shader::loadFromMetalShader(MTL::Library* const pLibrary, MTL::Device* c
 
 Shader::~Shader()
 {
-    if (Window::ins->isUsingOpenGL())
+    if (Renderer::isUsingOpenGL())
     {
         if (m_nProgram != GL_INVALID_INDEX)
         {
@@ -284,7 +284,7 @@ Shader::~Shader()
         }
     }
 #if __APPLE__
-    else if (Window::ins->isUsingMetal())
+    else if (Renderer::isUsingMetal())
     {
         if (m_pPSO)
         {
@@ -317,7 +317,7 @@ GLuint Shader::getAttributeLocation(const std::string& name) const
 
 void Shader::reload()
 {
-    if (Window::ins->isUsingOpenGL())
+    if (Renderer::isUsingOpenGL())
     {
         glDeleteShader(m_nVertexShader);
         glDeleteShader(m_nFragmentShader);
@@ -360,7 +360,7 @@ const ShaderUniformHandle* Shader::getUniformHandle(const std::string_view& strN
 
     ShaderUniformHandle* pHandle = &m_arrUniformHandles[m_nUniformHandleCount++];
 
-    if (Window::ins->isUsingOpenGL())
+    if (Renderer::isUsingOpenGL())
     {
         pHandle->m_nLocation = getUniformLocation(strName);
     }
@@ -393,7 +393,7 @@ void Shader::setLightUBOBindingPoint(GLuint nBindingPoint)
 
 void Shader::reloadLightUBOBinding()
 {
-    if (Window::ins->isUsingOpenGL())
+    if (Renderer::isUsingOpenGL())
     {
         if (m_nLightUBOBindingPoint != GL_INVALID_INDEX && LightManager::getInstance())
         {
@@ -412,7 +412,7 @@ void Shader::setTimeDataUBOBindingPoint(GLuint nBindingPoint)
 
 void Shader::reloadTimeDataUBOBinding()
 {
-    if (Window::ins->isUsingOpenGL())
+    if (Renderer::isUsingOpenGL())
     {
         if (m_nTimeDataUBOBindingPoint != GL_INVALID_INDEX && TimeManager::getInstance())
         {

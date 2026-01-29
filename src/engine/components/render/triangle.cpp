@@ -3,7 +3,7 @@
 
 #include "triangle.h"
 #include "../../render/shader.h"
-#include "../../render/shader_loader.h"
+#include "../../render/core/renderer.h"
 #include "../../core/camera.h"
 #include "../../core/window.h"
 #include "../../core/debug_macro.h"
@@ -18,7 +18,7 @@ Triangle::Triangle()
 
 Triangle::~Triangle()
 {
-    if (Window::ins->isUsingOpenGL())
+    if (Renderer::isUsingOpenGL())
     {
         glDeleteBuffers(1, &m_nVertexBuffer);
         glDeleteVertexArrays(1, &m_nVertexArray);
@@ -29,7 +29,7 @@ void Triangle::setShader(Shader* pShader)
 {
     m_pShader = pShader;
 
-    if (Window::ins->isUsingOpenGL())
+    if (Renderer::isUsingOpenGL())
     {
         m_pMVPHandle = m_pShader->getUniformHandle(SHADER_UNIFORM_MVP);
     }
@@ -42,7 +42,7 @@ void Triangle::registerBuffer()
     arrVertices[1] = { {  0.6f, -0.4f }, { 0.f, 1.f, 0.f } };
     arrVertices[2] = { {   0.f,  0.6f }, { 0.f, 0.f, 1.f } };
     
-    if (Window::ins->isUsingOpenGL())
+    if (Renderer::isUsingOpenGL())
     {
         glGenBuffers(1, &m_nVertexBuffer);
         glBindBuffer(GL_ARRAY_BUFFER, m_nVertexBuffer);
@@ -64,7 +64,7 @@ void Triangle::registerBuffer()
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
 #if __APPLE__
-    else if (Window::ins->isUsingMetal())
+    else if (Renderer::isUsingMetal())
     {
         MTL::Device* pDevice = Window::ins->getMetalDevice();
         m_pVertexBuffer = pDevice->newBuffer(arrVertices, sizeof(arrVertices), MTL::ResourceStorageModeShared);
@@ -81,7 +81,7 @@ void Triangle::draw()
     const mat4x4& cameraViewMatrix = Camera::main->getViewProjectionMatrix();
     mat4x4_mul(mvp, cameraViewMatrix, matModel);
 
-    if (Window::ins->isUsingOpenGL())
+    if (Renderer::isUsingOpenGL())
     {
         glUseProgram(m_pShader->getProgram());
         glUniformMatrix4fv(m_pMVPHandle->m_nLocation, 1, GL_FALSE, (const GLfloat*) mvp);
@@ -91,7 +91,7 @@ void Triangle::draw()
         glUseProgram(0);
     }
 #if __APPLE__
-    else if (Window::ins->isUsingMetal())
+    else if (Renderer::isUsingMetal())
     {
         MTL::RenderCommandEncoder* pRenderCommandEncoder = Window::ins->getCurrentFrameRenderEncoder();
 

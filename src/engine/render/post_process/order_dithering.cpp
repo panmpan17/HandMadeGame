@@ -12,12 +12,12 @@ void OrderDithering::initialize()
     m_nRenderWidth = m_pProcessQueue->getRenderWidth();
     m_nRenderHeight = m_pProcessQueue->getRenderHeight();
 
-    if (Window::ins->isUsingOpenGL())
+    if (Renderer::isUsingOpenGL())
     {
         initializeRenderTextureAndFBO(m_nFBOID, m_nRenderTexture, m_nRenderWidth, m_nRenderHeight);
     }
 #if __APPLE__
-    else if (Window::ins->isUsingMetal())
+    else if (Renderer::isUsingMetal())
     {
         initializeRenderTextureAndFBO(m_pMetalRenderTexture, m_nRenderWidth, m_nRenderHeight);
     }
@@ -30,7 +30,7 @@ void OrderDithering::initializeShader()
 {
     m_pShader = ShaderLoader::getInstance()->getShader("order_dithering");
 
-    if (Window::ins->isUsingOpenGL())
+    if (Renderer::isUsingOpenGL())
     {
         m_pTextureUniform = m_pShader->getUniformHandle(SHADER_UNIFORM_TEXTURE_0);
 
@@ -54,7 +54,7 @@ void OrderDithering::render()
     // Debug draw it to screen instead of another post-process render texture
     ASSERT(m_pShader, "Shader must be set before drawing the quad");
 
-    if (Window::ins->isUsingOpenGL())
+    if (Renderer::isUsingOpenGL())
     {
         glBindFramebuffer(GL_FRAMEBUFFER, m_nFBOID);
         glViewport(0, 0, m_nRenderWidth, m_nRenderHeight);
@@ -80,7 +80,7 @@ void OrderDithering::render()
         m_pProcessQueue->setFinalRenderTexture(m_nRenderTexture);
     }
 #if __APPLE__
-    else if (Window::ins->isUsingMetal())
+    else if (Renderer::isUsingMetal())
     {
         Window::ins->setCurrentDrawingTexture(m_pMetalRenderTexture);
 
@@ -106,12 +106,12 @@ void OrderDithering::onWindowResize()
     m_nRenderWidth = m_pProcessQueue->getRenderWidth();
     m_nRenderHeight = m_pProcessQueue->getRenderHeight();
     
-    if (Window::ins->isUsingOpenGL())
+    if (Renderer::isUsingOpenGL())
     {
         initializeRenderTextureAndFBO(m_nFBOID, m_nRenderTexture, m_nRenderWidth, m_nRenderHeight);
     }
 #if __APPLE__
-    else if (Window::ins->isUsingMetal())
+    else if (Renderer::isUsingMetal())
     {
         initializeRenderTextureAndFBO(m_pMetalRenderTexture, m_nRenderWidth, m_nRenderHeight);
     }

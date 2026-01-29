@@ -125,8 +125,8 @@ void WorldScene::update(float fDeltatime)
 
 void WorldScene::render()
 {
-    bool bUsingOpenGL = Window::ins->isUsingOpenGL();
-    bool bUsingMetal = Window::ins->isUsingMetal();
+    bool bUsingOpenGL = Renderer::isUsingOpenGL();
+    bool bUsingMetal = Renderer::isUsingMetal();
 
     if (bUsingOpenGL)
     {
@@ -165,8 +165,8 @@ void WorldScene::render()
 
 void WorldScene::renderTransparentObjects()
 {
-    bool bUsingOpenGL = Window::ins->isUsingOpenGL();
-    bool bUsingMetal = Window::ins->isUsingMetal();
+    bool bUsingOpenGL = Renderer::isUsingOpenGL();
+    bool bUsingMetal = Renderer::isUsingMetal();
 
     if (bUsingOpenGL)
     {

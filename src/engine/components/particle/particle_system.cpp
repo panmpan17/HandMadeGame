@@ -73,14 +73,14 @@ ParticleSystem::~ParticleSystem()
         }
     }
 
-    if (Window::ins->isUsingOpenGL())
+    if (Renderer::isUsingOpenGL())
     {
         glDeleteBuffers(1, &m_nInstanceBuffer);
         glDeleteVertexArrays(1, &m_nVertexArray);
         glDeleteBuffers(1, &m_nVertexBuffer);
     }
 #if __APPLE__
-    else if (Window::ins->isUsingMetal())
+    else if (Renderer::isUsingMetal())
     {
         m_pVertexBuffer->release();
         m_pInstanceBuffer->release();
@@ -96,7 +96,7 @@ void ParticleSystem::registerBuffer()
     arrQuadVerticies[2] = { { -.5f, .5f }, { 0.f, 1.f } };
     arrQuadVerticies[3] = { { .5f, .5f }, { 1.f, 1.f } };
 
-    if (Window::ins->isUsingOpenGL())
+    if (Renderer::isUsingOpenGL())
     {
         glGenBuffers(1, &m_nVertexBuffer);
         glBindBuffer(GL_ARRAY_BUFFER, m_nVertexBuffer);
@@ -140,7 +140,7 @@ void ParticleSystem::registerBuffer()
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
 #if __APPLE__
-    else if (Window::ins->isUsingMetal())
+    else if (Renderer::isUsingMetal())
     {
         MTL::Device* pDevice = Window::ins->getMetalDevice();
         m_pVertexBuffer = pDevice->newBuffer(arrQuadVerticies, sizeof(arrQuadVerticies), MTL::ResourceStorageModeShared);
@@ -164,7 +164,7 @@ void ParticleSystem::setMaterial(const std::shared_ptr<Material>& pMaterial)
 
 void ParticleSystem::setShader(Shader* pShader)
 {
-    if (Window::ins->isUsingOpenGL())
+    if (Renderer::isUsingOpenGL())
     {
         m_pModelMatrixUniform = pShader->getUniformHandle("u_modelMatrix");
         m_pNodeTransformUniform = pShader->getUniformHandle("u_nodeTransform");
@@ -184,7 +184,7 @@ void ParticleSystem::draw()
 
     if (m_nAliveParticleCount <= 0) return;
 
-    if (Window::ins->isUsingOpenGL())
+    if (Renderer::isUsingOpenGL())
     {
         glBindVertexArray(m_nVertexArray);
         m_pMaterial->useShader();
@@ -219,7 +219,7 @@ void ParticleSystem::draw()
         glUseProgram(0);
     }
 #if __APPLE__
-    else if (Window::ins->isUsingMetal())
+    else if (Renderer::isUsingMetal())
     {
         MTL::RenderCommandEncoder* pRenderEncoder = Window::ins->getCurrentFrameRenderEncoder();
 

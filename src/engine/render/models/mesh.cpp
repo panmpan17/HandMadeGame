@@ -2,6 +2,7 @@
 
 #include <glad/gl.h>
 #include <sstream>
+#include "../core/renderer.h"
 #include "../../core/window.h"
 
 
@@ -30,7 +31,7 @@ bool Mesh::getIsGPULoaded() const
 
 void Mesh::loadToGPU()
 {
-    if (Window::ins->isUsingOpenGL())
+    if (Renderer::isUsingOpenGL())
     {
         glGenBuffers(1, &m_nVertexBuffer);
         glBindBuffer(GL_ARRAY_BUFFER, m_nVertexBuffer);
@@ -44,7 +45,7 @@ void Mesh::loadToGPU()
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     }
 #if __APPLE__
-    else if (Window::ins->isUsingMetal())
+    else if (Renderer::isUsingMetal())
     {
         MTL::Device* pDevice = Window::ins->getMetalDevice();
         m_pMetalVertexBuffer = pDevice->newBuffer(m_arrVertices, sizeof(VertexWUVNormalTangent) * m_nVertexCount, MTL::ResourceStorageModeShared);
@@ -79,7 +80,7 @@ void Mesh::loadToGPU()
 
 void Mesh::unloadFromGPU()
 {
-    if (Window::ins->isUsingOpenGL())
+    if (Renderer::isUsingOpenGL())
     {
         if (m_nVertexBuffer != 0)
         {
@@ -94,7 +95,7 @@ void Mesh::unloadFromGPU()
         }
     }
 #if __APPLE__
-    else if (Window::ins->isUsingMetal())
+    else if (Renderer::isUsingMetal())
     {
         if (m_pMetalVertexBuffer)
         {

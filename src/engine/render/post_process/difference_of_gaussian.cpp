@@ -19,7 +19,7 @@ void DifferenceOfGaussian::initialize()
     int nOneForthWidth = static_cast<int>(m_nRenderWidth * BLUR_TEXTURE_RATIO);
     int nOneForthHeight = static_cast<int>(m_nRenderHeight * BLUR_TEXTURE_RATIO);
 
-    if (Window::ins->isUsingOpenGL())
+    if (Renderer::isUsingOpenGL())
     {
         initializeRenderTextureAndFBO(m_nFBOID_Blur1_Horizontal, m_nRenderTexture_Blur1_Horizontal, nOneForthWidth, nOneForthHeight);
         initializeRenderTextureAndFBO(m_nFBOID_BLur1_Vertical, m_nRenderTexture_Blur1_Vertical, nOneForthWidth, nOneForthHeight);
@@ -28,7 +28,7 @@ void DifferenceOfGaussian::initialize()
         initializeRenderTextureAndFBO(m_nFBOID_Final, m_nRenderTexture_Final, m_nRenderWidth, m_nRenderHeight);
     }
 #if __APPLE__
-    else if (Window::ins->isUsingMetal())
+    else if (Renderer::isUsingMetal())
     {
         initializeRenderTextureAndFBO(m_pOriginalRenderTexture_Metal, m_nRenderWidth, m_nRenderHeight);
         initializeRenderTextureAndFBO(m_pRenderTexture_Blur1_Horizontal_Metal, nOneForthWidth, nOneForthHeight);
@@ -48,7 +48,7 @@ void DifferenceOfGaussian::initializeQuad()
     m_pVerticalBlurShader = ShaderLoader::getInstance()->getShader("vertical_blur");
     m_pCompositeShader = ShaderLoader::getInstance()->getShader("difference_of_gaussian_composite");
 
-    if (Window::ins->isUsingOpenGL())
+    if (Renderer::isUsingOpenGL())
     {
         m_pTextureUniform_HorizontalBlur = m_pHorizontalBlurShader->getUniformHandle(SHADER_UNIFORM_TEXTURE_0);
         m_pTextureWidthUniform_HorizontalBlur = m_pHorizontalBlurShader->getUniformHandle("u_textureWidth");
@@ -79,7 +79,7 @@ void DifferenceOfGaussian::initializeQuad()
 
 void DifferenceOfGaussian::renderProcess()
 {
-    if (Window::ins->isUsingOpenGL())
+    if (Renderer::isUsingOpenGL())
     {
         m_nOriginalRenderTexture = m_pProcessQueue->getFinalRenderTexture();
 
@@ -92,7 +92,7 @@ void DifferenceOfGaussian::renderProcess()
         renderVerticalBlurOpenGL(m_nFBOID_BLur2_Vertical, m_nRenderTexture_Blur2_Vertical, m_nRenderTexture_Blur2_Horizontal, m_fBlurRadius2, m_fBlurSigma2);
     }
 #if __APPLE__
-    else if (Window::ins->isUsingMetal())
+    else if (Renderer::isUsingMetal())
     {
         m_pOriginalRenderTexture_Metal = m_pProcessQueue->getFinalMetalRenderTexture();
 
@@ -199,7 +199,7 @@ void DifferenceOfGaussian::renderComposite()
 {
     ASSERT(m_pCompositeShader, "Shader must be set before drawing the quad");
 
-    if (Window::ins->isUsingOpenGL())
+    if (Renderer::isUsingOpenGL())
     {
         glBindFramebuffer(GL_FRAMEBUFFER, m_nFBOID_Final);
         glViewport(0, 0, m_nRenderWidth, m_nRenderHeight);
@@ -234,7 +234,7 @@ void DifferenceOfGaussian::renderComposite()
         m_pProcessQueue->setFinalRenderTexture(m_nRenderTexture_Final);
     }
 #if __APPLE__
-    else if (Window::ins->isUsingMetal())
+    else if (Renderer::isUsingMetal())
     {
         Window::ins->setCurrentDrawingTexture(m_pRenderTexture_Final_Metal);
 
@@ -264,7 +264,7 @@ void DifferenceOfGaussian::onWindowResize()
     int nOneForthWidth = static_cast<int>(m_nRenderWidth * BLUR_TEXTURE_RATIO);
     int nOneForthHeight = static_cast<int>(m_nRenderHeight * BLUR_TEXTURE_RATIO);
 
-    if (Window::ins->isUsingOpenGL())
+    if (Renderer::isUsingOpenGL())
     {
         initializeRenderTextureAndFBO(m_nFBOID_Blur1_Horizontal, m_nRenderTexture_Blur1_Horizontal, nOneForthWidth, nOneForthHeight);
         initializeRenderTextureAndFBO(m_nFBOID_BLur1_Vertical, m_nRenderTexture_Blur1_Vertical, nOneForthWidth, nOneForthHeight);
@@ -273,7 +273,7 @@ void DifferenceOfGaussian::onWindowResize()
         initializeRenderTextureAndFBO(m_nFBOID_Final, m_nRenderTexture_Final, m_nRenderWidth, m_nRenderHeight);
     }
 #if __APPLE__
-    else if (Window::ins->isUsingMetal())
+    else if (Renderer::isUsingMetal())
     {
         initializeRenderTextureAndFBO(m_pOriginalRenderTexture_Metal, m_nRenderWidth, m_nRenderHeight);
         initializeRenderTextureAndFBO(m_pRenderTexture_Blur1_Horizontal_Metal, nOneForthWidth, nOneForthHeight);

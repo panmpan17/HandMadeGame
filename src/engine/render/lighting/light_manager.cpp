@@ -3,6 +3,7 @@
 
 #include "point_light.h"
 #include "direction_light.h"
+#include "../core/renderer.h"
 #include "../../core/window.h"
 
 
@@ -33,7 +34,7 @@ LightManager::LightManager()
 
 LightManager::~LightManager()
 {
-    if (Window::ins->isUsingOpenGL())
+    if (Renderer::isUsingOpenGL())
     {
         glDeleteBuffers(1, &m_nLightingUBO);
 
@@ -41,7 +42,7 @@ LightManager::~LightManager()
         glDeleteTextures(1, &m_nShadowDepthMapTexture);
     }
 #if __APPLE__
-    else if (Window::ins->isUsingMetal())
+    else if (Renderer::isUsingMetal())
     {
         m_pLightingBuffer->release();
     }
@@ -50,7 +51,7 @@ LightManager::~LightManager()
 
 void LightManager::registerLightingUBO()
 {
-    if (Window::ins->isUsingOpenGL())
+    if (Renderer::isUsingOpenGL())
     {
         glGenBuffers(1, &m_nLightingUBO);
         glBindBuffer(GL_UNIFORM_BUFFER, m_nLightingUBO);
@@ -58,7 +59,7 @@ void LightManager::registerLightingUBO()
         glBindBuffer(GL_UNIFORM_BUFFER, 0);
     }
 #if __APPLE__
-    else if (Window::ins->isUsingMetal())
+    else if (Renderer::isUsingMetal())
     {
         m_pLightingBuffer = Window::ins->getMetalDevice()->newBuffer(LIGHTING_UBO_SIZE, MTL::ResourceStorageModeShared);
     }
@@ -67,7 +68,7 @@ void LightManager::registerLightingUBO()
 
 void LightManager::registerShadowDepthMap()
 {
-    if (Window::ins->isUsingOpenGL())
+    if (Renderer::isUsingOpenGL())
     {
         glGenFramebuffers(1, &m_nShadowDepthMapFBO);
         glBindFramebuffer(GL_FRAMEBUFFER, m_nShadowDepthMapFBO);
@@ -89,7 +90,7 @@ void LightManager::registerShadowDepthMap()
         glBindTexture(GL_TEXTURE_2D, 0);
     }
 #if __APPLE__
-    else if (Window::ins->isUsingMetal())
+    else if (Renderer::isUsingMetal())
     {
         MTL::TextureDescriptor* pTextureDesc = MTL::TextureDescriptor::alloc()->init();
         pTextureDesc->setPixelFormat(MTL::PixelFormatDepth32Float);
@@ -134,7 +135,7 @@ void LightManager::updateLightingUBO()
     {
         m_bUBODirty = false;
 
-        if (Window::ins->isUsingOpenGL())
+        if (Renderer::isUsingOpenGL())
         {
             glBindBuffer(GL_UNIFORM_BUFFER, m_nLightingUBO);
             unsigned long nOffset = 0;
@@ -154,7 +155,7 @@ void LightManager::updateLightingUBO()
             glBindBuffer(GL_UNIFORM_BUFFER, 0);
         }
 #if __APPLE__
-        else if (Window::ins->isUsingMetal())
+        else if (Renderer::isUsingMetal())
         {
             void* pBufferContents = m_pLightingBuffer->contents();
             unsigned long nOffset = 0;

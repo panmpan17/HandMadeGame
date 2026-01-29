@@ -5,6 +5,7 @@
 #include <GLFW/glfw3.h>
 #include <assimp/scene.h>
 
+#include "core/renderer.h"
 #include "../core/window.h"
 
 #include "../../utils/filesystem.h"
@@ -29,7 +30,7 @@ void Image::configureAndLoadToGPU()
     int nForcedChannels = 0;
 
 #if __APPLE__
-    if (Window::ins->isUsingMetal())
+    if (Renderer::isUsingMetal())
     {
         if (memcmp(m_strPath.c_str() + m_strPath.size() - 4, ".jpg", 4) == 0
             || memcmp(m_strPath.c_str() + m_strPath.size() - 5, ".jpeg", 5) == 0)
@@ -42,7 +43,7 @@ void Image::configureAndLoadToGPU()
     loadFileToGPU(nForcedChannels);
 
 #if __APPLE__
-    if (Window::ins->isUsingMetal() && (m_nChannels == 3 && nForcedChannels != 4))
+    if (Renderer::isUsingMetal() && (m_nChannels == 3 && nForcedChannels != 4))
     {
         freeCPUData();
         nForcedChannels = 4;

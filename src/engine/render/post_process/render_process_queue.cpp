@@ -69,7 +69,7 @@ void RenderProcessQueue::initializeQuad()
     arrVertices[2] = { { -1, 1 }, { 0.0f, 1.0f } };
     arrVertices[3] = { { 1, 1 }, { 1.0f, 1.0f } };
 
-    if (Window::ins->isUsingOpenGL())
+    if (Renderer::isUsingOpenGL())
     {
         m_pTextureHandle = m_pShader->getUniformHandle(SHADER_UNIFORM_TEXTURE_0);
 
@@ -105,7 +105,7 @@ void RenderProcessQueue::initializeQuad()
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
 #if __APPLE__
-    else if (Window::ins->isUsingMetal())
+    else if (Renderer::isUsingMetal())
     {
         m_pMetalFullScreenVertexBuffer = Window::ins->getMetalDevice()->newBuffer(sizeof(arrVertices), MTL::ResourceStorageModeShared);
         memcpy(m_pMetalFullScreenVertexBuffer->contents(), arrVertices, sizeof(arrVertices));
@@ -115,7 +115,7 @@ void RenderProcessQueue::initializeQuad()
 
 void RenderProcessQueue::initializeOriginalFBO(bool bGenFramebuffer/* = true*/)
 {
-    if (Window::ins->isUsingOpenGL())
+    if (Renderer::isUsingOpenGL())
     {
         if (bGenFramebuffer)
         {
@@ -155,7 +155,7 @@ void RenderProcessQueue::initializeOriginalFBO(bool bGenFramebuffer/* = true*/)
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 #if __APPLE__
-    else if (Window::ins->isUsingMetal())
+    else if (Renderer::isUsingMetal())
     {
         if (m_pMetalOriginalRenderTexture)
         {
@@ -175,7 +175,7 @@ void RenderProcessQueue::onWindowSizeChanged(Vector2i oSize)
     m_nRenderWidth = oSize.x;
     m_nRenderHeight = oSize.y;
 
-    if (Window::ins->isUsingOpenGL())
+    if (Renderer::isUsingOpenGL())
     {
         glDeleteTextures(1, &m_nRenderTexture_original);
         glDeleteRenderbuffers(1, &m_nDepthBuffer_original);
@@ -196,7 +196,7 @@ void RenderProcessQueue::onWindowSizeChanged(Vector2i oSize)
 #pragma mark Drawing every frame
 void RenderProcessQueue::beginFrame()
 {
-    if (Window::ins->isUsingOpenGL())
+    if (Renderer::isUsingOpenGL())
     {
         glBindFramebuffer(GL_FRAMEBUFFER, m_nFBOID_original);
 
@@ -207,7 +207,7 @@ void RenderProcessQueue::beginFrame()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 #if __APPLE__
-    else if (Window::ins->isUsingMetal())
+    else if (Renderer::isUsingMetal())
     {
         Window::ins->setCurrentDrawingTexture(m_pMetalOriginalRenderTexture);
     }
@@ -216,13 +216,13 @@ void RenderProcessQueue::beginFrame()
 
 void RenderProcessQueue::endFrame()
 {
-    if (Window::ins->isUsingOpenGL())
+    if (Renderer::isUsingOpenGL())
     {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         m_nFinalRenderTexture = m_nRenderTexture_original;
     }
 #if __APPLE__
-    else if (Window::ins->isUsingMetal())
+    else if (Renderer::isUsingMetal())
     {
         m_pMetalFinalRenderTexture = m_pMetalOriginalRenderTexture;
     }
@@ -250,7 +250,7 @@ void RenderProcessQueue::renderToScreen()
         return;
     }
 
-    if (Window::ins->isUsingOpenGL())
+    if (Renderer::isUsingOpenGL())
     {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glViewport(0, 0, m_pWindow->GetActualWidth(), m_pWindow->GetActualHeight());
@@ -272,7 +272,7 @@ void RenderProcessQueue::renderToScreen()
         glUseProgram(0);
     }
 #if __APPLE__
-    else if (Window::ins->isUsingMetal())
+    else if (Renderer::isUsingMetal())
     {
         Window::ins->setCurrentDrawingTexture(Window::ins->getCurrentDrawable()->texture());
 
@@ -291,7 +291,7 @@ void RenderProcessQueue::renderToScreen()
 
 void RenderProcessQueue::renderToScreenSplit()
 {
-    if (Window::ins->isUsingOpenGL())
+    if (Renderer::isUsingOpenGL())
     {
         glViewport(0, 0, m_pWindow->GetActualWidth(), m_pWindow->GetActualHeight());
         glClear(GL_COLOR_BUFFER_BIT);
@@ -317,7 +317,7 @@ void RenderProcessQueue::renderToScreenSplit()
         glUseProgram(0);
     }
 #if __APPLE__
-    else if (Window::ins->isUsingMetal())
+    else if (Renderer::isUsingMetal())
     {
         Window::ins->setCurrentDrawingTexture(Window::ins->getCurrentDrawable()->texture());
 

@@ -74,7 +74,7 @@ void Skybox::bindVertexArray()
          1.0f, -1.0f,  1.0f
     };
 
-    if (Window::ins->isUsingOpenGL())
+    if (Renderer::isUsingOpenGL())
     {
         glGenVertexArrays(1, &m_nSkyboxVAO);
         glGenBuffers(1, &m_nSkyboxVBO);
@@ -90,7 +90,7 @@ void Skybox::bindVertexArray()
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
 #if __APPLE__
-    else if (Window::ins->isUsingMetal())
+    else if (Renderer::isUsingMetal())
     {
         MTL::Device* pDevice = Window::ins->getMetalDevice();
 
@@ -110,7 +110,7 @@ void Skybox::loadSkyboxCubmaps(std::initializer_list<std::string_view> strImages
         return;
     }
 
-    bool bUsingOpenGL = Window::ins->isUsingOpenGL();
+    bool bUsingOpenGL = Renderer::isUsingOpenGL();
     if (bUsingOpenGL)
     {
         glGenTextures(1, &m_nSkyboxTextureID);
@@ -124,7 +124,7 @@ void Skybox::loadSkyboxCubmaps(std::initializer_list<std::string_view> strImages
     }
 
 #if __APPLE__
-    bool bUsingMetal = Window::ins->isUsingMetal();
+    bool bUsingMetal = Renderer::isUsingMetal();
 
     if (bUsingMetal)
     {
@@ -172,8 +172,8 @@ void Skybox::loadSkyboxCubmaps(std::initializer_list<std::string_view> strImages
 
 void Skybox::draw()
 {
-    bool bUsingOpenGL = Window::ins->isUsingOpenGL();
-    bool bUsingMetal = Window::ins->isUsingMetal();
+    bool bUsingOpenGL = Renderer::isUsingOpenGL();
+    bool bUsingMetal = Renderer::isUsingMetal();
     
     if (bUsingOpenGL)
     {

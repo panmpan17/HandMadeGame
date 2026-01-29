@@ -24,7 +24,7 @@ GizmosManager::GizmosManager()
 
     m_pMeshGizmosShader = ShaderLoader::getInstance()->getShader("mesh_gizmos");
 
-    if (Window::ins->isUsingOpenGL())
+    if (Renderer::isUsingOpenGL())
     {
         m_pMeshGizmosModelUniform = m_pMeshGizmosShader->getUniformHandle("u_Model");
         m_pMeshGizmosColorUniform = m_pMeshGizmosShader->getUniformHandle("u_GizmosColor");
@@ -40,7 +40,7 @@ GizmosManager::GizmosManager()
 
 GizmosManager::~GizmosManager()
 {
-    if (Window::ins->isUsingOpenGL())
+    if (Renderer::isUsingOpenGL())
     {
         glDeleteBuffers(1, &m_nCircleGizmosVertexBuffer);
         glDeleteVertexArrays(1, &m_nCircleGizmosVertexArray);
@@ -58,7 +58,7 @@ GizmosManager::~GizmosManager()
         glDeleteVertexArrays(1, &m_nImageGizmosVertexArray);
     }
 #if __APPLE__
-    else if (Window::ins->isUsingMetal())
+    else if (Renderer::isUsingMetal())
     {
         if (m_pCircleGizmosMetalVertexBuffer)
         {
@@ -101,7 +101,7 @@ void GizmosManager::initImageGizmosShaderAndBuffer()
     arrVertices[1] = { { fStartX + 1, fStartY }, { 1, 0 } }; // Bottom right
     arrVertices[3] = { { fStartX + 1, fStartY + 1 }, { 1, 1 } }; // Top left
 
-    if (Window::ins->isUsingOpenGL())
+    if (Renderer::isUsingOpenGL())
     {
         m_pImageGizmosPositionUniform = m_pImageGizmosShader->getUniformHandle("u_WorldPosition");
         m_pImageGizmosColorUniform = m_pImageGizmosShader->getUniformHandle("u_imageColor");
@@ -128,7 +128,7 @@ void GizmosManager::initImageGizmosShaderAndBuffer()
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
 #if __APPLE__
-    else if (Window::ins->isUsingMetal())
+    else if (Renderer::isUsingMetal())
     {
         MTL::Device* pDevice = Window::ins->getMetalDevice();
         m_pImageGizmosMetalVertexBuffer = pDevice->newBuffer(arrVertices, sizeof(arrVertices), MTL::ResourceStorageModeShared);
@@ -179,13 +179,13 @@ void GizmosManager::initCircleGizmosShaderAndBuffer()
 {
     constexpr std::string_view strFilePath = "assets/gizmos/circle.obj";
 
-    if (Window::ins->isUsingOpenGL())
+    if (Renderer::isUsingOpenGL())
     {
         initMeshBufferUsingOpenGL(strFilePath, m_nCircleGizmosVertexCount,
                                   m_nCircleGizmosVertexBuffer, m_nCircleGizmosVertexArray);
     }
 #if __APPLE__
-    else if (Window::ins->isUsingMetal())
+    else if (Renderer::isUsingMetal())
     {
         initMeshBufferUsingMetal(strFilePath, m_nCircleGizmosVertexCount,
                                  m_pCircleGizmosMetalVertexBuffer);
@@ -197,13 +197,13 @@ void GizmosManager::initSphereGizmosShaderAndBuffer()
 {
     constexpr std::string_view strFilePath = "assets/gizmos/sphere.obj";
 
-    if (Window::ins->isUsingOpenGL())
+    if (Renderer::isUsingOpenGL())
     {
         initMeshBufferUsingOpenGL(strFilePath, m_nSphereGizmosVertexCount,
                                   m_nSphereGizmosVertexBuffer, m_nSphereGizmosVertexArray);
     }
 #if __APPLE__
-    else if (Window::ins->isUsingMetal())
+    else if (Renderer::isUsingMetal())
     {
         initMeshBufferUsingMetal(strFilePath, m_nSphereGizmosVertexCount,
                                  m_pSphereGizmosMetalVertexBuffer);
@@ -215,13 +215,13 @@ void GizmosManager::initRectangleGizmosShaderAndBuffer()
 {
     constexpr std::string_view strFilePath = "assets/gizmos/rectangle.obj";
 
-    if (Window::ins->isUsingOpenGL())
+    if (Renderer::isUsingOpenGL())
     {
         initMeshBufferUsingOpenGL(strFilePath, m_nRectangleGizmosVertexCount,
                                   m_nRectangleGizmosVertexBuffer, m_nRectangleGizmosVertexArray);
     }
 #if __APPLE__
-    else if (Window::ins->isUsingMetal())
+    else if (Renderer::isUsingMetal())
     {
         initMeshBufferUsingMetal(strFilePath, m_nRectangleGizmosVertexCount,
                                  m_pRectangleGizmosMetalVertexBuffer);
@@ -233,13 +233,13 @@ void GizmosManager::initCubeGizmosShaderAndBuffer()
 {
     constexpr std::string_view strFilePath = "assets/gizmos/cube.obj";
 
-    if (Window::ins->isUsingOpenGL())
+    if (Renderer::isUsingOpenGL())
     {
         initMeshBufferUsingOpenGL(strFilePath, m_nCubeGizmosVertexCount,
                                   m_nCubeGizmosVertexBuffer, m_nCubeGizmosVertexArray);
     }
 #if __APPLE__
-    else if (Window::ins->isUsingMetal())
+    else if (Renderer::isUsingMetal())
     {
         initMeshBufferUsingMetal(strFilePath, m_nCubeGizmosVertexCount,
                                  m_pCubeGizmosMetalVertexBuffer);
@@ -391,13 +391,13 @@ void GizmosManager::addCubeGizmos(const Vector3& vecPosition, const Quaternion& 
 
 void GizmosManager::drawAllGizmos()
 {
-    if (Window::ins->isUsingOpenGL())
+    if (Renderer::isUsingOpenGL())
     {
         glEnable(GL_BLEND);
         glDepthMask(GL_FALSE);
     }
 #if __APPLE__
-    else if (Window::ins->isUsingMetal())
+    else if (Renderer::isUsingMetal())
     {
         MTL::RenderCommandEncoder* pRenderCommandEncoder = Window::ins->getCurrentFrameRenderEncoder();
         pRenderCommandEncoder->setDepthStencilState(MetalRenderer::m_pDepthOffStencilState);
@@ -411,13 +411,13 @@ void GizmosManager::drawAllGizmos()
     drawCubeGizmos();
     drawImageGizmos();
 
-    if (Window::ins->isUsingOpenGL())
+    if (Renderer::isUsingOpenGL())
     {
         glDisable(GL_BLEND);
         glDepthMask(GL_TRUE);
     }
 #if __APPLE__
-    else if (Window::ins->isUsingMetal())
+    else if (Renderer::isUsingMetal())
     {
         MTL::RenderCommandEncoder* pRenderCommandEncoder = Window::ins->getCurrentFrameRenderEncoder();
         pRenderCommandEncoder->setDepthStencilState(MetalRenderer::m_pDepthOnStencilState);
@@ -431,7 +431,7 @@ void GizmosManager::drawCircleGizmos()
     mat4x4 oRotationMatrix;
     mat4x4 oModelMatrix;
 
-    if (Window::ins->isUsingOpenGL())
+    if (Renderer::isUsingOpenGL())
     {
         glDisable(GL_CULL_FACE);
 
@@ -466,7 +466,7 @@ void GizmosManager::drawCircleGizmos()
         glEnable(GL_CULL_FACE);
     }
 #if __APPLE__
-    else if (Window::ins->isUsingMetal())
+    else if (Renderer::isUsingMetal())
     {
         MTL::RenderCommandEncoder* pRenderCommandEncoder = Window::ins->getCurrentFrameRenderEncoder();
 
@@ -505,7 +505,7 @@ void GizmosManager::drawSphereGizmos()
     Quaternion::Identity.toMat4x4(oRotationMatrix);
     mat4x4 oModelMatrix;
 
-    if (Window::ins->isUsingOpenGL())
+    if (Renderer::isUsingOpenGL())
     {
         glUseProgram(m_pMeshGizmosShader->getProgram());
         glBindVertexArray(m_nSphereGizmosVertexArray);
@@ -533,7 +533,7 @@ void GizmosManager::drawSphereGizmos()
         glUseProgram(0);
     }
 #if __APPLE__
-    else if (Window::ins->isUsingMetal())
+    else if (Renderer::isUsingMetal())
     {
         MTL::RenderCommandEncoder* pRenderCommandEncoder = Window::ins->getCurrentFrameRenderEncoder();
 
@@ -568,7 +568,7 @@ void GizmosManager::drawRectangleGizmos()
     mat4x4 oRotationMatrix;
     mat4x4 oModelMatrix;
 
-    if (Window::ins->isUsingOpenGL())
+    if (Renderer::isUsingOpenGL())
     {
         glDisable(GL_CULL_FACE);
 
@@ -603,7 +603,7 @@ void GizmosManager::drawRectangleGizmos()
         glEnable(GL_CULL_FACE);
     }
 #if __APPLE__
-    else if (Window::ins->isUsingMetal())
+    else if (Renderer::isUsingMetal())
     {
         MTL::RenderCommandEncoder* pRenderCommandEncoder = Window::ins->getCurrentFrameRenderEncoder();
 
@@ -641,7 +641,7 @@ void GizmosManager::drawCubeGizmos()
     mat4x4 oRotationMatrix;
     mat4x4 oModelMatrix;
 
-    if (Window::ins->isUsingOpenGL())
+    if (Renderer::isUsingOpenGL())
     {
         glUseProgram(m_pMeshGizmosShader->getProgram());
         glBindVertexArray(m_nCubeGizmosVertexArray);
@@ -672,7 +672,7 @@ void GizmosManager::drawCubeGizmos()
         glUseProgram(0);
     }
 #if __APPLE__
-    else if (Window::ins->isUsingMetal())
+    else if (Renderer::isUsingMetal())
     {
         MTL::RenderCommandEncoder* pRenderCommandEncoder = Window::ins->getCurrentFrameRenderEncoder();
 
@@ -706,7 +706,7 @@ void GizmosManager::drawCubeGizmos()
 
 void GizmosManager::drawImageGizmos()
 {
-    if (Window::ins->isUsingOpenGL())
+    if (Renderer::isUsingOpenGL())
     {
         glUseProgram(m_pImageGizmosShader->getProgram());
         glBindVertexArray(m_nImageGizmosVertexArray);
@@ -738,7 +738,7 @@ void GizmosManager::drawImageGizmos()
         glUseProgram(0);
     }
 #if __APPLE__
-    else if (Window::ins->isUsingMetal())
+    else if (Renderer::isUsingMetal())
     {
         MTL::RenderCommandEncoder* pRenderCommandEncoder = Window::ins->getCurrentFrameRenderEncoder();
 

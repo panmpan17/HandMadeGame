@@ -18,7 +18,7 @@ void BloomTest::initialize()
     int nOneForthWidth = static_cast<int>(m_nRenderWidth * BLUR_TEXTURE_RATIO);
     int nOneForthHeight = static_cast<int>(m_nRenderHeight * BLUR_TEXTURE_RATIO);
 
-    if (Window::ins->isUsingOpenGL())
+    if (Renderer::isUsingOpenGL())
     {
         initializeRenderTextureAndFBO(m_nFBOID_ColorHighlight, m_nRenderTexture_ColorHighlight, m_nRenderWidth, m_nRenderHeight);
         initializeRenderTextureAndFBO(m_nFBOID_HorizontalBlur, m_nRenderTexture_HorizontalBlur, nOneForthWidth, nOneForthHeight);
@@ -29,7 +29,7 @@ void BloomTest::initialize()
         glBindTexture(GL_TEXTURE_2D, 0); // Unbind any texture when done
     }
 #if __APPLE__
-    else if (Window::ins->isUsingMetal())
+    else if (Renderer::isUsingMetal())
     {
         initializeRenderTextureAndFBO(m_pMetalRenderTexture_ColorHighlight, m_nRenderWidth, m_nRenderHeight);
         initializeRenderTextureAndFBO(m_pMetalRenderTexture_HorizontalBlur, nOneForthWidth, nOneForthHeight);
@@ -48,7 +48,7 @@ void BloomTest::initializeQuad()
     m_pVerticalBlurShader = ShaderLoader::getInstance()->getShader("vertical_blur");
     m_pCompositeShader = ShaderLoader::getInstance()->getShader("bloom_composite");
     
-    if (Window::ins->isUsingOpenGL())
+    if (Renderer::isUsingOpenGL())
     {
         m_pTextureUniform_ColorHighlight = m_pColorHighlightShader->getUniformHandle(SHADER_UNIFORM_TEXTURE_0);
         m_pThresholdUniform_ColorHighlight = m_pColorHighlightShader->getUniformHandle("u_threshold");
@@ -114,7 +114,7 @@ void BloomTest::renderColorHighlight()
     // Debug draw it to screen instead of another post-process render texture
     ASSERT(m_pColorHighlightShader, "Shader must be set before drawing the quad");
 
-    if (Window::ins->isUsingOpenGL())
+    if (Renderer::isUsingOpenGL())
     {
         glBindFramebuffer(GL_FRAMEBUFFER, m_nFBOID_ColorHighlight);
         glViewport(0, 0, m_nRenderWidth, m_nRenderHeight);
@@ -141,7 +141,7 @@ void BloomTest::renderColorHighlight()
         m_pProcessQueue->setFinalRenderTexture(m_nRenderTexture_ColorHighlight);
     }
 #if __APPLE__
-    else if (Window::ins->isUsingMetal())
+    else if (Renderer::isUsingMetal())
     {
         Window::ins->setCurrentDrawingTexture(m_pMetalRenderTexture_ColorHighlight);
 
@@ -167,7 +167,7 @@ void BloomTest::renderHorizontalBlur()
     // Debug draw it to screen instead of another post-process render texture
     ASSERT(m_pHorizontalBlurShader, "Shader must be set before drawing the quad");
 
-    if (Window::ins->isUsingOpenGL())
+    if (Renderer::isUsingOpenGL())
     {
         glBindFramebuffer(GL_FRAMEBUFFER, m_nFBOID_HorizontalBlur);
         glViewport(0, 0, m_nRenderWidth * BLUR_TEXTURE_RATIO, m_nRenderHeight * BLUR_TEXTURE_RATIO);
@@ -196,7 +196,7 @@ void BloomTest::renderHorizontalBlur()
         m_pProcessQueue->setFinalRenderTexture(m_nRenderTexture_HorizontalBlur);
     }
 #if __APPLE__
-    else if (Window::ins->isUsingMetal())
+    else if (Renderer::isUsingMetal())
     {
         Window::ins->setCurrentDrawingTexture(m_pMetalRenderTexture_HorizontalBlur);
 
@@ -232,7 +232,7 @@ void BloomTest::renderVerticalBlur()
     // Debug draw it to screen instead of another post-process render texture
     ASSERT(m_pVerticalBlurShader, "Shader must be set before drawing the quad");
 
-    if (Window::ins->isUsingOpenGL())
+    if (Renderer::isUsingOpenGL())
     {
         glBindFramebuffer(GL_FRAMEBUFFER, m_nFBOID_VerticalBlur);
         glViewport(0, 0, m_nRenderWidth * BLUR_TEXTURE_RATIO, m_nRenderHeight * BLUR_TEXTURE_RATIO);
@@ -261,7 +261,7 @@ void BloomTest::renderVerticalBlur()
         m_pProcessQueue->setFinalRenderTexture(m_nRenderTexture_VerticalBlur);
     }
 #if __APPLE__
-    else if (Window::ins->isUsingMetal())
+    else if (Renderer::isUsingMetal())
     {
         Window::ins->setCurrentDrawingTexture(m_pMetalRenderTexture_VerticalBlur);
 
@@ -297,7 +297,7 @@ void BloomTest::renderComposite()
     // Debug draw it to screen instead of another post-process render texture
     ASSERT(m_pCompositeShader, "Shader must be set before drawing the quad");
 
-    if (Window::ins->isUsingOpenGL())
+    if (Renderer::isUsingOpenGL())
     {
         glBindFramebuffer(GL_FRAMEBUFFER, m_nFBOID_Final);
         glViewport(0, 0, m_nRenderWidth, m_nRenderHeight);
@@ -329,7 +329,7 @@ void BloomTest::renderComposite()
         m_pProcessQueue->setFinalRenderTexture(m_nRenderTexture_Final);
     }
 #if __APPLE__
-    else if (Window::ins->isUsingMetal())
+    else if (Renderer::isUsingMetal())
     {
         Window::ins->setCurrentDrawingTexture(m_pMetalFinalRenderTexture);
 
@@ -367,7 +367,7 @@ void BloomTest::onWindowResize()
     int nOneForthWidth = static_cast<int>(m_nRenderWidth * BLUR_TEXTURE_RATIO);
     int nOneForthHeight = static_cast<int>(m_nRenderHeight * BLUR_TEXTURE_RATIO);
 
-    if (Window::ins->isUsingOpenGL())
+    if (Renderer::isUsingOpenGL())
     {
         initializeRenderTextureAndFBO(m_nFBOID_ColorHighlight, m_nRenderTexture_ColorHighlight, m_nRenderWidth, m_nRenderHeight);
         initializeRenderTextureAndFBO(m_nFBOID_HorizontalBlur, m_nRenderTexture_HorizontalBlur, nOneForthWidth, nOneForthHeight);
@@ -378,7 +378,7 @@ void BloomTest::onWindowResize()
         glBindTexture(GL_TEXTURE_2D, 0); // Unbind any texture when done
     }
 #if __APPLE__
-    else if (Window::ins->isUsingMetal())
+    else if (Renderer::isUsingMetal())
     {
         initializeRenderTextureAndFBO(m_pMetalRenderTexture_ColorHighlight, m_nRenderWidth, m_nRenderHeight);
         initializeRenderTextureAndFBO(m_pMetalRenderTexture_HorizontalBlur, nOneForthWidth, nOneForthHeight);

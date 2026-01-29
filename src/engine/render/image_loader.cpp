@@ -1,6 +1,6 @@
 #include "image_loader.h"
 
-#include "../core/window.h"
+#include "core/renderer.h"
 
 void ImageLoader::Initialize()
 {
@@ -24,12 +24,12 @@ ImageLoader::ImageLoader()
 {
     m_pPureWhite1by1Image = new Image(1, 1, 4, new unsigned char[4]{255, 255, 255, 255});
 
-    if (Window::ins->isUsingOpenGL())
+    if (Renderer::isUsingOpenGL())
     {
         m_pPureWhite1by1Image->loadTextureToGL();
     }
 #if __APPLE__
-    else if (Window::ins->isUsingMetal())
+    else if (Renderer::isUsingMetal())
     {
         m_pPureWhite1by1Image->loadTextureToMetal();
     }
@@ -56,7 +56,7 @@ Image* ImageLoader::getImageByPath(const std::string_view& strPath)
     auto pImage = new Image(strPath);
     if (pImage->isCPULoaded())
     {
-        switch (Window::ins->getGraphicAPI())
+        switch (Renderer::getGraphicAPI())
         {
             case GraphicAPI::OpenGL:
                 pImage->loadTextureToGL();

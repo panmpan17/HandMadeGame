@@ -2,8 +2,8 @@
 
 #include <glad/gl.h>
 #include "light_manager.h"
+#include "../core/renderer.h"
 #include "../../core/serialization/serializer.h"
-#include "../../core/window.h"
 #include "../../../editor/inspector_helper.h"
 #include "../../../editor/gizmos.h"
 
@@ -94,7 +94,7 @@ const mat4x4& DirectionLightComponent::getLightCastingMatrix()
         float farPlane = 30.0f;
 
         mat4x4 matOrtho;
-        if (Window::ins->isUsingOpenGL())
+        if (Renderer::isUsingOpenGL())
             mat4x4_ortho(matOrtho, -orthoSize, orthoSize, -orthoSize, orthoSize, nearPlane, farPlane);
         else
             mat4x4_ortho_metal(matOrtho, -orthoSize, orthoSize, -orthoSize, orthoSize, nearPlane, farPlane);

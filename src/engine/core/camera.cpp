@@ -5,6 +5,7 @@
 #include "debug_macro.h"
 #include "scene/node.h"
 #include "../render/shader_loader.h"
+#include "../render/core/renderer.h"
 #include "../../editor/inspector_helper.h"
 
 
@@ -20,7 +21,7 @@ Camera::Camera()
         m_bCameraUBODirty = true;
     });
 
-    if (Window::ins->isUsingOpenGL())
+    if (Renderer::isUsingOpenGL())
     {
         glGenBuffers(1, &m_nCameraUBO);
         glBindBuffer(GL_UNIFORM_BUFFER, m_nCameraUBO);
@@ -28,7 +29,7 @@ Camera::Camera()
         glBindBuffer(GL_UNIFORM_BUFFER, 0);
     }
 #if __APPLE__
-    else if (Window::ins->isUsingMetal())
+    else if (Renderer::isUsingMetal())
     {
         m_pCameraMetalUBO = Window::ins->getMetalDevice()->newBuffer(sizeof(mat4x4) * 2 + sizeof(vec4), MTL::ResourceStorageModeShared);
     }
@@ -153,7 +154,7 @@ void Camera::updateCameraDataBuffer()
 
         Vector3 camPos = m_pNode->getPositionInWorld();
 
-        if (Window::ins->isUsingOpenGL())
+        if (Renderer::isUsingOpenGL())
         {
             glBindBuffer(GL_UNIFORM_BUFFER, m_nCameraUBO);
             glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(mat4x4), getViewMatrix());
@@ -162,7 +163,7 @@ void Camera::updateCameraDataBuffer()
             glBindBuffer(GL_UNIFORM_BUFFER, 0);
         }
 #if __APPLE__
-        else if (Window::ins->isUsingMetal())
+        else if (Renderer::isUsingMetal())
         {
             float* pBuffer = reinterpret_cast<float*>(m_pCameraMetalUBO->contents());
             memcpy(pBuffer, getViewMatrix(), sizeof(mat4x4));

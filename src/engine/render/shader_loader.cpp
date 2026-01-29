@@ -1,5 +1,6 @@
 #include "shader_loader.h"
 #include "shader.h"
+#include "core/renderer.h"
 #include "../core/debug_macro.h"
 #include "../../utils/file_utils.h"
 #include "../../utils/platform.h"
@@ -50,7 +51,7 @@ void ShaderLoader::readRegistryFromFile()
 #if __APPLE__
     std::function<void()> funcCreateMetalShader = nullptr;
 
-    if (Window::ins->isUsingMetal())
+    if (Renderer::isUsingMetal())
     {
         MTL::Device* pMetalDevice = Window::ins->getMetalDevice();
         MTL::Library* pLibrary = nullptr;
@@ -98,7 +99,7 @@ void ShaderLoader::readRegistryFromFile()
         {
             if (oCurrentShaderData.nCurrentShaderId != -1 && !oCurrentShaderData.m_strName.empty())
             {
-                if (Window::ins->isUsingOpenGL())
+                if (Renderer::isUsingOpenGL())
                 {
                     if (!oCurrentShaderData.m_strVertexPath.empty() && !oCurrentShaderData.m_strFragmentPath.empty())
                     {
@@ -106,7 +107,7 @@ void ShaderLoader::readRegistryFromFile()
                     }
                 }
 #if __APPLE__
-                else if (Window::ins->isUsingMetal())
+                else if (Renderer::isUsingMetal())
                 {
                     if (!oCurrentShaderData.m_strMetalShaderPrefix.empty())
                     {
@@ -230,7 +231,7 @@ void ShaderLoader::onFileChangedListener(const std::string& strFilePath, eFileCh
         return;
     }
 
-    if (Window::ins->isUsingMetal())
+    if (Renderer::isUsingMetal())
     {
         // NOTE: Because metal shader require precompilation, which is might need extra tool to trigger recompilation.
         return;
