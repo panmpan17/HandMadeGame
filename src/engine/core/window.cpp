@@ -503,8 +503,6 @@ void Window::mainLoop()
 {
     beforeLoop();
 
-    Shader* pPureColorTexture = ShaderLoader::getInstance()->getShader("depth_debug");
-
 #if IS_DEBUG_VERSION
     while (!glfwWindowShouldClose(m_pWindow) && !sm_bRestartRequested)
 #else
@@ -572,21 +570,6 @@ void Window::mainLoop()
             m_pCurrentCommandBuffer = m_pMetalCommandQueue->commandBuffer();
 
             drawFrame();
-
-            if (m_bShowDebugDepth)
-            {
-                setCurrentDrawingTexture(m_pCurrentDrawable->texture());
-
-                m_pCurrentFrameRenderEncoder->setRenderPipelineState(pPureColorTexture->getMetalPipelineState());
-                m_pCurrentFrameRenderEncoder->setVertexBuffer(m_pRenderProcessQueue->getMetalFullScreenVertexBuffer(), 0, 0);
-                m_pCurrentFrameRenderEncoder->setFragmentTexture(LightManager::getInstance()->getShadowDepthMapTextureMetal(), 0);
-                m_pCurrentFrameRenderEncoder->setFragmentSamplerState(MetalRenderer::m_pLinearSampler, 0);
-
-                m_pCurrentFrameRenderEncoder->drawPrimitives(MTL::PrimitiveTypeTriangleStrip, NS::UInteger(0), NS::UInteger(4));
-
-                m_pCurrentFrameRenderEncoder->endEncoding();
-                m_pCurrentFrameRenderEncoder = nullptr;
-            }
 
             m_pCurrentCommandBuffer->presentDrawable(m_pCurrentDrawable);
             m_pCurrentCommandBuffer->commit();
@@ -743,9 +726,21 @@ void Window::drawFrame()
 
     if (m_bShowDebugDepth)
     {
-        return;
-    }
+        setCurrentDrawingTexture(m_pCurrentDrawable->texture());
 
+        Shader* pDebugDepthShader = ShaderLoader::getInstance()->getShader("depth_debug");
+        m_pCurrentFrameRenderEncoder->setRenderPipelineState(pDebugDepthShader->getMetalPipelineState());
+        m_pCurrentFrameRenderEncoder->setVertexBuffer(m_pRenderProcessQueue->getMetalFullScreenVertexBuffer(), 0, 0);
+        m_pCurrentFrameRenderEncoder->setFragmentTexture(LightManager::getInstance()->getShadowDepthMapTextureMetal(), 0);
+        m_pCurrentFrameRenderEncoder->setFragmentSamplerState(MetalRenderer::m_pLinearSampler, 0);
+
+        m_pCurrentFrameRenderEncoder->drawPrimitives(MTL::PrimitiveTypeTriangleStrip, NS::UInteger(0), NS::UInteger(4));
+
+        m_pCurrentFrameRenderEncoder->endEncoding();
+        m_pCurrentFrameRenderEncoder = nullptr;
+    }
+    else
+    {
     if (m_bEnablePostProcess) // Enable post process
     {
         m_pRenderProcessQueue->beginFrame();
@@ -771,6 +766,7 @@ void Window::drawFrame()
         }
 
         m_pWorldScene->render();
+    }
     }
 
     if (m_bDrawGizmos)
