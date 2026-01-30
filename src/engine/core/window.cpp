@@ -169,13 +169,6 @@ Window::~Window()
     ins = nullptr;
 }
 
-void APIENTRY glDebugOutput(GLenum source, GLenum type, unsigned int id, GLenum severity, GLsizei length, const char* message, const void* userParam)
-{
-    // ignore non-significant error/warnings
-    if (id == 131169 || id == 131185 || id == 131218 || id == 131204) return;
-
-    LOGLN("Debug message ({}) at {}:{}: {}", id, __FILE__, __LINE__, message);
-}
 
 bool Window::configureAndCreateWindow()
 {
@@ -183,20 +176,7 @@ bool Window::configureAndCreateWindow()
 
     glfwWindowHint(GLFW_RESIZABLE, m_bResizable ? GLFW_TRUE : GLFW_FALSE);
 
-    if (Renderer::isUsingOpenGL())
-    {
-        configureGLFWWithOpenGL();
-    }
-#if __APPLE__
-    else if (Renderer::isUsingMetal())
-    {
-        configureGLFWWithMetal();
-    }
-#endif // __APPLE__
-
-#if IS_DEBUG_VERSION
-    glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
-#endif // IS_DEBUG_VERSION
+    configureGLFWBeforeWindowCreation();
 
     // GLFWmonitor* pPrimaryMonitor = glfwGetPrimaryMonitor();
     // const GLFWvidmode* pVideoMode = glfwGetVideoMode(pPrimaryMonitor);
@@ -228,7 +208,6 @@ bool Window::configureAndCreateWindow()
     }
 
     glfwGetFramebufferSize(m_pWindow, &m_oActualSize.x, &m_oActualSize.y);
-    // m_fRatio = m_oActualSize.x / (float)m_oActualSize.y;
 
     // glfwSetWindowMonitor(m_pWindow, pPrimaryMonitor, 0, 0, pVideoMode->width, pVideoMode->height, pVideoMode->refreshRate);
 
@@ -239,38 +218,53 @@ bool Window::configureAndCreateWindow()
     return true;
 }
 
-void Window::configureGLFWWithOpenGL()
+void Window::configureGLFWBeforeWindowCreation()
 {
-    LOGLN("Configuring GLFW with OpenGL");
+    if (Renderer::isUsingOpenGL())
+    {
+        LOGLN("Configuring GLFW for OpenGL");
 #if __APPLE__
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
 #else
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
 #endif // __APPLE__
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    glfwWindowHint(GLFW_DEPTH_BITS, 24);
+        glfwWindowHint(GLFW_DEPTH_BITS, 24);
+
+#if IS_DEBUG_VERSION
+        glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
+#endif // IS_DEBUG_VERSION
+    }
+#if __APPLE__
+    else if (Renderer::isUsingMetal())
+    {
+        LOGLN("Configuring GLFW for Metal");
+        glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+    }
+#endif // __APPLE__
 }
 
-void Window::configureGLFWWithMetal()
-{
-    glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-}
 
 void Window::initializeGraphicsAPI()
 {
     if (Renderer::isUsingOpenGL())
     {
-        LOGLN("Metal is not supported on this device.");
         bindOpenGLToGlfwWindow();
     }
 #if __APPLE__
     else if (Renderer::isUsingMetal())
     {
-        LOGLN("Metal Device found: {}", m_pMetalDevice->name()->utf8String());
         bindMetalToGlfwWindow();
+
+        m_pMetalCommandQueue = m_pMetalDevice->newCommandQueue();
+
+        MetalRenderer::initMetalDepthTexture(m_pMetalDevice, m_oActualSize.x, m_oActualSize.y);
+        MetalRenderer::initRenderPassDescriptor();
+        MetalRenderer::initDepthOnlyRenderPassDescriptor();
+        MetalRenderer::initColorOnlyRenderPassDescriptor();
     }
 #endif // __APPLE__
 }
@@ -304,12 +298,6 @@ void Window::bindMetalToGlfwWindow()
 
     ((void (*)(id, SEL, id))objc_msgSend)((id)view, sel_registerName("setLayer:"), (id)m_pMetalLayer);
     ((void (*)(id, SEL, BOOL))objc_msgSend)((id)view, sel_registerName("setWantsLayer:"), (BOOL)true);
-
-    m_pMetalCommandQueue = m_pMetalDevice->newCommandQueue();
-
-    MetalRenderer::initMetalDepthTexture(m_pMetalDevice, m_oActualSize.x, m_oActualSize.y);
-    MetalRenderer::initRenderPassDescriptor();
-    MetalRenderer::initDepthOnlyRenderPassDescriptor();
 }
 #endif
 

@@ -53,8 +53,6 @@ public:
     inline void setShowFPS(bool bShow) { m_bShowFPS = bShow; }
 
     bool configureAndCreateWindow();
-    void configureGLFWWithOpenGL();
-    void configureGLFWWithMetal();
 
     void initializeGraphicsAPI();
 
@@ -130,6 +128,8 @@ private:
 #else
     bool m_bDrawGizmos = false;
 #endif // IS_DEBUG_VERSION
+
+    void configureGLFWBeforeWindowCreation();
 
     void bindOpenGLToGlfwWindow();
 #if __APPLE__

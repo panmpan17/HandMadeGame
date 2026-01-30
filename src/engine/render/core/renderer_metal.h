@@ -151,6 +151,30 @@ private:
     static inline MTL::RenderCommandEncoder* sm_pCurrentFrameDepthRenderEncoder = nullptr;
 
 #pragma endregion
+
+
+#pragma region Color only rendering
+
+public:
+    static inline MTL::RenderPassDescriptor* getColorOnlyRenderPassDescriptor() { return sm_pColorOnlyRenderPassDescriptor; }
+
+    static void initColorOnlyRenderPassDescriptor()
+    {
+        if (!sm_pColorOnlyRenderPassDescriptor)
+        {
+            sm_pColorOnlyRenderPassDescriptor = MTL::RenderPassDescriptor::alloc()->init();
+        }
+
+        MTL::RenderPassColorAttachmentDescriptor* pColorAttachment = sm_pColorOnlyRenderPassDescriptor->colorAttachments()->object(0);
+        pColorAttachment->setLoadAction(MTL::LoadActionClear);
+        pColorAttachment->setClearColor(MTL::ClearColor::Make(0.0, 0.0, 0.0, 1.0));
+        pColorAttachment->setStoreAction(MTL::StoreActionStore);
+    }
+
+private:
+    static inline MTL::RenderPassDescriptor* sm_pColorOnlyRenderPassDescriptor = nullptr;
+
+#pragma endregion
 };
 
 #endif // __APPLE__
