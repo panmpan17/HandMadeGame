@@ -29,6 +29,7 @@ int main(int nArgumentCount, char* arrArguments[])
         {
             Window window;
             window.setResizable(true);
+            window.setTransparentBackground(true);
             // colorPicker.preconfigureWindowObject(&window);
             if (!window.configureAndCreateWindow())
             {
@@ -40,17 +41,17 @@ int main(int nArgumentCount, char* arrArguments[])
             window.setupGameEngineRelatedObject();
     
             PROFILER_START_TIMER();
-            setupPostProcess();
-            PROFILER_END_TIMER("World", "Setup post process");
+            // setupPostProcess();
+            // PROFILER_END_TIMER("World", "Setup post process");
             // createDemo1();
             // createVisualEffectDemo();
-            createLightingShadowDemo();
+            // createLightingShadowDemo();
             // createPingPongGame();
             // sceneTest();
             // createProfolioSceneDemo();
             // colorPicker.pickerMain();
             // serializationTest();
-            // firstTriangeTest();
+            firstTriangeTest();
             PROFILER_END_TIMER("World", "Init");
     
             window.mainLoop();

@@ -33,6 +33,8 @@ public:
 
     inline void setResizable(bool resizable) { m_bResizable = resizable; }
     inline void setKeepRatio(bool keepRatio) { m_bKeepRatio = keepRatio; }
+    inline void setTransparentBackground(bool transparent) { m_bTransparentBackground = transparent; }
+    inline bool getTransparentBackground() const { return m_bTransparentBackground; }
     inline float getWindowRatio() { return m_fRatio; }
 
     inline const Vector2i& getActualSize() const { return m_oActualSize; }
@@ -107,8 +109,11 @@ private:
 
     WorldScene* m_pWorldScene = nullptr;
 
+    // GLFW Window Configuration
     bool m_bResizable = false;
     bool m_bKeepRatio = false;
+    bool m_bTransparentBackground = false;
+
     int m_nDrawCallCount = 0;
     int m_nTriangleCount = 0;
 

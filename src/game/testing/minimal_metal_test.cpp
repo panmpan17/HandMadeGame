@@ -28,18 +28,18 @@ void firstTriangeTest()
 
     Shader* const pImageShader = ShaderLoader::getInstance()->getShader("image");
 
-    { // Skybox
-        Skybox* pSkybox = new Skybox();
-        pSkybox->loadSkyboxCubmaps({
-            "assets/images/skybox/right.jpg",
-            "assets/images/skybox/left.jpg",
-            "assets/images/skybox/top.jpg",
-            "assets/images/skybox/bottom.jpg",
-            "assets/images/skybox/front.jpg",
-            "assets/images/skybox/back.jpg"
-        });
-        pWorldScene->setSkybox(pSkybox);
-    }
+    // { // Skybox
+    //     Skybox* pSkybox = new Skybox();
+    //     pSkybox->loadSkyboxCubmaps({
+    //         "assets/images/skybox/right.jpg",
+    //         "assets/images/skybox/left.jpg",
+    //         "assets/images/skybox/top.jpg",
+    //         "assets/images/skybox/bottom.jpg",
+    //         "assets/images/skybox/front.jpg",
+    //         "assets/images/skybox/back.jpg"
+    //     });
+    //     pWorldScene->setSkybox(pSkybox);
+    // }
 
     { // Triangle
         Shader* const pColorShared = ShaderLoader::getInstance()->getShader("colored_vertices");

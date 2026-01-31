@@ -78,7 +78,7 @@ public:
 
         MTL::RenderPassColorAttachmentDescriptor* pColorAttachment = sm_pRenderPassDescriptor->colorAttachments()->object(0);
         pColorAttachment->setLoadAction(MTL::LoadActionClear);
-        pColorAttachment->setClearColor(MTL::ClearColor::Make(0.0, 0.0, 0.0, 1.0));
+        pColorAttachment->setClearColor(MTL::ClearColor::Make(0.0, 0.0, 0.0, Window::ins->getTransparentBackground() ? 0 : 1));
         pColorAttachment->setStoreAction(MTL::StoreActionStore);
     }
 
@@ -167,7 +167,7 @@ public:
 
         MTL::RenderPassColorAttachmentDescriptor* pColorAttachment = sm_pColorOnlyRenderPassDescriptor->colorAttachments()->object(0);
         pColorAttachment->setLoadAction(MTL::LoadActionClear);
-        pColorAttachment->setClearColor(MTL::ClearColor::Make(0.0, 0.0, 0.0, 1.0));
+        pColorAttachment->setClearColor(MTL::ClearColor::Make(0.0, 0.0, 0.0, Window::ins->getTransparentBackground() ? 0 : 1));
         pColorAttachment->setStoreAction(MTL::StoreActionStore);
     }
 

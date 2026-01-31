@@ -56,6 +56,7 @@ inline constexpr std::string_view PROFILER_TAG_WINDOW_INITIALIZATION = "WindowIn
 // This is a workaround for Metal PixelFormat enum not being properly recognized in VSCode intellisense.
 #if VSCODE_ONLY
 namespace MTL { enum PixelFormat : NS::UInteger { PixelFormatBGRA8Unorm = 80 }; }
+#define GLFW_TRANSPARENT_FRAMEBUFFER 0x0002000A
 #endif // VSCODE_ONLY
 
 
@@ -189,8 +190,12 @@ bool Window::configureAndCreateWindow()
     // glfwWindowHint(GLFW_GREEN_BITS, pVideoMode->greenBits);
     // glfwWindowHint(GLFW_BLUE_BITS, pVideoMode->blueBits);
     // glfwWindowHint(GLFW_REFRESH_RATE, pVideoMode->refreshRate);
-    // glfwWindowHint(GLFW_DECORATED, GLFW_FALSE); // This is key for borderless
-
+    
+    if (m_bTransparentBackground)
+    {
+        glfwWindowHint(GLFW_DECORATED, GLFW_FALSE); // This is key for borderless
+        glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, GLFW_TRUE);
+    }
 
     m_pWindow = glfwCreateWindow(m_oWindowSize.x, m_oWindowSize.y, "Michael Hand Made Game", NULL, NULL);
     if (!m_pWindow)
@@ -298,6 +303,9 @@ void Window::bindMetalToGlfwWindow()
 
     ((void (*)(id, SEL, id))objc_msgSend)((id)view, sel_registerName("setLayer:"), (id)m_pMetalLayer);
     ((void (*)(id, SEL, BOOL))objc_msgSend)((id)view, sel_registerName("setWantsLayer:"), (BOOL)true);
+    ((void (*)(id, SEL, BOOL))objc_msgSend)((id)view, sel_registerName("setOpaque:"), (BOOL)!getTransparentBackground());
+    // TODO: set transparent color for metal
+    // ((void (*)(id, SEL, BOOL))objc_msgSend)((id)view, sel_registerName("setBackgroundColor:"), (BOOL)(getTransparentBackground() ? [NSColor clearColor] : [NSColor whiteColor]));
 }
 #endif
 
@@ -502,7 +510,7 @@ void Window::mainLoop()
         if (Renderer::isUsingOpenGL())
         {
             glViewport(0, 0, m_oActualSize.x, m_oActualSize.y);
-            glClearColor(0.f, 0.f, 0.f, 1.0f);
+            glClearColor(0.f, 0.f, 0.f, m_bTransparentBackground ? 0 : 1);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
             drawFrame();
