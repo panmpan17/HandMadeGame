@@ -8,5 +8,13 @@ out vec4 fragment;
 
 void main()
 {
-    fragment = texture(u_tex0, uv);
+    vec4 color = texture(u_tex0, uv);
+
+    float _max = max(color.r, max(color.g, color.b));
+    if (_max < 0.01)
+    {
+        discard;
+    }
+
+    fragment = color;
 }

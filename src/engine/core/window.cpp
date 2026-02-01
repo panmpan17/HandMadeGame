@@ -54,7 +54,7 @@ inline constexpr std::string_view PROFILER_TAG_WINDOW_INITIALIZATION = "WindowIn
 
 
 // This is a workaround for Metal PixelFormat enum not being properly recognized in VSCode intellisense.
-#if VSCODE_ONLY
+#if VSCODE_ONLY && __APPLE__
 namespace MTL { enum PixelFormat : NS::UInteger { PixelFormatBGRA8Unorm = 80 }; }
 #define GLFW_TRANSPARENT_FRAMEBUFFER 0x0002000A
 #endif // VSCODE_ONLY

@@ -1,16 +1,18 @@
 .PHONY: config-debug compile-debug compile ccquick quick clean build
 
 BUILD_DIR := cmake-build
+OUTPUT_NAME := MichaelHandMadeGame
 
 ifeq ($(OS),Windows_NT)
 	CMAKE_BIN := ${BUILD_DIR}\\bin
 	ASSET_TIMESTAMP := ${BUILD_DIR}\\assets.timestamp
+	EXECUTABLE_COMMAND := ./$(BUILD_DIR)/bin/$(OUTPUT_NAME).exe .
 else
 	CMAKE_BIN := ${BUILD_DIR}/bin
 	ASSET_TIMESTAMP := ${BUILD_DIR}/assets.timestamp
+	EXECUTABLE_COMMAND := ./$(CMAKE_BIN)/$(OUTPUT_NAME) .
 endif
 
-OUTPUT_NAME := MichaelHandMadeGame
 XCODE_PROJECT_FOLDER := xcode_proj
 
 REBUILD ?= 0
@@ -23,7 +25,8 @@ compile-debug:
 
 ccquick: config-debug compile-debug
 	@echo "Running Debug Build...\n"
-	@if (./$(CMAKE_BIN)/$(OUTPUT_NAME) .); then \
+	@echo "Executable Command: $(EXECUTABLE_COMMAND)\n"
+	@if ($(EXECUTABLE_COMMAND)); then \
 		echo ""; \
 	else \
 		python3 utilites/check_error.py crash_log.log ${BUILD_DIR}/bin; \
@@ -31,7 +34,7 @@ ccquick: config-debug compile-debug
 
 quick: compile-debug
 	@echo "Running Debug Build...\n"
-	@if (./$(CMAKE_BIN)/$(OUTPUT_NAME) .); then \
+	@if ($(EXECUTABLE_COMMAND)); then \
 		echo ""; \
 	else \
 		python3 utilites/check_error.py crash_log.log ${BUILD_DIR}/bin; \
