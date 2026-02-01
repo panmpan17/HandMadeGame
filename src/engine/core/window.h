@@ -4,7 +4,6 @@
 #include "input/event.h"
 #include "math/vector.h"
 #include "../../utils/expandable_array.h"
-#include "../../editor/editor_window.h"
 
 #if __APPLE__
 #include <Foundation/Foundation.hpp>
@@ -17,6 +16,7 @@ typedef struct GLFWwindow GLFWwindow;
 class WorldScene;
 class RenderProcessQueue;
 class FileWatchDog;
+class ImGuiEditorAddon;
 
 typedef unsigned int GLuint;
 
@@ -31,6 +31,7 @@ public:
     Window();
     ~Window();
 
+    inline GLFWwindow* getGLFWwindow() const { return m_pWindow; }
     inline void setResizable(bool resizable) { m_bResizable = resizable; }
     inline void setKeepRatio(bool keepRatio) { m_bKeepRatio = keepRatio; }
     inline void setTransparentBackground(bool transparent) { m_bTransparentBackground = transparent; }
@@ -49,10 +50,7 @@ public:
 
     inline RenderProcessQueue* getRenderProcessQueue() const { return m_pRenderProcessQueue; }
 
-    inline void setAddGameRelatedIMGUIWindows(bool bAdd) { m_bAddGameRelatedIMGUIWindows = bAdd; }
-    inline void addEditorWindow(IEditorWindow* pWindow) { m_oEditorWindows.addElement(pWindow); }
-
-    inline void setShowFPS(bool bShow) { m_bShowFPS = bShow; }
+    inline ImGuiEditorAddon* getImGuiEditorAddon() const { return m_pImGuiEditorAddon; }
 
     bool configureAndCreateWindow();
 
@@ -63,13 +61,13 @@ public:
 
     void mainLoop();
 
-    inline void increaseDrawCallCount() { ++m_nDrawCallCount; }
-    inline void increaseDrawCallCount(int nTriangleCount) { ++m_nDrawCallCount; m_nTriangleCount += nTriangleCount; }
-
     inline void registerResizeListener(std::function<void(Vector2i)> funcListener) 
     { 
         m_onWindowResize.add(funcListener); 
     }
+
+    inline bool getDrawGizmos() const { return m_bDrawGizmos; }
+    inline void setDrawGizmos(bool drawGizmos) { m_bDrawGizmos = drawGizmos; }
 
 #if __APPLE__
     inline MTL::Device* getMetalDevice() const { return m_pMetalDevice; }
@@ -103,10 +101,6 @@ private:
     Vector2i m_oActualSize;
     float m_fRatio = 1.0f;
 
-    // double m_fCurrentDrawTime = 0.0;
-    // double m_fLastDrawTime = 0.0;
-    // float m_fDeltaTime = 0.0;
-
     WorldScene* m_pWorldScene = nullptr;
 
     // GLFW Window Configuration
@@ -117,14 +111,13 @@ private:
     int m_nDrawCallCount = 0;
     int m_nTriangleCount = 0;
 
-    bool m_bShowIMGUI = false;
     bool m_bAddGameRelatedIMGUIWindows = true;
-    bool m_bShowFPS = true;
-    PointerExpandableArray<IEditorWindow*> m_oEditorWindows = PointerExpandableArray<IEditorWindow*>(2);
 
     FileWatchDog* m_pFileWatchDog = nullptr;
 
     CustomEvent<Vector2i> m_onWindowResize;
+
+    ImGuiEditorAddon* m_pImGuiEditorAddon = nullptr;
 
     bool m_bShowDebugDepth = false;
 
@@ -143,18 +136,9 @@ private:
 
     void setupInputManager();
 
-    void setupIMGUIAndEditorWindows();
-
     void beforeLoop();
     void IMGUINewFrame();
     void runUpdate();
     void drawIMGUIEditor();
     void drawFrame();
-    void drawFrameInfo();
 };
-
-#if IS_DEBUG_VERSION
-#define INCREASE_DRAW_CALL_COUNT(n) Window::ins->increaseDrawCallCount(n)
-#else
-#define INCREASE_DRAW_CALL_COUNT(n) do {} while (0)
-#endif // IS_DEBUG_VERSION

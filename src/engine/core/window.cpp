@@ -20,6 +20,7 @@
 #include "window.h"
 #include "camera.h"
 #include "time.h"
+#include "imgui_editor_addon.h"
 #include "engine_event_dispatcher.h"
 #include "input/input_manager.h"
 #include "scene/world.h"
@@ -34,17 +35,10 @@
 #include "../render/font/font_loader.h"
 #include "../misc/preference.h"
 #include "../../editor/gizmos.h"
-#include "../../editor/node_inspector.h"
-#include "../../editor/hierarchy_view.h"
-#include "../../editor/post_process_inspector.h"
 #include "../../utils/file_watch_dog.h"
 
-#include "imgui.h"
-#include "imgui_impl_glfw.h"
-#include "imgui_impl_opengl3.h"
 
 #if __APPLE__
-#include "imgui_impl_metal.h"
 #include "metal/helper.h"
 #endif // __APPLE__
 
@@ -70,7 +64,6 @@ Window::Window()
     sm_bRestartRequested = false;
 #endif // IS_DEBUG_VERSION
 
-    m_bShowIMGUI = Preference::getEnableIMGUI();
     m_bEnablePostProcess = Preference::getEnablePostProcess();
     m_oWindowSize.x = Preference::getWindowWidth();
     m_oWindowSize.y = Preference::getWindowHeight();
@@ -154,18 +147,11 @@ Window::~Window()
 
     glfwTerminate();
 
-    if (Renderer::isUsingOpenGL())
+    if (m_pImGuiEditorAddon)
     {
-        ImGui_ImplOpenGL3_Shutdown();
+        delete m_pImGuiEditorAddon;
+        m_pImGuiEditorAddon = nullptr;
     }
-#if __APPLE__
-    else if (Renderer::isUsingMetal())
-    {
-        ImGui_ImplMetal_Shutdown();
-    }
-#endif // __APPLE__
-    ImGui_ImplGlfw_Shutdown();
-    ImGui::DestroyContext();
 
     ins = nullptr;
 }
@@ -374,17 +360,12 @@ void Window::setupGameEngineRelatedObject()
 
     PROFILER_END_TIMER("Initialization", "World init");
 
-    setupIMGUIAndEditorWindows();
-
+    m_pImGuiEditorAddon = new ImGuiEditorAddon(this);
+    if (m_bAddGameRelatedIMGUIWindows)
+    {
+        m_pImGuiEditorAddon->setupIMGUIAndEditorWindows();
+    }
     PROFILER_END_TIMER("Initialization", "IMGui & editor setup");
-
-    InputManager::getInstance()->registerKeyPressCallback(KeyCode::KEY_FUNCTION_3, [](bool pressed) {
-        if (pressed)
-        {
-            Window::ins->m_bShowIMGUI = !Window::ins->m_bShowIMGUI;
-            Preference::setEnableIMGUI(Window::ins->m_bShowIMGUI);
-        }
-    });
 
 #if IS_DEBUG_VERSION
     InputManager::getInstance()->registerKeyPressCallback(KeyCode::KEY_FUNCTION_1, [this](bool pressed) {
@@ -414,49 +395,7 @@ void Window::setupGameEngineRelatedObject()
         });
     });
     m_pFileWatchDog->startWatching();
-
-    PROFILER_END_TIMER("Initialization", "IMGui setup");
 #endif
-}
-
-void Window::setupIMGUIAndEditorWindows()
-{
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO();
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
-
-    // Setup Platform/Renderer backends
-    if (Renderer::isUsingOpenGL())
-    {
-        ImGui_ImplGlfw_InitForOpenGL(m_pWindow, true);          // Second param install_callback=true will install GLFW callbacks and chain to existing ones.
-        ImGui_ImplOpenGL3_Init();
-    }
-#if __APPLE__
-    else if (Renderer::isUsingMetal())
-    {
-        ImGui_ImplGlfw_InitForOther(m_pWindow, true);
-        ImGui_ImplMetal_Init(m_pMetalDevice);
-    }
-#endif // __APPLE__
-
-    if (m_bAddGameRelatedIMGUIWindows)
-    {
-        m_oEditorWindows.addElement(new NodeInspector());
-        m_oEditorWindows.addElement(new HierarchyView());
-        m_oEditorWindows.addElement(new PostProcessInspector());
-    }
-
-    for (int i = 0; i < m_oEditorWindows.getCount(); ++i)
-    {
-        IEditorWindow* pWindow = m_oEditorWindows.getElement(i);
-        if (pWindow)
-        {
-            bool bActive = Preference::getPlayerPreferenceInstance().getBool(std::string("EditorWindow_") + typeid(*pWindow).name(), true);
-            pWindow->setActive(bActive);
-        }
-    }
 }
 
 void Window::beforeLoop()
@@ -500,9 +439,9 @@ void Window::mainLoop()
             // TODO: Change to glfwSetFramebufferSizeCallback
         }
 
-        if (m_bShowIMGUI)
+        if (m_pImGuiEditorAddon)
         {
-            IMGUINewFrame();
+            m_pImGuiEditorAddon->startIMGUIFrame();
         }
 
         runUpdate();
@@ -550,85 +489,6 @@ void Window::runUpdate()
     }
 
     LightManager::getInstance()->updateLightingUBO();
-}
-
-void Window::IMGUINewFrame()
-{
-    if (Renderer::isUsingOpenGL())
-    {
-        ImGui_ImplOpenGL3_NewFrame();
-    }
-#if __APPLE__
-    else if (Renderer::isUsingMetal())
-    {
-        ImGui_ImplMetal_NewFrame(MetalRenderer::getRenderPassDescriptor());
-    }
-#endif // __APPLE__
-
-    ImGui_ImplGlfw_NewFrame();
-    ImGui::NewFrame();
-}
-
-void Window::drawIMGUIEditor()
-{
-    int nSize = m_oEditorWindows.getSize();
-    for (int i = 0; i < nSize; ++i)
-    {
-        IEditorWindow* pWindow = m_oEditorWindows.getElement(i);
-        if (pWindow && pWindow->isActive())
-        {
-            pWindow->update();
-        }
-    }
-
-    // TODO: try to fix the issue of menu bar on Metal will crash
-    if (!Renderer::isUsingMetal() && ImGui::BeginMainMenuBar())
-    {
-        if (ImGui::BeginMenu("Editor Windows"))
-        {
-            for (int i = 0; i < nSize; ++i)
-            {
-                IEditorWindow* pWindow = m_oEditorWindows.getElement(i);
-                if (pWindow)
-                {
-                    if (ImGui::MenuItem(typeid(*pWindow).name(), NULL, pWindow->isActive()))
-                    {
-                        pWindow->setActive(!pWindow->isActive());
-                        Preference::getPlayerPreferenceInstance().setBool(std::string("EditorWindow_") + typeid(*pWindow).name(), pWindow->isActive());
-                    }
-                }
-            }
-
-            ImGui::EndMenu();
-        }
-
-        if (ImGui::MenuItem("Show Gizmos", NULL, m_bDrawGizmos))
-        {
-            m_bDrawGizmos = !m_bDrawGizmos;
-            Preference::setEnableGizmos(m_bDrawGizmos);
-        }
-
-        ImGui::EndMainMenuBar();
-    }
-
-#if IS_DEBUG_VERSION
-    if (m_bShowFPS)
-    {
-        drawFrameInfo();
-    }
-#endif
-    ImGui::Render();
-
-    if (Renderer::isUsingOpenGL())
-    {
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-    }
-#if __APPLE__
-    else if (Renderer::isUsingMetal())
-    {
-        ImGui_ImplMetal_RenderDrawData(ImGui::GetDrawData(), m_pCurrentCommandBuffer, m_pCurrentFrameRenderEncoder);
-    }
-#endif // __APPLE__
 }
 
 
@@ -728,9 +588,10 @@ void Window::drawFrame()
         m_pWorldScene->drawGizmos();
     }
 
-    if (m_bShowIMGUI)
+    if (m_pImGuiEditorAddon)
     {
-        drawIMGUIEditor();
+        m_pImGuiEditorAddon->update();
+        m_pImGuiEditorAddon->renderFrame();
     }
 
 #if __APPLE__
@@ -740,18 +601,4 @@ void Window::drawFrame()
         m_pCurrentFrameRenderEncoder = nullptr;
     }
 #endif // __APPLE__
-}
-
-void Window::drawFrameInfo()
-{
-    ImGui::Begin("Info", nullptr,
-                 ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar
-                 | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing
-                 | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoBackground);
-    ImGui::SetWindowSize(ImVec2(200, 100), ImGuiCond_Always);
-    ImGui::SetWindowPos(ImVec2(0, ImGui::GetIO().DisplaySize.y - 60), ImGuiCond_Always);
-    ImGui::Text("Grahpics: %s", Renderer::isUsingOpenGL() ? "OpenGL" : (Renderer::isUsingMetal() ? "Metal" : "Unknown"));
-    ImGui::Text("%.1f FPS (%.3f ms)", ImGui::GetIO().Framerate, 1000.0f / ImGui::GetIO().Framerate);
-    ImGui::Text("Draw Call: %d; Triangle: %d", m_nDrawCallCount, m_nTriangleCount);
-    ImGui::End();
 }

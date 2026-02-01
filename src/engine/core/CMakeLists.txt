@@ -6,6 +6,8 @@ list(APPEND SOURCES
     ${CMAKE_CURRENT_LIST_DIR}/engine_event_dispatcher.h
     ${CMAKE_CURRENT_LIST_DIR}/error_handler.cpp
     ${CMAKE_CURRENT_LIST_DIR}/error_handler.h
+    ${CMAKE_CURRENT_LIST_DIR}/imgui_editor_addon.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/imgui_editor_addon.h
     ${CMAKE_CURRENT_LIST_DIR}/window.cpp
     ${CMAKE_CURRENT_LIST_DIR}/window.h
     ${CMAKE_CURRENT_LIST_DIR}/time.cpp

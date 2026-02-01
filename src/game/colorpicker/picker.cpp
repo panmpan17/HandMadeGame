@@ -9,6 +9,7 @@
 #include "../../engine/core/debug_macro.h"
 #include "../../engine/core/camera.h"
 #include "../../engine/core/window.h"
+#include "../../engine/core/imgui_editor_addon.h"
 #include "../../engine/core/scene/world.h"
 #include "../../engine/core/input/input_manager.h"
 // #include "../../engine/core/math/random.h"
@@ -44,11 +45,13 @@ void ColorPicker::preconfigureWindowObject(Window* pWindow)
 {
     m_pWindow = pWindow;
     pWindow->setPostProcessEnabled(false);
-    pWindow->setAddGameRelatedIMGUIWindows(false);
-    pWindow->setShowFPS(false);
     pWindow->setResizable(false);
     pWindow->setWindowSize(400, 400);
-    pWindow->addEditorWindow(new PickerInspector());
+
+    ImGuiEditorAddon* pImGuiEditorAddon = pWindow->getImGuiEditorAddon();
+    pImGuiEditorAddon->setAddGameRelatedIMGUIWindows(false);
+    pImGuiEditorAddon->setShowFrameInfo(false);
+    pImGuiEditorAddon->addEditorWindow(new PickerInspector());
 }
 
 void ColorPicker::pickerMain()

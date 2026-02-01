@@ -4,6 +4,7 @@
 #include <random>
 #include "../../render/shader.h"
 #include "../../render/vertex.h"
+#include "../../render/core/renderer.h"
 #include "../../core/debug_macro.h"
 #include "../../core/camera.h"
 #include "../../core/window.h"
