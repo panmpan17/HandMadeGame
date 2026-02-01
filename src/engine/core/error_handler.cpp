@@ -20,7 +20,7 @@
 #endif
 
 
-void printBackTrace(const std::string_view& strCrashType)
+void printBackTrace(std::string_view strCrashType)
 {
     ErrorOutputter oErrorOutputter;
 

@@ -58,7 +58,7 @@ public:
 
     bool getIsUsingFile(const std::string& strFilePath) const;
 
-    const ShaderUniformHandle* getUniformHandle(const std::string_view& strName);
+    const ShaderUniformHandle* getUniformHandle(std::string_view strName);
 
     GLuint getAttributeLocation(const std::string& name) const;
 
@@ -96,7 +96,7 @@ protected:
     int m_nUniformHandleCount = 0;
 
     GLuint getUniformLocation(const std::string& name) const;
-    GLuint getUniformLocation(const std::string_view& name) const;
+    GLuint getUniformLocation(std::string_view name) const;
 
     bool m_bTransparent = false;
 

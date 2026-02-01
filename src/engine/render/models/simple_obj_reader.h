@@ -30,9 +30,9 @@ public:
     SimpleObjReader();
     ~SimpleObjReader();
 
-    std::shared_ptr<Mesh> loadWavefrontFile(const std::string_view& strFilename);
+    std::shared_ptr<Mesh> loadWavefrontFile(std::string_view strFilename);
 
-    static void readVertexBufferFromWavefrontFile(const std::string_view& strFilename, std::vector<Vector3>& outVertices);
+    static void readVertexBufferFromWavefrontFile(std::string_view strFilename, std::vector<Vector3>& outVertices);
 
 private:
     int parseFaceVertex(std::vector<TriangleFaceVertex>& vecUniqueVertices, const std::string& strToken);

@@ -14,7 +14,7 @@ void Material::useShader() const
     }
 }
 
-void Material::bindTextureWithImage(const std::string_view& strUniformName, Image* pImage)
+void Material::bindTextureWithImage(std::string_view strUniformName, Image* pImage)
 {
     if (!m_pShader)
     {
@@ -45,7 +45,7 @@ Image* Material::getImageByUniformName(const std::string& strUniformName) const
     }
     return nullptr;
 }
-Image* Material::getImageByUniformName(const std::string_view& strUniformName) const
+Image* Material::getImageByUniformName(std::string_view strUniformName) const
 {
     int nSize = static_cast<int>(m_vecTextureUniforms.size());
     for (int i = 0; i < nSize; ++i)

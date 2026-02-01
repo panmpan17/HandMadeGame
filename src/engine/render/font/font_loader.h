@@ -34,7 +34,7 @@ public:
         m_bInitialized = false;
     }
 
-    inline Font* loadFont(const std::string_view& strPath)
+    inline Font* loadFont(std::string_view strPath)
     {
         if (!m_bInitialized) return nullptr;
 
@@ -56,7 +56,7 @@ public:
         return &m_mapLoadedFonts.at(strPath);
     }
 
-    inline Font* getFont(const std::string_view& strPath)
+    inline Font* getFont(std::string_view strPath)
     {
         auto it = m_mapLoadedFonts.find(strPath);
         if (it != m_mapLoadedFonts.end())

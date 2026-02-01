@@ -185,7 +185,7 @@ void Quad::serializeToWrapper(DataSerializer& serializer) const
     serializer.ADD_ATTRIBUTES(m_pShader);
 }
 
-bool Quad::deserializeField(DataDeserializer& deserializer, const std::string_view& strFieldName, const std::string_view& strFieldValue)
+bool Quad::deserializeField(DataDeserializer& deserializer, std::string_view strFieldName, std::string_view strFieldValue)
 {
     if (NodeComponent::deserializeField(deserializer, strFieldName, strFieldValue)) return true;
     DESERIALIZE_FIELD(m_fWidth);

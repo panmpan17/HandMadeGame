@@ -39,7 +39,7 @@ public:
     inline void setShouldSerialize(bool shouldSerialize) { m_bShouldSerialize = shouldSerialize; }
     inline bool getShouldSerialize() const { return m_bShouldSerialize; }
     void serializedTo(DataSerializer& serializer) const override;
-    bool deserializeField(DataDeserializer& deserializer, const std::string_view& strFieldName, const std::string_view& strFieldValue) override;
+    bool deserializeField(DataDeserializer& deserializer, std::string_view strFieldName, std::string_view strFieldValue) override;
     void onFinishedDeserialization();
 
     Node* clone() const;

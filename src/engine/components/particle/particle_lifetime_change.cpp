@@ -8,7 +8,7 @@ std::string ScaleThroughParticleLifetime::getDeserializedValue() const
     return oss.str();
 }
 
-void ScaleThroughParticleLifetime::deserializeFromField(const std::string_view& strFieldValue)
+void ScaleThroughParticleLifetime::deserializeFromField(std::string_view strFieldValue)
 {
     sscanf(strFieldValue.data(), "%f,%f", &m_fMinScale, &m_fMaxScale);
 }
@@ -22,7 +22,7 @@ std::string OpacityThroughParticleLifetime::getDeserializedValue() const
     return oss.str();
 }
 
-void OpacityThroughParticleLifetime::deserializeFromField(const std::string_view& strFieldValue)
+void OpacityThroughParticleLifetime::deserializeFromField(std::string_view strFieldValue)
 {
     sscanf(strFieldValue.data(), "%f,%f", &m_fMinOpacity, &m_fMaxOpacity);
 }

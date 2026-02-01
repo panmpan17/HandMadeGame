@@ -16,7 +16,7 @@ class Image
 {
 public:
     Image(const std::string& strPath, bool flipVertically = true);
-    Image(const std::string_view& strPath, bool flipVertically = true);
+    Image(std::string_view strPath, bool flipVertically = true);
     Image(const aiTexture* pAiTexture, const char* strName, bool flipVertically = true);
     Image(int nWidth, int nHeight, int nChannels, unsigned char* pData);
     ~Image();

@@ -11,7 +11,7 @@ const std::string_view g_arrDebugTagIgnore[] = {
 constexpr int g_DebugTagIgnoreLength = sizeof(g_arrDebugTagIgnore) / sizeof(std::string_view);
 
 
-bool Profiler_CheckTagIsInAllow(const std::string_view& strTag)
+bool Profiler_CheckTagIsInAllow(std::string_view strTag)
 {
     if (g_DebugTagAllowLength == 0)
     {
@@ -29,7 +29,7 @@ bool Profiler_CheckTagIsInAllow(const std::string_view& strTag)
     return false;
 }
 
-bool Profiler_CheckTagIsInIgnore(const std::string_view& strTag)
+bool Profiler_CheckTagIsInIgnore(std::string_view strTag)
 {
     for (int i = 0; i < g_DebugTagIgnoreLength; i++)
     {

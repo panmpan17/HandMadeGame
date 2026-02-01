@@ -15,7 +15,7 @@
 #include "../../utils/file_utils.h"
 
 
-void checkShaderCompilResult(const std::string_view& strShaderPath, GLuint nShader)
+void checkShaderCompilResult(std::string_view strShaderPath, GLuint nShader)
 {
     GLint isCompiled = 0;
     glGetShaderiv(nShader, GL_COMPILE_STATUS, &isCompiled);
@@ -305,7 +305,7 @@ GLuint Shader::getUniformLocation(const std::string& name) const
     return glGetUniformLocation(m_nProgram, name.c_str());
 }
 
-GLuint Shader::getUniformLocation(const std::string_view& strName) const
+GLuint Shader::getUniformLocation(std::string_view strName) const
 {
     return glGetUniformLocation(m_nProgram, strName.data());
 }
@@ -342,7 +342,7 @@ void Shader::reload()
     }
 }
 
-const ShaderUniformHandle* Shader::getUniformHandle(const std::string_view& strName)
+const ShaderUniformHandle* Shader::getUniformHandle(std::string_view strName)
 {
     for (int i = 0; i < m_nUniformHandleCount; ++i)
     {

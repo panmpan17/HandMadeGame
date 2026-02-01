@@ -50,7 +50,7 @@ int SimpleObjReader::parseFaceVertex(std::vector<TriangleFaceVertex>& vecUniqueV
     return static_cast<int>(vecUniqueVertices.size()) - 1;
 }
 
-std::shared_ptr<Mesh> SimpleObjReader::loadWavefrontFile(const std::string_view& strFilename)
+std::shared_ptr<Mesh> SimpleObjReader::loadWavefrontFile(std::string_view strFilename)
 {
     auto oFileReader = FileReader(strFilename);
     if (!oFileReader.isOpen())
@@ -193,7 +193,7 @@ std::shared_ptr<Mesh> SimpleObjReader::loadWavefrontFile(const std::string_view&
 }
 
 
-void SimpleObjReader::readVertexBufferFromWavefrontFile(const std::string_view& strFilename, std::vector<Vector3>& outVertices)
+void SimpleObjReader::readVertexBufferFromWavefrontFile(std::string_view strFilename, std::vector<Vector3>& outVertices)
 {
     auto oFileReader = FileReader(strFilename);
     if (!oFileReader.isOpen())

@@ -13,7 +13,7 @@
 
 class MemoryAllocateException : public std::exception {
 public:
-    MemoryAllocateException(const std::string_view& strMessage) : m_strMessage(strMessage) {}
+    MemoryAllocateException(std::string_view strMessage) : m_strMessage(strMessage) {}
 
     const char* what() const noexcept override {
         return m_strMessage.data();

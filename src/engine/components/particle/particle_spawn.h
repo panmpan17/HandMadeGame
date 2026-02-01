@@ -26,7 +26,7 @@ public:
     }
 
     std::string getDeserializedValue() const override;
-    void deserializeFromField(const std::string_view& strFieldValue) override;
+    void deserializeFromField(std::string_view strFieldValue) override;
 
 private:
     float m_fSpawnInterval;
@@ -56,7 +56,7 @@ public:
     }
 
     std::string getDeserializedValue() const override;
-    void deserializeFromField(const std::string_view& strFieldValue) override;
+    void deserializeFromField(std::string_view strFieldValue) override;
 
     void onActiveTimeReset() override
     {

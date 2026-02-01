@@ -45,7 +45,7 @@ public:
         }
     }
 
-    void startClassHeader(const std::string_view& strClassName)
+    void startClassHeader(std::string_view strClassName)
     {
         CHECK_FILE_IS_OPEN;
         m_oOutputFile << strClassName << " {\n";
@@ -56,69 +56,69 @@ public:
         m_oOutputFile << "}\n";
     }
 
-    void addAttributes(const std::string_view& strAttributeNames, int nValue)
+    void addAttributes(std::string_view strAttributeNames, int nValue)
     {
         CHECK_FILE_IS_OPEN;
         m_oOutputFile << strAttributeNames << ": " << nValue << "\n";
     }
-    void addAttributes(const std::string_view& strAttributeNames, float fValue)
+    void addAttributes(std::string_view strAttributeNames, float fValue)
     {
         CHECK_FILE_IS_OPEN;
         m_oOutputFile << strAttributeNames << ": " << fValue << "\n";
     }
-    void addAttributes(const std::string_view& strAttributeNames, size_t nValue)
+    void addAttributes(std::string_view strAttributeNames, size_t nValue)
     {
         CHECK_FILE_IS_OPEN;
         m_oOutputFile << strAttributeNames << ": " << nValue << "\n";
     }
-    void addAttributes(const std::string_view& strAttributeNames, const vec2& vecValue)
+    void addAttributes(std::string_view strAttributeNames, const vec2& vecValue)
     {
         CHECK_FILE_IS_OPEN;
         m_oOutputFile << strAttributeNames << ": " << vecValue[0] << ", " << vecValue[1] << "\n";
     }
-    void addAttributes(const std::string_view& strAttributeNames, const vec3& vecValue)
+    void addAttributes(std::string_view strAttributeNames, const vec3& vecValue)
     {
         CHECK_FILE_IS_OPEN;
         m_oOutputFile << strAttributeNames << ": " << vecValue[0] << ", " << vecValue[1] << ", " << vecValue[2] << "\n";
     }
-    void addAttributes(const std::string_view& strAttributeNames, const vec4& vecValue)
+    void addAttributes(std::string_view strAttributeNames, const vec4& vecValue)
     {
         CHECK_FILE_IS_OPEN;
         m_oOutputFile << strAttributeNames << ": " << vecValue[0] << ", " << vecValue[1] << ", " << vecValue[2] << ", " << vecValue[3] << "\n";
     }
-    void addAttributes(const std::string_view& strAttributeNames, const Vector2& vecValue)
+    void addAttributes(std::string_view strAttributeNames, const Vector2& vecValue)
     {
         CHECK_FILE_IS_OPEN;
         m_oOutputFile << strAttributeNames << ": " << vecValue.x << ", " << vecValue.y << "\n";
     }
-    void addAttributes(const std::string_view& strAttributeNames, const Vector3& vecValue)
+    void addAttributes(std::string_view strAttributeNames, const Vector3& vecValue)
     {
         CHECK_FILE_IS_OPEN;
         m_oOutputFile << strAttributeNames << ": " << vecValue.x << ", " << vecValue.y << ", " << vecValue.z << "\n";
     }
-    void addAttributes(const std::string_view& strAttributeNames, bool bValue)
+    void addAttributes(std::string_view strAttributeNames, bool bValue)
     {
         CHECK_FILE_IS_OPEN;
         m_oOutputFile << strAttributeNames << ": " << bValue << "\n";
     }
-    void addAttributes(const std::string_view& strAttributeNames, const std::string& strValue)
+    void addAttributes(std::string_view strAttributeNames, const std::string& strValue)
     {
         CHECK_FILE_IS_OPEN;
         m_oOutputFile << strAttributeNames << ": " << strValue << "\n";
     }
-    void addAttributes(const std::string_view& strAttributeNames, const Shader* const pShader)
+    void addAttributes(std::string_view strAttributeNames, const Shader* const pShader)
     {
         if (!pShader) return;
         CHECK_FILE_IS_OPEN;
         m_oOutputFile << strAttributeNames << ": " << pShader->getId() << "\n";
     }
-    void addAttributes(const std::string_view& strAttributeNames, const Image* const pImage)
+    void addAttributes(std::string_view strAttributeNames, const Image* const pImage)
     {
         if (!pImage) return;
         CHECK_FILE_IS_OPEN;
         m_oOutputFile << strAttributeNames << ": " << pImage->getPath() << "\n";
     }
-    void addAttributes(const std::string_view& strAttributeNames, const ISerializable* const pSerializable)
+    void addAttributes(std::string_view strAttributeNames, const ISerializable* const pSerializable)
     {
         CHECK_FILE_IS_OPEN;
         m_oOutputFile << strAttributeNames << ": " << (pSerializable ? pSerializable->getID() : 0) << "\n";
@@ -140,56 +140,56 @@ private:
 class DataDeserializer
 {
 public:
-    static void deserializeField(vec2& outVec, const std::string_view& strFieldValue)
+    static void deserializeField(vec2& outVec, std::string_view strFieldValue)
     {
         sscanf(strFieldValue.data(), "%f, %f", &outVec[0], &outVec[1]);
     }
-    static void deserializeField(vec3& outVec, const std::string_view& strFieldValue)
+    static void deserializeField(vec3& outVec, std::string_view strFieldValue)
     {
         sscanf(strFieldValue.data(), "%f, %f, %f", &outVec[0], &outVec[1], &outVec[2]);
     }
-    static void deserializeField(vec4& outVec, const std::string_view& strFieldValue)
+    static void deserializeField(vec4& outVec, std::string_view strFieldValue)
     {
         sscanf(strFieldValue.data(), "%f, %f, %f, %f", &outVec[0], &outVec[1], &outVec[2], &outVec[3]);
     }
-    static void deserializeField(Vector2& outVec, const std::string_view& strFieldValue)
+    static void deserializeField(Vector2& outVec, std::string_view strFieldValue)
     {
         sscanf(strFieldValue.data(), "%f, %f", &outVec.x, &outVec.y);
     }
-    static void deserializeField(Vector3& outVec, const std::string_view& strFieldValue)
+    static void deserializeField(Vector3& outVec, std::string_view strFieldValue)
     {
         sscanf(strFieldValue.data(), "%f, %f, %f", &outVec.x, &outVec.y, &outVec.z);
     }
-    static void deserializeField(int& outInt, const std::string_view& strFieldValue)
+    static void deserializeField(int& outInt, std::string_view strFieldValue)
     {
         outInt = std::stoi(strFieldValue.data());
     }
-    static void deserializeField(float& outFloat, const std::string_view& strFieldValue)
+    static void deserializeField(float& outFloat, std::string_view strFieldValue)
     {
         outFloat = std::stof(strFieldValue.data());
     }
-    static void deserializeField(size_t& outSizeT, const std::string_view& strFieldValue)
+    static void deserializeField(size_t& outSizeT, std::string_view strFieldValue)
     {
         outSizeT = static_cast<size_t>(std::stoull(strFieldValue.data()));
     }
-    static void deserializeField(bool& outBool, const std::string_view& strFieldValue)
+    static void deserializeField(bool& outBool, std::string_view strFieldValue)
     {
         outBool = std::string(strFieldValue) == "1";
     }
-    static void deserializeField(Shader*& pShader, const std::string_view& strFieldValue)
+    static void deserializeField(Shader*& pShader, std::string_view strFieldValue)
     {
         pShader = ShaderLoader::getInstance()->getShader(std::atoi(strFieldValue.data()));
     }
-    static void deserializeField(Image*& pImage, const std::string_view& strFieldValue)
+    static void deserializeField(Image*& pImage, std::string_view strFieldValue)
     {
         pImage = ImageLoader::getInstance()->getImageByPath(strFieldValue);
     }
-    static void deserializeField(std::string& outString, const std::string_view& strFieldValue)
+    static void deserializeField(std::string& outString, std::string_view strFieldValue)
     {
         outString = strFieldValue;
     }
 
-    DataDeserializer(const std::string_view& strFilename)
+    DataDeserializer(std::string_view strFilename)
     {
 #if IS_PLATFORM_MACOS
         m_oInputFile.open(strFilename, std::ios::in);

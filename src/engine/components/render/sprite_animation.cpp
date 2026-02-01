@@ -9,7 +9,7 @@ SpriteAnimation::SpriteAnimation(Sprite* pSprite) : m_pSprite(pSprite)
     m_nID = generateRandomUUID();
 }
 
-void SpriteAnimation::openAnimationFile(const std::string_view& strFilePath)
+void SpriteAnimation::openAnimationFile(std::string_view strFilePath)
 {
     FileReader fileReader(strFilePath);
     if (!fileReader.isOpen())
@@ -84,7 +84,7 @@ void SpriteAnimation::serializeToWrapper(DataSerializer& serializer) const
     serializer.ADD_ATTRIBUTES(m_strAnimationFileName);
 }
 
-bool SpriteAnimation::deserializeField(DataDeserializer& deserializer, const std::string_view& strFieldName, const std::string_view& strFieldValue)
+bool SpriteAnimation::deserializeField(DataDeserializer& deserializer, std::string_view strFieldName, std::string_view strFieldValue)
 {
     if (NodeComponent::deserializeField(deserializer, strFieldName, strFieldValue))
     {

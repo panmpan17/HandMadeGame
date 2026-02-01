@@ -32,7 +32,7 @@ void DirectionLightComponent::onStart()
 }
 
 
-bool DirectionLightComponent::deserializeField(DataDeserializer& deserializer, const std::string_view& strFieldName, const std::string_view& strFieldValue)
+bool DirectionLightComponent::deserializeField(DataDeserializer& deserializer, std::string_view strFieldName, std::string_view strFieldValue)
 {
     if (NodeComponent::deserializeField(deserializer, strFieldName, strFieldValue)) return true;
 

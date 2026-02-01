@@ -55,7 +55,7 @@ void Node::serializedTo(DataSerializer& serializer) const
     }
 }
 
-bool Node::deserializeField(DataDeserializer& deserializer, const std::string_view& strFieldName, const std::string_view& strFieldValue)
+bool Node::deserializeField(DataDeserializer& deserializer, std::string_view strFieldName, std::string_view strFieldValue)
 {
     DESERIALIZE_FIELD(m_strName);
     DESERIALIZE_FIELD(m_nID);

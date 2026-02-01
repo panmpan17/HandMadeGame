@@ -50,7 +50,7 @@ void WorldScene::init()
     }
 }
 
-void WorldScene::readFromFiles(const std::string_view& strFilePath)
+void WorldScene::readFromFiles(std::string_view strFilePath)
 {
     Camera::main->setWorldSizeScale(1.0f);
 

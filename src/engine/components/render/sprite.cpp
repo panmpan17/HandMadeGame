@@ -34,7 +34,7 @@ void Sprite::serializeToWrapper(DataSerializer& serializer) const
     Quad::serializeToWrapper(serializer);
 }
 
-bool Sprite::deserializeField(DataDeserializer& deserializer, const std::string_view& strFieldName, const std::string_view& strFieldValue)
+bool Sprite::deserializeField(DataDeserializer& deserializer, std::string_view strFieldName, std::string_view strFieldValue)
 {
     return Quad::deserializeField(deserializer, strFieldName, strFieldValue);
 }

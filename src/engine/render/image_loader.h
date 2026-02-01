@@ -10,7 +10,7 @@ public:
     static void Initialize();
     static void Cleanup();
 
-    Image* getImageByPath(const std::string_view& strPath);
+    Image* getImageByPath(std::string_view strPath);
 
     inline Image* getPureWhite1by1Image() const { return m_pPureWhite1by1Image; }
 

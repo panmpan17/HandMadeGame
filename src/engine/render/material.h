@@ -26,7 +26,7 @@ public:
 
     inline Shader* getShader() const { return m_pShader; }
 
-    void bindTextureWithImage(const std::string_view& strUniformName, Image* pImage);
+    void bindTextureWithImage(std::string_view strUniformName, Image* pImage);
 
     void useShader() const;
 
@@ -38,7 +38,7 @@ public:
     bool getIsTransparent() const { return m_bTransparent; }
 
     Image* getImageByUniformName(const std::string& strUniformName) const;
-    Image* getImageByUniformName(const std::string_view& strUniformName) const;
+    Image* getImageByUniformName(std::string_view strUniformName) const;
     
 private:
     Shader* m_pShader = nullptr;

@@ -44,7 +44,7 @@ public:
     virtual bool isIDrawable() const override { return false; }
     virtual bool isUpdatable() const override { return true; }
 
-    void openAnimationFile(const std::string_view& strFilePath);
+    void openAnimationFile(std::string_view strFilePath);
 
     int addAnimationInfo(SpriteAnimationInfo* pAnimationInfo)
     {

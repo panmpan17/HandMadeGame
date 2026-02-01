@@ -17,7 +17,7 @@ public:
     }
 
     std::string getDeserializedValue() const override;
-    void deserializeFromField(const std::string_view& strFieldValue) override;
+    void deserializeFromField(std::string_view strFieldValue) override;
 
 private:
     float m_fMinScale = 0, m_fMaxScale = 0;
@@ -40,7 +40,7 @@ public:
     }
 
     std::string getDeserializedValue() const override;
-    void deserializeFromField(const std::string_view& strFieldValue) override;
+    void deserializeFromField(std::string_view strFieldValue) override;
 
 private:
     float m_fMinOpacity = 0, m_fMaxOpacity = 0;

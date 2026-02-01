@@ -39,8 +39,8 @@
 //     } while (0)
 
 
-bool Profiler_CheckTagIsInAllow(const std::string_view& strTag);
-bool Profiler_CheckTagIsInIgnore(const std::string_view& strTag);
+bool Profiler_CheckTagIsInAllow(std::string_view strTag);
+bool Profiler_CheckTagIsInIgnore(std::string_view strTag);
 
 #define PROFILER_CHECK_TAG_COULD_PRINT(strTag) (Profiler_CheckTagIsInAllow(strTag) && !Profiler_CheckTagIsInIgnore(strTag))
 #define PROFILER_START_TIMER() std::clock_t oDebugTimedStart = std::clock();

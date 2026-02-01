@@ -80,8 +80,8 @@ public:
 
     void clearAllGizmos();
 
-    void addImageGizmos(NodeComponent* const pComponent, const Vector3& vecPosition, const std::string_view& m_strImagePath);
-    void addImageGizmos(NodeComponent* const pComponent, const Vector3& vecPosition, const std::string_view& m_strImagePath, const Vector3& vecColor);
+    void addImageGizmos(NodeComponent* const pComponent, const Vector3& vecPosition, std::string_view m_strImagePath);
+    void addImageGizmos(NodeComponent* const pComponent, const Vector3& vecPosition, std::string_view m_strImagePath, const Vector3& vecColor);
 
     void addCircleGizmos(const Vector3& vecPosition, const Quaternion& rotation, float fRadius);
     void addCircleGizmos(const Vector3& vecPosition, const Quaternion& rotation, float fRadius, const Color& vecColor);
@@ -199,8 +199,8 @@ private:
 
     void onMouseClickCheck(bool bPressed);
 
-    void initMeshBufferUsingOpenGL(const std::string_view& strFilePath, int& nVertexCount, GLuint& nVertexBuffer, GLuint& nVertxArray);
+    void initMeshBufferUsingOpenGL(std::string_view strFilePath, int& nVertexCount, GLuint& nVertexBuffer, GLuint& nVertxArray);
 #if __APPLE__
-    void initMeshBufferUsingMetal(const std::string_view& strFilePath, int& nVertexCount, MTL::Buffer*& pMetalVertexBuffer);
+    void initMeshBufferUsingMetal(std::string_view strFilePath, int& nVertexCount, MTL::Buffer*& pMetalVertexBuffer);
 #endif // __APPLE__
 };

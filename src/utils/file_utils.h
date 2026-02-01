@@ -43,7 +43,7 @@ class FileWriter
 {
 public:
     // FileWriter(const std::string& strPath, bool bAppend = false);
-    FileWriter(const std::string_view& strPath, bool bAppend = false);
+    FileWriter(std::string_view strPath, bool bAppend = false);
     ~FileWriter();
 
     bool isOpen() const;

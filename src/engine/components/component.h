@@ -29,7 +29,7 @@ public:
     virtual std::string getTypeName() const { return typeid(*this).name(); };
 
     void serializedTo(DataSerializer& serializer) const override;
-    virtual bool deserializeField(DataDeserializer& deserializer, const std::string_view& strFieldName, const std::string_view& strFieldValue) override;
+    virtual bool deserializeField(DataDeserializer& deserializer, std::string_view strFieldName, std::string_view strFieldValue) override;
     virtual void onNodeFinishedDeserialization() {}
 
     virtual void onInspectorUI(int nComponentIndex) {};
@@ -44,6 +44,6 @@ protected:
 
 #define COMPONENT_REGISTER_SERIALIZABLE(T)public:\
     inline std::string getTypeName() const override { return #T; }\
-    virtual bool deserializeField(DataDeserializer& deserializer, const std::string_view& strFieldName, const std::string_view& strFieldValue) override;\
+    virtual bool deserializeField(DataDeserializer& deserializer, std::string_view strFieldName, std::string_view strFieldValue) override;\
 protected:\
     virtual void serializeToWrapper(DataSerializer& serializer) const override;

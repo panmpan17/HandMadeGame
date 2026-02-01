@@ -13,7 +13,7 @@ public:
     virtual ~ISerializable() = default;
 
     virtual void serializedTo(DataSerializer& serializer) const = 0;
-    virtual bool deserializeField(DataDeserializer& deserializer, const std::string_view& strFieldName, const std::string_view& strFieldValue) = 0;
+    virtual bool deserializeField(DataDeserializer& deserializer, std::string_view strFieldName, std::string_view strFieldValue) = 0;
 
     size_t getID() const { return m_nID; }
 

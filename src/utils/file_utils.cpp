@@ -204,7 +204,7 @@ void FileReader::close()
 //     }
 // }
 
-FileWriter::FileWriter(const std::string_view& strPath, bool bAppend)
+FileWriter::FileWriter(std::string_view strPath, bool bAppend)
 {
     std::ios_base::openmode mode = std::ios::out;
     if (bAppend) mode |= std::ios::app;

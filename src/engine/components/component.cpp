@@ -11,7 +11,7 @@ void NodeComponent::serializedTo(DataSerializer& serializer) const
     serializer.endClassHeader();
 }
 
-bool NodeComponent::deserializeField(DataDeserializer& deserializer, const std::string_view& strFieldName, const std::string_view& strFieldValue)
+bool NodeComponent::deserializeField(DataDeserializer& deserializer, std::string_view strFieldName, std::string_view strFieldValue)
 {
     DESERIALIZE_FIELD(m_nID);
 

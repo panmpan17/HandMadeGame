@@ -19,7 +19,7 @@ Image::Image(const std::string& strPath, bool flipVertically/* = true */) : m_st
     configureAndLoadToGPU();
 }
 
-Image::Image(const std::string_view& strPath, bool flipVertically/* = true */) : m_strPath(std::string(strPath))
+Image::Image(std::string_view strPath, bool flipVertically/* = true */) : m_strPath(std::string(strPath))
 {
     stbi_set_flip_vertically_on_load(flipVertically);
     configureAndLoadToGPU();

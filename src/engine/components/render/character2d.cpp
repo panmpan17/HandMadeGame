@@ -29,7 +29,7 @@ void Character2d::serializeToWrapper(DataSerializer& serializer) const
     serializer.ADD_ATTRIBUTES(m_pAnimation);
 }
 
-bool Character2d::deserializeField(DataDeserializer& deserializer, const std::string_view& strFieldName, const std::string_view& strFieldValue)
+bool Character2d::deserializeField(DataDeserializer& deserializer, std::string_view strFieldName, std::string_view strFieldValue)
 {
     if (NodeComponent::deserializeField(deserializer, strFieldName, strFieldValue))
     {

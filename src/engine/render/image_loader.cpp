@@ -45,7 +45,7 @@ ImageLoader::~ImageLoader()
     m_mapLoadedImages.clear();
 }
 
-Image* ImageLoader::getImageByPath(const std::string_view& strPath)
+Image* ImageLoader::getImageByPath(std::string_view strPath)
 {
     auto it = m_mapLoadedImages.find(strPath);
     if (it != m_mapLoadedImages.end())
