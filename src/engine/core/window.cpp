@@ -631,6 +631,8 @@ void Window::drawIMGUIEditor()
 #endif // __APPLE__
 }
 
+
+#if __APPLE__
 void Window::setCurrentDrawingTexture(MTL::Texture* pTexture)
 {
     if (m_pCurrentFrameRenderEncoder)
@@ -644,6 +646,7 @@ void Window::setCurrentDrawingTexture(MTL::Texture* pTexture)
 
     m_pCurrentFrameRenderEncoder = m_pCurrentCommandBuffer->renderCommandEncoder(pRenderPassDescriptor);
 }
+#endif // __APPLE__
 
 void Window::drawFrame()
 {
@@ -674,8 +677,9 @@ void Window::drawFrame()
 #endif // __APPLE__
     }
 
-    if (m_bShowDebugDepth)
+    if (m_bShowDebugDepth && Renderer::isUsingMetal())
     {
+#if __APPLE__
         setCurrentDrawingTexture(m_pCurrentDrawable->texture());
 
         Shader* pDebugDepthShader = ShaderLoader::getInstance()->getShader("depth_debug");
@@ -685,6 +689,7 @@ void Window::drawFrame()
         m_pCurrentFrameRenderEncoder->setFragmentSamplerState(MetalRenderer::m_pLinearSampler, 0);
 
         m_pCurrentFrameRenderEncoder->drawPrimitives(MTL::PrimitiveTypeTriangleStrip, NS::UInteger(0), NS::UInteger(4));
+#endif // __APPLE__
     }
     else
     {
@@ -707,10 +712,12 @@ void Window::drawFrame()
     }
     else
     {
+#if __APPLE__
         if (Renderer::isUsingMetal())
         {
         setCurrentDrawingTexture(m_pCurrentDrawable->texture());
         }
+#endif // __APPLE__
 
         m_pWorldScene->render();
     }
@@ -726,11 +733,13 @@ void Window::drawFrame()
         drawIMGUIEditor();
     }
 
+#if __APPLE__
     if (Renderer::isUsingMetal())
     {
         m_pCurrentFrameRenderEncoder->endEncoding();
         m_pCurrentFrameRenderEncoder = nullptr;
     }
+#endif // __APPLE__
 }
 
 void Window::drawFrameInfo()

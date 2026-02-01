@@ -169,6 +169,7 @@ void DifferenceOfGaussian::renderVerticalBlurOpenGL(GLuint nFBO, GLuint nOutputT
     m_pProcessQueue->setFinalRenderTexture(nOutputTexture);
 }
 
+#if __APPLE__
 void DifferenceOfGaussian::renderBlurMetal(Shader* pShader, MTL::Texture* pOutputTexture, MTL::Texture* pInputTexture, int nSize, float fBlurRadius, float fBlurSigma)
 {
     Window::ins->setCurrentDrawingTexture(pOutputTexture);
@@ -194,6 +195,7 @@ void DifferenceOfGaussian::renderBlurMetal(Shader* pShader, MTL::Texture* pOutpu
     pEncoder->drawPrimitives(MTL::PrimitiveTypeTriangleStrip, NS::UInteger(0), NS::UInteger(4));
     INCREASE_DRAW_CALL_COUNT(2);
 }
+#endif // __APPLE__
 
 void DifferenceOfGaussian::renderComposite()
 {
