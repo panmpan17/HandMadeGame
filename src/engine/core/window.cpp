@@ -361,10 +361,6 @@ void Window::setupGameEngineRelatedObject()
     PROFILER_END_TIMER("Initialization", "World init");
 
     m_pImGuiEditorAddon = new ImGuiEditorAddon(this);
-    if (m_bAddGameRelatedIMGUIWindows)
-    {
-        m_pImGuiEditorAddon->setupIMGUIAndEditorWindows();
-    }
     PROFILER_END_TIMER("Initialization", "IMGui & editor setup");
 
 #if IS_DEBUG_VERSION
@@ -437,11 +433,6 @@ void Window::mainLoop()
             }
 #endif // __APPLE__
             // TODO: Change to glfwSetFramebufferSizeCallback
-        }
-
-        if (m_pImGuiEditorAddon)
-        {
-            m_pImGuiEditorAddon->startIMGUIFrame();
         }
 
         runUpdate();
@@ -588,12 +579,6 @@ void Window::drawFrame()
         m_pWorldScene->drawGizmos();
     }
 
-    if (m_pImGuiEditorAddon)
-    {
-        m_pImGuiEditorAddon->update();
-        m_pImGuiEditorAddon->renderFrame();
-    }
-
 #if __APPLE__
     if (Renderer::isUsingMetal())
     {
@@ -601,4 +586,11 @@ void Window::drawFrame()
         m_pCurrentFrameRenderEncoder = nullptr;
     }
 #endif // __APPLE__
+
+    if (m_pImGuiEditorAddon)
+    {
+        m_pImGuiEditorAddon->startIMGUIFrame();
+        m_pImGuiEditorAddon->update();
+        m_pImGuiEditorAddon->renderFrame();
+    }
 }

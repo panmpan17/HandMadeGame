@@ -3,6 +3,10 @@
 #include "../../utils/expandable_array.h"
 #include "../../editor/editor_window.h"
 
+#if __APPLE__
+#include <Metal/Metal.hpp>
+#endif // __APPLE__
+
 
 class Window;
 
@@ -13,7 +17,6 @@ public:
     ImGuiEditorAddon(Window* pWindow);
     ~ImGuiEditorAddon();
 
-    void setupIMGUIAndEditorWindows();
     inline void addEditorWindow(IEditorWindow* pWindow) { m_oEditorWindows.addElement(pWindow); }
 
     void startIMGUIFrame();
@@ -34,6 +37,12 @@ private:
     bool m_bShowFrameInfo = true;
 
     PointerExpandableArray<IEditorWindow*> m_oEditorWindows = PointerExpandableArray<IEditorWindow*>(2);
+
+#if __APPLE__
+    MTL::RenderPassDescriptor* m_pRenderPassDescriptor = nullptr;
+#endif // __APPLE__
+
+    void setupIMGUIAndEditorWindows();
 
     void drawEditorWindows();
     void drawFrameInfo();

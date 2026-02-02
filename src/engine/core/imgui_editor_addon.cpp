@@ -37,6 +37,12 @@ ImGuiEditorAddon::ImGuiEditorAddon(Window* pWindow)
     {
         ImGui_ImplGlfw_InitForOther(m_pWindow->getGLFWwindow(), true);
         ImGui_ImplMetal_Init(m_pWindow->getMetalDevice());
+
+        m_pRenderPassDescriptor = MTL::RenderPassDescriptor::alloc()->init();
+
+        MTL::RenderPassColorAttachmentDescriptor* pColorAttachment = m_pRenderPassDescriptor->colorAttachments()->object(0);
+        pColorAttachment->setLoadAction(MTL::LoadActionLoad);
+        pColorAttachment->setStoreAction(MTL::StoreActionStore);
     }
 #endif // __APPLE__
 
@@ -99,7 +105,9 @@ void ImGuiEditorAddon::startIMGUIFrame()
 #if __APPLE__
     else if (Renderer::isUsingMetal())
     {
-        ImGui_ImplMetal_NewFrame(MetalRenderer::getRenderPassDescriptor());
+        m_pRenderPassDescriptor->colorAttachments()->object(0)->setTexture(m_pWindow->getCurrentDrawable()->texture());
+
+        ImGui_ImplMetal_NewFrame(m_pRenderPassDescriptor);
     }
 #endif // __APPLE__
 
@@ -135,7 +143,7 @@ void ImGuiEditorAddon::drawEditorWindows()
     }
 
     // TODO: try to fix the issue of menu bar on Metal will crash
-    if (!Renderer::isUsingMetal() && ImGui::BeginMainMenuBar())
+    if (ImGui::BeginMainMenuBar())
     {
         if (ImGui::BeginMenu("Editor Windows"))
         {
@@ -192,7 +200,10 @@ void ImGuiEditorAddon::renderFrame()
 #if __APPLE__
     else if (Renderer::isUsingMetal())
     {
-        ImGui_ImplMetal_RenderDrawData(ImGui::GetDrawData(), m_pWindow->getCurrentCommandBuffer(), m_pWindow->getCurrentFrameRenderEncoder());
+        MTL::CommandBuffer* pCurrentCommandBuffer = m_pWindow->getCurrentCommandBuffer();
+        MTL::RenderCommandEncoder* pIMGUIRenderCommandEncoder = pCurrentCommandBuffer->renderCommandEncoder(m_pRenderPassDescriptor);
+        ImGui_ImplMetal_RenderDrawData(ImGui::GetDrawData(), pCurrentCommandBuffer, pIMGUIRenderCommandEncoder);
+        pIMGUIRenderCommandEncoder->endEncoding();
     }
 #endif // __APPLE__
 }
