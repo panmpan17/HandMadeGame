@@ -136,9 +136,8 @@ private:
 
     void setupInputManager();
 
-    void beforeLoop();
-    void IMGUINewFrame();
     void runUpdate();
-    void drawIMGUIEditor();
     void drawFrame();
+
+    void onFramebufferSizeChanged(int nWidth, int nHeight);
 };

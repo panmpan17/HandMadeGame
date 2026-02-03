@@ -28,7 +28,6 @@
 #include "../render/image_loader.h"
 #include "../render/shader_loader.h"
 #include "../render/material_loader.h"
-#include "../render/vertex.h"
 #include "../render/post_process/render_process_queue.h"
 #include "../render/lighting/light_manager.h"
 #include "../render/lighting/direction_light.h"
@@ -37,10 +36,6 @@
 #include "../../editor/gizmos.h"
 #include "../../utils/file_watch_dog.h"
 
-
-#if __APPLE__
-#include "metal/helper.h"
-#endif // __APPLE__
 
 
 inline constexpr std::string_view PROFILER_TAG_WINDOW_INITIALIZATION = "WindowInitialization";
@@ -157,31 +152,14 @@ Window::~Window()
 }
 
 
+#pragma region Window Configuration and Graphics API Initialization
+
+
 bool Window::configureAndCreateWindow()
 {
     PROFILER_START_TIMER();
 
-    glfwWindowHint(GLFW_RESIZABLE, m_bResizable ? GLFW_TRUE : GLFW_FALSE);
-
     configureGLFWBeforeWindowCreation();
-
-    // GLFWmonitor* pPrimaryMonitor = glfwGetPrimaryMonitor();
-    // const GLFWvidmode* pVideoMode = glfwGetVideoMode(pPrimaryMonitor);
-
-    // m_nWidth = pVideoMode->width;
-    // m_nHeight = pVideoMode->height;
-
-    // // Set window hints to create a borderless, resizable window
-    // glfwWindowHint(GLFW_RED_BITS, pVideoMode->redBits);
-    // glfwWindowHint(GLFW_GREEN_BITS, pVideoMode->greenBits);
-    // glfwWindowHint(GLFW_BLUE_BITS, pVideoMode->blueBits);
-    // glfwWindowHint(GLFW_REFRESH_RATE, pVideoMode->refreshRate);
-    
-    if (m_bTransparentBackground)
-    {
-        glfwWindowHint(GLFW_DECORATED, GLFW_FALSE); // This is key for borderless
-        glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, GLFW_TRUE);
-    }
 
     m_pWindow = glfwCreateWindow(m_oWindowSize.x, m_oWindowSize.y, "Michael Hand Made Game", NULL, NULL);
     if (!m_pWindow)
@@ -199,18 +177,30 @@ bool Window::configureAndCreateWindow()
     }
 
     glfwGetFramebufferSize(m_pWindow, &m_oActualSize.x, &m_oActualSize.y);
-
-    // glfwSetWindowMonitor(m_pWindow, pPrimaryMonitor, 0, 0, pVideoMode->width, pVideoMode->height, pVideoMode->refreshRate);
-
-    // glfwSetWindowOpacity(m_pWindow, 0.5f); // Fun
+    m_fRatio = m_oActualSize.x / (float) m_oActualSize.y;
 
     DEBUG_WINDOW_INIT_TIMER("Window configured");
+
+    initializeGraphicsAPI();
+
+    DEBUG_WINDOW_INIT_TIMER("Graphics API initialized");
 
     return true;
 }
 
 void Window::configureGLFWBeforeWindowCreation()
 {
+    // General GLFW configuration
+    glfwWindowHint(GLFW_RESIZABLE, m_bResizable ? GLFW_TRUE : GLFW_FALSE);
+
+    if (m_bTransparentBackground)
+    {
+        glfwWindowHint(GLFW_DECORATED, GLFW_FALSE); // This is key for borderless
+        glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, GLFW_TRUE);
+    }
+
+
+    // Configure GLFW based on the selected Graphic API
     if (Renderer::isUsingOpenGL())
     {
         LOGLN("Configuring GLFW for OpenGL");
@@ -237,7 +227,6 @@ void Window::configureGLFWBeforeWindowCreation()
     }
 #endif // __APPLE__
 }
-
 
 void Window::initializeGraphicsAPI()
 {
@@ -295,15 +284,10 @@ void Window::bindMetalToGlfwWindow()
 }
 #endif
 
-void Window::setWindowSize(int nWidth, int nHeight)
-{
-    m_oWindowSize.x = nWidth;
-    m_oWindowSize.y = nHeight;
-    if (m_pWindow)
-    {
-        glfwSetWindowSize(m_pWindow, nWidth, nHeight);
-    }
-}
+#pragma endregion Window Configuration and Graphics API Initialization
+
+
+#pragma region Managers and Game Engine Related Setup
 
 void Window::setupManagers()
 {
@@ -328,11 +312,15 @@ void Window::setupManagers()
     setupInputManager();
     PROFILER_END_TIMER("Initialization", "Input manager");
 
+    glfwSetFramebufferSizeCallback(m_pWindow, [](GLFWwindow*, int nWidth, int nHeight) {
+        Window::ins->onFramebufferSizeChanged(nWidth, nHeight);
+    });
+
     GizmosManager::Initialize();
     PROFILER_END_TIMER("Initialization", "Gizmos setup");
 
-    // FontLoader::Initialize();
-    // FontLoader::getInstance()->loadFont("assets/fonts/arial.ttf");
+    FontLoader::Initialize();
+    FontLoader::getInstance()->loadFont("assets/fonts/arial.ttf");
 
     m_pRenderProcessQueue = new RenderProcessQueue(this);
 
@@ -394,16 +382,54 @@ void Window::setupGameEngineRelatedObject()
 #endif
 }
 
-void Window::beforeLoop()
-{
-    m_fRatio = m_oActualSize.x / (float) m_oActualSize.y;
+#pragma endregion Managers and Game Engine Related Setup
 
-    TimeManager::getInstance()->onWindowStart();
+
+#pragma region Window Setting Methods
+
+void Window::setWindowSize(int nWidth, int nHeight)
+{
+    m_oWindowSize.x = nWidth;
+    m_oWindowSize.y = nHeight;
+    if (m_pWindow)
+    {
+        glfwSetWindowSize(m_pWindow, nWidth, nHeight);
+    }
 }
+
+#pragma endregion Window Setting Methods
+
+
+#pragma region GLFW Callbacks
+
+void Window::onFramebufferSizeChanged(int nWidth, int nHeight)
+{
+    m_fRatio = nWidth / (float) nHeight;
+
+    m_oActualSize.x = nWidth;
+    m_oActualSize.y = nHeight;
+    m_onWindowResize.invoke(m_oActualSize);
+
+    glfwGetWindowSize(m_pWindow, &m_oWindowSize.x, &m_oWindowSize.y);
+
+#if __APPLE__
+    if (Renderer::isUsingMetal())
+    {
+        m_pMetalLayer->setDrawableSize(CGSizeMake(m_oActualSize.x, m_oActualSize.y));
+        MetalRenderer::initMetalDepthTexture(m_pMetalDevice, m_oActualSize.x, m_oActualSize.y);
+        MetalRenderer::initRenderPassDescriptor();
+    }
+#endif // __APPLE__
+}
+
+#pragma endregion GLFW Callbacks
+
+
+#pragma region Main Loop and Frame Update
 
 void Window::mainLoop()
 {
-    beforeLoop();
+    TimeManager::getInstance()->onWindowStart();
 
 #if IS_DEBUG_VERSION
     while (!glfwWindowShouldClose(m_pWindow) && !sm_bRestartRequested)
@@ -412,29 +438,6 @@ void Window::mainLoop()
 #endif
     {
         glfwPollEvents();
-
-        // Because mac's retina display has a different pixel ratio (and moving to different monitors)
-        // need to adjust the viewport to match the actual framebuffer size.
-        glfwGetFramebufferSize(m_pWindow, &m_oActualSize.x, &m_oActualSize.y);
-        float fNewRatio = m_oActualSize.x / (float) m_oActualSize.y;
-        if (m_fRatio != fNewRatio)
-        {
-            m_fRatio = fNewRatio;
-            m_onWindowResize.invoke(m_oActualSize);
-
-            glfwGetWindowSize(m_pWindow, &m_oWindowSize.x, &m_oWindowSize.y);
-
-#if __APPLE__
-            if (Renderer::isUsingMetal())
-            {
-                m_pMetalLayer->setDrawableSize(CGSizeMake(m_oActualSize.x, m_oActualSize.y));
-                MetalRenderer::initMetalDepthTexture(m_pMetalDevice, m_oActualSize.x, m_oActualSize.y);
-                MetalRenderer::initRenderPassDescriptor();
-            }
-#endif // __APPLE__
-            // TODO: Change to glfwSetFramebufferSizeCallback
-        }
-
         runUpdate();
 
         if (Renderer::isUsingOpenGL())
@@ -594,3 +597,5 @@ void Window::drawFrame()
         m_pImGuiEditorAddon->renderFrame();
     }
 }
+
+#pragma endregion Main Loop and Frame Update

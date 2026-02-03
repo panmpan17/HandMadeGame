@@ -68,6 +68,12 @@ ImGuiEditorAddon::~ImGuiEditorAddon()
     else if (Renderer::isUsingMetal())
     {
         ImGui_ImplMetal_Shutdown();
+
+        if (m_pRenderPassDescriptor)
+        {
+            m_pRenderPassDescriptor->release();
+            m_pRenderPassDescriptor = nullptr;
+        }
     }
 #endif // __APPLE__
     ImGui_ImplGlfw_Shutdown();

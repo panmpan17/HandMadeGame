@@ -23,50 +23,40 @@ int main(int nArgumentCount, char* arrArguments[])
     registerSignalHandlers();
     // ColorPicker colorPicker;
 
-    // try
-    // {
-        do
+    do
+    {
+        Window window;
+        window.setResizable(true);
+        // window.setTransparentBackground(true);
+        // colorPicker.preconfigureWindowObject(&window);
+        if (!window.configureAndCreateWindow())
         {
-            Window window;
-            window.setResizable(true);
-            window.setTransparentBackground(true);
-            // colorPicker.preconfigureWindowObject(&window);
-            if (!window.configureAndCreateWindow())
-            {
-                return -1; // Initialization failed
-            }
-    
-            window.initializeGraphicsAPI();
-            window.setupManagers();
-            window.setupGameEngineRelatedObject();
-    
-            PROFILER_START_TIMER();
-            // setupPostProcess();
-            // PROFILER_END_TIMER("World", "Setup post process");
-            // createDemo1();
-            // createVisualEffectDemo();
-            // createLightingShadowDemo();
-            // createPingPongGame();
-            // sceneTest();
-            // createProfolioSceneDemo();
-            // colorPicker.pickerMain();
-            // serializationTest();
-            firstTriangeTest();
-            PROFILER_END_TIMER("World", "Init");
-    
-            window.mainLoop();
+            return -1; // Initialization failed
         }
-#if IS_DEBUG_VERSION
-        while (Window::sm_bRestartRequested);
-#else
-        while (false);
-#endif
-    // }
-    // catch (const std::exception& e)
-    // {
-    //     std::cerr << "main.cpp catch exception: " << e.what() << '\n';
-    //     return -1;
-    // }
 
+        window.setupManagers();
+        window.setupGameEngineRelatedObject();
+
+        PROFILER_START_TIMER();
+        // setupPostProcess();
+        // PROFILER_END_TIMER("World", "Setup post process");
+        // createDemo1();
+        // createVisualEffectDemo();
+        // createLightingShadowDemo();
+        // createPingPongGame();
+        // sceneTest();
+        // createProfolioSceneDemo();
+        // colorPicker.pickerMain();
+        // serializationTest();
+        firstTriangeTest();
+        PROFILER_END_TIMER("World", "Init");
+
+        window.mainLoop();
+    }
+#if IS_DEBUG_VERSION
+    while (Window::sm_bRestartRequested);
+#else
+    while (false);
+#endif
     return 0;
 }
