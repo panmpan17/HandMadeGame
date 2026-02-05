@@ -260,6 +260,8 @@ void Window::bindOpenGLToGlfwWindow()
     glEnable(GL_CULL_FACE);
 
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    glPolygonMode(GL_FRONT_AND_BACK, m_bWireframeMode ? GL_LINE : GL_FILL);
 }
 
 #if __APPLE__
@@ -356,6 +358,17 @@ void Window::setupGameEngineRelatedObject()
         if (pressed)
         {
             m_bShowDebugDepth = !m_bShowDebugDepth;
+        }
+    });
+
+    InputManager::getInstance()->registerKeyPressCallback(KeyCode::KEY_FUNCTION_2, [this](bool pressed) {
+        if (pressed)
+        {
+            m_bWireframeMode = !m_bWireframeMode;
+            if (Renderer::isUsingOpenGL())
+            {
+                glPolygonMode(GL_FRONT_AND_BACK, m_bWireframeMode ? GL_LINE : GL_FILL);;
+            }
         }
     });
 
@@ -499,13 +512,14 @@ void Window::setCurrentDrawingTexture(MTL::Texture* pTexture)
     pColorAttachment->setTexture(pTexture);
 
     m_pCurrentFrameRenderEncoder = m_pCurrentCommandBuffer->renderCommandEncoder(pRenderPassDescriptor);
+
+    m_pCurrentFrameRenderEncoder->setTriangleFillMode(m_bWireframeMode ? MTL::TriangleFillModeLines : MTL::TriangleFillModeFill);
 }
 #endif // __APPLE__
 
 void Window::drawFrame()
 {
-    m_nDrawCallCount = 0;
-    m_nTriangleCount = 0;
+    Renderer::resetDrawCallCount();
 
     LightManager* const pLightManager = LightManager::getInstance();
     DirectionLightComponent* pMainDirLight = LightManager::getInstance()->getMainDirectionLightComponent();

@@ -1,6 +1,8 @@
 #pragma once
 
 #include <ft2build.h>
+#include <string>
+#include <utility>
 #include FT_FREETYPE_H
 #include "font.h"
 #include "../../core/debug_macro.h"
@@ -34,12 +36,12 @@ public:
         m_bInitialized = false;
     }
 
-    inline Font* loadFont(std::string_view strPath)
+    inline Font* loadFont(std::string strPath)
     {
         if (!m_bInitialized) return nullptr;
 
         Font oFont;
-        if (FT_New_Face(m_ftLibrary, strPath.data(), 0, &oFont.m_ftFace))
+        if (FT_New_Face(m_ftLibrary, strPath.c_str(), 0, &oFont.m_ftFace))
         {
             LOGERR("Failed to create FreeType face for path: {}", strPath);
             return nullptr;
@@ -51,28 +53,27 @@ public:
         oFont.loadAsciiCharacters();
         oFont.unloadFontFace();
 
-        m_mapLoadedFonts.emplace(strPath, std::move(oFont));
+        auto [it, _] = m_mapLoadedFonts.emplace(std::move(strPath), std::move(oFont));
 
-        return &m_mapLoadedFonts.at(strPath);
+        return &it->second;
     }
 
     inline Font* getFont(std::string_view strPath)
     {
-        auto it = m_mapLoadedFonts.find(strPath);
+        std::string ownedPath(strPath);
+        auto it = m_mapLoadedFonts.find(ownedPath);
         if (it != m_mapLoadedFonts.end())
         {
             return &it->second;
         }
-        return loadFont(strPath);
+        return loadFont(std::move(ownedPath));
     }
 
 private:
-    static FontLoader* ins;
+    static inline FontLoader* ins = nullptr;
 
     bool m_bInitialized = false;
     FT_Library m_ftLibrary = nullptr;
 
-    std::unordered_map<std::string_view, Font> m_mapLoadedFonts;
+    std::unordered_map<std::string, Font> m_mapLoadedFonts;
 };
-
-FontLoader* FontLoader::ins = nullptr;

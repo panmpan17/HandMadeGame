@@ -5,6 +5,7 @@
 class Shader;
 class Mesh;
 class Material;
+class Font;
 
 
 typedef unsigned int GLuint;
@@ -13,18 +14,18 @@ typedef unsigned int GLuint;
 class TextRenderer : public IDrawable
 {
 public:
-    TextRenderer();
+    TextRenderer(Font* const pFont);
     ~TextRenderer();
 
     virtual void update(float fDeltaTime) override {}
 
     virtual void draw() override;
 
-    virtual void setShader(Shader* pShader) override {}
+    virtual void setShader(Shader* pShader) override;
 
     virtual NodeComponent* clone() const override
     {
-        TextRenderer* pNewTextRenderer = new TextRenderer();
+        TextRenderer* pNewTextRenderer = new TextRenderer(m_pFont);
         if (m_pMaterial) pNewTextRenderer->setMaterial(m_pMaterial);
         return pNewTextRenderer;
     }
@@ -35,22 +36,17 @@ private:
     GLuint m_nVertexArray = 0;
     GLuint m_nVertexBuffer = 0;
 
-    const ShaderUniformHandle* m_pModelUniform = nullptr;
-    // const ShaderUniformHandle* m_pSpecularParamUniform = nullptr;
-    // const ShaderUniformHandle* m_pTextureEnabledUniform = nullptr;
+    Shader* m_pShader = nullptr;
 
-    // const ShaderUniformHandle* m_pDepthTextureUniform = nullptr;
-    // const ShaderUniformHandle* m_pLightMatrixUniform1 = nullptr;
-    // const ShaderUniformHandle* m_pShadowColorUniform = nullptr;
+    Font* m_pFont = nullptr;
 
-    // Shader* m_pDepthShader = nullptr;
-    // const ShaderUniformHandle* m_pDepthModelUniform = nullptr;
-    // const ShaderUniformHandle* m_pLightMatrixUniform2 = nullptr;
+    const ShaderUniformHandle* m_pMVPHandle = nullptr;
+    const ShaderUniformHandle* m_pTextureHandle = nullptr;
 
 
     int m_nIndiceCount = 0;
 
-    // void bindVertexArray(Shader* const pShader);
+    void bindVertexArray(Shader* const pShader);
 
     // int m_nIdleAnimationIndex = -1;
     // int m_nWalkAnimationIndex = -1;

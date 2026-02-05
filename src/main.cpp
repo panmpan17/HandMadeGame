@@ -48,7 +48,8 @@ int main(int nArgumentCount, char* arrArguments[])
         // createProfolioSceneDemo();
         // colorPicker.pickerMain();
         // serializationTest();
-        firstTriangeTest();
+        // firstTriangeTest();
+        fullTest();
         PROFILER_END_TIMER("World", "Init");
 
         window.mainLoop();

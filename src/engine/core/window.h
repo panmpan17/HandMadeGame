@@ -108,9 +108,6 @@ private:
     bool m_bKeepRatio = false;
     bool m_bTransparentBackground = false;
 
-    int m_nDrawCallCount = 0;
-    int m_nTriangleCount = 0;
-
     bool m_bAddGameRelatedIMGUIWindows = true;
 
     FileWatchDog* m_pFileWatchDog = nullptr;
@@ -120,6 +117,8 @@ private:
     ImGuiEditorAddon* m_pImGuiEditorAddon = nullptr;
 
     bool m_bShowDebugDepth = false;
+
+    bool m_bWireframeMode = false;
 
 #if IS_DEBUG_VERSION
     bool m_bDrawGizmos = true;

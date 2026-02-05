@@ -23,6 +23,7 @@ public:
 
 
 
+    static inline void resetDrawCallCount() { sm_nDrawCallCount = 0; sm_nTriangleCount = 0; }
     static inline int getDrawCallCount() { return sm_nDrawCallCount; }
     static inline int getTriangleCount() { return sm_nTriangleCount; }
     static inline void increaseDrawCallCount() { ++sm_nDrawCallCount; }

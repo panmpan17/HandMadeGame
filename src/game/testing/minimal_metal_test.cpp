@@ -9,9 +9,11 @@
 #include "../../engine/components/render/sprite.h"
 #include "../../engine/components/render/sprite_animation.h"
 #include "../../engine/components/render/character2d.h"
+#include "../../engine/components/render/text_renderer.h"
 #include "../../engine/components/particle/particle_system.h"
 #include "../../engine/components/particle/particle_spawn.h"
 #include "../../engine/components/particle/particle_lifetime_change.h"
+#include "../../engine/render/font/font_loader.h"
 #include "../../engine/render/shader.h"
 #include "../../engine/render/shader_loader.h"
 #include "../../engine/render/image_loader.h"
@@ -22,24 +24,35 @@
 #include "../../engine/render/material_loader.h"
 
 
+void fullTest()
+{
+    // addTestSkybox();
+    // firstTriangeTest();
+    // addQuadImage();
+    // addSpriteAnimation();
+    // addParticles();
+    fontTest();
+}
+
+void addTestSkybox()
+{
+    { // Skybox
+        Skybox* pSkybox = new Skybox();
+        pSkybox->loadSkyboxCubmaps({
+            "assets/images/skybox/right.jpg",
+            "assets/images/skybox/left.jpg",
+            "assets/images/skybox/top.jpg",
+            "assets/images/skybox/bottom.jpg",
+            "assets/images/skybox/front.jpg",
+            "assets/images/skybox/back.jpg"
+        });
+        WorldScene::current->setSkybox(pSkybox);
+    }
+}
+
 void firstTriangeTest()
 {
     WorldScene* const pWorldScene = WorldScene::current;
-
-    Shader* const pImageShader = ShaderLoader::getInstance()->getShader("image");
-
-    // { // Skybox
-    //     Skybox* pSkybox = new Skybox();
-    //     pSkybox->loadSkyboxCubmaps({
-    //         "assets/images/skybox/right.jpg",
-    //         "assets/images/skybox/left.jpg",
-    //         "assets/images/skybox/top.jpg",
-    //         "assets/images/skybox/bottom.jpg",
-    //         "assets/images/skybox/front.jpg",
-    //         "assets/images/skybox/back.jpg"
-    //     });
-    //     pWorldScene->setSkybox(pSkybox);
-    // }
 
     { // Triangle
         Shader* const pColorShared = ShaderLoader::getInstance()->getShader("colored_vertices");
@@ -58,7 +71,11 @@ void firstTriangeTest()
 
         pWorldScene->addNode(pNode);
     }
+}
 
+void addQuadImage()
+{
+    Shader* const pImageShader = ShaderLoader::getInstance()->getShader("image");
     { // Quad with Image
         Image* pTestImage = ImageLoader::getInstance()->getImageByPath("assets/images/test.png");
 
@@ -74,10 +91,14 @@ void firstTriangeTest()
 
         // pNode2->addComponent(new Rotate3D(0, 0, 1.0f));
 
-        pWorldScene->addNode(pNode2);
+        WorldScene::current->addNode(pNode2);
     }
+}
 
+void addSpriteAnimation()
+{
     {
+        Shader* const pImageShader = ShaderLoader::getInstance()->getShader("image");
         Image* pCharacter = ImageLoader::getInstance()->getImageByPath("assets/images/character_animation.png");
 
         auto pPlayer = new Node(0.f, -1.f, 0.f);
@@ -93,9 +114,12 @@ void firstTriangeTest()
         auto pCharacter2d = new Character2d(pSpriteAnimation);
         pPlayer->addComponent(pCharacter2d);
 
-        pWorldScene->addNode(pPlayer);
+        WorldScene::current->addNode(pPlayer);
     }
+}
 
+void addParticles()
+{
     { // Particle
         std::shared_ptr<Material> pMaterial = MaterialLoader::getInstance()->getMaterial("assets/materials/dust_particle.yaml");
 
@@ -125,14 +149,33 @@ void firstTriangeTest()
         pNode5->addComponent(new TwoPointsMovement({ -0.5f, 0.f, 1.f }, { 0.5f, 0.f, 1.f }, 2.0f));
 
         pNode5->setActive(false);
-        pWorldScene->addNode(pNode5);
+        WorldScene::current->addNode(pNode5);
     }
-    
+}
+
+void add3DBox()
+{
+    std::shared_ptr<Material> pMaterial = MaterialLoader::getInstance()->getMaterial("assets/materials/box.yaml");
+    AssimpModelReader oModelReader("assets/models/box.obj", { pMaterial });
+    Node* pBox = oModelReader.instantiateCloneNode();
+    pBox->setPosition(0.f, 0.f, 0.f);
+    WorldScene::current->addNode(pBox);
+}
+
+void fontTest()
+{
+    WorldScene* const pWorldScene = WorldScene::current;
+
     {
-        std::shared_ptr<Material> pMaterial = MaterialLoader::getInstance()->getMaterial("assets/materials/box.yaml");
-        AssimpModelReader oModelReader("assets/models/box.obj", { pMaterial });
-        Node* pBox = oModelReader.instantiateCloneNode();
-        pBox->setPosition(0.f, 0.f, 0.f);
-        pWorldScene->addNode(pBox);
+        Node* pTextNode = new Node(0.f, 0.f, 0.f);
+
+        Font* pFont = FontLoader::getInstance()->getFont("assets/fonts/arial.ttf");
+
+        Shader* pTextShader = ShaderLoader::getInstance()->getShader("text");
+        TextRenderer* pTextRenderer = new TextRenderer(pFont);
+        pTextRenderer->setShader(pTextShader);
+
+        pTextNode->addComponent(pTextRenderer);
+        pWorldScene->addNode(pTextNode);
     }
 }

@@ -127,7 +127,7 @@ void Quad::draw()
             glUniform1i(m_pTextureHandle->m_nLocation, 0); // Texture unit 0
 
             glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, m_pImage ? m_pImage->getTextureID() : 0);
+            glBindTexture(GL_TEXTURE_2D, m_pImage->getTextureID());
         }
         else
         {

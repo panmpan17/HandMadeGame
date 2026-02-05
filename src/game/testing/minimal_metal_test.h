@@ -1,1 +1,2 @@
-void firstTriangeTest();
+void fullTest();
+void fontTest();
