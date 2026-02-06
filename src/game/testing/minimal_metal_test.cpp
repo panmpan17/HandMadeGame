@@ -24,16 +24,6 @@
 #include "../../engine/render/material_loader.h"
 
 
-void fullTest()
-{
-    // addTestSkybox();
-    // firstTriangeTest();
-    // addQuadImage();
-    // addSpriteAnimation();
-    // addParticles();
-    fontTest();
-}
-
 void addTestSkybox()
 {
     { // Skybox
@@ -173,9 +163,21 @@ void fontTest()
 
         Shader* pTextShader = ShaderLoader::getInstance()->getShader("text");
         TextRenderer* pTextRenderer = new TextRenderer(pFont);
+        pTextRenderer->setText("Hello, World!");
         pTextRenderer->setShader(pTextShader);
 
         pTextNode->addComponent(pTextRenderer);
         pWorldScene->addNode(pTextNode);
     }
+}
+
+void fullTest()
+{
+    addTestSkybox();
+    // firstTriangeTest();
+    // addQuadImage();
+    // addSpriteAnimation();
+    // addParticles();
+    add3DBox();
+    fontTest();
 }

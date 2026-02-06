@@ -32,24 +32,29 @@ public:
 
     void setMaterial(const std::shared_ptr<Material>& pMaterial);
 
+    inline const std::string& getText() const { return m_strText; }
+    inline void setText(const std::string& strText) { m_strText = strText; }
+
+    inline const float getFontSize() const { return m_fFontSize; }
+    inline void setFontSize(float fFontSize) { m_fFontSize = fFontSize; }
+
+    virtual bool getIsTransparent() const override { return true; }
+
 private:
     GLuint m_nVertexArray = 0;
     GLuint m_nVertexBuffer = 0;
 
     Shader* m_pShader = nullptr;
-
     Font* m_pFont = nullptr;
 
     const ShaderUniformHandle* m_pMVPHandle = nullptr;
     const ShaderUniformHandle* m_pTextureHandle = nullptr;
+    const ShaderUniformHandle* m_pSizeHandle = nullptr;
 
-
-    int m_nIndiceCount = 0;
+    std::string m_strText;
+    float m_fFontSize = 1.f;
 
     void bindVertexArray(Shader* const pShader);
-
-    // int m_nIdleAnimationIndex = -1;
-    // int m_nWalkAnimationIndex = -1;
 
     // COMPONENT_REGISTER_SERIALIZABLE(TextRenderer)
 };

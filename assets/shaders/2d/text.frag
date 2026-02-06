@@ -8,9 +8,6 @@ out vec4 fragment;
 void main()
 {
     float r = texture(u_tex0, uv).r;
+    if (r < 0.01) discard;
     fragment = vec4(r);
-    // vec4 textColor = texture(u_tex0, uv);
-    // if (textColor.a < 0.01)
-    //     discard;
-    // fragment = textColor;
 }

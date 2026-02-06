@@ -140,7 +140,7 @@ private:
         {
             glPixelStorei(GL_UNPACK_ALIGNMENT, 1); // Disable byte-alignment restriction
 
-            for (unsigned char c = 65; c < 66; c++)
+            for (unsigned char c = 0; c < 128; c++)
             {
                 // Load character glyph
                 if (FT_Load_Char(m_ftFace, c, FT_LOAD_RENDER))
