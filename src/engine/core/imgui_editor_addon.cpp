@@ -148,7 +148,6 @@ void ImGuiEditorAddon::drawEditorWindows()
         }
     }
 
-    // TODO: try to fix the issue of menu bar on Metal will crash
     if (ImGui::BeginMainMenuBar())
     {
         if (ImGui::BeginMenu("Editor Windows"))

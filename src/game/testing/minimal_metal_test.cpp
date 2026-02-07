@@ -159,11 +159,11 @@ void fontTest()
     {
         Node* pTextNode = new Node(0.f, 0.f, 0.f);
 
-        Font* pFont = FontLoader::getInstance()->getFont("assets/fonts/arial.ttf");
+        Font* pFont = FontLoader::getInstance()->getFont("assets/fonts/Arial Unicode.ttf");
 
         Shader* pTextShader = ShaderLoader::getInstance()->getShader("text");
         TextRenderer* pTextRenderer = new TextRenderer(pFont);
-        pTextRenderer->setText("Hello, World!");
+        pTextRenderer->setText(u"我是潘啟元 Hello, World!");
         pTextRenderer->setShader(pTextShader);
 
         pTextNode->addComponent(pTextRenderer);

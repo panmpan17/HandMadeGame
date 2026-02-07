@@ -80,7 +80,6 @@ std::shared_ptr<Mesh> SimpleObjReader::loadWavefrontFile(std::string_view strFil
             continue;
         }
 
-        // TODO: Can be improved with iterator to avoid all string is parse?
         std::vector<std::string> strTokens = splitString(strLine, ' ', true);
         if (strTokens.empty())
             continue;

@@ -96,7 +96,6 @@ void TextRenderer::draw()
                 glUniform2f(m_pSizeHandle->m_nLocation, fGlyphWidth, fGlyphHeight);
 
                 mat4x4 finalMVP;
-                // Position glyph so its baseline aligns via bearing and size (quad is centered)
                 float fGlyphCenterX = fXOffset + fBearingX + (fGlyphWidth * 0.5f);
                 float fGlyphCenterY = fBearingY - (fGlyphHeight * 0.5f);
                 mat4x4_translate(finalMVP, fGlyphCenterX, fGlyphCenterY, 0);
@@ -109,8 +108,11 @@ void TextRenderer::draw()
                 glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
                 INCREASE_DRAW_CALL_COUNT(2);
 
-                // Advance in FreeType is stored in 1/64th pixels
                 fXOffset += (pCharacter->m_nAdvance >> 6) * fScale;
+            }
+            else
+            {
+                // LOGERR("Character not found in font: {}", FORMAT_CHAR16(m_strText[i]));
             }
         }
 

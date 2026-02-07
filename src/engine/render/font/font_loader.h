@@ -19,7 +19,6 @@ public:
         if (FT_Init_FreeType(&m_ftLibrary))
         {
             m_ftLibrary = nullptr;
-            // TODO: Handle error
             LOGERR("Failed to initialize FreeType library");
             return;
         }
@@ -47,10 +46,15 @@ public:
             return nullptr;
         }
 
-        oFont.setCharSize(16, 300);
-        // oFont.setPixelSize(16);
+        // oFont.setCharSize(16, 300);
+        oFont.setPixelSize(64);
 
         oFont.loadAsciiCharacters();
+        oFont.loadCharacterTexture(u'我');
+        oFont.loadCharacterTexture(u'是');
+        oFont.loadCharacterTexture(u'潘');
+        oFont.loadCharacterTexture(u'啟');
+        oFont.loadCharacterTexture(u'元');
         oFont.unloadFontFace();
 
         auto [it, _] = m_mapLoadedFonts.emplace(std::move(strPath), std::move(oFont));

@@ -37,7 +37,6 @@ void InputManager::onMousePosCallback(GLFWwindow* pWindow, double fPosX, double 
 {
     float fMouseX = static_cast<float>(fPosX);
     float fMouseY = static_cast<float>(fPosY);
-    // TODO: fire event or callback if needed
 
     if (ins)
     {
@@ -115,7 +114,6 @@ void InputManager::Initialize()
 
 InputManager::InputManager()
 {
-    // Initialize key states to false
     for (int i = 0; i < 256; ++i)
     {
         m_bKeyPressed[i] = false;

@@ -66,8 +66,6 @@ void printBackTrace(std::string_view strCrashType)
     }
     oErrorOutputter << std::dec << std::endl;
     oErrorOutputter << "=======================" << std::endl;
-
-    // TODO: For some functions, it gets the wrong function name, need to investigate
 #endif
 
 // atos -o output/MyGLFWApp -l 0x000000010452d224

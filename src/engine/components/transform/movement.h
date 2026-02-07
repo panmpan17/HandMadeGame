@@ -62,7 +62,6 @@ protected:
     float m_fDuration;
     float m_fTimer = 0;
 
-    // TODO: make this flexible
     bool m_bIsMovingForward = false;
 
     COMPONENT_REGISTER_SERIALIZABLE(TwoPointsMovement)

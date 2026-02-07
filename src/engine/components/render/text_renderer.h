@@ -32,8 +32,8 @@ public:
 
     void setMaterial(const std::shared_ptr<Material>& pMaterial);
 
-    inline const std::string& getText() const { return m_strText; }
-    inline void setText(const std::string& strText) { m_strText = strText; }
+    inline const std::u16string& getText() const { return m_strText; }
+    inline void setText(const std::u16string& strText) { m_strText = strText; }
 
     inline const float getFontSize() const { return m_fFontSize; }
     inline void setFontSize(float fFontSize) { m_fFontSize = fFontSize; }
@@ -51,7 +51,7 @@ private:
     const ShaderUniformHandle* m_pTextureHandle = nullptr;
     const ShaderUniformHandle* m_pSizeHandle = nullptr;
 
-    std::string m_strText;
+    std::u16string m_strText;
     float m_fFontSize = 1.f;
 
     void bindVertexArray(Shader* const pShader);

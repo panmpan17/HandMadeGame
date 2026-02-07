@@ -60,7 +60,6 @@ void createDemo1()
 {
     WorldScene* const pWorldScene = WorldScene::current;
 
-    // TODO: remove this
     DataSerializer oSerializer("assets/level.txt");
 
     Shader* pTestShader = ShaderLoader::getInstance()->getShader("test");

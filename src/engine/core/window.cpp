@@ -276,7 +276,7 @@ void Window::bindMetalToGlfwWindow()
     m_pMetalLayer = CA::MetalLayer::layer();
     m_pMetalLayer->setDevice(m_pMetalDevice);
     m_pMetalLayer->setPixelFormat(MTL::PixelFormat::PixelFormatBGRA8Unorm); // TODO: Might need to make this HDR?
-    m_pMetalLayer->setDrawableSize(CGSizeMake(m_oActualSize.x, m_oActualSize.y)); // TODO: Should this be m_oActualSize or m_oWindowSize?
+    m_pMetalLayer->setDrawableSize(CGSizeMake(m_oActualSize.x, m_oActualSize.y));
 
     ((void (*)(id, SEL, id))objc_msgSend)((id)view, sel_registerName("setLayer:"), (id)m_pMetalLayer);
     ((void (*)(id, SEL, BOOL))objc_msgSend)((id)view, sel_registerName("setWantsLayer:"), (BOOL)true);
@@ -322,7 +322,7 @@ void Window::setupManagers()
     PROFILER_END_TIMER("Initialization", "Gizmos setup");
 
     FontLoader::Initialize();
-    FontLoader::getInstance()->loadFont("assets/fonts/arial.ttf");
+    FontLoader::getInstance()->loadFont("assets/fonts/Arial Unicode.ttf");
 
     m_pRenderProcessQueue = new RenderProcessQueue(this);
 

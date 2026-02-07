@@ -10,6 +10,7 @@
 
 #include FT_FREETYPE_H
 
+#define FORMAT_CHAR16(c) static_cast<std::uint_least16_t>(c)
 
 struct Character
 {
@@ -77,7 +78,7 @@ public:
         }
     }
 
-    Character* getCharacter(char c)
+    Character* getCharacter(char16_t c)
     {
         auto it = m_mapCharacters.find(c);
         if (it != m_mapCharacters.end())
@@ -87,10 +88,70 @@ public:
         return nullptr;
     }
 
+    // Returns true if character was loaded successfully, false if it failed to load
+    inline bool loadCharacterTexture(char16_t c)
+    {
+        LOGLN("Loading character: {}", FORMAT_CHAR16(c));
+        std::unordered_map<char16_t, Character>::iterator it = m_mapCharacters.find(c);
+        if (it != m_mapCharacters.end())
+        {
+            return true;
+        }
+
+        if (!m_ftFace)
+        {
+            LOGERR("Font face not loaded, cannot load character: {}", FORMAT_CHAR16(c));
+            return false;
+        }
+
+        if (FT_Load_Char(m_ftFace, c, FT_LOAD_RENDER))
+        {
+            LOGERR("Failed to load Glyph for char: {}", FORMAT_CHAR16(c));
+            return false;
+        }
+
+        if (Renderer::isUsingOpenGL())
+        {
+            unsigned int nTexture;
+            glGenTextures(1, &nTexture);
+            glBindTexture(GL_TEXTURE_2D, nTexture);
+
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+            glTexImage2D(
+                GL_TEXTURE_2D,
+                0,
+                GL_RED,
+                m_ftFace->glyph->bitmap.width,
+                m_ftFace->glyph->bitmap.rows,
+                0,
+                GL_RED,
+                GL_UNSIGNED_BYTE,
+                m_ftFace->glyph->bitmap.buffer
+            );
+
+            // Now store character for later use
+            Character character = {
+                nTexture,
+                { (float)m_ftFace->glyph->bitmap.width, (float)m_ftFace->glyph->bitmap.rows },
+                { (float)m_ftFace->glyph->bitmap_left, (float)m_ftFace->glyph->bitmap_top },
+                (unsigned int)m_ftFace->glyph->advance.x
+            };
+            m_mapCharacters.insert(std::pair<char16_t, Character>(c, character));
+            glBindTexture(GL_TEXTURE_2D, 0);
+            return true;
+        }
+
+        return false;
+    }
+
 private:
     FT_Face m_ftFace = nullptr;
 
-    std::unordered_map<char, Character> m_mapCharacters;
+    std::unordered_map<char16_t, Character> m_mapCharacters;
 
     inline void moveFrom(Font&& other) noexcept
     {
@@ -139,48 +200,11 @@ private:
         if (Renderer::isUsingOpenGL())
         {
             glPixelStorei(GL_UNPACK_ALIGNMENT, 1); // Disable byte-alignment restriction
+        }
 
-            for (unsigned char c = 0; c < 128; c++)
-            {
-                // Load character glyph
-                if (FT_Load_Char(m_ftFace, c, FT_LOAD_RENDER))
-                {
-                    LOGERR("Failed to load Glyph for char: {}", c);
-                    continue;
-                }
-
-                unsigned int nTexture;
-                glGenTextures(1, &nTexture);
-                glBindTexture(GL_TEXTURE_2D, nTexture);
-
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-                glTexImage2D(
-                    GL_TEXTURE_2D,
-                    0,
-                    GL_RED,
-                    m_ftFace->glyph->bitmap.width,
-                    m_ftFace->glyph->bitmap.rows,
-                    0,
-                    GL_RED,
-                    GL_UNSIGNED_BYTE,
-                    m_ftFace->glyph->bitmap.buffer
-                );
-
-                // Now store character for later use
-                Character character = {
-                    nTexture,
-                    { (float)m_ftFace->glyph->bitmap.width, (float)m_ftFace->glyph->bitmap.rows },
-                    { (float)m_ftFace->glyph->bitmap_left, (float)m_ftFace->glyph->bitmap_top },
-                    (unsigned int)m_ftFace->glyph->advance.x
-                };
-                m_mapCharacters.insert(std::pair<char, Character>(c, character));
-                glBindTexture(GL_TEXTURE_2D, 0);
-            }
-
+        for (char16_t c = 0; c < 128; c++)
+        {
+            loadCharacterTexture(c);
         }
     }
 };
