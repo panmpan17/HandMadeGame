@@ -85,29 +85,37 @@ public:
         {
             return &it->second;
         }
+
+        it = loadCharacterTexture(c);
+        if (it != m_mapCharacters.end())
+        {
+            return &it->second;
+        }
+        
+        LOGERR("Failed to load character: {}", FORMAT_CHAR16(c));
         return nullptr;
     }
 
     // Returns true if character was loaded successfully, false if it failed to load
-    inline bool loadCharacterTexture(char16_t c)
+    inline std::unordered_map<char16_t, Character>::iterator loadCharacterTexture(char16_t c)
     {
         LOGLN("Loading character: {}", FORMAT_CHAR16(c));
         std::unordered_map<char16_t, Character>::iterator it = m_mapCharacters.find(c);
         if (it != m_mapCharacters.end())
         {
-            return true;
+            return it; // Character already loaded
         }
 
         if (!m_ftFace)
         {
             LOGERR("Font face not loaded, cannot load character: {}", FORMAT_CHAR16(c));
-            return false;
+            return m_mapCharacters.end();
         }
 
         if (FT_Load_Char(m_ftFace, c, FT_LOAD_RENDER))
         {
             LOGERR("Failed to load Glyph for char: {}", FORMAT_CHAR16(c));
-            return false;
+            return m_mapCharacters.end();
         }
 
         if (Renderer::isUsingOpenGL())
@@ -142,10 +150,10 @@ public:
             };
             m_mapCharacters.insert(std::pair<char16_t, Character>(c, character));
             glBindTexture(GL_TEXTURE_2D, 0);
-            return true;
+            return m_mapCharacters.find(c);
         }
 
-        return false;
+        return m_mapCharacters.end();
     }
 
 private:

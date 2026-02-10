@@ -50,12 +50,8 @@ public:
         oFont.setPixelSize(64);
 
         oFont.loadAsciiCharacters();
-        oFont.loadCharacterTexture(u'我');
-        oFont.loadCharacterTexture(u'是');
-        oFont.loadCharacterTexture(u'潘');
-        oFont.loadCharacterTexture(u'啟');
-        oFont.loadCharacterTexture(u'元');
-        oFont.unloadFontFace();
+        // If unloadFontFace, won't able to load character textures later
+        // oFont.unloadFontFace();
 
         auto [it, _] = m_mapLoadedFonts.emplace(std::move(strPath), std::move(oFont));
 
