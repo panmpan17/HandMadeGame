@@ -99,7 +99,6 @@ public:
     // Returns true if character was loaded successfully, false if it failed to load
     inline std::unordered_map<char16_t, Character>::iterator loadCharacterTexture(char16_t c)
     {
-        LOGLN("Loading character: {}", FORMAT_CHAR16(c));
         std::unordered_map<char16_t, Character>::iterator it = m_mapCharacters.find(c);
         if (it != m_mapCharacters.end())
         {

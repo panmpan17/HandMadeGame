@@ -62,6 +62,8 @@ Window::Window()
     m_bEnablePostProcess = Preference::getEnablePostProcess();
     m_oWindowSize.x = Preference::getWindowWidth();
     m_oWindowSize.y = Preference::getWindowHeight();
+    m_oWindowPosition.x = Preference::getWindowPositionX();
+    m_oWindowPosition.y = Preference::getWindowPositionY();
     m_bDrawGizmos = Preference::getEnableGizmos();
 
 #if __APPLE__
@@ -169,7 +171,7 @@ bool Window::configureAndCreateWindow()
         return false;
     }
 
-    glfwSetWindowPos(m_pWindow, Preference::getWindowPositionX(), Preference::getWindowPositionY());
+    glfwSetWindowPos(m_pWindow, m_oWindowPosition.x, m_oWindowPosition.y);
 
     if (m_bKeepRatio)
     {
@@ -407,6 +409,16 @@ void Window::setWindowSize(int nWidth, int nHeight)
     if (m_pWindow)
     {
         glfwSetWindowSize(m_pWindow, nWidth, nHeight);
+    }
+}
+
+void Window::setWindowPosition(int nX, int nY)
+{
+    m_oWindowPosition.x = nX;
+    m_oWindowPosition.y = nY;
+    if (m_pWindow)
+    {
+        glfwSetWindowPos(m_pWindow, nX, nY);
     }
 }
 

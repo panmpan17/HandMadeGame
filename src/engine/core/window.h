@@ -45,6 +45,9 @@ public:
     void setWindowSize(int nWidth, int nHeight);
     inline const Vector2i& getWindowSize() const { return m_oWindowSize; }
 
+    void setWindowPosition(int nX, int nY);
+    inline const Vector2i& getWindowPosition() const { return m_oWindowPosition; }
+
     inline bool isPostProcessEnabled() const { return m_bEnablePostProcess; }
     inline void setPostProcessEnabled(bool enabled) { m_bEnablePostProcess = enabled; }
 
@@ -99,6 +102,7 @@ private:
 
     Vector2i m_oWindowSize;
     Vector2i m_oActualSize;
+    Vector2i m_oWindowPosition;
     float m_fRatio = 1.0f;
 
     WorldScene* m_pWorldScene = nullptr;

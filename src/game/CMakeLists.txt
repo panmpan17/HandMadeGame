@@ -2,3 +2,4 @@
 # include(${CMAKE_CURRENT_LIST_DIR}/pingpong/CMakeLists.txt)
 include(${CMAKE_CURRENT_LIST_DIR}/testing/CMakeLists.txt)
 # include(${CMAKE_CURRENT_LIST_DIR}/colorpicker/CMakeLists.txt)
+include(${CMAKE_CURRENT_LIST_DIR}/desktop_farm/CMakeLists.txt)

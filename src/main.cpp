@@ -6,6 +6,7 @@
 // #include "game/pingpong/game.h"
 // #include "game/colorpicker/picker.h"
 #include "game/testing/minimal_metal_test.h"
+#include "game/desktop_farm/desktop_farm.h"
 
 #include "utils/file_utils.h"
 
@@ -22,6 +23,7 @@ int main(int nArgumentCount, char* arrArguments[])
 
     registerSignalHandlers();
     // ColorPicker colorPicker;
+    DesktopFarmGame desktopFarmGame;
 
     do
     {
@@ -29,6 +31,7 @@ int main(int nArgumentCount, char* arrArguments[])
         window.setResizable(true);
         // window.setTransparentBackground(true);
         // colorPicker.preconfigureWindowObject(&window);
+        desktopFarmGame.preconfigureWindowObject(&window);
         if (!window.configureAndCreateWindow())
         {
             return -1; // Initialization failed
@@ -49,7 +52,8 @@ int main(int nArgumentCount, char* arrArguments[])
         // colorPicker.pickerMain();
         // serializationTest();
         // firstTriangeTest();
-        fullTest();
+        // fullTest();
+        desktopFarmGame.setupWorldScene();
         PROFILER_END_TIMER("World", "Init");
 
         window.mainLoop();
