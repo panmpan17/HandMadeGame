@@ -4,11 +4,9 @@
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
+#include "farm_animal.h"
+
 #include "../../engine/core/window.h"
-#include "../../engine/core/debug_macro.h"
-
-
-#include "../../engine/core/debug_macro.h"
 #include "../../engine/core/scene/node.h"
 #include "../../engine/core/scene/world.h"
 #include "../../engine/core/math/random.h"
@@ -32,6 +30,13 @@
 #include "../../engine/render/material_loader.h"
 
 
+#if VSCODE_ONLY
+void glfwGetMonitorWorkarea(GLFWmonitor* monitor, int* xpos, int* ypos, int* width, int* height);
+#endif // VSCODE_ONLY
+
+constexpr int WINDOW_HEIGHT = 300;
+
+
 DesktopFarmGame::DesktopFarmGame()
 {
     ins = this;
@@ -43,21 +48,14 @@ void DesktopFarmGame::preconfigureWindowObject(Window* pWindow)
     pWindow->setKeepRatio(false);
     pWindow->setTransparentBackground(true);
 
+    glfwWindowHint(GLFW_FLOATING, GLFW_TRUE);
+
     GLFWmonitor* pPrimaryMonitor = glfwGetPrimaryMonitor();
-    int nPhysicalWidthMM, nPhysicalHeightMM;
-    glfwGetMonitorPhysicalSize(pPrimaryMonitor, &nPhysicalWidthMM, &nPhysicalHeightMM);
-    LOGLN("Primary Monitor: {} x {} mm", nPhysicalWidthMM, nPhysicalHeightMM);
+    int nWorkAreaOffsetX, nWorkAreaOffsetY, nWorkAreaWidth, nWorkAreaHeight;
+    glfwGetMonitorWorkarea(pPrimaryMonitor, &nWorkAreaOffsetX, &nWorkAreaOffsetY, &nWorkAreaWidth, &nWorkAreaHeight);
 
-    int x, y, width, height;
-    glfwGetMonitorWorkarea(pPrimaryMonitor, &x, &y, &width, &height);
-    LOGLN("Primary Monitor Work Area: {} x {} at ({}, {})", width, height, x, y);
-
-    float scaleX, scaleY;
-    glfwGetMonitorContentScale(pPrimaryMonitor, &scaleX, &scaleY);
-    LOGLN("Primary Monitor Content Scale: {} x {}", scaleX, scaleY);
-
-    pWindow->setWindowSize(width, 300);
-    pWindow->setWindowPosition(x, height - 300 + y);
+    pWindow->setWindowSize(nWorkAreaWidth, WINDOW_HEIGHT);
+    pWindow->setWindowPosition(nWorkAreaOffsetX, nWorkAreaHeight - WINDOW_HEIGHT + nWorkAreaOffsetY);
 }
 
 void DesktopFarmGame::setupWorldScene()
@@ -77,8 +75,8 @@ void DesktopFarmGame::setupWorldScene()
         pSpriteAnimation->openAnimationFile("assets/character_animation.yaml");
         pPlayer->addComponent(pSpriteAnimation);
 
-        auto pCharacter2d = new Character2d(pSpriteAnimation);
-        pPlayer->addComponent(pCharacter2d);
+        auto pFarmAnimal = new FarmAnimal(pSpriteAnimation);
+        pPlayer->addComponent(pFarmAnimal);
 
         WorldScene::current->addNode(pPlayer);
     }

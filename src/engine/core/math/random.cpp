@@ -8,6 +8,10 @@ static std::random_device rd;
 static std::mt19937 gen(rd());
 std::uniform_real_distribution<float> randomRange0To1(0.0f, 1.0f);
 
+bool randomTwoChoice()
+{
+    return randomRange0To1(gen) >= 0.5f;
+}
 
 float randomFloat()
 {

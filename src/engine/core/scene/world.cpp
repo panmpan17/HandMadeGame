@@ -172,6 +172,7 @@ void WorldScene::renderTransparentObjects()
     {
         glDepthMask(GL_FALSE);
         glEnable(GL_BLEND);
+        glDisable(GL_CULL_FACE);
     }
 #if __APPLE__
     else if (bUsingMetal)
@@ -196,6 +197,7 @@ void WorldScene::renderTransparentObjects()
     {
         glDepthMask(GL_TRUE);
         glDisable(GL_BLEND);
+        glEnable(GL_CULL_FACE);
     }
 #if __APPLE__
     else if (bUsingMetal)

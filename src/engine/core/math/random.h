@@ -2,6 +2,7 @@
 
 #include <linmath.h>
 
+bool randomTwoChoice();
 float randomFloat();
 float randomFloat(float fMin, float fMax);
 int randomInt(int nMin, int nMax);
