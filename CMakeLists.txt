@@ -266,6 +266,19 @@ elseif(UNIX)
 
 endif()
 
+
+if (ON)
+    add_subdirectory(external/steam)
+
+    add_custom_command(TARGET MichaelHandMadeGame POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${STEAM_SHARED_LIB_PATH}"
+        $<TARGET_FILE_DIR:MichaelHandMadeGame>
+    )
+
+    target_link_libraries(MichaelHandMadeGame PRIVATE SteamAppTicket)
+endif()
+
 target_link_libraries(MichaelHandMadeGame PRIVATE glfw freetype )
 target_link_libraries(imgui PRIVATE glfw)
 

@@ -1,7 +1,5 @@
 glfw-build/
 glfw-3.4/
-*.dylib
-*.dll
 *.a
 * APP
 *.app

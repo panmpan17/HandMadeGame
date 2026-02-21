@@ -2,6 +2,8 @@
 #include "engine/core/error_handler.h"
 #include "engine/core/debug_macro.h"
 
+#include "steam_api.h"
+
 #include "game/testing/test.h"
 // #include "game/pingpong/game.h"
 // #include "game/colorpicker/picker.h"
@@ -13,6 +15,11 @@
 
 int main(int nArgumentCount, char* arrArguments[])
 {
+    if ( SteamAPI_RestartAppIfNecessary( k_uAppIdInvalid ) )
+    {
+        return 1;
+    }
+
 #if IS_DEBUG_VERSION
     if (nArgumentCount >= 2)
     {
