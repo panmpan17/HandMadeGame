@@ -13,6 +13,8 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 # Options
 option(BUILD_APP "Build as a macOS .app bundle" OFF)
+option(INCLUDE_STEAM "Include Steamworks SDK" OFF)
+
 
 # Default to Release if nothing is specified
 if(NOT DEFINED CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
@@ -267,7 +269,7 @@ elseif(UNIX)
 endif()
 
 
-if (ON)
+if (INCLUDE_STEAM)
     add_subdirectory(external/steam)
 
     add_custom_command(TARGET MichaelHandMadeGame POST_BUILD
@@ -276,7 +278,19 @@ if (ON)
         $<TARGET_FILE_DIR:MichaelHandMadeGame>
     )
 
+    # Debug app steam app id is provided by a text file
+    # In release, the app id is provided by steam so no need to include the text file
+    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+        add_custom_command(TARGET MichaelHandMadeGame POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${CMAKE_CURRENT_SOURCE_DIR}/app_packing/steam_appid.txt"
+            $<TARGET_FILE_DIR:MichaelHandMadeGame>
+        )
+    endif()
+
     target_link_libraries(MichaelHandMadeGame PRIVATE SteamAppTicket)
+
+    target_compile_definitions(MichaelHandMadeGame PRIVATE INCLUDE_STEAMWORKS)
 endif()
 
 target_link_libraries(MichaelHandMadeGame PRIVATE glfw freetype )

@@ -2,8 +2,6 @@
 #include "engine/core/error_handler.h"
 #include "engine/core/debug_macro.h"
 
-#include "steam_api.h"
-
 #include "game/testing/test.h"
 // #include "game/pingpong/game.h"
 // #include "game/colorpicker/picker.h"
@@ -12,13 +10,20 @@
 
 #include "utils/file_utils.h"
 
+#ifdef INCLUDE_STEAMWORKS
+#include "steam/steam_hook.h"
+#endif
 
 int main(int nArgumentCount, char* arrArguments[])
 {
-    if ( SteamAPI_RestartAppIfNecessary( k_uAppIdInvalid ) )
+#ifdef INCLUDE_STEAMWORKS
+    SteamHook steamHook;
+    if (!steamHook.init())
     {
-        return 1;
+        std::cerr << "Failed to initialize Steam API." << std::endl;
+        return -1;
     }
+#endif
 
 #if IS_DEBUG_VERSION
     if (nArgumentCount >= 2)
@@ -70,5 +75,10 @@ int main(int nArgumentCount, char* arrArguments[])
 #else
     while (false);
 #endif
+
+#ifdef INCLUDE_STEAMWORKS
+    steamHook.shutdown();
+#endif
+
     return 0;
 }
