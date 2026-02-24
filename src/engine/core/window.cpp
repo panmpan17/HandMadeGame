@@ -375,6 +375,12 @@ void Window::setupGameEngineRelatedObject()
     });
 
     InputManager::getInstance()->registerKeyPressCallback(KeyCode::KEY_FUNCTION_4, [](bool pressed) {
+#if (__WIN32__ || __WIN64__)
+        if (InputManager::getInstance()->isKeyPressed(KeyCode::KEY_LEFT_ALT))
+        {
+            return;
+        }
+#endif
         if (pressed)
         {
             Preference::setForceOpenGLOnMac(!Preference::getForceOpenGLOnMac());

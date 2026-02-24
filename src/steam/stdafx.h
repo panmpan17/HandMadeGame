@@ -73,10 +73,10 @@ typedef unsigned __int32 uint32;
 typedef __int64 int64;
 typedef unsigned __int64 uint64;
 
-#include "steam/isteamuserstats.h"
-#include "steam/isteamremotestorage.h"
-#include "steam/isteammatchmaking.h"
-#include "steam/steam_gameserver.h"
+#include "isteamuserstats.h"
+#include "isteamremotestorage.h"
+#include "isteammatchmaking.h"
+#include "steam_gameserver.h"
 
 #elif defined(POSIX)
 
@@ -176,11 +176,11 @@ typedef unsigned char uint8;
 	((DWORD)(( (((((color))&0xff))<<24)|(((((color>>24))&0xff))<<16)|(((color>>16)&0xff)<<8)|((color)>>8)&0xff)))
 
 // steam api header file
-#include "steam/steam_api.h"
-#include "steam/isteamuserstats.h"
-#include "steam/isteamremotestorage.h"
-#include "steam/isteammatchmaking.h"
-#include "steam/steam_gameserver.h"
+#include "steam_api.h"
+#include "isteamuserstats.h"
+#include "isteamremotestorage.h"
+#include "isteammatchmaking.h"
+#include "steam_gameserver.h"
 
 extern void OutputDebugString( const char *pchMsg );
 extern int Alert( const char *lpCaption, const char *lpText );
