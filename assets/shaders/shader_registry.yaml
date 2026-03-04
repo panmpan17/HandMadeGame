@@ -165,3 +165,11 @@
   vertex: assets/shaders/2d/text.vert
   fragment: assets/shaders/2d/text.frag
   transparency: 1
+24:
+  name: sprite_9slice
+  vertex: assets/shaders/2d/simple_image.vert
+  fragment: assets/shaders/2d/simple_image.frag
+  # metal_prefix: image
+  # metal_attribute_size: 2,2
+  # metal_attribute_pack: 1
+  # transparency: 1

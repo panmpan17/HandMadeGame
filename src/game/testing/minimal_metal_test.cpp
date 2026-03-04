@@ -6,6 +6,7 @@
 #include "../../engine/core/math/random.h"
 #include "../../engine/components/render/triangle.h"
 #include "../../engine/components/render/quad.h"
+#include "../../engine/components/render/sprite_9slice.h"
 #include "../../engine/components/render/sprite.h"
 #include "../../engine/components/render/sprite_animation.h"
 #include "../../engine/components/render/character2d.h"
@@ -171,13 +172,29 @@ void fontTest()
     }
 }
 
+void sprite9SliceTest()
+{
+    WorldScene* const pWorldScene = WorldScene::current;
+
+    {
+        Image* pTestImage = ImageLoader::getInstance()->getImageByPath("assets/images/test_9slice.png");
+        Node* pSprite9SliceNode = new Node(0.f, 0.f, 0.f);
+        Sprite9Slice* pSprite9Slice = new Sprite9Slice(pTestImage, 10.f, 2.f, 100.f, { 20.f, 20.f, 20.f, 20.f });
+        pSprite9Slice->setShader(ShaderLoader::getInstance()->getShader("sprite_9slice"));
+        pSprite9Slice->registerBuffer();
+        pSprite9SliceNode->addComponent(pSprite9Slice);
+        pWorldScene->addNode(pSprite9SliceNode);
+    }
+}
+
 void fullTest()
 {
-    addTestSkybox();
+    // addTestSkybox();
     // firstTriangeTest();
     // addQuadImage();
     // addSpriteAnimation();
     // addParticles();
-    add3DBox();
-    fontTest();
+    // add3DBox();
+    // fontTest();
+    sprite9SliceTest();
 }
