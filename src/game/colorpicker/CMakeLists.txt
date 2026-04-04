@@ -1,0 +1,4 @@
+list(APPEND SOURCES
+    ${CMAKE_CURRENT_LIST_DIR}/picker.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/picker.h
+)

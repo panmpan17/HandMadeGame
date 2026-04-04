@@ -1,0 +1,2 @@
+void fullTest();
+void fontTest();

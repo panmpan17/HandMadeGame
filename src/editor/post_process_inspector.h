@@ -13,7 +13,7 @@ public:
     PostProcessInspector();
     ~PostProcessInspector();
 
-    void update(float fDeltaTime) override;
+    void update() override;
     void updateRenderProcessQueue(IRenderProcess* pProcess);
 
 private:

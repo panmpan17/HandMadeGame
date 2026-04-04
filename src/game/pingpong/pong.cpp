@@ -2,13 +2,13 @@
 #include <iostream>
 #include "pong.h"
 #include "paddle_control.h"
-#include "../../node.h"
-#include "../../components/quad.h"
-#include "../../draw/shader_loader.h"
-#include "../../physics/aabb.h"
-#include "../../random.h"
-#include "../../components/particle/particle_system.h"
-#include "../../components/particle/particle_spawn.h"
+#include "../../engine/render/shader_loader.h"
+#include "../../engine/physics/aabb.h"
+#include "../../engine/core/math/random.h"
+#include "../../engine/core/scene/node.h"
+#include "../../engine/components/render/quad.h"
+#include "../../engine/components/particle/particle_system.h"
+#include "../../engine/components/particle/particle_spawn.h"
 
 
 Pong::Pong(const Box& oBox, PaddleControl* pPaddleControlLeft, PaddleControl* pPaddleControlRight, float fStartSpeed, float fMaxSpeed) :
@@ -50,7 +50,7 @@ void Pong::start()
     m_pTestParticle->setParticleLifetime(.8f, 1);
     m_pTestParticle->setParticleStartVelocity(.8, 1);
     m_pTestParticle->setParticleStartScale(0.2f, 0.25f);
-    m_pTestParticle->setGravity({ 0, -0.6f });
+    m_pTestParticle->setGravity(0, -0.6f, 0);
     m_pTestParticle->stop();
 
     m_pNode->addComponent(m_pTestParticle);

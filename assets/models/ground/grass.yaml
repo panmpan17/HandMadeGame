@@ -1,0 +1,4 @@
+shader: 3d_lit_default
+textures:
+  u_tex0: assets/models/ground/grass_albedo.jpg
+  u_tex2: assets/models/ground/grass_normal.jpg

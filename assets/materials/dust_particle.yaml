@@ -1,0 +1,4 @@
+shader: particle_instance_billboard
+transparent: 1
+textures:
+  u_tex0: assets/images/dust_1.png

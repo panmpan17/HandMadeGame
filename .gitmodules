@@ -1,6 +1,15 @@
 [submodule "imgui"]
-	path = imgui
+	path = external/imgui
 	url = https://github.com/ocornut/imgui.git
 [submodule "external/soloud"]
 	path = external/soloud
 	url = https://github.com/panmpan17/soloud.git
+[submodule "external/glfw"]
+	path = external/glfw
+	url = https://github.com/glfw/glfw.git
+[submodule "external/assimp"]
+	path = external/assimp
+	url = https://github.com/assimp/assimp.git
+[submodule "external/freetype"]
+	path = external/freetype
+	url = https://github.com/freetype/freetype.git

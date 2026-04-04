@@ -1,8 +1,9 @@
 #pragma once
 
-#include "../../components/component.h"
-#include "../../vector.h"
-#include "../../physics/box.h"
+#include <linmath.h>
+#include "../../engine/components/component.h"
+#include "../../engine/core/math/vector.h"
+#include "../../engine/physics/box.h"
 
 class PaddleControl;
 
@@ -17,7 +18,7 @@ enum class PongState
 class ParticleSystem;
 class Quad;
 
-class Pong : public Component
+class Pong : public NodeComponent
 {
 public:
     Pong(const Box& oBox, PaddleControl* pPaddleControlLeft, PaddleControl* pPaddleControlRight, float fStartSpeed, float fMaxSpeed);
@@ -30,7 +31,6 @@ public:
 
     void start();
     void update(float fDeltaTime) override;
-    void draw() override {}
 
     Box getBox() const;
 

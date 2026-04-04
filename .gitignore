@@ -1,12 +1,17 @@
 glfw-build/
 glfw-3.4/
-*.dylib
-*.dll
 *.a
 * APP
 *.app
+*.metallib
 output/
 .DS_Store
 build/
 cmake-build/
 *.ini
+__pycache__/
+xcode_proj/
+player_preferences.cfg
+crash_log.log
+utilites/outputs/
+.cache/

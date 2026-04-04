@@ -1,0 +1,50 @@
+#pragma once
+
+#include <string_view>
+#include <vector>
+#include "../../utils/expandable_array.h"
+
+
+class Shader;
+class ShaderUniformHandle;
+class Image;
+
+
+struct TextureUniform
+{
+    const ShaderUniformHandle* pUniformHandle = nullptr;
+    int nTextureUnitIndex = -1;
+    Image* pImage = nullptr;
+};
+
+
+class Material
+{
+public:
+    Material(Shader* pShader) : m_pShader(pShader) {}
+    ~Material() {}
+
+    inline Shader* getShader() const { return m_pShader; }
+
+    void bindTextureWithImage(std::string_view strUniformName, Image* pImage);
+
+    void useShader() const;
+
+    int sendTexturesData() const;
+
+    void syncTo(const Material* const pOtherMaterial);
+
+    void setTransparent(bool bTransparent) { m_bTransparent = bTransparent; }
+    bool getIsTransparent() const { return m_bTransparent; }
+
+    Image* getImageByUniformName(const std::string& strUniformName) const;
+    Image* getImageByUniformName(std::string_view strUniformName) const;
+    
+private:
+    Shader* m_pShader = nullptr;
+    bool m_bTransparent = false;
+
+    std::vector<TextureUniform> m_vecTextureUniforms;
+
+    void initShader(Shader* const pShader);
+};

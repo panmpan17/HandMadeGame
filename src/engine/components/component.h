@@ -1,0 +1,49 @@
+#pragma once
+
+#include <typeinfo>
+#include "../core/serialization/iserializable.h"
+#include "../core/serialization/type_registry.h"
+
+
+class Node;
+
+
+class NodeComponent : public ISerializable
+{
+public:
+    virtual ~NodeComponent() = default;
+
+    virtual bool isIDrawable() const = 0;
+
+    virtual bool isUpdatable() const = 0;
+
+    virtual void setNode(Node* pNode) { m_pNode = pNode; }
+    virtual Node* getNode() const { return m_pNode; }
+
+    virtual void onStart() {}
+
+    virtual void update(float deltaTime) = 0;
+
+    virtual NodeComponent* clone() const { return nullptr; };
+
+    virtual std::string getTypeName() const { return typeid(*this).name(); };
+
+    void serializedTo(DataSerializer& serializer) const override;
+    virtual bool deserializeField(DataDeserializer& deserializer, std::string_view strFieldName, std::string_view strFieldValue) override;
+    virtual void onNodeFinishedDeserialization() {}
+
+    virtual void onInspectorUI(int nComponentIndex) {};
+    virtual void onDrawGizmos(bool bIsSelected) {};
+
+protected:
+    Node* m_pNode = nullptr;
+
+    virtual void serializeToWrapper(DataSerializer& serializer) const {};
+};
+
+
+#define COMPONENT_REGISTER_SERIALIZABLE(T)public:\
+    inline std::string getTypeName() const override { return #T; }\
+    virtual bool deserializeField(DataDeserializer& deserializer, std::string_view strFieldName, std::string_view strFieldValue) override;\
+protected:\
+    virtual void serializeToWrapper(DataSerializer& serializer) const override;

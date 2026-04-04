@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../../components/component.h"
-#include "../../physics/box.h"
+#include "../../engine/components/component.h"
+#include "../../engine/physics/box.h"
 
 enum class PaddleControlType
 {
@@ -11,7 +11,7 @@ enum class PaddleControlType
 };
 
 // class PaddleControl
-class PaddleControl : public Component
+class PaddleControl : public NodeComponent
 {
 public:
     PaddleControl(const Box& oBox, PaddleControlType eControlType, float fMaxSpeed = 5.0f);
@@ -24,7 +24,6 @@ public:
 
     void start();
     void update(float deltaTime) override;
-    void draw() override {}
 
     Box getBox() const;
 

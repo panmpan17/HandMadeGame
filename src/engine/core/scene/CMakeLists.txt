@@ -1,0 +1,6 @@
+list(APPEND SOURCES
+    ${CMAKE_CURRENT_LIST_DIR}/node.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/node.h
+    ${CMAKE_CURRENT_LIST_DIR}/world.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/world.h
+)

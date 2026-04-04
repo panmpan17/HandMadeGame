@@ -1,0 +1,123 @@
+#pragma once
+
+#include "light_data.h"
+
+#include <linmath.h>
+#include "../../../utils/expandable_array.h"
+
+#if __APPLE__
+#include <Metal/Metal.hpp>
+#endif
+
+typedef unsigned int GLuint;
+class PointLightComponent;
+class DirectionLightComponent;
+
+
+constexpr int MAX_DIRECTION_LIGHTS = 4;
+constexpr int MAX_POINT_LIGHTS = 8;
+
+
+class LightManager
+{
+public:
+    static constexpr int SHADOW_MAP_WIDTH = 2048;
+    static constexpr int SHADOW_MAP_HEIGHT = 2048;
+
+    inline static LightManager* getInstance() { return ins; }
+
+    static void Initialize();
+    static void Cleanup() { delete ins; ins = nullptr; }
+
+    inline GLuint getLightingUBO() const { return m_nLightingUBO; }
+
+#if __APPLE__
+    inline MTL::Buffer* getLightingMetalBuffer() const { return m_pLightingBuffer; }
+#endif
+
+    void updateLightingUBO();
+
+    inline const vec3& getAmbientLightColor() const { return m_colorAmbientLight; }
+    inline void setAmbientLightColor(const vec3& color) { vec3_dup(m_colorAmbientLight, color); m_bUBODirty = true; }
+
+    inline void registerPointLightComponent(PointLightComponent* pPointLightComp)
+    {
+        m_arrPointLightsComponents.addElement(pPointLightComp);
+        ++m_nNumPointLights;
+        m_bUBODirty = true;
+    }
+
+    inline void unregisterPointLightComponent(PointLightComponent* pPointLightComp)
+    {
+        int nIndex = m_arrPointLightsComponents.getElementIndex(pPointLightComp);
+        if (nIndex != -1)
+        {
+            m_arrPointLightsComponents.removeElement(nIndex);
+            m_bUBODirty = true;
+            --m_nNumPointLights;
+        }
+    }
+
+    inline void registerDirectionLightComponent(DirectionLightComponent* pDirectionLightComp)
+    {
+        m_arrDirectionLightsComponents.addElement(pDirectionLightComp);
+        ++m_nNumDirectionLights;
+        m_bUBODirty = true;
+    }
+
+    inline void unregisterDirectionLightComponent(DirectionLightComponent* pDirectionLightComp)
+    {
+        int nIndex = m_arrDirectionLightsComponents.getElementIndex(pDirectionLightComp);
+        if (nIndex != -1)
+        {
+            m_arrDirectionLightsComponents.removeElement(nIndex);
+            m_bUBODirty = true;
+            --m_nNumDirectionLights;
+        }
+    }
+    inline DirectionLightComponent* getMainDirectionLightComponent()
+    {
+        if (m_nNumDirectionLights > 0)
+        {
+            return m_arrDirectionLightsComponents.getElement(0);
+        }
+        return nullptr;
+    }
+
+    inline GLuint getShadowDepthMapFBO() const { return m_nShadowDepthMapFBO; }
+    inline GLuint getShadowDepthMapTexture() const { return m_nShadowDepthMapTexture; }
+
+#if __APPLE__
+    inline MTL::Texture* getShadowDepthMapTextureMetal() const { return m_pShadowDepthMapTextureMetal; }
+#endif
+
+private:
+    static LightManager* ins;
+
+    LightManager();
+    ~LightManager();
+
+    bool m_bUBODirty = true;
+    GLuint m_nLightingUBO = 0;
+
+#if __APPLE__
+    MTL::Buffer* m_pLightingBuffer = nullptr;
+    MTL::Texture* m_pShadowDepthMapTextureMetal = nullptr;
+#endif
+
+    vec3 m_colorAmbientLight = {0.2f, 0.2f, 0.2f};
+
+    DirectionLightGPUData m_vecDirectionLights[MAX_DIRECTION_LIGHTS];
+    int m_nNumDirectionLights = 0;
+    PointerExpandableArray<DirectionLightComponent*> m_arrDirectionLightsComponents{ MAX_DIRECTION_LIGHTS };
+    
+    PointLightGPUData m_vecPointLights[MAX_POINT_LIGHTS];
+    int m_nNumPointLights = 0;
+    PointerExpandableArray<PointLightComponent*> m_arrPointLightsComponents{ MAX_POINT_LIGHTS };
+
+    GLuint m_nShadowDepthMapFBO = 0;
+    GLuint m_nShadowDepthMapTexture = 0;
+
+    void registerLightingUBO();
+    void registerShadowDepthMap();
+};
