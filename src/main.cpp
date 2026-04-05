@@ -1,6 +1,8 @@
 #include "engine/core/window.h"
 #include "engine/core/error_handler.h"
 #include "engine/core/debug_macro.h"
+#include "engine/core/audio/audio_engine.h"
+#include "engine/core/audio/audio_clip.h"
 
 #include "game/testing/test.h"
 // #include "game/pingpong/game.h"
@@ -14,41 +16,9 @@
 #include "steam/steam_hook.h"
 #endif
 
-#include <soloud.h>
-#include <soloud_wav.h>
-
 
 int main(int nArgumentCount, char* arrArguments[])
 {
-
-    SoLoud::Soloud soloud; // Engine core
-    SoLoud::Wav sample;    // Audio source
-
-    const auto audioInitResult = soloud.init();
-    const bool bAudioInitialized = audioInitResult == SoLoud::SO_NO_ERROR;
-
-    if (!bAudioInitialized)
-    {
-        std::cerr << "Failed to initialize SoLoud: "
-                  << soloud.getErrorString(audioInitResult) << std::endl;
-    }
-    else
-    {
-        const std::string strSoundPath = "/Users/panmichael/Projects/GLFWTest/assets/camera_zoom.wav";
-        const auto loadResult = sample.load(strSoundPath.c_str());
-
-        if (loadResult != SoLoud::SO_NO_ERROR)
-        {
-            std::cerr << "Failed to load sound: "
-                      << soloud.getErrorString(loadResult)
-                      << " (" << strSoundPath << ')' << std::endl;
-        }
-        else
-        {
-            soloud.play(sample);
-        }
-    }
-
 #ifdef INCLUDE_STEAMWORKS
     SteamHook steamHook;
     if (!steamHook.init())
@@ -112,11 +82,6 @@ int main(int nArgumentCount, char* arrArguments[])
 #ifdef INCLUDE_STEAMWORKS
     steamHook.shutdown();
 #endif
-
-    if (bAudioInitialized)
-    {
-        soloud.deinit();
-    }
 
     return 0;
 }
