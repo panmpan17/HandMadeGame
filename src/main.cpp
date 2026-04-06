@@ -1,6 +1,8 @@
 #include "engine/core/window.h"
 #include "engine/core/error_handler.h"
 #include "engine/core/debug_macro.h"
+#include "engine/core/audio/audio_engine.h"
+#include "engine/core/audio/audio_clip.h"
 
 #include "game/testing/test.h"
 // #include "game/pingpong/game.h"
@@ -13,6 +15,7 @@
 #ifdef INCLUDE_STEAMWORKS
 #include "steam/steam_hook.h"
 #endif
+
 
 int main(int nArgumentCount, char* arrArguments[])
 {

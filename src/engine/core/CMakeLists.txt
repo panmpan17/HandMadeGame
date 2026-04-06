@@ -15,6 +15,7 @@ list(APPEND SOURCES
 )
 
 # Include sub-directory CMakeLists
+include(${CMAKE_CURRENT_LIST_DIR}/audio/CMakeLists.txt)
 include(${CMAKE_CURRENT_LIST_DIR}/input/CMakeLists.txt)
 include(${CMAKE_CURRENT_LIST_DIR}/serialization/CMakeLists.txt)
 include(${CMAKE_CURRENT_LIST_DIR}/math/CMakeLists.txt)

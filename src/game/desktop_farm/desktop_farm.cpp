@@ -10,6 +10,7 @@
 #include "../../engine/core/scene/node.h"
 #include "../../engine/core/scene/world.h"
 #include "../../engine/core/math/random.h"
+#include "../../engine/core/audio/audio_engine.h"
 #include "../../engine/components/render/triangle.h"
 #include "../../engine/components/render/quad.h"
 #include "../../engine/components/render/sprite.h"
@@ -80,4 +81,11 @@ void DesktopFarmGame::setupWorldScene()
 
         WorldScene::current->addNode(pPlayer);
     }
+
+
+    if (!m_pStartupAudioClip)
+    {
+        m_pStartupAudioClip = std::make_unique<AudioClip>("assets/camera_zoom.wav");
+    }
+    AudioEngine::getInstance().playOneShotAudio(*m_pStartupAudioClip);
 }

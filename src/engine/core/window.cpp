@@ -24,6 +24,9 @@
 #include "engine_event_dispatcher.h"
 #include "input/input_manager.h"
 #include "scene/world.h"
+#include "audio/audio_engine.h"
+#include "audio/audio_clip.h"
+
 #include "../render/core/renderer.h"
 #include "../render/image_loader.h"
 #include "../render/shader_loader.h"
@@ -35,7 +38,6 @@
 #include "../misc/preference.h"
 #include "../../editor/gizmos.h"
 #include "../../utils/file_watch_dog.h"
-
 
 
 inline constexpr std::string_view PROFILER_TAG_WINDOW_INITIALIZATION = "WindowInitialization";
@@ -312,6 +314,10 @@ void Window::setupManagers()
     PROFILER_END_TIMER("Initialization", "Shader setup");
     MaterialLoader::Initialize();
     PROFILER_END_TIMER("Initialization", "Material setup");
+
+    AudioEngine& audioEngine = AudioEngine::getInstance();
+    PROFILER_END_TIMER("Initialization", "Audio Engine Initialization");
+
 
     setupInputManager();
     PROFILER_END_TIMER("Initialization", "Input manager");

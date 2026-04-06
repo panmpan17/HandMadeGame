@@ -1,6 +1,9 @@
 [submodule "imgui"]
 	path = external/imgui
 	url = https://github.com/ocornut/imgui.git
+[submodule "external/soloud"]
+	path = external/soloud
+	url = https://github.com/panmpan17/soloud.git
 [submodule "external/glfw"]
 	path = external/glfw
 	url = https://github.com/glfw/glfw.git

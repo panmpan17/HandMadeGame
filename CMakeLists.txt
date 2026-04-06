@@ -140,7 +140,10 @@ else()
     )
 endif()
 
-target_include_directories(MichaelHandMadeGame PRIVATE ${CMAKE_SOURCE_DIR}/include)
+target_include_directories(MichaelHandMadeGame PRIVATE
+    ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}/external/soloud/include
+)
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     target_compile_definitions(MichaelHandMadeGame PRIVATE DEBUG_FLAG=1)
@@ -240,6 +243,14 @@ if (ON)
 endif()
 
 
+if (APPLE)
+    set(SOLOUD_BACKEND_COREAUDIO ON CACHE BOOL "" FORCE)
+    set(SOLOUD_BACKEND_NULL OFF CACHE BOOL "" FORCE)
+endif()
+
+add_subdirectory(external/soloud/contrib)
+
+
 # Platform-specific settings
 if (APPLE)
     # Add mac specific frameworks
@@ -293,6 +304,6 @@ if (INCLUDE_STEAM)
     target_compile_definitions(MichaelHandMadeGame PRIVATE INCLUDE_STEAMWORKS)
 endif()
 
-target_link_libraries(MichaelHandMadeGame PRIVATE glfw freetype )
+target_link_libraries(MichaelHandMadeGame PRIVATE glfw freetype soloud)
 target_link_libraries(imgui PRIVATE glfw)
 
