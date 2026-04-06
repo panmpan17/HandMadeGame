@@ -7,7 +7,7 @@ namespace SoLoud { class Wav; };
 class AudioClip
 {
 public:
-    AudioClip(const std::string& strFilePath);
+    AudioClip(const std::string& strFilePath, bool bLogAudioInfo = false);
     ~AudioClip();
 
     SoLoud::Wav& getAudioSource() { return *m_pAudioClip; }

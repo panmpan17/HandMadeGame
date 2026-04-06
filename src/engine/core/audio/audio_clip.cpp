@@ -1,5 +1,6 @@
 #include "audio_clip.h"
 
+#include "../debug_macro.h"
 #include "../../../utils/file_utils.h"
 
 #include <filesystem>
@@ -8,7 +9,7 @@
 #include <soloud_wav.h>
 
 
-AudioClip::AudioClip(const std::string& strFilePath)
+AudioClip::AudioClip(const std::string& strFilePath, bool bLogAudioInfo/* = false*/)
 {
     m_pAudioClip = new SoLoud::Wav();
 
@@ -25,6 +26,17 @@ AudioClip::AudioClip(const std::string& strFilePath)
     {
         std::cerr << "Failed to load audio clip: " << loadResult
                   << " (" << strResolvedPath << ')' << std::endl;
+        return;
+    }
+
+    if (bLogAudioInfo)
+    {
+         LOGLN("Length: {}, Sample count: {}, Base sample rate: {}, Channels: {}, Loop point: {}",
+              m_pAudioClip->getLength(),
+              m_pAudioClip->mSampleCount,
+              m_pAudioClip->mBaseSamplerate,
+              m_pAudioClip->mChannels,
+              m_pAudioClip->getLoopPoint());
     }
 }
 

@@ -4,7 +4,7 @@
 #include "audio_clip.h"
 
 
-namespace SoLoud { class Soloud; };
+namespace SoLoud { class Soloud; typedef unsigned int handle; typedef double time; };
 
 
 class AudioEngine
@@ -22,7 +22,7 @@ public:
     AudioEngine(const AudioEngine&) = delete;
     AudioEngine& operator=(const AudioEngine&) = delete;
 
-    void playOneShotAudio(AudioClip& audioClip);
+    SoLoud::handle playOneShotAudio(AudioClip& audioClip, float fVolume = -1.0f, float fPan = 0.0f);
 
 private:
     SoLoud::Soloud* m_pSoloudEngine = nullptr; // Engine core

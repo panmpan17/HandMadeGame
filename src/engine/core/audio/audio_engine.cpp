@@ -35,20 +35,19 @@ AudioEngine::~AudioEngine()
     m_pSoloudEngine = nullptr;
 }
 
-void AudioEngine::playOneShotAudio(AudioClip& audioClip)
+SoLoud::handle AudioEngine::playOneShotAudio(AudioClip& audioClip, float fVolume/* = -1.0f*/, float fPan/* = 0.0f*/)
 {
     if (!m_bAudioInitialized)
     {
         std::cerr << "Audio engine is not initialized. Cannot play audio." << std::endl;
-        return;
+        return 0;
     }
 
     if (!audioClip.isLoaded())
     {
         std::cerr << "Audio clip is not loaded. Cannot play audio." << std::endl;
-        return;
+        return 0;
     }
 
-    std::cout << "Playing audio clip..." << std::endl;
-    m_pSoloudEngine->play(audioClip.getAudioSource());
+    return m_pSoloudEngine->play(audioClip.getAudioSource(), fVolume, fPan);
 }
