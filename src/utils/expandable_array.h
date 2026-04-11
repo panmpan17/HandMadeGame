@@ -10,6 +10,10 @@
 #include <cstring>
 #endif
 
+#if IS_PLATFORM_LINUX
+#include <algorithm>
+#endif
+
 
 class MemoryAllocateException : public std::exception {
 public:

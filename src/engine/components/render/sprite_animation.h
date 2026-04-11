@@ -7,7 +7,7 @@
 #include "../../../utils/expandable_array.h"
 #include "../../../utils/platform.h"
 
-#if IS_PLATFORM_MACOS
+#if IS_PLATFORM_MACOS || IS_PLATFORM_LINUX
 #define USHORT ushort
 #elif IS_PLATFORM_WINDOWS
 #include <windows.h>

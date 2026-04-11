@@ -57,6 +57,14 @@ std::string FileUtils::getExecutablePath()
     ssize_t count = readlink("/proc/self/exe", path, sizeof(path));
     return std::string(path, (count > 0) ? count : 0);
 }
+
+std::string FileUtils::getResourcesPath()
+{
+    char path[4096];
+    ssize_t count = readlink("/proc/self/exe", path, sizeof(path));
+    std::string strFullPath = fs::path(std::string(path, (count > 0) ? count : 0)).parent_path().string();
+    return strFullPath;
+}
 #elif IS_PLATFORM_WINDOWS
 std::string FileUtils::getExecutablePath()
 {
@@ -117,11 +125,15 @@ void FileReader::read(std::string_view strPath)
         if (fs::exists(strPath))
 #elif IS_PLATFORM_WINDOWS
         if (fs::exists(strPath.data()))
+#elif IS_PLATFORM_LINUX
+        if (fs::exists(strPath))
 #endif
         {
 #if IS_PLATFORM_MACOS
             file.open(strPath);
 #elif IS_PLATFORM_WINDOWS
+            file.open(strPath.data());
+#elif IS_PLATFORM_LINUX
             file.open(strPath.data());
 #endif
         }

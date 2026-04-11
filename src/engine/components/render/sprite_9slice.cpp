@@ -4,6 +4,7 @@
 
 #include "../../core/camera.h"
 #include "../../core/scene/node.h"
+#include "../../core/debug_macro.h"
 #include "../../render/image.h"
 #include "../../render/shader_loader.h"
 #include "../../render/core/renderer.h"

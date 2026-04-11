@@ -40,6 +40,7 @@ $ git clone --recurse-submodules https://github.com/panmpan17/HandMadeGame.git
 ```
 
 #### macOS Build
+
 Requirements:
 * CMake 3.16
 * clang
@@ -64,6 +65,15 @@ Without make
 $ cmake -S . -B ${BUILD_DIR} -DBUILD_APP=ON -DCMAKE_BUILD_TYPE=Release
 $ cmake --build ${BUILD_DIR} --parallel <cpu count>
 ```
+
+#### Ubuntu Build
+
+Requirements:
+* CMake 3.16
+* g++ (Or other compiler)
+* [GLFW Compile](https://www.glfw.org/docs/latest/compile.html)
+  * Wayland
+  * X11
 
 <!-- Future Work -->
 

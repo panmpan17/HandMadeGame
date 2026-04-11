@@ -3,8 +3,13 @@ cmake_minimum_required(VERSION 3.16)
 project(MichaelHandMadeGame
         VERSION 0.1
         DESCRIPTION "GLFW Test"
-        LANGUAGES C CXX OBJCXX
+        LANGUAGES C CXX
 )
+
+
+if (APPLE)
+    enable_language(OBJCXX)
+endif()
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -123,7 +128,7 @@ if (APPLE)
         -Wmacro-redefined
         -Wno-delete-abstract-non-virtual-dtor
     )
-else()
+elseif(WIN32)
     enable_language(RC)
     
     add_executable(MichaelHandMadeGame
@@ -138,6 +143,14 @@ else()
         -Wbuiltin-macro-redefined
         # -w
     )
+elseif(UNIX)
+    add_executable(MichaelHandMadeGame
+                   ${SOURCES})
+    
+    set(EXECUTABLE_PATH ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+    set(ASSET_BUILD_TARGET_FOLDER ${EXECUTABLE_PATH}/assets)
+
+
 endif()
 
 target_include_directories(MichaelHandMadeGame PRIVATE
@@ -276,7 +289,6 @@ if (APPLE)
 elseif (WIN32)
     target_link_options(MichaelHandMadeGame PRIVATE -mwindows)
 elseif(UNIX)
-
 endif()
 
 
