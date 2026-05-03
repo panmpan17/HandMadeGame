@@ -3,6 +3,7 @@
 #include <linmath.h>
 
 #include "../drawable_interface.h"
+#include "../../render/gl_macro.h"
 // #include "../../render/shader.h"
 // #include "../../render/vertex.h"
 #include "../../core/math/color.h"
@@ -16,8 +17,6 @@
 
 class Shader;
 class Image;
-
-typedef unsigned int GLuint;
 
 struct Slice9
 {
@@ -34,7 +33,6 @@ public:
     Sprite9Slice(Image* pImage, float fWidth, float fHeight, float fPixelPerUnit, const Slice9& slice, int nPixelPerUnit = 100);
     ~Sprite9Slice();
 
-    void registerBuffer();
     void draw() override;
     
     // Not allow setting shader for 9-slice sprite, as it uses a specific shader for 9-slice rendering
@@ -42,6 +40,15 @@ public:
     inline void setImage(Image* pImage) { m_pImage = pImage; }
 
     bool getIsTransparent() const override { return true; }
+
+    float getWidth() const { return m_fWidth; }
+    float getHeight() const { return m_fHeight; }
+    void setSize(float fWidth, float fHeight)
+    {
+        m_fWidth = fWidth;
+        m_fHeight = fHeight;
+        m_bBufferDirty = true;
+    }
 
 private:
     // Color m_color;
@@ -53,8 +60,11 @@ private:
     const ShaderUniformHandle* m_pTextureHandle = nullptr;
     const ShaderUniformHandle* m_pSliceDataHandle = nullptr;
 
-    GLuint m_nVertexBuffer;
-    GLuint m_nVertexArray;
+    GLuint m_nVertexBuffer = GL_INVALID_INDEX;
+    GLuint m_nVertexArray = GL_INVALID_INDEX;
+    bool m_bBufferDirty = true;
 
     float m_fWidth, m_fHeight, m_fPixelPerUnit;
+
+    void registerBuffer();
 };

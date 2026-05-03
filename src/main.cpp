@@ -38,7 +38,8 @@ int main(int nArgumentCount, char* arrArguments[])
 
     registerSignalHandlers();
     // ColorPicker colorPicker;
-    DesktopFarmGame desktopFarmGame;
+    DesktopFarmGame* desktopFarmGame = nullptr;
+    // desktopFarmGame = new DesktopFarmGame();
 
     do
     {
@@ -46,7 +47,10 @@ int main(int nArgumentCount, char* arrArguments[])
         window.setResizable(true);
         // window.setTransparentBackground(true);
         // colorPicker.preconfigureWindowObject(&window);
-        desktopFarmGame.preconfigureWindowObject(&window);
+        if (desktopFarmGame)
+        {
+            desktopFarmGame->preconfigureWindowObject(&window);
+        }
         if (!window.configureAndCreateWindow())
         {
             return -1; // Initialization failed
@@ -67,8 +71,11 @@ int main(int nArgumentCount, char* arrArguments[])
         // colorPicker.pickerMain();
         // serializationTest();
         // firstTriangeTest();
-        // fullTest();
-        desktopFarmGame.setupWorldScene();
+        fullTest();
+        if (desktopFarmGame)
+        {
+            desktopFarmGame->setupWorldScene();
+        }
         PROFILER_END_TIMER("World", "Init");
 
         window.mainLoop();

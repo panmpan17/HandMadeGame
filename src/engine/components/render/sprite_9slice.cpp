@@ -13,6 +13,10 @@
 Sprite9Slice::Sprite9Slice(Image* pImage, float fWidth, float fHeight, float fPixelPerUnit, const Slice9& slice, int nPixelPerUnit)
     : m_pImage(pImage), m_fWidth(fWidth), m_fHeight(fHeight), m_fPixelPerUnit(fPixelPerUnit), m_slice(slice)
 {
+    m_pShader = ShaderLoader::getInstance()->getShader("sprite_9slice");
+
+    m_pMVPHandle = m_pShader->getUniformHandle(SHADER_UNIFORM_MVP);
+    m_pTextureHandle = m_pShader->getUniformHandle(SHADER_UNIFORM_TEXTURE_0);
 }
 
 Sprite9Slice::~Sprite9Slice()
@@ -26,11 +30,6 @@ Sprite9Slice::~Sprite9Slice()
 
 void Sprite9Slice::registerBuffer()
 {
-    m_pShader = ShaderLoader::getInstance()->getShader("sprite_9slice");
-
-    m_pMVPHandle = m_pShader->getUniformHandle(SHADER_UNIFORM_MVP);
-    m_pTextureHandle = m_pShader->getUniformHandle(SHADER_UNIFORM_TEXTURE_0);
-
     const float fLeftEdgePercentage = m_slice.fPixelOnLeftEdge / m_pImage->getWidth();
     const float fRightEdgePercentage = 1 - (m_slice.fPixelOnRightEdge / m_pImage->getWidth());
     const float fBottomEdgePercentage = m_slice.fPixelOnBottomEdge / m_pImage->getHeight();
@@ -87,7 +86,10 @@ void Sprite9Slice::registerBuffer()
 
     if (Renderer::isUsingOpenGL())
     {
-        glGenBuffers(1, &m_nVertexBuffer);
+        if (m_nVertexBuffer == GL_INVALID_INDEX)
+        {
+            glGenBuffers(1, &m_nVertexBuffer);
+        }
         glBindBuffer(GL_ARRAY_BUFFER, m_nVertexBuffer);
 
         glBufferData(GL_ARRAY_BUFFER, sizeof(vecVertices), vecVertices, GL_STATIC_DRAW);
@@ -95,15 +97,18 @@ void Sprite9Slice::registerBuffer()
         GLuint nVPosAttr = m_pShader->getAttributeLocation("a_vPos");
         GLuint nVUVAttr = m_pShader->getAttributeLocation("a_vUV");
 
-        glGenVertexArrays(1, &m_nVertexArray);
-        glBindVertexArray(m_nVertexArray);
-        glEnableVertexAttribArray(nVPosAttr);
-        glVertexAttribPointer(nVPosAttr, 2, GL_FLOAT, GL_FALSE, sizeof(VertexWUV), (void*)offsetof(VertexWUV, pos));
-        glEnableVertexAttribArray(nVUVAttr);
-        glVertexAttribPointer(nVUVAttr, 2, GL_FLOAT, GL_FALSE, sizeof(VertexWUV), (void*)offsetof(VertexWUV, uv));
+        if (m_nVertexArray == GL_INVALID_INDEX)
+        {
+            glGenVertexArrays(1, &m_nVertexArray);
+            glBindVertexArray(m_nVertexArray);
+            glEnableVertexAttribArray(nVPosAttr);
+            glVertexAttribPointer(nVPosAttr, 2, GL_FLOAT, GL_FALSE, sizeof(VertexWUV), (void*)offsetof(VertexWUV, pos));
+            glEnableVertexAttribArray(nVUVAttr);
+            glVertexAttribPointer(nVUVAttr, 2, GL_FLOAT, GL_FALSE, sizeof(VertexWUV), (void*)offsetof(VertexWUV, uv));
+            glBindVertexArray(0);
+        }
 
         // Unbind
-        glBindVertexArray(0);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
 }
@@ -111,6 +116,12 @@ void Sprite9Slice::registerBuffer()
 void Sprite9Slice::draw()
 {
     ASSERT(m_pShader, "Shader must be set before drawing the quad");
+
+    if (m_bBufferDirty)
+    {
+        registerBuffer();
+        m_bBufferDirty = false;
+    }
 
     mat4x4 mvp;
     const mat4x4& matModel = m_pNode->getWorldMatrix();

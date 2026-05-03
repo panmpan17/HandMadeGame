@@ -181,7 +181,7 @@ void sprite9SliceTest()
         Node* pSprite9SliceNode = new Node(0.f, 0.f, 0.f);
         Sprite9Slice* pSprite9Slice = new Sprite9Slice(pTestImage, 10.f, 2.f, 100.f, { 20.f, 20.f, 20.f, 20.f });
         pSprite9Slice->setShader(ShaderLoader::getInstance()->getShader("sprite_9slice"));
-        pSprite9Slice->registerBuffer();
+        // pSprite9Slice->registerBuffer();
         pSprite9SliceNode->addComponent(pSprite9Slice);
         pWorldScene->addNode(pSprite9SliceNode);
     }

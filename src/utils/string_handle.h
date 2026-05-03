@@ -23,14 +23,14 @@ static std::vector<std::string> splitString(const std::string& strData, char chr
             continue;
         }
 
-        vet.push_back(strData.substr(nBegin, nEnd - nBegin).c_str());
+        vet.emplace_back(strData, nBegin, nEnd - nBegin);
         nBegin = nEnd + 1;
         nEnd = (int)strData.find(chr, nBegin);
     }
 
     if (!bSkipEmpty || !strData.substr(nBegin, strData.length() - nBegin).empty())
     {
-        vet.push_back(strData.substr(nBegin, strData.length() - nBegin));
+        vet.emplace_back(strData, nBegin, strData.length() - nBegin);
     }
     return vet;
 }
@@ -55,14 +55,14 @@ static std::vector<std::string> splitString(const std::string& strData, const ch
             continue;
         }
 
-        vet.push_back(strData.substr(nBegin, nEnd - nBegin).c_str());
+        vet.emplace_back(strData, nBegin, nEnd - nBegin);
         nBegin = nEnd + 1;
         nEnd = (int)strData.find(chr, nBegin);
     }
 
     if (!strData.substr(nBegin, strData.length() - nBegin).empty())
     {
-        vet.push_back(strData.substr(nBegin, strData.length() - nBegin));
+        vet.emplace_back(strData, nBegin, strData.length() - nBegin);
     }
     return vet;
 }
@@ -86,14 +86,14 @@ static void splitStringPush(std::vector<std::string>& vec, const std::string& st
             continue;
         }
 
-        vec.push_back(strData.substr(nBegin, nEnd - nBegin).c_str());
+        vec.emplace_back(strData, nBegin, nEnd - nBegin);
         nBegin = nEnd + 1;
         nEnd = (int)strData.find(chr, nBegin);
     }
 
     if (!bSkipEmpty || !strData.substr(nBegin, strData.length() - nBegin).empty())
     {
-        vec.push_back(strData.substr(nBegin, strData.length() - nBegin));
+        vec.emplace_back(strData, nBegin, strData.length() - nBegin);
     }
     return;
 }

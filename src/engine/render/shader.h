@@ -2,9 +2,7 @@
 
 #include <string>
 #include <linmath.h>
-
-typedef unsigned int GLuint;
-#define GL_INVALID_INDEX 0xFFFFFFFF
+#include "gl_macro.h"
 
 inline constexpr std::string_view SHADER_UNIFORM_TEXTURE_0 = "u_tex0";
 inline constexpr std::string_view SHADER_UNIFORM_TEXTURE_1 = "u_tex1";

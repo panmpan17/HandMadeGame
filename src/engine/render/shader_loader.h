@@ -5,8 +5,7 @@
 #include <string>
 #include "../../utils/file_watch_dog.h"
 #include "shader.h"
-
-#define GL_INVALID_INDEX 0xFFFFFFFF
+#include "gl_macro.h"
 
 struct ShaderRegisteryData
 {
