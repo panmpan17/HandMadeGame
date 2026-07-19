@@ -1,4 +1,4 @@
-.PHONY: config-debug compile-debug compile ccquick quick clean build
+.PHONY: config-debug compile-debug compile run run-dev clean build
 
 BUILD_DIR := cmake-build
 OUTPUT_NAME := MichaelHandMadeGame
@@ -23,7 +23,7 @@ config-debug:
 compile-debug:
 	cmake --build ${BUILD_DIR} --parallel 8
 
-ccquick: config-debug compile-debug
+run: config-debug compile-debug
 	@echo "Running Debug Build...\n"
 	@echo "Executable Command: $(EXECUTABLE_COMMAND)\n"
 	@if ($(EXECUTABLE_COMMAND)); then \
@@ -32,7 +32,7 @@ ccquick: config-debug compile-debug
 		python3 utilites/check_error.py crash_log.log ${BUILD_DIR}/bin; \
 	fi
 
-quick: compile-debug
+run-dev: compile-debug
 	@echo "Running Debug Build...\n"
 	@if ($(EXECUTABLE_COMMAND)); then \
 		echo ""; \
