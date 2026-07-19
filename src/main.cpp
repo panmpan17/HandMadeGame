@@ -39,7 +39,7 @@ int main(int nArgumentCount, char* arrArguments[])
     registerSignalHandlers();
     // ColorPicker colorPicker;
     DesktopFarmGame* desktopFarmGame = nullptr;
-    // desktopFarmGame = new DesktopFarmGame();
+    desktopFarmGame = new DesktopFarmGame();
 
     do
     {

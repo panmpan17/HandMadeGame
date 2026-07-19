@@ -5,6 +5,7 @@
 #include <GLFW/glfw3.h>
 
 #include "farm_animal.h"
+#include "music_player.h"
 
 #include "../../engine/core/window.h"
 #include "../../engine/core/scene/node.h"
@@ -82,10 +83,19 @@ void DesktopFarmGame::setupWorldScene()
         WorldScene::current->addNode(pPlayer);
     }
 
-
-    if (!m_pStartupAudioClip)
     {
-        m_pStartupAudioClip = std::make_unique<AudioClip>("assets/camera_zoom.wav");
+        auto pNode = new Node(0.f, 0.f, 0.f);
+        MusicPlayer* pMusicPlayer = new MusicPlayer();
+
+        auto pMusic1 = std::make_shared<AudioClip>("assets/musics/lofidreams-lofi-jazz-music-485312.mp3");
+        auto pMusic2 = std::make_shared<AudioClip>("assets/musics/idoberg-cozy-lofi-beat-split-memmories-248205.mp3");
+
+        pMusicPlayer->addAudioClip(pMusic1);
+        pMusicPlayer->addAudioClip(pMusic2);
+
+        pMusicPlayer->play();
+
+        pNode->addComponent(pMusicPlayer);
+        WorldScene::current->addNode(pNode);
     }
-    AudioEngine::getInstance().playOneShotAudio(*m_pStartupAudioClip);
 }
