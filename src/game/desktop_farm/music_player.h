@@ -26,6 +26,8 @@ public:
 
     virtual void update(float fDeltaTime) override;
 
+    bool isPlaying() const { return m_bIsPlaying; }
+
 private:
     static constexpr float FADE_DURATION = 1.0f; // Duration for fade in/out in seconds
 

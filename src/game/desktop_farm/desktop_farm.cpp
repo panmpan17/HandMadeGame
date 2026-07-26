@@ -97,5 +97,19 @@ void DesktopFarmGame::setupWorldScene()
 
         pNode->addComponent(pMusicPlayer);
         WorldScene::current->addNode(pNode);
+
+        InputManager::getInstance()->registerKeyPressCallback(KeyCode::KEY_SPACE, [this, pMusicPlayer](bool pressed) {
+            if (pressed)
+            {
+                if (pMusicPlayer->isPlaying())
+                {
+                    pMusicPlayer->pause();
+                }
+                else
+                {
+                    pMusicPlayer->play();
+                }
+            }
+        });
     }
 }
