@@ -1,21 +1,38 @@
 #pragma once
 
+#include <algorithm>
+#include <cstddef>
 #include <vector>
 #include <functional>
 
 struct VoidEvent
 {
-    std::vector<std::function<void()>> listeners;
+    struct Entry
+    {
+        std::size_t id;
+        std::function<void()> fn;
+    };
 
-    void add(std::function<void()> f) { listeners.push_back(f); }
-    // void remove(std::function<void(Args...)> f) 
-    // { 
-    //     listeners.erase(std::remove(listeners.begin(), listeners.end(), f), listeners.end()); 
-    // }
+    std::vector<Entry> listeners;
+    std::size_t nextId = 1;
+
+    std::size_t add(std::function<void()> f)
+    {
+        listeners.push_back({ nextId, std::move(f) });
+        return nextId++;
+    }
+
+    void remove(std::size_t id)
+    {
+        listeners.erase(
+            std::remove_if(listeners.begin(), listeners.end(), [id](const Entry& entry) { return entry.id == id; }),
+            listeners.end());
+    }
+
     void invoke() {
         for (auto& listener : listeners)
         {
-            listener();
+            listener.fn();
         }
     }
 };
@@ -23,17 +40,32 @@ struct VoidEvent
 template<typename... Args>
 struct CustomEvent
 {
-    std::vector<std::function<void(Args...)>> listeners;
+    struct Entry
+    {
+        std::size_t id;
+        std::function<void(Args...)> fn;
+    };
 
-    void add(std::function<void(Args...)> f) { listeners.push_back(f); }
-    // void remove(std::function<void(Args...)> f) 
-    // { 
-    //     listeners.erase(std::remove(listeners.begin(), listeners.end(), f), listeners.end()); 
-    // }
+    std::vector<Entry> listeners;
+    std::size_t nextId = 1;
+
+    std::size_t add(std::function<void(Args...)> f)
+    {
+        listeners.push_back({ nextId, std::move(f) });
+        return nextId++;
+    }
+
+    void remove(std::size_t id)
+    {
+        listeners.erase(
+            std::remove_if(listeners.begin(), listeners.end(), [id](const Entry& entry) { return entry.id == id; }),
+            listeners.end());
+    }
+
     void invoke(Args... args) {
         for (auto& listener : listeners)
         {
-            listener(args...);
+            listener.fn(args...);
         }
     }
 };
