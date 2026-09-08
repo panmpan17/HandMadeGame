@@ -10,6 +10,10 @@
 #include "../../render/core/renderer.h"
 #include "../../render/vertex.h"
 
+
+inline constexpr std::string_view SHADER_UNIFORM_COLOR = "u_imageColor";
+
+
 Sprite9Slice::Sprite9Slice(Image* pImage, float fWidth, float fHeight, float fPixelPerUnit, const Slice9& slice, int nPixelPerUnit)
     : m_pImage(pImage), m_fWidth(fWidth), m_fHeight(fHeight), m_fPixelPerUnit(fPixelPerUnit), m_slice(slice)
 {
@@ -17,6 +21,7 @@ Sprite9Slice::Sprite9Slice(Image* pImage, float fWidth, float fHeight, float fPi
 
     m_pMVPHandle = m_pShader->getUniformHandle(SHADER_UNIFORM_MVP);
     m_pTextureHandle = m_pShader->getUniformHandle(SHADER_UNIFORM_TEXTURE_0);
+    m_pColorHandle = m_pShader->getUniformHandle(SHADER_UNIFORM_COLOR);
 }
 
 Sprite9Slice::~Sprite9Slice()
@@ -141,6 +146,7 @@ void Sprite9Slice::draw()
         if (m_pImage)
         {
             glUniform1i(m_pTextureHandle->m_nLocation, 0); // Texture unit 0
+            glUniform4f(m_pColorHandle->m_nLocation, m_color.r, m_color.g, m_color.b, m_color.a);
 
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, m_pImage->getTextureID());

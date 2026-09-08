@@ -31,26 +31,43 @@ void UIButton::getWorldBounds(Vector3& outTopLeft, Vector3& outBottomRight) cons
 
 void UIButton::onMouseEnter()
 {
-    // Implement mouse enter behavior here
+    m_bMouseHover = true;
+
     if (m_pSprite9Slice)
     {
-        // TODO: Set hover color
-        LOGLN("Mouse entered UIButton");
+        m_pSprite9Slice->setColor(m_bMouseDown ? m_clickColor : m_hoverColor);
     }
 }
 
 void UIButton::onMouseExit()
 {
-    // Implement mouse exit behavior here
+    m_bMouseHover = false;
+
     if (m_pSprite9Slice)
     {
-        // TODO: Reset to normal color
-        LOGLN("Mouse exited UIButton");
+        m_pSprite9Slice->setColor(m_normalColor);
     }
+}
+
+void UIButton::onMouseDown()
+{
+    if (m_pSprite9Slice)
+    {
+        m_pSprite9Slice->setColor(m_clickColor);
+    }
+    m_bMouseDown = true;
+}
+
+void UIButton::onMouseUp()
+{
+    if (m_pSprite9Slice)
+    {
+        m_pSprite9Slice->setColor(m_bMouseHover ? m_hoverColor : m_normalColor);
+    }
+    m_bMouseDown = false;
 }
 
 void UIButton::onMouseClick()
 {
-    // Implement mouse click behavior here
     LOGLN("Mouse clicked UIButton");
 }

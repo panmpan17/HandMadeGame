@@ -41,12 +41,27 @@ void GraphicRaycastController::update(float fDeltaTime)
 
 void GraphicRaycastController::onMouseClickCheck(bool bPressed)
 {
-    if (!bPressed) return;
-
     IGraphicRaycastable* pCurrentHover = getCurrentMouseHoverObject();
-    if (pCurrentHover)
+
+    if (bPressed)
     {
-        pCurrentHover->onMouseClick();
+        if (pCurrentHover)
+        {
+            pCurrentHover->onMouseDown();
+            m_pCurrentMouseDown = pCurrentHover;
+        }
+    }
+    else
+    {
+        if (m_pCurrentMouseDown)
+        {
+            m_pCurrentMouseDown->onMouseUp();
+            if (m_pCurrentMouseDown == pCurrentHover)
+            {
+                m_pCurrentMouseDown->onMouseClick();
+            }
+        }
+        m_pCurrentMouseDown = nullptr;
     }
 }
 

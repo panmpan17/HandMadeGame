@@ -2,6 +2,7 @@
 #include "graphic_raycast_controller.h"
 
 #include "../../core/math/vector.h"
+#include "../../core/math/color.h"
 
 
 class Sprite9Slice;
@@ -22,6 +23,8 @@ public:
 
     virtual void onMouseEnter() override;
     virtual void onMouseExit() override;
+    virtual void onMouseDown() override;
+    virtual void onMouseUp() override;
     virtual void onMouseClick() override;
 
     void setSize(const Vector2& size) { m_size = size; }
@@ -31,10 +34,16 @@ public:
     Sprite9Slice* getSprite9Slice() const { return m_pSprite9Slice; }
 
 private:
-    // Vector2 m_centerOffset;
+    Color m_normalColor = Color(1.0f, 1.0f, 1.0f, 1.0f);
+    Color m_hoverColor = Color(0.9f, 0.9f, 0.9f, 0.9f);
+    Color m_clickColor = Color(0.8f, 0.8f, 0.8f, 0.8f);
+
     Vector2 m_size;
+
+    bool m_bMouseHover = false;
+    bool m_bMouseDown = false;
 
     Sprite9Slice* m_pSprite9Slice = nullptr;
 
-    
+
 };

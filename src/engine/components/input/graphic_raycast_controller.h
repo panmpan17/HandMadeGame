@@ -19,6 +19,9 @@ public:
 
     virtual void onMouseEnter() {}
     virtual void onMouseExit() {}
+
+    virtual void onMouseDown() {}
+    virtual void onMouseUp() {}
     virtual void onMouseClick() {}
     
 private:
@@ -44,6 +47,7 @@ public:
 private:
 std::vector<IGraphicRaycastable*> m_vecRaycastables;
     IGraphicRaycastable* m_pCurrentHover = nullptr;
+    IGraphicRaycastable* m_pCurrentMouseDown = nullptr;
     std::size_t m_nMouseClickCallbackId = 0;
 
 
