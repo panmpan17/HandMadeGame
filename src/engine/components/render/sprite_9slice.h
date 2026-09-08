@@ -50,8 +50,11 @@ public:
         m_bBufferDirty = true;
     }
 
+    void setColor(const Color& color) { m_color = color; }
+    const Color& getColor() const { return m_color; }
+
 private:
-    // Color m_color;
+    Color m_color = Color(1.0f, 1.0f, 1.0f, 1.0f);
     Image* m_pImage = nullptr;
     Shader* m_pShader = nullptr;
     Slice9 m_slice;
@@ -59,6 +62,7 @@ private:
     const ShaderUniformHandle* m_pMVPHandle = nullptr;
     const ShaderUniformHandle* m_pTextureHandle = nullptr;
     const ShaderUniformHandle* m_pSliceDataHandle = nullptr;
+    const ShaderUniformHandle* m_pColorHandle = nullptr;
 
     GLuint m_nVertexBuffer = GL_INVALID_INDEX;
     GLuint m_nVertexArray = GL_INVALID_INDEX;

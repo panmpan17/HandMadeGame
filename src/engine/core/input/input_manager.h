@@ -32,35 +32,44 @@ public:
     static void Initialize();
     static void Cleanup() { delete ins; ins = nullptr; }
 
-    void registerKeyPressCallback(KeyCode key, std::function<void(bool)> callback)
+    std::size_t registerKeyPressCallback(KeyCode key, std::function<void(bool)> callback)
     {
         if (key > KeyCode::KEY_UNKNOWN && key < KeyCode::MAX_KEY_CODE)
         {
-            m_KeyPressEvent[static_cast<int>(key)].add(callback);
+            return m_KeyPressEvent[static_cast<int>(key)].add(callback);
+        }
+        return 0;
+    }
+    void unregisterKeyPressCallback(KeyCode key, std::size_t nCallbackId)
+    {
+        if (key > KeyCode::KEY_UNKNOWN && key < KeyCode::MAX_KEY_CODE)
+        {
+            m_KeyPressEvent[static_cast<int>(key)].remove(nCallbackId);
         }
     }
-    // void unregisterKeyPressCallback(KeyCode key, std::function<void(bool)> callback)
-    // {
-    //     if (key > KeyCode::KEY_UNKNOWN && key < KeyCode::MAX_KEY_CODE)
-    //     {
-    //         m_KeyPressEvent[static_cast<int>(key)].remove(callback);
-    //     }
-    // }
 
-    void registerMouseMoveCallback(std::function<void(float, float)> callback)
+    int registerMouseMoveCallback(std::function<void(float, float)> callback)
     {
-        m_arrMouseMoveEvent.add(callback);
+        return m_arrMouseMoveEvent.add(callback);
     }
-    // void unregisterMouseMoveCallback(std::function<void(float, float)> callback)
-    // {
-    //     m_arrMouseMoveEvent.remove(callback);
-    // }
+    void unregisterMouseMoveCallback(std::size_t nCallbackId)
+    {
+        m_arrMouseMoveEvent.remove(nCallbackId);
+    }
 
-    void registerMouseButtonCallback(MouseButton eButton, std::function<void(bool)> callback)
+    std::size_t registerMouseButtonCallback(MouseButton eButton, std::function<void(bool)> callback)
     {
         if (eButton >= MouseButton::BUTTON_LEFT && eButton < MouseButton::MAX_BUTTONS)
         {
-            m_arrMouseButtonEvent[static_cast<int>(eButton)].add(callback);
+            return m_arrMouseButtonEvent[static_cast<int>(eButton)].add(callback);
+        }
+        return 0;
+    }
+    void unregisterMouseButtonCallback(MouseButton eButton, std::size_t nCallbackId)
+    {
+        if (eButton >= MouseButton::BUTTON_LEFT && eButton < MouseButton::MAX_BUTTONS)
+        {
+            m_arrMouseButtonEvent[static_cast<int>(eButton)].remove(nCallbackId);
         }
     }
 

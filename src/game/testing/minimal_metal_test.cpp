@@ -14,6 +14,8 @@
 #include "../../engine/components/particle/particle_system.h"
 #include "../../engine/components/particle/particle_spawn.h"
 #include "../../engine/components/particle/particle_lifetime_change.h"
+#include "../../engine/components/input/graphic_raycast_controller.h"
+#include "../../engine/components/input/ui_button.h"
 #include "../../engine/render/font/font_loader.h"
 #include "../../engine/render/shader.h"
 #include "../../engine/render/shader_loader.h"
@@ -176,6 +178,11 @@ void sprite9SliceTest()
 {
     WorldScene* const pWorldScene = WorldScene::current;
 
+    Node* pRaycastControllerNode = new Node(0.f, 0.f, 0.f);
+    GraphicRaycastController* pRaycastController = new GraphicRaycastController();
+    pRaycastControllerNode->addComponent(pRaycastController);
+    pWorldScene->addNode(pRaycastControllerNode);
+
     {
         Image* pTestImage = ImageLoader::getInstance()->getImageByPath("assets/images/test_9slice.png");
         Node* pSprite9SliceNode = new Node(0.f, 0.f, 0.f);
@@ -183,6 +190,16 @@ void sprite9SliceTest()
         pSprite9Slice->setShader(ShaderLoader::getInstance()->getShader("sprite_9slice"));
         // pSprite9Slice->registerBuffer();
         pSprite9SliceNode->addComponent(pSprite9Slice);
+
+        UIButton* pButton = new UIButton();
+        pButton->setSprite9Slice(pSprite9Slice);
+        pButton->setSize({ 10.f, 2.f });
+        pSprite9SliceNode->addComponent(pButton);
+        pRaycastController->registerRaycastable(pButton);
+        pButton->registerOnClick([pSprite9SliceNode]() {
+            pSprite9SliceNode->move(0.f, .1f);
+        });
+
         pWorldScene->addNode(pSprite9SliceNode);
     }
 }
