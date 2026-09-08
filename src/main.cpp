@@ -71,7 +71,7 @@ int main(int nArgumentCount, char* arrArguments[])
         // colorPicker.pickerMain();
         // serializationTest();
         // firstTriangeTest();
-        fullTest();
+        // fullTest();
         if (desktopFarmGame)
         {
             desktopFarmGame->setupWorldScene();

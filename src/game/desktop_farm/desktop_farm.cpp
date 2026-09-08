@@ -21,6 +21,8 @@
 #include "../../engine/components/particle/particle_system.h"
 #include "../../engine/components/particle/particle_spawn.h"
 #include "../../engine/components/particle/particle_lifetime_change.h"
+#include "../../engine/components/render/sprite_9slice.h"
+#include "../../engine/components/input/ui_button.h"
 #include "../../engine/render/font/font_loader.h"
 #include "../../engine/render/shader.h"
 #include "../../engine/render/shader_loader.h"
@@ -30,7 +32,6 @@
 #include "../../engine/components/transform/rotate.h"
 #include "../../engine/components/transform/movement.h"
 #include "../../engine/render/material_loader.h"
-
 
 #if VSCODE_ONLY
 void glfwGetMonitorWorkarea(GLFWmonitor* monitor, int* xpos, int* ypos, int* width, int* height);
@@ -85,31 +86,64 @@ void DesktopFarmGame::setupWorldScene()
 
     {
         auto pNode = new Node(0.f, 0.f, 0.f);
-        MusicPlayer* pMusicPlayer = new MusicPlayer();
+        m_pMusicPlayer = new MusicPlayer();
 
         auto pMusic1 = std::make_shared<AudioClip>("assets/musics/lofidreams-lofi-jazz-music-485312.mp3");
         auto pMusic2 = std::make_shared<AudioClip>("assets/musics/idoberg-cozy-lofi-beat-split-memmories-248205.mp3");
 
-        pMusicPlayer->addAudioClip(pMusic1);
-        pMusicPlayer->addAudioClip(pMusic2);
+        m_pMusicPlayer->addAudioClip(pMusic1);
+        m_pMusicPlayer->addAudioClip(pMusic2);
 
-        pMusicPlayer->play();
+        m_pMusicPlayer->play();
 
-        pNode->addComponent(pMusicPlayer);
+        pNode->addComponent(m_pMusicPlayer);
         WorldScene::current->addNode(pNode);
 
-        InputManager::getInstance()->registerKeyPressCallback(KeyCode::KEY_SPACE, [this, pMusicPlayer](bool pressed) {
-            if (pressed)
+        // InputManager::getInstance()->registerKeyPressCallback(KeyCode::KEY_SPACE, [this, m_pMusicPlayer](bool pressed) {
+        //     if (pressed)
+        //     {
+        //         if (m_pMusicPlayer->isPlaying())
+        //         {
+        //             m_pMusicPlayer->pause();
+        //         }
+        //         else
+        //         {
+        //             m_pMusicPlayer->play();
+        //         }
+        //     }
+        // });
+    }
+
+
+    Node* pRaycastControllerNode = new Node(0.f, 0.f, 0.f);
+    GraphicRaycastController* pRaycastController = new GraphicRaycastController();
+    pRaycastControllerNode->addComponent(pRaycastController);
+    WorldScene::current->addNode(pRaycastControllerNode);
+
+    {
+        Image* pTestImage = ImageLoader::getInstance()->getImageByPath("assets/images/test_9slice.png");
+        Node* pSprite9SliceNode = new Node(0.f, 0.f, 0.f);
+        Sprite9Slice* pSprite9Slice = new Sprite9Slice(pTestImage, 2.f, 2.f, 100.f, { 20.f, 20.f, 20.f, 20.f });
+        pSprite9Slice->setShader(ShaderLoader::getInstance()->getShader("sprite_9slice"));
+        // pSprite9Slice->registerBuffer();
+        pSprite9SliceNode->addComponent(pSprite9Slice);
+
+        UIButton* pButton = new UIButton();
+        pButton->setSprite9Slice(pSprite9Slice);
+        pButton->setSize({ 10.f, 2.f });
+        pSprite9SliceNode->addComponent(pButton);
+        pRaycastController->registerRaycastable(pButton);
+        pButton->registerOnClick([this]() {
+            if (m_pMusicPlayer->isPlaying())
             {
-                if (pMusicPlayer->isPlaying())
-                {
-                    pMusicPlayer->pause();
-                }
-                else
-                {
-                    pMusicPlayer->play();
-                }
+                m_pMusicPlayer->pause();
+            }
+            else
+            {
+                m_pMusicPlayer->play();
             }
         });
+
+        WorldScene::current->addNode(pSprite9SliceNode);
     }
 }

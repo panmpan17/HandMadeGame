@@ -4,6 +4,7 @@
 
 class Window;
 class AudioClip;
+class MusicPlayer;
 
 class DesktopFarmGame
 {
@@ -17,4 +18,6 @@ private:
     static inline DesktopFarmGame* ins = nullptr;
 
     Window* m_pWindow = nullptr;
+
+    MusicPlayer* m_pMusicPlayer = nullptr;
 };
