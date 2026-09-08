@@ -25,6 +25,7 @@ void UIButton::getWorldBounds(Vector3& outTopLeft, Vector3& outBottomRight) cons
     Node* pNode = getNode();
     const Vector3& center = pNode->getPosition();
 
+    // TODO: I tested button moving when clicked in minimal_metal_test.cpp, but the bounding box is weird, check it out
     outTopLeft = pNode->transformPoint(Vector3(center.x - m_size.x / 2.0f, center.y + m_size.y / 2.0f, center.z));
     outBottomRight = pNode->transformPoint(Vector3(center.x + m_size.x / 2.0f, center.y - m_size.y / 2.0f, center.z));
 }
@@ -69,5 +70,5 @@ void UIButton::onMouseUp()
 
 void UIButton::onMouseClick()
 {
-    LOGLN("Mouse clicked UIButton");
+    m_onClick.invoke();
 }

@@ -1,6 +1,7 @@
 #include "../component.h"
 #include "graphic_raycast_controller.h"
 
+#include "../../core/input/event.h"
 #include "../../core/math/vector.h"
 #include "../../core/math/color.h"
 
@@ -33,6 +34,9 @@ public:
     void setSprite9Slice(Sprite9Slice* pSprite9Slice) { m_pSprite9Slice = pSprite9Slice; }
     Sprite9Slice* getSprite9Slice() const { return m_pSprite9Slice; }
 
+    std::size_t registerOnClick(const std::function<void()>& listener) { return m_onClick.add(listener); }
+    void unregisterOnClick(std::size_t nHandle) { m_onClick.remove(nHandle); }
+
 private:
     Color m_normalColor = Color(1.0f, 1.0f, 1.0f, 1.0f);
     Color m_hoverColor = Color(0.9f, 0.9f, 0.9f, 0.9f);
@@ -45,5 +49,5 @@ private:
 
     Sprite9Slice* m_pSprite9Slice = nullptr;
 
-
+    VoidEvent m_onClick;
 };

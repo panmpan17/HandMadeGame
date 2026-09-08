@@ -196,6 +196,9 @@ void sprite9SliceTest()
         pButton->setSize({ 10.f, 2.f });
         pSprite9SliceNode->addComponent(pButton);
         pRaycastController->registerRaycastable(pButton);
+        pButton->registerOnClick([pSprite9SliceNode]() {
+            pSprite9SliceNode->move(0.f, .1f);
+        });
 
         pWorldScene->addNode(pSprite9SliceNode);
     }
