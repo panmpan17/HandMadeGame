@@ -23,11 +23,17 @@ void UIButton::update(float fDeltaTime)
 void UIButton::getWorldBounds(Vector3& outTopLeft, Vector3& outBottomRight) const
 {
     Node* pNode = getNode();
-    const Vector3& center = pNode->getPosition();
-
-    // TODO: I tested button moving when clicked in minimal_metal_test.cpp, but the bounding box is weird, check it out
-    outTopLeft = pNode->transformPoint(Vector3(center.x - m_size.x / 2.0f, center.y + m_size.y / 2.0f, center.z));
-    outBottomRight = pNode->transformPoint(Vector3(center.x + m_size.x / 2.0f, center.y - m_size.y / 2.0f, center.z));
+    if (m_pSprite9Slice) {
+        float fWidth = m_pSprite9Slice->getWidth();
+        float fHeight = m_pSprite9Slice->getHeight();
+        outTopLeft = pNode->transformPoint(Vector3(-fWidth / 2.0f, fHeight / 2.0f, 0));
+        outBottomRight = pNode->transformPoint(Vector3(fWidth / 2.0f, -fHeight / 2.0f, 0));
+    }
+    else
+    {
+        outTopLeft = pNode->getPositionInWorld();
+        outBottomRight = pNode->getPositionInWorld();
+    }
 }
 
 void UIButton::onMouseEnter()
