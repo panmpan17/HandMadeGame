@@ -28,9 +28,6 @@ public:
     virtual void onMouseUp() override;
     virtual void onMouseClick() override;
 
-    void setSize(const Vector2& size) { m_size = size; }
-    const Vector2& getSize() const { return m_size; }
-
     void setSprite9Slice(Sprite9Slice* pSprite9Slice) { m_pSprite9Slice = pSprite9Slice; }
     Sprite9Slice* getSprite9Slice() const { return m_pSprite9Slice; }
 
@@ -41,8 +38,6 @@ private:
     Color m_normalColor = Color(1.0f, 1.0f, 1.0f, 1.0f);
     Color m_hoverColor = Color(0.9f, 0.9f, 0.9f, 0.9f);
     Color m_clickColor = Color(0.8f, 0.8f, 0.8f, 0.8f);
-
-    Vector2 m_size;
 
     bool m_bMouseHover = false;
     bool m_bMouseDown = false;
