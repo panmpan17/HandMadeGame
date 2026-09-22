@@ -130,7 +130,6 @@ void DesktopFarmGame::setupWorldScene()
 
         UIButton* pButton = new UIButton();
         pButton->setSprite9Slice(pSprite9Slice);
-        pButton->setSize({ 10.f, 2.f });
         pSprite9SliceNode->addComponent(pButton);
         pRaycastController->registerRaycastable(pButton);
         pButton->registerOnClick([this]() {
