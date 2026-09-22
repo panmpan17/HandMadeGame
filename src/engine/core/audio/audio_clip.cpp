@@ -45,3 +45,8 @@ AudioClip::~AudioClip()
     delete m_pAudioClip;
     m_pAudioClip = nullptr;
 }
+
+float AudioClip::getLength() const
+{
+    return m_pAudioClip ? m_pAudioClip->getLength() : 0.0f;
+}

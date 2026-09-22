@@ -9,7 +9,8 @@
 #include <soloud_wav.h>
 
 
-#define CHECK_AUDIO_ENGINE_INITIALIZED() if (!m_bAudioInitialized) { LOGERR("Audio engine not initialized."); return; }
+#define CHECK_AUDIO_ENGINE_INITIALIZED() if (!m_bAudioInitialized) { LOGERR("Audio engine not initialized."); return; } if (handle == 0) { LOGERR("Invalid audio handle."); return; }
+#define CHECK_AUDIO_ENGINE_INITIALIZED(X) if (!m_bAudioInitialized) { LOGERR("Audio engine not initialized."); return X; } if (handle == 0) { LOGERR("Invalid audio handle."); return X; }
 
 
 AudioEngine::AudioEngine()
@@ -67,6 +68,12 @@ void AudioEngine::setPause(SoLoud::handle handle, bool bPause)
     m_pSoloudEngine->setPause(handle, bPause);
 }
 
+bool AudioEngine::getIsPaused(SoLoud::handle handle)
+{
+    CHECK_AUDIO_ENGINE_INITIALIZED(false);
+    return m_pSoloudEngine->getPause(handle);
+}
+
 void AudioEngine::setVolume(SoLoud::handle handle, float fVolume)
 {
     CHECK_AUDIO_ENGINE_INITIALIZED();
@@ -103,16 +110,12 @@ void AudioEngine::schedulePause(SoLoud::handle handle, float fDelay)
 
 bool AudioEngine::isValidVoiceHandle(SoLoud::handle handle)
 {
-    if (!m_bAudioInitialized)
-    {
-        return false;
-    }
-
-    // Check if the voice handle is valid
-    if (handle == 0)
-    {
-        return false;
-    }
-
+    CHECK_AUDIO_ENGINE_INITIALIZED(false);
     return m_pSoloudEngine->isValidVoiceHandle(handle);
+}
+
+float AudioEngine::getStreamTime(SoLoud::handle handle)
+{
+    CHECK_AUDIO_ENGINE_INITIALIZED(0.0f);
+    return m_pSoloudEngine->getStreamTime(handle);
 }

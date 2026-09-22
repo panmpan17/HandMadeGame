@@ -33,12 +33,16 @@ public:
 
     void setLoopPoint(SoLoud::handle handle, float loopPoint);
     void setPause(SoLoud::handle handle, bool bPause);
+    bool getIsPaused(SoLoud::handle handle);
     void setVolume(SoLoud::handle handle, float fVolume);
     void fadeVolume(SoLoud::handle handle, float fTargetVolume, float fFadeTime, bool bStopOnFadeOut = false);
     void stop(SoLoud::handle handle);
     void scheduleStop(SoLoud::handle handle, float fDelay);
     void schedulePause(SoLoud::handle handle, float fDelay);
     bool isValidVoiceHandle(SoLoud::handle handle);
+
+    float getStreamTime(SoLoud::handle handle);
+    float getClipLength(SoLoud::handle handle);
 
 private:
     SoLoud::Soloud* m_pSoloudEngine = nullptr; // Engine core
