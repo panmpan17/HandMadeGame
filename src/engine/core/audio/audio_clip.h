@@ -15,6 +15,8 @@ public:
 
     bool isLoaded() const { return m_bLoaded; }
 
+    float getLength() const;
+
 private:
     SoLoud::Wav* m_pAudioClip = nullptr;
     bool m_bLoaded = false;
