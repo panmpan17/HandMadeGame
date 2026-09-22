@@ -42,6 +42,20 @@ void Sprite9Slice::registerBuffer()
 
     float fVerticesX[4] = { -m_fWidth / 2.0f, -m_fWidth / 2.0f + m_slice.fPixelOnLeftEdge / m_fPixelPerUnit, m_fWidth / 2.0f - m_slice.fPixelOnRightEdge / m_fPixelPerUnit, m_fWidth / 2.0f };
     float fVerticesY[4] = { -m_fHeight / 2.0f, -m_fHeight / 2.0f + m_slice.fPixelOnBottomEdge / m_fPixelPerUnit, m_fHeight / 2.0f - m_slice.fPixelOnTopEdge / m_fPixelPerUnit, m_fHeight / 2.0f };
+
+    if (fVerticesX[2] < fVerticesX[1])
+    {
+        float fMiddleX = (fVerticesX[1] + fVerticesX[2]) / 2.0f;
+        fVerticesX[1] = fMiddleX;
+        fVerticesX[2] = fMiddleX;
+    }
+    if (fVerticesY[2] < fVerticesY[1])
+    {
+        float fMiddleY = (fVerticesY[1] + fVerticesY[2]) / 2.0f;
+        fVerticesY[1] = fMiddleY;
+        fVerticesY[2] = fMiddleY;
+    }
+
     float fUVsX[4] = { 0.0f, fLeftEdgePercentage, fRightEdgePercentage, 1.0f };
     float fUVsY[4] = { 0.0f, fBottomEdgePercentage, fTopEdgePercentage, 1.0f };
 
