@@ -82,11 +82,39 @@ void MusicPlayer::stop(bool bFadeOut/* = true */)
     }
 }
 
+void MusicPlayer::nextTrack()
+{
+    AudioEngine& audioEngine = AudioEngine::getInstance();
+    audioEngine.stop(m_nCurrentClipHandle);
+
+    m_nCurrentClipIndex = (m_nCurrentClipIndex + 1) % m_audioClips.size();
+    std::shared_ptr<AudioClip> nextClip = m_audioClips[m_nCurrentClipIndex];
+
+    m_nCurrentClipHandle = audioEngine.playOneShotAudio(*nextClip, 1.0f);
+    if (m_bIsPlaying)
+    {
+        audioEngine.fadeVolume(m_nCurrentClipHandle, m_fVolume, FADE_DURATION);
+    }
+    else
+    {
+        audioEngine.setVolume(m_nCurrentClipHandle, 0.0f);
+        audioEngine.setPause(m_nCurrentClipHandle, true);
+    }
+
+    float fFullLength = m_audioClips[m_nCurrentClipIndex]->getLength();
+    m_onProgressUpdate.invoke(0, fFullLength);
+}
+
 void MusicPlayer::update(float fDeltaTime)
 {
-    if (!m_bIsPlaying) { return; }
+    // if (!m_bIsPlaying) { return; }
 
     AudioEngine& audioEngine = AudioEngine::getInstance();
+    if (audioEngine.getIsPaused(m_nCurrentClipHandle))
+    {
+        return;
+    }
+
     if (!audioEngine.isValidVoiceHandle(m_nCurrentClipHandle))
     {
         // Current clip has finished playing, move to the next clip
@@ -96,5 +124,14 @@ void MusicPlayer::update(float fDeltaTime)
         // Play the next clip
         m_nCurrentClipHandle = audioEngine.playOneShotAudio(*nextClip, 1.0f);
         audioEngine.fadeVolume(m_nCurrentClipHandle, m_fVolume, FADE_DURATION);
+
+        float fFullLength = m_audioClips[m_nCurrentClipIndex]->getLength();
+        m_onProgressUpdate.invoke(0, fFullLength);
+    }
+    else
+    {
+        float fCurrentTime = audioEngine.getStreamTime(m_nCurrentClipHandle);
+        float fFullLength = m_audioClips[m_nCurrentClipIndex]->getLength();
+        m_onProgressUpdate.invoke(fCurrentTime, fFullLength);
     }
 }

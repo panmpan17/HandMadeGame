@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "../../engine/components/component.h"
+#include "../../engine/core/input/event.h"
 
 
 class AudioClip;
@@ -21,12 +22,19 @@ public:
     void pause(bool bFadeOut = true);
     void stop(bool bFadeOut = true);
 
+    void nextTrack();
+
     virtual inline bool isIDrawable() const override { return false; }
     virtual inline bool isUpdatable() const override { return true; }
 
     virtual void update(float fDeltaTime) override;
 
     bool isPlaying() const { return m_bIsPlaying; }
+    
+    void addOnProgressUpdateCallback(const std::function<void(float, float)>& callback)
+    {
+        m_onProgressUpdate.add(callback);
+    }
 
 private:
     static constexpr float FADE_DURATION = 1.0f; // Duration for fade in/out in seconds
@@ -37,4 +45,6 @@ private:
     int m_nCurrentClipIndex = 0;
     int m_nCurrentClipHandle = -1;
     bool m_bIsPlaying = false;
+
+    CustomEvent<float, float> m_onProgressUpdate;
 };

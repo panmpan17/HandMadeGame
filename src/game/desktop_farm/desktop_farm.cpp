@@ -120,12 +120,13 @@ void DesktopFarmGame::setupWorldScene()
     pRaycastControllerNode->addComponent(pRaycastController);
     WorldScene::current->addNode(pRaycastControllerNode);
 
+    Image* pSliceImage = ImageLoader::getInstance()->getImageByPath("assets/images/test_9slice.png");
+    Shader* pShader = ShaderLoader::getInstance()->getShader("sprite_9slice");
+
     {
-        Image* pTestImage = ImageLoader::getInstance()->getImageByPath("assets/images/test_9slice.png");
         Node* pSprite9SliceNode = new Node(0.f, 0.f, 0.f);
-        Sprite9Slice* pSprite9Slice = new Sprite9Slice(pTestImage, 2.f, 2.f, 100.f, { 20.f, 20.f, 20.f, 20.f });
-        pSprite9Slice->setShader(ShaderLoader::getInstance()->getShader("sprite_9slice"));
-        // pSprite9Slice->registerBuffer();
+        Sprite9Slice* pSprite9Slice = new Sprite9Slice(pSliceImage, 2.f, 2.f, 100.f, { 20.f, 20.f, 20.f, 20.f });
+        pSprite9Slice->setShader(pShader);
         pSprite9SliceNode->addComponent(pSprite9Slice);
 
         UIButton* pButton = new UIButton();
@@ -144,5 +145,44 @@ void DesktopFarmGame::setupWorldScene()
         });
 
         WorldScene::current->addNode(pSprite9SliceNode);
+    }
+
+    {
+        Node* pSprite9SliceNode = new Node(4.f, 0.f, 0.f);
+        Sprite9Slice* pSprite9Slice = new Sprite9Slice(pSliceImage, 1.f, 1.f, 100.f, { 20.f, 20.f, 20.f, 20.f });
+        pSprite9Slice->setShader(pShader);
+        pSprite9SliceNode->addComponent(pSprite9Slice);
+
+        UIButton* pButton = new UIButton();
+        pButton->setSprite9Slice(pSprite9Slice);
+        pSprite9SliceNode->addComponent(pButton);
+        pRaycastController->registerRaycastable(pButton);
+        pButton->registerOnClick([this]() {
+            m_pMusicPlayer->nextTrack();
+        });
+
+        WorldScene::current->addNode(pSprite9SliceNode);
+    }
+
+    {
+        Node* pFullLength = new Node(0.f, -1.5f, 0.f);
+        Sprite9Slice* pSprite9Slice = new Sprite9Slice(pSliceImage, 10.f, .5f, 100.f, { 20.f, 20.f, 20.f, 20.f });
+        pSprite9Slice->setShader(pShader);
+        pSprite9Slice->setColor({ .5f, .5f, .5f, 1.f });
+        pFullLength->addComponent(pSprite9Slice);
+        WorldScene::current->addNode(pFullLength);
+
+        Node* pProgress = new Node(-5.f, -1.5f, 0.f);
+        Sprite9Slice* pSprite9Slice2 = new Sprite9Slice(pSliceImage, 10.f, .5f, 100.f, { 20.f, 20.f, 20.f, 20.f });
+        pSprite9Slice2->setShader(pShader);
+        pProgress->addComponent(pSprite9Slice2);
+        WorldScene::current->addNode(pProgress);
+
+        m_pMusicPlayer->addOnProgressUpdateCallback([this, pProgress, pSprite9Slice2](float fCurrentTime, float fFullLength) {
+            float fProgress = fFullLength > 0.f ? fCurrentTime / fFullLength : 0.f;
+            pSprite9Slice2->setSize(10.f * fProgress, .5f);
+
+            pProgress->setPosition(LERP(-5, 5, fProgress / 2), -1.5f, 0.f);
+        });
     }
 }
