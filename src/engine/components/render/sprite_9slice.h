@@ -26,6 +26,14 @@ struct Slice9
     float fPixelOnBottomEdge = 1;
 };
 
+enum Sprite9Slice_SizeCompensateMode
+{
+    NONE = 0,
+    MIDDLE = 1,
+    EDGE1 = 2,
+    EDGE2 = 3,
+};
+
 class Sprite9Slice : public IDrawable
 {
 public:
@@ -53,6 +61,11 @@ public:
     void setColor(const Color& color) { m_color = color; }
     const Color& getColor() const { return m_color; }
 
+    void setWidthCompensateMode(Sprite9Slice_SizeCompensateMode eMode) { m_eWidthCompensateMode = eMode; m_bBufferDirty = true; }
+    void setHeightCompensateMode(Sprite9Slice_SizeCompensateMode eMode) { m_eHeightCompensateMode = eMode; m_bBufferDirty = true; }
+    Sprite9Slice_SizeCompensateMode getWidthCompensateMode() const { return m_eWidthCompensateMode; }
+    Sprite9Slice_SizeCompensateMode getHeightCompensateMode() const { return m_eHeightCompensateMode; }
+
 private:
     Color m_color = Color(1.0f, 1.0f, 1.0f, 1.0f);
     Image* m_pImage = nullptr;
@@ -69,6 +82,9 @@ private:
     bool m_bBufferDirty = true;
 
     float m_fWidth, m_fHeight, m_fPixelPerUnit;
+
+    Sprite9Slice_SizeCompensateMode m_eWidthCompensateMode = Sprite9Slice_SizeCompensateMode::MIDDLE;
+    Sprite9Slice_SizeCompensateMode m_eHeightCompensateMode = Sprite9Slice_SizeCompensateMode::MIDDLE;
 
     void registerBuffer();
 };

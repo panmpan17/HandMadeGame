@@ -33,6 +33,53 @@ Sprite9Slice::~Sprite9Slice()
     }
 }
 
+#define COMPENSATE_LENGTH(eMode, fVertices, fUVs, fSize, fEdge1, fEdge2)\
+{\
+    switch (eMode)\
+    {\
+    case Sprite9Slice_SizeCompensateMode::NONE:\
+        break;\
+    case Sprite9Slice_SizeCompensateMode::MIDDLE:\
+        if (fVertices[2] < fVertices[1])\
+        {\
+            float fMiddle = (fVertices[1] + fVertices[2]) / 2.0f;\
+            fVertices[1] = fMiddle;\
+            fVertices[2] = fMiddle;\
+        }\
+        break;\
+    case Sprite9Slice_SizeCompensateMode::EDGE1:\
+        if (fSize < (fEdge1 / m_fPixelPerUnit + fEdge2 / m_fPixelPerUnit))\
+        {\
+            if (fSize < fEdge1 / m_fPixelPerUnit)\
+            {\
+                fVertices[1] = fVertices[2] = fVertices[0] + fSize;\
+                fUVs[1] = fSize * m_fPixelPerUnit / m_pImage->getWidth(); \
+            }\
+            else\
+            {\
+                fVertices[2] = fVertices[1];\
+            }\
+        }\
+        break;\
+    case Sprite9Slice_SizeCompensateMode::EDGE2:\
+        if (fSize < (fEdge1 / m_fPixelPerUnit + fEdge2 / m_fPixelPerUnit))\
+        {\
+            if (fSize < fEdge2 / m_fPixelPerUnit)\
+            {\
+                fVertices[1] = fVertices[2] = fVertices[3] - fSize;\
+                fUVs[2] = 1.0f - fSize * m_fPixelPerUnit / m_pImage->getWidth(); \
+            }\
+            else\
+            {\
+                fVertices[1] = fVertices[2];\
+            }\
+        }\
+        break;\
+    default:\
+        break;\
+    }\
+}
+
 void Sprite9Slice::registerBuffer()
 {
     const float fLeftEdgePercentage = m_slice.fPixelOnLeftEdge / m_pImage->getWidth();
@@ -43,21 +90,12 @@ void Sprite9Slice::registerBuffer()
     float fVerticesX[4] = { -m_fWidth / 2.0f, -m_fWidth / 2.0f + m_slice.fPixelOnLeftEdge / m_fPixelPerUnit, m_fWidth / 2.0f - m_slice.fPixelOnRightEdge / m_fPixelPerUnit, m_fWidth / 2.0f };
     float fVerticesY[4] = { -m_fHeight / 2.0f, -m_fHeight / 2.0f + m_slice.fPixelOnBottomEdge / m_fPixelPerUnit, m_fHeight / 2.0f - m_slice.fPixelOnTopEdge / m_fPixelPerUnit, m_fHeight / 2.0f };
 
-    if (fVerticesX[2] < fVerticesX[1])
-    {
-        float fMiddleX = (fVerticesX[1] + fVerticesX[2]) / 2.0f;
-        fVerticesX[1] = fMiddleX;
-        fVerticesX[2] = fMiddleX;
-    }
-    if (fVerticesY[2] < fVerticesY[1])
-    {
-        float fMiddleY = (fVerticesY[1] + fVerticesY[2]) / 2.0f;
-        fVerticesY[1] = fMiddleY;
-        fVerticesY[2] = fMiddleY;
-    }
-
     float fUVsX[4] = { 0.0f, fLeftEdgePercentage, fRightEdgePercentage, 1.0f };
     float fUVsY[4] = { 0.0f, fBottomEdgePercentage, fTopEdgePercentage, 1.0f };
+
+    COMPENSATE_LENGTH(m_eWidthCompensateMode, fVerticesX, fUVsX, m_fWidth, m_slice.fPixelOnLeftEdge, m_slice.fPixelOnRightEdge);
+    COMPENSATE_LENGTH(m_eHeightCompensateMode, fVerticesY, fUVsY, m_fHeight, m_slice.fPixelOnBottomEdge, m_slice.fPixelOnTopEdge);
+
 
     VertexWUV arrVertices[16];
     int nIndex = 0;
