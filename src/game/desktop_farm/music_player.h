@@ -17,6 +17,7 @@ public:
     ~MusicPlayer();
 
     void addAudioClip(const std::shared_ptr<AudioClip>& audioClip);
+    std::shared_ptr<AudioClip> getCurrentAudioClip() const { return m_nCurrentClipIndex >= 0 && m_nCurrentClipIndex < static_cast<int>(m_audioClips.size()) ? m_audioClips[m_nCurrentClipIndex] : nullptr; }
 
     void play();
     void pause(bool bFadeOut = true);
@@ -31,10 +32,8 @@ public:
 
     bool isPlaying() const { return m_bIsPlaying; }
     
-    void addOnProgressUpdateCallback(const std::function<void(float, float)>& callback)
-    {
-        m_onProgressUpdate.add(callback);
-    }
+    void addOnProgressUpdateCallback(const std::function<void(float, float)>& callback) { m_onProgressUpdate.add(callback); }
+    void addOnSongChangeCallback(const std::function<void()>& callback) { m_onSongChange.add(callback); }
 
 private:
     static constexpr float FADE_DURATION = 1.0f; // Duration for fade in/out in seconds
@@ -47,4 +46,5 @@ private:
     bool m_bIsPlaying = false;
 
     CustomEvent<float, float> m_onProgressUpdate;
+    VoidEvent m_onSongChange;
 };

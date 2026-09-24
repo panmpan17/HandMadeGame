@@ -96,6 +96,9 @@ void DesktopFarmGame::setupWorldScene()
 
         m_pMusicPlayer->play();
 
+        m_pMusicPlayer->addOnSongChangeCallback(std::bind(&DesktopFarmGame::onSongChange, this));
+        m_pMusicPlayer->addOnProgressUpdateCallback(std::bind(&DesktopFarmGame::onSongProgressUpdate, this, std::placeholders::_1, std::placeholders::_2));
+
         pNode->addComponent(m_pMusicPlayer);
         WorldScene::current->addNode(pNode);
 
@@ -172,17 +175,45 @@ void DesktopFarmGame::setupWorldScene()
         pFullLength->addComponent(pSprite9Slice);
         WorldScene::current->addNode(pFullLength);
 
-        Node* pProgress = new Node(-5.f, -1.5f, 0.f);
-        Sprite9Slice* pSprite9Slice2 = new Sprite9Slice(pSliceImage, 10.f, .5f, 100.f, { 20.f, 20.f, 20.f, 20.f });
-        pSprite9Slice2->setShader(pShader);
-        pProgress->addComponent(pSprite9Slice2);
-        WorldScene::current->addNode(pProgress);
-
-        m_pMusicPlayer->addOnProgressUpdateCallback([this, pProgress, pSprite9Slice2](float fCurrentTime, float fFullLength) {
-            float fProgress = fFullLength > 0.f ? fCurrentTime / fFullLength : 0.f;
-            pSprite9Slice2->setSize(10.f * fProgress, .5f);
-
-            pProgress->setPosition(LERP(-5, 5, fProgress / 2), -1.5f, 0.f);
-        });
+        m_pProgressBarNode = new Node(-5.f, -1.5f, 0.f);
+        m_pProgressBarSprite = new Sprite9Slice(pSliceImage, 10.f, .5f, 100.f, { 20.f, 20.f, 20.f, 20.f });
+        m_pProgressBarSprite->setWidthCompensateMode(Sprite9Slice_SizeCompensateMode::EDGE1);
+        m_pProgressBarSprite->setShader(pShader);
+        m_pProgressBarNode->addComponent(m_pProgressBarSprite);
+        WorldScene::current->addNode(m_pProgressBarNode);
     }
+
+    {
+        Node* pTextNode = new Node(0.f, -1.f, 0.f);
+
+        Font* pFont = FontLoader::getInstance()->getFont("assets/fonts/Arial Unicode.ttf");
+
+        Shader* pTextShader = ShaderLoader::getInstance()->getShader("text");
+        m_pSongNameText = new TextRenderer(pFont);
+        onSongChange();
+        m_pSongNameText->setShader(pTextShader);
+
+        pTextNode->addComponent(m_pSongNameText);
+        WorldScene::current->addNode(pTextNode);
+    }
+}
+
+void DesktopFarmGame::onSongChange()
+{
+    std::shared_ptr<AudioClip> pCurrentAudioClip = m_pMusicPlayer->getCurrentAudioClip();
+    if (!pCurrentAudioClip)
+    {
+        m_pSongNameText->setText(u"Not Playing");
+        return;
+    }
+    std::string strFileName = pCurrentAudioClip->getFileName();
+    m_pSongNameText->setText(strFileName);
+}
+
+void DesktopFarmGame::onSongProgressUpdate(float fCurrentTime, float fFullLength)
+{
+    float fProgress = fFullLength > 0.f ? fCurrentTime / fFullLength : 0.f;
+    m_pProgressBarSprite->setSize(10.f * fProgress, .5f);
+
+    m_pProgressBarNode->setPosition(LERP(-5, 5, fProgress / 2), -1.5f, 0.f);
 }

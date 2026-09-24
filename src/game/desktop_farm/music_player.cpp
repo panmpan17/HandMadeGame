@@ -103,6 +103,7 @@ void MusicPlayer::nextTrack()
 
     float fFullLength = m_audioClips[m_nCurrentClipIndex]->getLength();
     m_onProgressUpdate.invoke(0, fFullLength);
+    m_onSongChange.invoke();
 }
 
 void MusicPlayer::update(float fDeltaTime)
@@ -127,6 +128,7 @@ void MusicPlayer::update(float fDeltaTime)
 
         float fFullLength = m_audioClips[m_nCurrentClipIndex]->getLength();
         m_onProgressUpdate.invoke(0, fFullLength);
+        m_onSongChange.invoke();
     }
     else
     {

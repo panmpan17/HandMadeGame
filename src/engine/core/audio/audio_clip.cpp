@@ -10,6 +10,7 @@
 
 
 AudioClip::AudioClip(const std::string& strFilePath, bool bLogAudioInfo/* = false*/)
+    : m_strFilePath(strFilePath)
 {
     m_pAudioClip = new SoLoud::Wav();
 

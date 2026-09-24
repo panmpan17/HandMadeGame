@@ -34,6 +34,7 @@ public:
 
     inline const std::u16string& getText() const { return m_strText; }
     inline void setText(const std::u16string& strText) { m_strText = strText; }
+    inline void setText(const std::string& strText) { m_strText = std::u16string(strText.begin(), strText.end()); }
 
     inline const float getFontSize() const { return m_fFontSize; }
     inline void setFontSize(float fFontSize) { m_fFontSize = fFontSize; }

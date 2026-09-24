@@ -17,7 +17,12 @@ public:
 
     float getLength() const;
 
+    const std::string& getFilePath() const { return m_strFilePath; }
+    const std::string getFileName() const { return m_strFilePath.substr(m_strFilePath.find_last_of("/\\") + 1); }
+
 private:
     SoLoud::Wav* m_pAudioClip = nullptr;
     bool m_bLoaded = false;
+
+    std::string m_strFilePath;
 };
