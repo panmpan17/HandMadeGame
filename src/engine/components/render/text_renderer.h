@@ -52,7 +52,7 @@ private:
     const ShaderUniformHandle* m_pSizeHandle = nullptr;
 
     std::u16string m_strText;
-    float m_fFontSize = 1.f;
+    float m_fFontSize = 32.f;
 
     void bindVertexArray(Shader* const pShader);
 

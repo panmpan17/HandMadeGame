@@ -2,6 +2,7 @@
 
 #include <linmath.h>
 
+#include "ui_raycastable.h"
 #include "../drawable_interface.h"
 #include "../../render/gl_macro.h"
 // #include "../../render/shader.h"
@@ -34,7 +35,7 @@ enum Sprite9Slice_SizeCompensateMode
     EDGE2 = 3,
 };
 
-class Sprite9Slice : public IDrawable
+class Sprite9Slice : public IDrawable, public IUIRaycastable, public IColorable
 {
 public:
     Sprite9Slice() {}
@@ -49,8 +50,8 @@ public:
 
     bool getIsTransparent() const override { return true; }
 
-    float getWidth() const { return m_fWidth; }
-    float getHeight() const { return m_fHeight; }
+    float getWidth() const override { return m_fWidth; }
+    float getHeight() const override { return m_fHeight; }
     void setSize(float fWidth, float fHeight)
     {
         m_fWidth = fWidth;
@@ -58,8 +59,8 @@ public:
         m_bBufferDirty = true;
     }
 
-    void setColor(const Color& color) { m_color = color; }
-    const Color& getColor() const { return m_color; }
+    void setColor(const Color& color) override { m_color = color; }
+    const Color& getColor() const override { return m_color; }
 
     void setWidthCompensateMode(Sprite9Slice_SizeCompensateMode eMode) { m_eWidthCompensateMode = eMode; m_bBufferDirty = true; }
     void setHeightCompensateMode(Sprite9Slice_SizeCompensateMode eMode) { m_eHeightCompensateMode = eMode; m_bBufferDirty = true; }

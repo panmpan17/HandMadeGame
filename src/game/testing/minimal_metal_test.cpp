@@ -192,7 +192,8 @@ void sprite9SliceTest()
         pSprite9SliceNode->addComponent(pSprite9Slice);
 
         UIButton* pButton = new UIButton();
-        pButton->setSprite9Slice(pSprite9Slice);
+        pButton->setRaycastable(pSprite9Slice);
+        pButton->setColorable(pSprite9Slice);
         pSprite9SliceNode->addComponent(pButton);
         pRaycastController->registerRaycastable(pButton);
         pButton->registerOnClick([pSprite9SliceNode]() {

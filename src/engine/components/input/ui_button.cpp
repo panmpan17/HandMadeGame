@@ -2,7 +2,8 @@
 
 #include "../../core/scene/node.h"
 #include "../../core/debug_macro.h"
-#include "../render/sprite_9slice.h"
+#include "../render/ui_raycastable.h"
+#include "../drawable_interface.h"
 
 
 UIButton::UIButton()
@@ -23,9 +24,9 @@ void UIButton::update(float fDeltaTime)
 void UIButton::getWorldBounds(Vector3& outTopLeft, Vector3& outBottomRight) const
 {
     Node* pNode = getNode();
-    if (m_pSprite9Slice) {
-        float fWidth = m_pSprite9Slice->getWidth();
-        float fHeight = m_pSprite9Slice->getHeight();
+    if (m_pRaycastable) {
+        float fWidth = m_pRaycastable->getWidth();
+        float fHeight = m_pRaycastable->getHeight();
         outTopLeft = pNode->transformPoint(Vector3(-fWidth / 2.0f, fHeight / 2.0f, 0));
         outBottomRight = pNode->transformPoint(Vector3(fWidth / 2.0f, -fHeight / 2.0f, 0));
     }
@@ -40,9 +41,9 @@ void UIButton::onMouseEnter()
 {
     m_bMouseHover = true;
 
-    if (m_pSprite9Slice)
+    if (m_pColorable)
     {
-        m_pSprite9Slice->setColor(m_bMouseDown ? m_clickColor : m_hoverColor);
+        m_pColorable->setColor(m_bMouseDown ? m_clickColor : m_hoverColor);
     }
 }
 
@@ -50,26 +51,26 @@ void UIButton::onMouseExit()
 {
     m_bMouseHover = false;
 
-    if (m_pSprite9Slice)
+    if (m_pColorable)
     {
-        m_pSprite9Slice->setColor(m_normalColor);
+        m_pColorable->setColor(m_normalColor);
     }
 }
 
 void UIButton::onMouseDown()
 {
-    if (m_pSprite9Slice)
+    if (m_pColorable)
     {
-        m_pSprite9Slice->setColor(m_clickColor);
+        m_pColorable->setColor(m_clickColor);
     }
     m_bMouseDown = true;
 }
 
 void UIButton::onMouseUp()
 {
-    if (m_pSprite9Slice)
+    if (m_pColorable)
     {
-        m_pSprite9Slice->setColor(m_bMouseHover ? m_hoverColor : m_normalColor);
+        m_pColorable->setColor(m_bMouseHover ? m_hoverColor : m_normalColor);
     }
     m_bMouseDown = false;
 }

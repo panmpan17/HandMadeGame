@@ -80,7 +80,7 @@ void TextRenderer::draw()
         glUniform1i(m_pTextureHandle->m_nLocation, 0);
         glActiveTexture(GL_TEXTURE0);
 
-        float fScale = 1.f / 64.f;
+        float fScale = m_fFontSize / 2048;
         float fXOffset = 0.f;
         
         for (int i = 0; i < m_strText.size(); i++)

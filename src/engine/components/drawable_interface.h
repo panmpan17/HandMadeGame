@@ -3,6 +3,7 @@
 #include <memory>
 #include "../components/component.h"
 #include "../render/material.h"
+#include "../core/math/color.h"
 
 
 class Shader;
@@ -36,3 +37,9 @@ protected:
     std::shared_ptr<Material> m_pMaterial = nullptr;
 };
 
+class IColorable
+{
+public:
+    virtual void setColor(const Color& color) = 0;
+    virtual const Color& getColor() const = 0;
+};

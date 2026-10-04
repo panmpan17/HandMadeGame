@@ -6,7 +6,8 @@
 #include "../../core/math/color.h"
 
 
-class Sprite9Slice;
+class IUIRaycastable;
+class IColorable;
 
 
 class UIButton : public NodeComponent, public IGraphicRaycastable
@@ -28,8 +29,11 @@ public:
     virtual void onMouseUp() override;
     virtual void onMouseClick() override;
 
-    void setSprite9Slice(Sprite9Slice* pSprite9Slice) { m_pSprite9Slice = pSprite9Slice; }
-    Sprite9Slice* getSprite9Slice() const { return m_pSprite9Slice; }
+    void setRaycastable(IUIRaycastable* pSprite9Slice) { m_pRaycastable = pSprite9Slice; }
+    IUIRaycastable* getRaycastable() const { return m_pRaycastable; }
+
+    void setColorable(IColorable* pColorable) { m_pColorable = pColorable; }
+    IColorable* getColorable() const { return m_pColorable; }
 
     std::size_t registerOnClick(const std::function<void()>& listener) { return m_onClick.add(listener); }
     void unregisterOnClick(std::size_t nHandle) { m_onClick.remove(nHandle); }
@@ -42,7 +46,8 @@ private:
     bool m_bMouseHover = false;
     bool m_bMouseDown = false;
 
-    Sprite9Slice* m_pSprite9Slice = nullptr;
+    IUIRaycastable* m_pRaycastable = nullptr;
+    IColorable* m_pColorable = nullptr;
 
     VoidEvent m_onClick;
 };
